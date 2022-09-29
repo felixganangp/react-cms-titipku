@@ -1,5 +1,10 @@
 import React from 'react';
 
-const NotFound: React.FC = () => <div>NotFound</div>;
+const NotFound: React.FC = () => {
+  return (
+    <div>NotFound<span>gimana</span></div>
+    
+  );
+}
 
 export default NotFound;

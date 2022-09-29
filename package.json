@@ -15,15 +15,7 @@
     "lint:staged": "lint-staged"
   },
   "lint-staged": {
-    "*.js": [
-      "yarn run lint:eslint:fix",
-      "git add --force"
-    ],
-    "*.ts": [
-      "yarn run lint:eslint:fix",
-      "git add --force"
-    ],
-    "*.tsx": [
+    "*.{js, ts, tsx}": [
       "yarn run lint:eslint:fix",
       "git add --force"
     ],
