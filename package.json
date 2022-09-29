@@ -19,6 +19,14 @@
       "npm run lint:eslint:fix",
       "git add --force"
     ],
+    "*.ts": [
+      "npm run lint:eslint:fix",
+      "git add --force"
+    ],
+    "*.tsx": [
+      "npm run lint:eslint:fix",
+      "git add --force"
+    ],
     "*.json": [
       "prettier --write",
       "git add --force"
