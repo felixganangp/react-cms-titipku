@@ -1,3 +1,11 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
+const fs = require('fs');
+const path = require('path');
+
+const prettierOptions = JSON.parse(
+  fs.readFileSync(path.resolve(__dirname, '.prettierrc'), 'utf8'),
+);
+
 module.exports = {
   env: {
     browser: true,
@@ -20,6 +28,7 @@ module.exports = {
   },
   plugins: ['react', '@typescript-eslint', 'prettier'],
   rules: {
+    'prettier/prettier': ['error', prettierOptions],
     'react/function-component-definition': 0,
   },
 };
