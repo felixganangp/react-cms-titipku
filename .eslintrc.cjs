@@ -30,5 +30,6 @@ module.exports = {
   rules: {
     'prettier/prettier': ['error', prettierOptions],
     'react/function-component-definition': 0,
+    'react/no-array-index-key': 0,
   },
 };
