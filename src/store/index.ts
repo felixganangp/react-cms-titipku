@@ -1,16 +1,20 @@
-import { Action, combineReducers, configureStore, ThunkAction } from '@reduxjs/toolkit';
+import {
+  Action,
+  combineReducers,
+  configureStore,
+  ThunkAction,
+} from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
 
-const rootReducer = combineReducers({
-    
-})
-const sagaMiddleware = createSagaMiddleware()
+const rootReducer = combineReducers({});
+const sagaMiddleware = createSagaMiddleware();
 
 export const store = configureStore({
-    reducer: rootReducer,
-    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(sagaMiddleware),
-    devTools: import.meta.env.DEV
-})
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(sagaMiddleware),
+  devTools: import.meta.env.DEV,
+});
 
 // sagaMiddleware.run(rootSaga)
 

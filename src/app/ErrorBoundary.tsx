@@ -1,5 +1,5 @@
-import { Container, Typography } from "@mui/material";
-import * as React from "react";
+import { Container, Typography } from '@mui/material';
+import * as React from 'react';
 
 /**
  * An error screen that will be used as a fallback UI.
@@ -11,6 +11,7 @@ export default class ErrorBoundary extends React.Component<Props> {
     return { error };
   }
 
+  // eslint-disable-next-line react/state-in-constructor
   override state: State = { error: undefined };
 
   override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
@@ -26,15 +27,15 @@ export default class ErrorBoundary extends React.Component<Props> {
     }
 
     return (
-      <Container sx={{ marginTop: "43vh" }}>
+      <Container sx={{ marginTop: '43vh' }}>
         <Container maxWidth="sm">
           <Typography
             variant="h1"
             align="center"
             sx={{
-              fontSize: "2em",
+              fontSize: '2em',
               fontWeight: 300,
-              "& strong": {
+              '& strong': {
                 fontWeight: 400,
               },
             }}

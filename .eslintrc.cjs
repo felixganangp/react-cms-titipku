@@ -31,5 +31,6 @@ module.exports = {
     'prettier/prettier': ['error', prettierOptions],
     'react/function-component-definition': 0,
     'react/no-array-index-key': 0,
+    'react/destructuring-assignment': 0,
   },
 };

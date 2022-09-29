@@ -1,9 +1,9 @@
-import { createTheme } from "@mui/material/styles";
-import * as typography from "./typography";
-import palettes from "./pallets";
-import components from "./components";
+import { createTheme } from '@mui/material/styles';
+import * as typography from './typography';
+import palettes from './pallets';
+import components from './components';
 
-const { palette } = createTheme({ palette: palettes["light"] });
+const { palette } = createTheme({ palette: palettes.light });
 const mainTheme = createTheme(
   {
     palette,
@@ -12,7 +12,7 @@ const mainTheme = createTheme(
   },
   {
     typography: typography.overrides,
-  }
+  },
 );
 
 export default mainTheme;

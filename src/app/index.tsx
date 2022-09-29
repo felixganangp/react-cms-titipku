@@ -1,10 +1,10 @@
-import React from "react";
-import Theme from "theme";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+import React from 'react';
+import Theme from 'theme';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 
-import ErrorBoundary from "./ErrorBoundary";
-import Router from "./Router";
+import ErrorBoundary from './ErrorBoundary';
+import Router from './Router';
 
 export default function index() {
   // console.log(import.meta.env.DEV)

@@ -1,20 +1,20 @@
-import { lazy } from "react";
+import { lazy } from 'react';
 
-const Home = lazy(() => import("pages/Home"));
-const NotFound = lazy(() => import("pages/NotFound"));
+const Home = lazy(() => import('pages/Home'));
+const NotFound = lazy(() => import('pages/NotFound'));
 
 const ListRoute = [
   {
     comp: Home,
-    path: "/",
+    path: '/',
     index: true,
-    auth: "Public",
+    auth: 'Public',
   },
   {
     comp: NotFound,
-    path: "*",
+    path: '*',
     index: false,
-    auth: "Public",
+    auth: 'Public',
   },
 ];
 
