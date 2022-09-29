@@ -17,11 +17,11 @@
   "lint-staged": {
     "*.js": [
       "npm run lint:eslint:fix",
-      "git add"
+      "git add --force"
     ],
     "*.json": [
       "prettier --write",
-      "git add "
+      "git add --force"
     ]
   },
   "pre-commit": "lint:staged",
@@ -54,9 +54,10 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
+    "lint-staged": "^13.0.3",
+    "pre-commit": "^1.2.2",
     "prettier": "^2.7.1",
     "typescript": "^4.6.4",
-    "lint-staged": "^13.0.3",
     "vite": "^3.0.7",
     "vite-tsconfig-paths": "^3.5.0"
   }
