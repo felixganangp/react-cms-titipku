@@ -17,11 +17,11 @@
   "lint-staged": {
     "*.js": [
       "npm run lint:eslint:fix",
-      "git add --force"
+      "git add"
     ],
     "*.json": [
       "prettier --write",
-      "git add --force"
+      "git add "
     ]
   },
   "pre-commit": "lint:staged",
