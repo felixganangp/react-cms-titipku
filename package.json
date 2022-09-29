@@ -7,24 +7,24 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "npm run lint:js && npm run lint:css",
+    "lint": "yarn run lint:js && yarn run lint:css",
     "lint:css": "stylelint app/**/*.js",
     "lint:eslint": "eslint --ignore-path .gitignore",
     "lint:eslint:fix": "eslint --ignore-path .gitignore --fix",
-    "lint:js": "npm run lint:eslint -- . ",
+    "lint:js": "yarn run lint:eslint -- . ",
     "lint:staged": "lint-staged"
   },
   "lint-staged": {
     "*.js": [
-      "npm run lint:eslint:fix",
+      "yarn run lint:eslint:fix",
       "git add --force"
     ],
     "*.ts": [
-      "npm run lint:eslint:fix",
+      "yarn run lint:eslint:fix",
       "git add --force"
     ],
     "*.tsx": [
-      "npm run lint:eslint:fix",
+      "yarn run lint:eslint:fix",
       "git add --force"
     ],
     "*.json": [
