@@ -17,7 +17,7 @@ const initialState: UIState = {
   },
 };
 const uiSlice = createSlice({
-  name: 'city',
+  name: 'ui',
   initialState,
   reducers: {
     openToast(state: UIState, action: PayloadAction<ToastProsp>) {
@@ -28,12 +28,10 @@ const uiSlice = createSlice({
       };
     },
     closeToast(state: UIState) {
-      state.toast = {
-        ...state.toast,
-        open: false,
-        deleted: false,
-        severity: 'success',
-      };
+      state.toast.open = false;
+    },
+    clearToast(state: UIState) {
+      state.toast = initialState.toast;
     },
   },
 });

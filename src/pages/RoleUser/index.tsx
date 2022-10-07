@@ -14,19 +14,25 @@ import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
 
-import { useAppDispatch } from 'store/hooks';
-import { uiAction } from 'store/slice/ui';
+import useToast from 'hooks/useToast';
 
 export default function RoleUser() {
-  const dispatch = useAppDispatch();
+  const toast = useToast();
 
   const callToastExample = () => {
-    dispatch(
-      uiAction.openToast({
-        headMsg: 'hi',
-        severity: 'success',
-      }),
-    );
+    toast.openToast({
+      headMsg: 'Succecc Delete',
+      deleted: true,
+      severity: 'success',
+    });
+  };
+
+  const callAnotherTypeToast = () => {
+    toast.openToast({
+      headMsg: 'Upload failde',
+      message: 'please connect api first',
+      severity: 'error',
+    });
   };
 
   const headCell = [
@@ -76,6 +82,7 @@ export default function RoleUser() {
                     boxShadow: '0 3px 8px 0 rgba(0, 0, 0, 0.1)',
                     border: 'solid 1px #ebeff3',
                   }}
+                  onClick={callAnotherTypeToast}
                 >
                   <SimCardDownloadOutlinedIcon />
                 </IconButton>

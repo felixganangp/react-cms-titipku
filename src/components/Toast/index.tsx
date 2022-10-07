@@ -23,7 +23,7 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 export interface ToastProsp {
   open?: boolean;
   duration?: number;
-  severity: AlertColor;
+  severity?: AlertColor;
   headMsg: string;
   message?: string;
   deleted?: boolean;
@@ -112,5 +112,6 @@ Toast.defaultProps = {
   duration: 3000,
   message: '',
   deleted: false,
+  severity: 'success',
 };
 export default Toast;
