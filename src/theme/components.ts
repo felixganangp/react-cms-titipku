@@ -20,6 +20,7 @@ const components = (palette: Palette): ThemeOptions['components'] => ({
     defaultProps: {
       disableElevation: true,
       size: 'medium',
+      variant: 'contained',
     },
   },
 
@@ -40,6 +41,16 @@ const components = (palette: Palette): ThemeOptions['components'] => ({
   MuiAutocomplete: {
     defaultProps: {
       color: 'primary',
+    },
+  },
+
+  MuiCard: {
+    defaultProps: {
+      sx: {
+        boxShadow: '0 3px 10px 0 rgba(0, 0, 0, 0.1)',
+        p: '15px',
+        borderRadius: '5px',
+      },
     },
   },
 });

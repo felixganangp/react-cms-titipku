@@ -32,14 +32,17 @@
     "@mui/material": "^5.10.0",
     "@reduxjs/toolkit": "^1.8.4",
     "connected-react-router": "^6.9.3",
+    "formik": "^2.2.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.2",
     "react-router-dom": "^6.3.0",
     "redux": "^4.2.0",
-    "redux-saga": "^1.2.0"
+    "redux-saga": "^1.2.0",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@types/node": "^18.8.2",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@typescript-eslint/eslint-plugin": "^5.38.1",

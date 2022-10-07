@@ -3,6 +3,7 @@ import { lazy } from 'react';
 const Home = lazy(() => import('pages/Home'));
 const NotFound = lazy(() => import('pages/NotFound'));
 const Login = lazy(() => import('pages/Auth/login'));
+const RoleUser = lazy(() => import('pages/RoleUser'));
 
 const ListRoute = [
   {
@@ -14,6 +15,12 @@ const ListRoute = [
   {
     comp: Login,
     path: '/sign-in',
+    index: true,
+    auth: 'Public',
+  },
+  {
+    comp: RoleUser,
+    path: '/role-user',
     index: true,
     auth: 'Public',
   },
