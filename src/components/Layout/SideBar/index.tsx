@@ -10,7 +10,7 @@ import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import SideBarProfile from './Profile';
-import SubMenu from './SubMenu';
+import Menu from './Menu';
 
 interface SideBarProps {
   open: boolean;
@@ -38,104 +38,104 @@ function SideBar(props: SideBarProps) {
     {
       id: 1,
       title: 'User',
-      path: '/cms/user',
+      path: '/user',
       icon: <PeopleIcon />,
       subNav: [
-        {
-          id: 12,
-          title: 'Child User',
-          path: '/cms/child-user',
-        },
+        // {
+        //   id: 12,
+        //   title: 'Child User',
+        //   path: '/child-user',
+        // },
       ],
     },
     {
       id: 2,
       title: 'Jatiper',
-      path: '/cms/jatiper',
+      path: '/jatiper',
       icon: <PersonIcon />,
       subNav: [
         {
           id: 13,
           title: 'Child Jatiper',
-          path: '/cms/child-jatiper',
+          path: '/child-jatiper',
         },
       ],
     },
     {
       id: 3,
       title: 'Lapak',
-      path: '/cms/lapak',
+      path: '/lapak',
       icon: <StoreIcon />,
       subNav: [
         {
           id: 14,
           title: 'Child Lapak',
-          path: '/cms/child-lapak',
+          path: '/child-lapak',
         },
       ],
     },
     {
       id: 4,
       title: 'Product',
-      path: '/cms/product',
+      path: '/product',
       icon: <StoreIcon />,
       subNav: [
         {
           id: 15,
           title: 'Child Product',
-          path: '/cms/child-product',
+          path: '/child-product',
         },
       ],
     },
     {
       id: 5,
       title: 'Transaction',
-      path: '/cms/transaction',
+      path: '/transaction',
       icon: <StoreIcon />,
       subNav: [
         {
           id: 16,
           title: 'Child Transaction',
-          path: '/cms/child-transaction',
+          path: '/child-transaction',
         },
       ],
     },
     {
       id: 6,
       title: 'Application',
-      path: '/cms/application',
+      path: '/application',
       icon: <PhonelinkSetupIcon />,
       subNav: [
         {
           id: 17,
           title: 'Child Application',
-          path: '/cms/child-appl',
+          path: '/child-appl',
         },
       ],
     },
     {
       id: 7,
       title: 'Promo & Voucher',
-      path: '/cms/promo-voucher',
+      path: '/promo-voucher',
       icon: <ConfirmationNumberIcon />,
       subNav: [
         {
           id: 18,
           title: 'Child Promo',
-          path: '/cms/child-promo',
+          path: '/child-promo',
         },
       ],
     },
     {
       id: 8,
       title: 'Service & Request',
-      path: '/cms/service-request',
+      path: '/service-request',
       icon: <HeadsetMicIcon />,
       subNav: [
         {
           id: 19,
           title: 'Child Service',
-          path: '/cms/child-service',
+          path: '/child-service',
         },
       ],
     },
@@ -148,12 +148,12 @@ function SideBar(props: SideBarProps) {
         {
           id: 10,
           title: 'Role User',
-          path: '/cms/role-user',
+          path: '/role-user',
         },
         {
           id: 11,
           title: 'Role Management',
-          path: '/cms/role-management',
+          path: '/role-management',
         },
       ],
     },
@@ -174,7 +174,7 @@ function SideBar(props: SideBarProps) {
       >
         <SideBarProfile value={profileData} />
       </Box>
-      <SubMenu value={sidebarData} />
+      <Menu listOfMenu={sidebarData} open={open} />
     </>
   );
 
