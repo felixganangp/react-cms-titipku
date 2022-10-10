@@ -5,8 +5,10 @@ import {
   ThunkAction,
 } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
+import reducers from './reducers';
+import rootSaga from './saga';
 
-const rootReducer = combineReducers({});
+const rootReducer = combineReducers(reducers);
 const sagaMiddleware = createSagaMiddleware();
 
 export const store = configureStore({
@@ -16,7 +18,7 @@ export const store = configureStore({
   devTools: import.meta.env.DEV,
 });
 
-// sagaMiddleware.run(rootSaga)
+sagaMiddleware.run(rootSaga);
 
 export type AppDispatch = typeof store.dispatch;
 export type RootState = ReturnType<typeof store.getState>;

@@ -11,7 +11,7 @@ export const light: PaletteOptions = {
   },
 
   background: {
-    default: 'rgb(240,242,245)',
+    default: '#f5f7fa',
   },
 
   example: {

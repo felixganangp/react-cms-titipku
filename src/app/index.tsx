@@ -1,19 +1,26 @@
 import React from 'react';
-import Theme from 'theme';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
+
+import Toast from 'components/Toast';
+import useToast from 'hooks/useToast';
 
 import ErrorBoundary from './ErrorBoundary';
 import Router from './Router';
 
-export default function index() {
-  // console.log(import.meta.env.DEV)
+export default function App() {
+  const { state, closeToast } = useToast();
+
   return (
-    <ThemeProvider theme={Theme}>
-      <CssBaseline />
-      <ErrorBoundary>
-        <Router />
-      </ErrorBoundary>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <Router />
+      <Toast
+        open={state.open}
+        headMsg={state.headMsg}
+        message={state.message}
+        severity={state.severity}
+        deleted={state.deleted}
+        duration={state.duration}
+        handleClose={closeToast}
+      />
+    </ErrorBoundary>
   );
 }
