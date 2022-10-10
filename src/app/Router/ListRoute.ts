@@ -14,12 +14,6 @@ const ListRoute = [
     auth: 'Public',
   },
   {
-    comp: Layout,
-    path: '/layout',
-    index: true,
-    auth: 'Public',
-  },
-  {
     comp: Login,
     path: '/sign-in',
     index: true,

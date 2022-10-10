@@ -50,7 +50,7 @@ function SideBarProfile(props: ProfileProps) {
       <Box
         sx={{
           display: 'flex',
-          marginRight: '18px',
+          marginRight: '10px',
           paddingLeft: '0px',
           alignItems: 'center',
           alignContent: 'center',
@@ -61,14 +61,18 @@ function SideBarProfile(props: ProfileProps) {
             overlap="circular"
             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             variant="standard"
+            sx={{
+              '& .MuiAvatar-root': {
+                backgroundColor: 'transparent',
+              },
+            }}
           >
             <Avatar>
               <PersonIcon
                 sx={{
-                  backgroundColor: '#ffff',
+                  backgroundColor: '#626b79',
                   borderRadius: '50%',
-                  border: '2px white solid',
-                  color: '#000',
+                  color: '#ffff',
                   width: '32px',
                   height: '32px',
                 }}
@@ -87,7 +91,6 @@ function SideBarProfile(props: ProfileProps) {
             lineHeight: 'inherit',
             fontWeight: 500,
             fontSize: '14px',
-            // fontFamily: 'Roboto',
             color: '#192a3e',
           }}
         >
@@ -102,7 +105,6 @@ function SideBarProfile(props: ProfileProps) {
             lineHeight: 'inherit',
             color: '#8b95a5',
             fontSize: '12px',
-            // fontFamily: 'Poppins',
           }}
         >
           {value.email}
