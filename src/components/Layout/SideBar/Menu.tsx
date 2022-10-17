@@ -23,10 +23,17 @@ interface MenuProps {
     title: string;
     path: string;
     icon: any;
-    subNav: {
+    child: {
       id: number;
       path: string;
       title: string;
+      child:
+        | {
+            id: number;
+            path: string;
+            title: string;
+          }[]
+        | [];
     }[];
   }[];
   open: boolean;
@@ -47,7 +54,7 @@ function Menu(props: MenuProps) {
   return (
     <List dense>
       {listOfMenu?.map((menu) =>
-        menu?.subNav?.length === 0 ? (
+        menu?.child?.length === 0 ? (
           <Link key={menu.id} style={{ textDecoration: 'none' }} to={menu.path}>
             <ListItemButton
               sx={{
@@ -78,9 +85,9 @@ function Menu(props: MenuProps) {
               />
               {
                 // eslint-disable-next-line no-nested-ternary
-                menu.subNav.length > 0 && openList !== menu.id
+                menu.child.length > 0 && openList !== menu.id
                   ? iconOpened
-                  : menu.subNav.length > 0 && openList === menu.id
+                  : menu.child.length > 0 && openList === menu.id
                   ? iconClosed
                   : null
               }
@@ -98,7 +105,7 @@ function Menu(props: MenuProps) {
                 borderRadius: '8px',
               }}
               onClick={() =>
-                menu.subNav.length === 0 ? (
+                menu.child.length === 0 ? (
                   <Link to={menu.path} />
                 ) : (
                   toggleOpenList(menu)
@@ -120,16 +127,15 @@ function Menu(props: MenuProps) {
                   overflowX: 'hidden',
                   color: '#626b79',
                   fontSize: '14px',
-                  fontFamily: 'Roboto-Regular',
                   whiteSpace: 'nowrap',
                   minWidth: '126px',
                 }}
               />
               {
                 // eslint-disable-next-line no-nested-ternary
-                menu.subNav.length > 0 && openList !== menu.id
+                menu.child.length > 0 && openList !== menu.id
                   ? iconOpened
-                  : menu.subNav.length > 0 && openList === menu.id
+                  : menu.child.length > 0 && openList === menu.id
                   ? iconClosed
                   : null
               }
@@ -141,7 +147,7 @@ function Menu(props: MenuProps) {
                   marginLeft: '0px',
                 }}
               >
-                <ChildMenu key={menu.id} subNav={menu.subNav} />
+                <ChildMenu key={menu.id} child={menu.child} open={open} />
               </Box>
             </Collapse>
           </>

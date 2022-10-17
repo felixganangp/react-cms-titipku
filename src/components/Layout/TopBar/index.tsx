@@ -88,7 +88,15 @@ const TopBar = (props: TopBarInterface) => {
         }}
         position="static"
       >
-        <Container maxWidth="xl">
+        <Container
+          maxWidth="xl"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            maxWidth: 'inherit',
+          }}
+        >
           <Toolbar disableGutters>
             <Box sx={{ flexGrow: 1 }}>
               <SideBarHeader open={open} onLogoClick={onLogoClick} />

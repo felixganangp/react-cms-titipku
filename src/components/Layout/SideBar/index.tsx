@@ -38,104 +38,205 @@ function SideBar(props: SideBarProps) {
     {
       id: 1,
       title: 'User',
-      path: '/user',
+      path: '',
       icon: <PeopleIcon />,
-      subNav: [
-        // {
-        //   id: 12,
-        //   title: 'Child User',
-        //   path: '/child-user',
-        // },
-      ],
-    },
-    {
-      id: 2,
-      title: 'Jatiper',
-      path: '/jatiper',
-      icon: <PersonIcon />,
-      subNav: [
+      child: [
+        {
+          id: 12,
+          title: 'Nitiper',
+          path: '/nitiper',
+          child: [],
+        },
         {
           id: 13,
-          title: 'Child Jatiper',
-          path: '/child-jatiper',
+          title: 'Jatiper',
+          path: '/jatiper',
+          child: [
+            {
+              id: 13,
+              title: 'Jatiper Management',
+              path: '/jatiper-management',
+            },
+            {
+              id: 13,
+              title: 'Jatiper Registration',
+              path: '/jatiper-registration',
+            },
+          ],
         },
       ],
     },
     {
       id: 3,
       title: 'Lapak',
-      path: '/lapak',
+      path: '',
       icon: <StoreIcon />,
-      subNav: [
+      child: [
         {
           id: 14,
-          title: 'Child Lapak',
-          path: '/child-lapak',
+          title: 'Area',
+          path: '/area',
+          child: [],
+        },
+        {
+          id: 14,
+          title: 'Lapak',
+          path: '/lapak',
+          child: [],
         },
       ],
     },
     {
       id: 4,
-      title: 'Product',
-      path: '/product',
+      title: 'Products',
+      path: '',
       icon: <StoreIcon />,
-      subNav: [
+      child: [
         {
           id: 15,
-          title: 'Child Product',
-          path: '/child-product',
+          title: 'Product Mangement',
+          path: '/product-management',
+          child: [],
+        },
+        {
+          id: 15,
+          title: 'SKU Mangement',
+          path: '/sku-management',
+          child: [],
+        },
+        {
+          id: 15,
+          title: 'Category Mangement',
+          path: '/category-management',
+          child: [],
         },
       ],
     },
     {
       id: 5,
       title: 'Transaction',
-      path: '/transaction',
+      path: '',
       icon: <StoreIcon />,
-      subNav: [
+      child: [
         {
           id: 16,
-          title: 'Child Transaction',
-          path: '/child-transaction',
+          title: 'Transaction',
+          path: '/transaction',
+          child: [],
+        },
+        {
+          id: 16,
+          title: 'Urgent Order',
+          path: '/urgent-order',
+          child: [],
         },
       ],
     },
     {
       id: 6,
       title: 'Application',
-      path: '/application',
+      path: '',
       icon: <PhonelinkSetupIcon />,
-      subNav: [
+      child: [
         {
           id: 17,
-          title: 'Child Application',
-          path: '/child-appl',
+          title: 'Notification',
+          path: '/notification',
+          child: [],
+        },
+        {
+          id: 17,
+          title: 'Banner',
+          path: '/banner',
+          child: [],
+        },
+        {
+          id: 17,
+          title: 'Event',
+          path: '/event',
+          child: [],
+        },
+        {
+          id: 17,
+          title: 'Giveaway',
+          path: '/giveaway',
+          child: [],
         },
       ],
     },
     {
       id: 7,
       title: 'Promo & Voucher',
-      path: '/promo-voucher',
+      path: '',
       icon: <ConfirmationNumberIcon />,
-      subNav: [
+      child: [
         {
           id: 18,
-          title: 'Child Promo',
-          path: '/child-promo',
+          title: 'Promo Product',
+          path: '/promo-product',
+          child: [],
+        },
+        {
+          id: 17,
+          title: 'Join Promo',
+          path: '/join-promo',
+          child: [],
+        },
+        {
+          id: 17,
+          title: 'Voucher',
+          path: '/voucher',
+          child: [],
+        },
+        {
+          id: 17,
+          title: 'Mass Voucher',
+          path: '/mass-voucher',
+          child: [],
+        },
+        {
+          id: 17,
+          title: 'Giveaway',
+          path: '/giveaway',
+          child: [],
         },
       ],
     },
     {
       id: 8,
       title: 'Service & Request',
-      path: '/service-request',
+      path: '',
       icon: <HeadsetMicIcon />,
-      subNav: [
+      child: [
         {
           id: 19,
-          title: 'Child Service',
-          path: '/child-service',
+          title: 'Withdraw Request',
+          path: '/withdraw-request',
+          child: [],
+        },
+        {
+          id: 19,
+          title: 'Join Promo Request',
+          path: '/join-promo-request',
+          child: [],
+        },
+        {
+          id: 19,
+          title: 'New Product Request',
+          path: '/new-product-request',
+          child: [],
+        },
+        {
+          id: 19,
+          title: 'Master Data Config',
+          path: '/master-data-config',
+          child: [],
+        },
+        {
+          id: 19,
+          title: 'App Service',
+          path: '/app-service',
+          child: [],
         },
       ],
     },
@@ -144,16 +245,18 @@ function SideBar(props: SideBarProps) {
       title: 'Admin Panel',
       path: '',
       icon: <PersonIcon />,
-      subNav: [
+      child: [
         {
           id: 10,
           title: 'Role User',
           path: '/role-user',
+          child: [],
         },
         {
           id: 11,
-          title: 'Role Management',
-          path: '/role-management',
+          title: 'Role Access',
+          path: '/role-access',
+          child: [],
         },
       ],
     },

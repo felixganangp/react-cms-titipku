@@ -58,7 +58,7 @@ export const TableWrapper = styled(Box)`
   border-radius: 5px;
   width: 100%;
   height: 100%;
-  background-color: #fafafa;
+  background-color: #ffff;
   box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.1);
 `;
 
@@ -114,17 +114,21 @@ export const TablesProperty = styled(Box)`
 `;
 
 export const Search = styled(TextField)`
-  bgcolor: #fafafa;
+  background-color: #fafafa;
   border: 1px solid #ebeff3;
   width: 560px;
   height: 40px;
 `;
 
-export const DownloadButton = styled(Button)`
-  width: 40px;
-  height: 40px;
-  background-color: #ffff;
-  border: solid 1px #ebeff3;
-  border-radius: 4px;
-  margin-left: 28px;
-`;
+export const DownloadButton = styled(Button)(() => ({
+  width: '40px',
+  height: '40px',
+  backgroundColor: '#ffff',
+  '&:hover': {
+    backgroundColor: '#EBEFF3',
+  },
+  border: 'solid 1px #ebeff3',
+  borderRadius: '4px',
+  marginLeft: '28px',
+  boxShadow: '0 3px 8px 0 rgba(0, 0, 0, 0.1)',
+}));

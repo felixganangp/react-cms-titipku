@@ -1,6 +1,5 @@
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
-import useToast from 'hooks/useToast';
 import React from 'react';
 import Grid from '@mui/material/Grid';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -258,7 +257,6 @@ const listOfMenu = [
 
 export default function RoleUserDetails(props: RoleUserDetailsProps) {
   const { id } = props;
-  const toast = useToast();
 
   const contentOfTable = [
     {
