@@ -5,7 +5,14 @@ const NotFound = lazy(() => import('pages/NotFound'));
 const Login = lazy(() => import('pages/Auth/login'));
 const RoleUser = lazy(() => import('pages/RoleUser'));
 
-const ListRoute = [
+interface RouteProps {
+  path: string;
+  index: boolean;
+  comp: React.LazyExoticComponent<() => JSX.Element>;
+  auth: string;
+}
+
+const ListRoute: RouteProps[] = [
   {
     comp: Home,
     path: '/',
@@ -22,7 +29,7 @@ const ListRoute = [
     comp: RoleUser,
     path: '/role-user',
     index: true,
-    auth: 'Public',
+    auth: 'Private',
   },
   {
     comp: NotFound,

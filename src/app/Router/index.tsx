@@ -1,6 +1,7 @@
 import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import ListRoute from './ListRoute';
+import PrivateRoute from './PrivateRoute';
 
 export default function IndexRoute() {
   return (
@@ -11,9 +12,17 @@ export default function IndexRoute() {
           path={val.path}
           key={index}
           element={
-            <Suspense>
-              <val.comp />
-            </Suspense>
+            val.auth === 'Private' ? (
+              <PrivateRoute redirect="/">
+                <Suspense>
+                  <val.comp />
+                </Suspense>
+              </PrivateRoute>
+            ) : (
+              <Suspense>
+                <val.comp />
+              </Suspense>
+            )
           }
         />
       ))}

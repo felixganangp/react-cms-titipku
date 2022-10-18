@@ -8,16 +8,22 @@ import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 
 import Table from 'components/Table';
+import useToast from 'hooks/useToast';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { roleUserAction } from 'store/slice/RoleUser';
 
 import AddIcon from '@mui/icons-material/Add';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
 
-import useToast from 'hooks/useToast';
-
 export default function RoleUser() {
   const toast = useToast();
+  const dispatch = useAppDispatch();
+
+  React.useEffect(() => {
+    dispatch(roleUserAction.fetchData());
+  }, []);
 
   const callToastExample = () => {
     toast.openToast({
@@ -33,6 +39,14 @@ export default function RoleUser() {
       message: 'please connect api first',
       severity: 'error',
     });
+  };
+
+  const handleAddData = () => {
+    dispatch(
+      roleUserAction.addRoleUser({
+        username: 'Hi',
+      }),
+    );
   };
 
   const headCell = [
@@ -60,7 +74,7 @@ export default function RoleUser() {
           <Grid item xs={12}>
             <Card>
               <Box display="flex" gap="20px" flexWrap="wrap">
-                <Button startIcon={<AddIcon />} onClick={callToastExample}>
+                <Button startIcon={<AddIcon />} onClick={handleAddData}>
                   Add New
                 </Button>
                 <TextField
