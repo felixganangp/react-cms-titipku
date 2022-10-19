@@ -9,7 +9,7 @@ import Checkbox from '@mui/material/Checkbox';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import Table from '../../../components/Table';
-import AccordionOnDetails from '../../../components/Accordion/AccordionOnDetails';
+import AccordionOnDetails from '../../../components/Accordion/Details';
 import FileDownload from '../../../assets/file-download-outline.svg';
 import {
   TitleWrapper,
