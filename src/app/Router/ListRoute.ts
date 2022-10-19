@@ -4,6 +4,8 @@ const Home = lazy(() => import('pages/Home'));
 const NotFound = lazy(() => import('pages/NotFound'));
 const Login = lazy(() => import('pages/Auth/login'));
 const RoleUser = lazy(() => import('pages/RoleUser'));
+const RoleAccess = lazy(() => import('pages/RoleAccess'));
+const RoleAccessDetails = lazy(() => import('pages/RoleAccess/Details'));
 
 const ListRoute = [
   {
@@ -21,6 +23,18 @@ const ListRoute = [
   {
     comp: RoleUser,
     path: '/role-user',
+    index: true,
+    auth: 'Public',
+  },
+  {
+    comp: RoleAccess,
+    path: '/role-access',
+    index: true,
+    auth: 'Public',
+  },
+  {
+    comp: RoleAccessDetails,
+    path: '/role-access-details',
     index: true,
     auth: 'Public',
   },
