@@ -1,0 +1,132 @@
+import React, { useState } from 'react';
+import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import useToast from 'hooks/useToast';
+import FormLabel from 'components/FormLabel';
+
+const initial = {
+  name: '',
+  email: '',
+  roleAccess: null,
+};
+
+export default function Form() {
+  const [initialValues, setInitialValues] = useState(initial);
+
+  const toast = useToast();
+  const formik = useFormik({
+    initialValues,
+    onSubmit: async (value) => {
+      try {
+        toast.openToast({
+          headMsg: 'Success',
+          message: 'please connect api first',
+          severity: 'success',
+        });
+      } catch (error) {
+        toast.openToast({
+          headMsg: 'Failed',
+          message: 'please connect api first',
+          severity: 'error',
+        });
+      }
+    },
+    validationSchema: yup.object({
+      name: yup.string().required('Name is required'),
+      email: yup.string().required('Name is required'),
+      roleAccess: yup.string().required('Name is required'),
+    }),
+    enableReinitialize: true,
+  });
+
+  const {
+    handleSubmit,
+    values,
+    handleBlur,
+    handleChange,
+    errors,
+    touched,
+    setFieldValue,
+    isValid,
+  } = formik;
+  return (
+    <Box>
+      <form onSubmit={handleSubmit}>
+        <FormLabel
+          text="Name"
+          error={touched.name && Boolean(errors.name)}
+          helperText={touched.name && errors.name && `${errors.name}`}
+        >
+          <TextField
+            type="text"
+            name="name"
+            placeholder="Input Category name"
+            value={values.name}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            fullWidth
+          />
+        </FormLabel>
+        <FormLabel
+          text="Email"
+          error={touched.email && Boolean(errors.email)}
+          helperText={touched.email && errors.email && `${errors.email}`}
+        >
+          <TextField
+            type="text"
+            name="email"
+            placeholder="Input Category name"
+            value={values.email}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            fullWidth
+          />
+        </FormLabel>
+        <FormLabel
+          text="Role Access"
+          error={touched.roleAccess && Boolean(errors.roleAccess)}
+          helperText={
+            touched.roleAccess && errors.roleAccess && `${errors.roleAccess}`
+          }
+        >
+          <Autocomplete
+            id="role"
+            options={[]}
+            onChange={(e, value) => {
+              setFieldValue('roleAccess', value);
+            }}
+            isOptionEqualToValue={(option) => option === values.roleAccess}
+            getOptionLabel={(option) => `${option}`}
+            value={values.roleAccess}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                name="roleAccess"
+                onBlur={handleBlur}
+                placeholder="Select Role Access"
+              />
+            )}
+          />
+        </FormLabel>
+        <Box
+          width="100%"
+          display="flex"
+          gap="10px"
+          justifyContent="end"
+          mt="50px"
+        >
+          <Button variant="text" color="error">
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isValid}>
+            Add
+          </Button>
+        </Box>
+      </form>
+    </Box>
+  );
+}

@@ -8,32 +8,28 @@ import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 
 import Table from 'components/Table';
+import Modal from 'components/Modal';
+import useToast from 'hooks/useToast';
+import useModal from 'hooks/useModal';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { roleUserAction } from 'store/slice/RoleUser';
 
 import AddIcon from '@mui/icons-material/Add';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
 
-import useToast from 'hooks/useToast';
+import FormRoleUser from './components/from';
 
 export default function RoleUser() {
-  const toast = useToast();
+  // const toast = useToast();
+  const formModal = useModal();
+  const formModal2 = useModal();
+  const dispatch = useAppDispatch();
 
-  const callToastExample = () => {
-    toast.openToast({
-      headMsg: 'Succecc Delete',
-      deleted: true,
-      severity: 'success',
-    });
-  };
-
-  const callAnotherTypeToast = () => {
-    toast.openToast({
-      headMsg: 'Upload failde',
-      message: 'please connect api first',
-      severity: 'error',
-    });
-  };
+  React.useEffect(() => {
+    dispatch(roleUserAction.fetchData());
+  }, []);
 
   const headCell = [
     {
@@ -60,7 +56,7 @@ export default function RoleUser() {
           <Grid item xs={12}>
             <Card>
               <Box display="flex" gap="20px" flexWrap="wrap">
-                <Button startIcon={<AddIcon />} onClick={callToastExample}>
+                <Button startIcon={<AddIcon />} onClick={formModal.openModal}>
                   Add New
                 </Button>
                 <TextField
@@ -82,7 +78,7 @@ export default function RoleUser() {
                     boxShadow: '0 3px 8px 0 rgba(0, 0, 0, 0.1)',
                     border: 'solid 1px #ebeff3',
                   }}
-                  onClick={callAnotherTypeToast}
+                  onClick={formModal2.openModal}
                 >
                   <SimCardDownloadOutlinedIcon />
                 </IconButton>
@@ -110,6 +106,13 @@ export default function RoleUser() {
           </Grid>
         </Grid>
       </Box>
+      <Modal
+        open={formModal.open}
+        title="Role User"
+        onClose={formModal.closeModal}
+      >
+        <FormRoleUser />
+      </Modal>
     </div>
   );
 }
