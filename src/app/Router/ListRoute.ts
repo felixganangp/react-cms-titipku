@@ -4,6 +4,8 @@ const Home = lazy(() => import('pages/Home'));
 const NotFound = lazy(() => import('pages/NotFound'));
 const Login = lazy(() => import('pages/Auth/login'));
 const RoleUser = lazy(() => import('pages/RoleUser'));
+const RoleAccess = lazy(() => import('pages/RoleAccess'));
+const RoleAccessDetails = lazy(() => import('pages/RoleAccess/Details'));
 
 interface RouteProps {
   path: string;
@@ -30,6 +32,18 @@ const ListRoute: RouteProps[] = [
     path: '/role-user',
     index: true,
     auth: 'Private',
+  },
+  {
+    comp: RoleAccess,
+    path: '/role-access',
+    index: true,
+    auth: 'Public',
+  },
+  {
+    comp: RoleAccessDetails,
+    path: '/role-access-details',
+    index: true,
+    auth: 'Public',
   },
   {
     comp: NotFound,
