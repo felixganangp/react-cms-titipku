@@ -284,6 +284,46 @@ export default function RoleUserDetails(props: RoleUserDetailsProps) {
     },
   ];
 
+  const renderListOfMenu = () => {
+    return listOfMenu.map((parentMenu) => (
+      <AccordionOnDetails
+        title={parentMenu.name}
+        key={parentMenu.id}
+        parent
+        checked={parentMenu.is_checked}
+      >
+        {parentMenu.child.map((childMenu) =>
+          childMenu.child.length === 0 ? (
+            <HorizontalContent>
+              <ChildMenu>{childMenu.name}</ChildMenu>
+              <Checkbox
+                checked={childMenu.is_checked}
+                sx={{ color: '#d5d5d5' }}
+              />
+            </HorizontalContent>
+          ) : (
+            <AccordionOnDetails
+              title={childMenu.name}
+              key={childMenu.id}
+              parent={false}
+              checked={childMenu.is_checked}
+            >
+              {childMenu.child.map((superChildMenu) => (
+                <HorizontalContent key={superChildMenu.id}>
+                  <SuperChildMenu>{superChildMenu.name}</SuperChildMenu>
+                  <Checkbox
+                    checked={superChildMenu.is_checked}
+                    sx={{ color: '#d5d5d5' }}
+                  />
+                </HorizontalContent>
+              ))}
+            </AccordionOnDetails>
+          ),
+        )}
+      </AccordionOnDetails>
+    ));
+  };
+
   return (
     <div>
       <Box p="20px" bgcolor="#F5F7FA">
@@ -340,46 +380,7 @@ export default function RoleUserDetails(props: RoleUserDetailsProps) {
           <ExpandMore sx={{ marginRight: '5px' }} />
           <span>Menu Access</span>
         </TitleWrapper>
-        <ContentWrapper>
-          {listOfMenu.map((parentMenu) => (
-            <AccordionOnDetails
-              title={parentMenu.name}
-              key={parentMenu.id}
-              parent
-              checked={parentMenu.is_checked}
-            >
-              {parentMenu.child.map((childMenu) =>
-                childMenu.child.length === 0 ? (
-                  <HorizontalContent>
-                    <ChildMenu>{childMenu.name}</ChildMenu>
-                    <Checkbox
-                      checked={childMenu.is_checked}
-                      sx={{ color: '#d5d5d5' }}
-                    />
-                  </HorizontalContent>
-                ) : (
-                  <AccordionOnDetails
-                    title={childMenu.name}
-                    key={childMenu.id}
-                    parent={false}
-                    checked={childMenu.is_checked}
-                  >
-                    {childMenu.child.map((superChildMenu) => (
-                      <HorizontalContent key={superChildMenu.id}>
-                        <SuperChildMenu>{superChildMenu.name}</SuperChildMenu>
-                        <Checkbox
-                          checked={superChildMenu.is_checked}
-                          sx={{ color: '#d5d5d5' }}
-                        />
-                      </HorizontalContent>
-                    ))}
-                  </AccordionOnDetails>
-                ),
-              )}
-            </AccordionOnDetails>
-          ))}
-        </ContentWrapper>
-
+        <ContentWrapper>{renderListOfMenu()}</ContentWrapper>
         <TitleWrapper>
           <ExpandMore sx={{ marginRight: '5px' }} />
           <span>Role User List</span>

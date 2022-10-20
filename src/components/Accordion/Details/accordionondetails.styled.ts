@@ -1,6 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 interface ButtonAccordionProps {
   parent: boolean;
@@ -48,7 +49,7 @@ export const ButtonAccordion = styled.button<
   align-items: center;
 `;
 
-export const Title = styled.span`
+export const Title = styled(Typography)`
   color: #232933;
   font-size: 14px;
 `;
