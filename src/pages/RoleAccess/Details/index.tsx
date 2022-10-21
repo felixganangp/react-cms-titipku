@@ -8,6 +8,7 @@ import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
 import Checkbox from '@mui/material/Checkbox';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
+import { Link } from 'react-router-dom';
 import Table from '../../../components/Table';
 import AccordionOnDetails from '../../../components/Accordion/Details';
 import FileDownload from '../../../assets/file-download-outline.svg';
@@ -331,9 +332,14 @@ export default function RoleUserDetails(props: RoleUserDetailsProps) {
           <Grid item xs={12}>
             <Card>
               <Menu>Role Access Management</Menu>
-              <BackButton startIcon={<ArrowBackIosIcon />}>
-                <TitlePage>Details</TitlePage>
-              </BackButton>
+              <Link style={{ textDecoration: 'none' }} to="/role-access">
+                <BackButton
+                  sx={{ '&:hover': { backgroundColor: '#ffff' } }}
+                  startIcon={<ArrowBackIosIcon />}
+                >
+                  <TitlePage>Details</TitlePage>
+                </BackButton>
+              </Link>
             </Card>
           </Grid>
         </Grid>
