@@ -40,5 +40,7 @@ module.exports = {
       'error',
       { devDependencies: ['**/*.test.ts', '**/*.test.tsx', 'vite.config.ts'] },
     ],
+    'react/jsx-no-useless-fragment': 0,
+    'react/react-in-jsx-scope': 0,
   },
 };
