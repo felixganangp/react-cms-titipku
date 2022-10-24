@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 export const Menu = styled(Typography)`
   font-size: 16px;
@@ -103,6 +104,16 @@ export const HorizontalContent = styled(Box)`
   height: 30px;
   padding-top: 0px;
   padding-bottom: 0px;
+  :nth-child(odd) {
+    background-color: #fafafa;
+  }
+  :nth-child(even) {
+    background-color: #ffff;
+  }
+`;
+
+export const Control = styled(FormControlLabel)`
+  margin-right: 0px;
 `;
 
 export const TablesProperty = styled(Box)`

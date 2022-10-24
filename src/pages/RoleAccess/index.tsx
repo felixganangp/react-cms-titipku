@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -17,11 +17,9 @@ import useModal from '../../hooks/useModal';
 
 export default function RoleAccess() {
   const toast = useToast();
+  const formModal = useModal();
 
-  // form
-  const [open, setOpen] = useState<boolean>(false);
-  const openForm = () => setOpen(!open);
-
+  // data table
   const callToast = () => {
     toast.openToast({
       headMsg: 'Successfully Add Role',
@@ -282,12 +280,67 @@ export default function RoleAccess() {
     },
   ];
 
+  // form
+  const [open, setOpen] = useState<boolean>(false);
+  const openForm = () => setOpen(!open);
+  // const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [formData, setFormData] = useState<{
+    name: string;
+    access: { [x: number]: boolean };
+  }>({ name: '', access: { 0: false } });
+  const [categorizedMenu, setCategorizedMenu] = useState<
+    {
+      parent: number;
+      menu: number[];
+    }[]
+  >([]);
+
+  const getInitialData = () => {
+    const accessMenu: { [x: number]: boolean } = {};
+    accessMenu[listOfMenu[0].child[0].id] = false;
+    if (listOfMenu !== undefined) {
+      for (let i = 0; i < listOfMenu.length; i += 1) {
+        accessMenu[listOfMenu[i].id] = false;
+        if (listOfMenu[i].child.length > 0) {
+          for (let a = 0; a < listOfMenu[i].child.length; a += 1) {
+            accessMenu[listOfMenu[i].child[a].id] = false;
+            if (listOfMenu[i].child[a].child.length > 0) {
+              for (let b = 0; b < listOfMenu[i].child[a].child.length; b += 1) {
+                accessMenu[listOfMenu[i].child[a].child[b].id] = false;
+              }
+            }
+          }
+        }
+      }
+    }
+    return { name: '', access: accessMenu };
+  };
+
+  useEffect(() => {
+    const mappedData: {
+      parent: number;
+      menu: number[];
+    }[] = [];
+    if (listOfMenu.length > 0) {
+      for (let i = 0; i < listOfMenu.length; i += 1) {
+        if (listOfMenu[i].child.length > 0) {
+          mappedData.push({
+            parent: listOfMenu[i].id,
+            menu: listOfMenu[i].child.map((a) => a.id),
+          });
+        }
+      }
+    }
+    setCategorizedMenu(mappedData);
+  }, []);
+
   return (
     <div>
       <RoleAccessForm
         open={open}
         onClose={() => setOpen(!open)}
-        listOfMenu={listOfMenu}
+        initialValues={formData}
+        categorizedMenu={categorizedMenu}
       />
       <Box p="20px" bgcolor="#F5F7FA">
         <Grid container spacing={2}>
@@ -299,7 +352,13 @@ export default function RoleAccess() {
           <Grid item xs={12}>
             <Card>
               <Box display="flex" gap="20px" flexWrap="wrap">
-                <Button startIcon={<AddIcon />} onClick={openForm}>
+                <Button
+                  startIcon={<AddIcon />}
+                  onClick={() => {
+                    setOpen(!open);
+                    setFormData(getInitialData());
+                  }}
+                >
                   Add New
                 </Button>
                 <TextField

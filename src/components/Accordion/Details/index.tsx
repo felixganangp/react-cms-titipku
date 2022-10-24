@@ -1,8 +1,10 @@
 import React, { useRef, useState } from 'react';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import { Checkbox } from '@mui/material';
+import Box from '@mui/material/Box';
 import {
   ButtonAccordion,
+  Content,
   HeaderBox,
   Icon,
   Title,
@@ -14,11 +16,11 @@ interface AccordionOnDetailsProps {
   title: string;
   children: any;
   parent: boolean;
-  checked: boolean;
+  headerContent: any;
 }
 
 export default function AccordionOnDetails(props: AccordionOnDetailsProps) {
-  const { title, children, parent, checked } = props;
+  const { title, children, parent, headerContent } = props;
   // content
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const contentRef = useRef<any>();
@@ -36,8 +38,8 @@ export default function AccordionOnDetails(props: AccordionOnDetailsProps) {
 
   return (
     <Wrapper>
-      <ButtonAccordion onClick={toggleClick} parent={parent}>
-        <HeaderBox>
+      <HeaderBox parent={parent}>
+        <ButtonAccordion onClick={toggleClick} parent={parent}>
           <Icon rotate={isOpen ? 1 : 0}>
             <KeyboardArrowRightIcon
               sx={{
@@ -48,9 +50,9 @@ export default function AccordionOnDetails(props: AccordionOnDetailsProps) {
             />
           </Icon>
           <Title>{title}</Title>
-        </HeaderBox>
-        <Checkbox sx={{ color: '#d5d5d5' }} checked={checked} />
-      </ButtonAccordion>
+        </ButtonAccordion>
+        {headerContent}
+      </HeaderBox>
       <WrapperContent ref={contentRef}>{children}</WrapperContent>
     </Wrapper>
   );

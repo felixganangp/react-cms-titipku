@@ -6,6 +6,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 export const TitleWrapper = styled(DialogTitle)`
   display: flex;
@@ -69,11 +70,17 @@ export const HorizontalContent = styled(Box)`
   height: 30px;
   padding-top: 0px;
   padding-bottom: 0px;
+  :nth-child(odd) {
+    background-color: #fafafa;
+  }
+  :nth-child(even) {
+    background-color: #ffff;
+  }
 `;
 
 export const Menu = styled(Typography)`
   font-size: 14px;
-  padding-left: 40px;
+  padding-left: 44px;
   color: #232933;
 `;
 
@@ -81,4 +88,8 @@ export const ChildMenu = styled(Typography)`
   font-size: 14px;
   padding-left: 40px;
   color: #232933;
+`;
+
+export const Control = styled(FormControlLabel)`
+  margin-right: 0px;
 `;

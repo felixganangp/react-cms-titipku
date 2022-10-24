@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Dialog from '@mui/material/Dialog';
 import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
@@ -16,6 +16,7 @@ import {
   CancelButton,
   ChildMenu,
   ContentWrapper,
+  Control,
   HorizontalContent,
   Menu,
   SubmitButton,
@@ -26,32 +27,304 @@ import {
 interface RoleAccessFormProps {
   open: boolean;
   onClose(): void;
-  listOfMenu: {
-    id: number;
-    name: string;
-    is_checked: boolean;
-    child: {
-      id: number;
-      name: string;
-      is_checked: boolean;
-      child: {
-        id: number;
-        name: string;
-        is_checked: boolean;
-      }[];
-    }[];
+  initialValues: { name: string; access: { [id: number]: boolean } };
+  categorizedMenu: {
+    parent: number;
+    menu: number[];
   }[];
 }
 
-const initial = {
-  name: '',
-  access: {},
-};
+const listOfMenu = [
+  {
+    id: 1,
+    name: 'Admin Panel',
+    is_checked: false,
+    child: [
+      {
+        id: 101,
+        name: 'Role User',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 102,
+        name: 'Role Access',
+        is_checked: false,
+        child: [],
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Products',
+    is_checked: false,
+    child: [
+      {
+        id: 201,
+        name: 'Product Mangement',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 202,
+        name: 'SKU Management',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 203,
+        name: 'Category Management',
+        is_checked: false,
+        child: [],
+      },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Lapak',
+    is_checked: false,
+    child: [
+      {
+        id: 301,
+        name: 'Area',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 302,
+        name: 'Lapak',
+        is_checked: false,
+        child: [],
+      },
+    ],
+  },
+  {
+    id: 4,
+    name: 'User',
+    is_checked: false,
+    child: [
+      {
+        id: 401,
+        name: 'Nitiper',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 402,
+        name: 'Jatiper',
+        is_checked: false,
+        child: [
+          {
+            id: 40201,
+            name: 'Jatiper Management',
+            is_checked: false,
+          },
+          {
+            id: 40202,
+            name: 'Jatiper Registration',
+            is_checked: false,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: 5,
+    name: 'Transaction',
+    is_checked: false,
+    child: [
+      {
+        id: 501,
+        name: 'Transaction',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 502,
+        name: 'Urgent Order',
+        is_checked: false,
+        child: [],
+      },
+    ],
+  },
+  {
+    id: 6,
+    name: 'Application',
+    is_checked: false,
+    child: [
+      {
+        id: 601,
+        name: 'Notification',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 602,
+        name: 'Banner',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 603,
+        name: 'Event',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 604,
+        name: 'Giveaway',
+        is_checked: false,
+        child: [],
+      },
+    ],
+  },
+  {
+    id: 7,
+    name: 'Promo & Voucher',
+    is_checked: false,
+    child: [
+      {
+        id: 701,
+        name: 'Promo Product',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 702,
+        name: 'Join Promo',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 703,
+        name: 'Voucher',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 704,
+        name: 'Mass Voucher',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 705,
+        name: 'Giveaway',
+        is_checked: false,
+        child: [],
+      },
+    ],
+  },
+  {
+    id: 8,
+    name: 'Request',
+    is_checked: false,
+    child: [
+      {
+        id: 801,
+        name: 'Withdraw Request',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 802,
+        name: 'Join Promo Request',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 803,
+        name: 'New Product Request',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 804,
+        name: 'Master Data Config',
+        is_checked: false,
+        child: [],
+      },
+      {
+        id: 805,
+        name: 'App Service',
+        is_checked: false,
+        child: [],
+      },
+    ],
+  },
+];
 
 export default function RoleAccessForm(props: RoleAccessFormProps) {
-  const { open, onClose, listOfMenu } = props;
+  const { open, onClose, initialValues, categorizedMenu } = props;
+
+  // handle menu access
+  const [accessMenu, setAccessMenu] = useState<{ [id: number]: boolean }>({});
+  const handleChangeAccessMenu = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    id: number,
+  ) => {
+    setAccessMenu({ ...accessMenu, [id]: !!event.target.checked });
+  };
+
+  useEffect(() => {
+    const access: { [x: number]: boolean } = {};
+    if (listOfMenu !== undefined) {
+      for (let i = 0; i < listOfMenu.length; i += 1) {
+        access[listOfMenu[i].id] = false;
+        if (listOfMenu[i].child.length > 0) {
+          for (let a = 0; a < listOfMenu[i].child.length; a += 1) {
+            access[listOfMenu[i].child[a].id] = false;
+            if (listOfMenu[i].child[a].child.length > 0) {
+              for (let b = 0; b < listOfMenu[i].child[a].child.length; b += 1) {
+                access[listOfMenu[i].child[a].child[b].id] = false;
+              }
+            }
+          }
+        }
+      }
+    }
+    setAccessMenu({ ...access });
+  }, []);
+
+  const handleChangeChild = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    id: number,
+  ) => {
+    const changedChild: { [id: number]: boolean } = {};
+    for (let i = 0; i < categorizedMenu.length; i += 1) {
+      if (categorizedMenu[i].parent === id) {
+        for (let j = 0; j < categorizedMenu[i].menu.length; j += 1) {
+          changedChild[categorizedMenu[i].menu[j]] = !!e.target.checked;
+        }
+        setAccessMenu({
+          ...accessMenu,
+          ...changedChild,
+          [id]: !!e.target.checked,
+        });
+      }
+    }
+  };
+
+  const handleChangeParentChild = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    parentId: number,
+    childId: number,
+  ) => {
+    if (accessMenu[parentId] === false) {
+      setAccessMenu({
+        ...accessMenu,
+        [parentId]: !!e.target.checked,
+        [childId]: !!e.target.checked,
+      });
+    } else {
+      setAccessMenu({
+        ...accessMenu,
+        [childId]: !!e.target.checked,
+      });
+    }
+  };
+
   // formik
-  const [initialValues, setInitialValues] = useState(initial);
   const toast = useToast();
   const formik = useFormik({
     initialValues,
@@ -87,17 +360,6 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
     isValid,
   } = formik;
 
-  // handle menu access
-  const [accessMenu, setAccessMenu] = useState<{ [id: number]: boolean }>({});
-  const handleChangeAccessMenu = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    id: number,
-  ) => {
-    setAccessMenu({ ...accessMenu, [id]: !!e.target.checked });
-  };
-
-  console.log('access menu', accessMenu);
-
   return (
     <div>
       <div>
@@ -130,19 +392,42 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
                     title={parentMenu.name}
                     key={parentMenu.id}
                     parent
-                    checked={parentMenu.is_checked}
+                    headerContent={
+                      <Control
+                        style={{ marginRight: '0px' }}
+                        label=""
+                        key={parentMenu.id}
+                        control={
+                          <Checkbox
+                            checked={accessMenu[parentMenu.id]}
+                            onChange={(e) => {
+                              handleChangeChild(e, parentMenu.id);
+                              // handleChangeAccessMenu(e, parentMenu.id);
+                            }}
+                          />
+                        }
+                      />
+                    }
                   >
                     {parentMenu.child.map((menu) =>
                       menu.child.length === 0 ? (
                         <HorizontalContent>
                           <Menu>{menu.name}</Menu>
-                          <FormControlLabel
-                            sx={{ marginRight: '0px' }}
+                          <Control
                             label=""
                             key={menu.id}
-                            control={<Checkbox checked={accessMenu[menu.id]} />}
-                            onChange={(e: any) =>
-                              handleChangeAccessMenu(e, menu.id)
+                            control={
+                              <Checkbox
+                                checked={accessMenu[menu.id]}
+                                onChange={(e) => {
+                                  // handleChangeAccessMenu(e, parentMenu.id);
+                                  handleChangeParentChild(
+                                    e,
+                                    parentMenu.id,
+                                    menu.id,
+                                  );
+                                }}
+                              />
                             }
                           />
                         </HorizontalContent>
@@ -152,22 +437,39 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
                             title={menu.name}
                             key={menu.id}
                             parent={false}
-                            checked={menu.is_checked}
+                            headerContent={
+                              <Control
+                                label=""
+                                key={menu.id}
+                                control={
+                                  <Checkbox
+                                    checked={accessMenu[menu.id]}
+                                    onChange={(e) => {
+                                      handleChangeParentChild(
+                                        e,
+                                        parentMenu.id,
+                                        menu.id,
+                                      );
+                                      // handleChangeAccessMenu(e, menu.id);
+                                    }}
+                                  />
+                                }
+                              />
+                            }
                           >
                             {menu.child.map((childMenu) => (
                               <HorizontalContent key={childMenu.id}>
                                 <ChildMenu>{childMenu.name}</ChildMenu>
-                                <FormControlLabel
+                                <Control
                                   label=""
-                                  sx={{ marginRight: '0px' }}
                                   key={childMenu.id}
                                   control={
                                     <Checkbox
                                       checked={accessMenu[childMenu.id]}
+                                      onChange={(e) =>
+                                        handleChangeAccessMenu(e, childMenu.id)
+                                      }
                                     />
-                                  }
-                                  onChange={(e: any) =>
-                                    handleChangeAccessMenu(e, childMenu.id)
                                   }
                                 />
                               </HorizontalContent>
