@@ -1,5 +1,4 @@
-/* eslint-disable react/require-default-props */
-import React, { useState } from 'react';
+import React from 'react';
 import AvatarEditor from 'react-avatar-editor';
 
 import Box from '@mui/material/Box';
@@ -29,12 +28,6 @@ interface State {
 }
 
 class ImageCrop extends React.Component<Props, State> {
-  // public static defaultProps: Partial<Props> = {
-  //   title: '',
-  //   width: 250,
-  //   height: 250,
-  // };
-
   // eslint-disable-next-line react/sort-comp
   constructor(props: Props) {
     super(props);
