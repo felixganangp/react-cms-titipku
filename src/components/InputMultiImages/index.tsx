@@ -25,18 +25,22 @@ interface Props {
   onChange: any;
   // onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   maxImage?: number;
+  cropable?: boolean;
 }
 
-function InputMultiImages({ values, onChange, maxImage }: Props) {
-  const [imageCrop, setImageCrop] = useState(false);
+function InputMultiImages({ values, onChange, maxImage, cropable }: Props) {
+  const [imageCrop, setImageCrop] = useState<any>(false);
   const fileInputField = useRef<HTMLInputElement>(null);
 
   const handleNewFileUpload = (e: any) => {
     const { files: newFiles } = e.target;
     if (newFiles.length) {
       // props.setSelectedImg([...props.selectedImg, newFiles[0]]);
-      // onChange([...values, newFiles[0]]);
-      setImageCrop(newFiles[0]);
+      if (cropable) {
+        setImageCrop(newFiles[0]);
+      } else {
+        onChange([...values, newFiles[0]]);
+      }
     }
   };
 
@@ -62,6 +66,10 @@ function InputMultiImages({ values, onChange, maxImage }: Props) {
     file.splice(index, 1);
     // props.setSelectedImg([...file]);
     onChange([...file]);
+  };
+
+  const handleSetImageCrop = (e: any) => {
+    setImageCrop(e);
   };
 
   return (
@@ -179,9 +187,7 @@ function InputMultiImages({ values, onChange, maxImage }: Props) {
       <ImageCrop
         open={Boolean(imageCrop)}
         image={imageCrop}
-        setClose={(e: any) => {
-          setImageCrop(e);
-        }}
+        setClose={handleSetImageCrop}
         onChange={handleSaveCropedImage}
       />
     </div>
@@ -190,6 +196,7 @@ function InputMultiImages({ values, onChange, maxImage }: Props) {
 
 InputMultiImages.defaultProps = {
   maxImage: 5,
+  cropable: false,
 };
 
 export default InputMultiImages;

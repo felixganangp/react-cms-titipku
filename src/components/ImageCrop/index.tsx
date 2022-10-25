@@ -14,7 +14,7 @@ import Modal from 'components/Modal';
 
 interface Props {
   open: boolean;
-  image: any;
+  image: File;
   setClose: any;
   onChange: any;
   width?: number;
