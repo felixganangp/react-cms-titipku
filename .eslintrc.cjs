@@ -36,10 +36,7 @@ module.exports = {
     'react/no-unstable-nested-components': 'off',
     'no-param-reassign': 'off',
     'react-hooks/exhaustive-deps': 'off',
-    'import/no-extraneous-dependencies': [
-      'error',
-      { devDependencies: ['**/*.test.ts', '**/*.test.tsx', 'vite.config.ts'] },
-    ],
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     'react/jsx-no-useless-fragment': 0,
     'react/react-in-jsx-scope': 0,
     'react/require-default-props': 0,
