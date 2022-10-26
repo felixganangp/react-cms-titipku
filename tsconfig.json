@@ -20,6 +20,12 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["./src/**/*", ".eslintrc.cjs", "src", "vite.config.ts"],
+  "include": [
+    "./src/**/*",
+    ".eslintrc.cjs",
+    "src",
+    "vite.config.ts",
+    "@testing-library/jest-dom"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

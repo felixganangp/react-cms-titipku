@@ -5,14 +5,15 @@ import GooleIcon from 'components/Icon/Google';
 export default function Home() {
   return (
     <div>
-      <Button
+      hello
+      {/* <Button
         variant="contained"
         fullWidth
         sx={{ borderRadius: '20px' }}
         startIcon={<GooleIcon />}
       >
         Sign in with Google
-      </Button>
+      </Button> */}
     </div>
   );
 }
