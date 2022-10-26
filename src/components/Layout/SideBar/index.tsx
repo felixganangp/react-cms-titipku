@@ -289,7 +289,11 @@ function SideBar(props: SideBarProps) {
         backgroundColor: '#fafafa',
       }}
     >
-      <Box width={drawerWidthClose} />
+      <Box
+        width={drawerWidthClose}
+        height="calc(100% - 56px)"
+        boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
+      />
       <Box position="absolute" height="calc(100% - 56px)">
         <Drawer
           variant="permanent"
