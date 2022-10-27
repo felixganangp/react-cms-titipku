@@ -19,7 +19,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
 
-import FormRoleUser from './components/from';
+import FormRoleUser from './components/form';
 
 export default function RoleUser() {
   // const toast = useToast();

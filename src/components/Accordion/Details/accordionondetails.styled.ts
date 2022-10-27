@@ -4,9 +4,9 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 interface ButtonAccordionProps {
-  parent: boolean;
   padding?: string;
   margin?: string;
+  parent: boolean;
 }
 
 interface WrapperProps {
@@ -18,10 +18,14 @@ interface IconProps {
   rotate: number | string;
 }
 
+interface HeaderBoxProps {
+  parent: boolean;
+}
+
 export const Wrapper = styled.div<Pick<WrapperProps, 'padding' | 'margin'>>`
   width: 100%;
   padding: ${(p) => (p.padding ? p.padding : 'unset')};
-  margin: ${(p) => (p.margin ? p.margin : '1px 0')};
+  margin: ${(p) => (p.margin ? p.margin : '2px 0')};
   border-bottom: solid 1px #ebeff3;
 `;
 
@@ -36,17 +40,16 @@ export const ButtonAccordion = styled.button<
   Pick<ButtonAccordionProps, 'padding' | 'margin' | 'parent'>
 >`
   width: 100%;
-  height: 30px;
   padding: ${(p) => (p.padding ? p.padding : '10px 0')};
   margin: ${(p) => (p.margin ? p.margin : 'unset')};
-  background-color: ${(p) => (p.parent ? '#ebeff3' : 'transparent')};
-  transparent;
-  outline: none;
+  background-color: ${(p) => (p.parent ? '#ebeff3' : '#ffff')};
   border: none;
+  outline: none;
   cursor: pointer;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
+  height: 30px;
 `;
 
 export const Title = styled(Typography)`
@@ -64,9 +67,12 @@ export const Content = styled.div`
   padding: 5px;
 `;
 
-export const HeaderBox = styled(Box)`
+export const HeaderBox = styled(Box)<Pick<HeaderBoxProps, 'parent'>>`
   display: flex;
+  width: inherit;
+  height: 30px;
   flex-direction: row;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
+  background-color: ${(p) => (p.parent ? '#ebeff3' : '#ffff')};
 `;

@@ -8,6 +8,8 @@ import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
 import Checkbox from '@mui/material/Checkbox';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
+import { Link } from 'react-router-dom';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import Table from '../../../components/Table';
 import AccordionOnDetails from '../../../components/Accordion/Details';
 import FileDownload from '../../../assets/file-download-outline.svg';
@@ -29,6 +31,7 @@ import {
   TablesProperty,
   Search,
   DownloadButton,
+  Control,
 } from './details.styled';
 
 interface RoleUserDetailsProps {
@@ -290,7 +293,13 @@ export default function RoleUserDetails(props: RoleUserDetailsProps) {
         title={parentMenu.name}
         key={parentMenu.id}
         parent
-        checked={parentMenu.is_checked}
+        headerContent={
+          <Control
+            label=""
+            key={parentMenu.id}
+            control={<Checkbox checked={false} />}
+          />
+        }
       >
         {parentMenu.child.map((childMenu) =>
           childMenu.child.length === 0 ? (
@@ -306,7 +315,13 @@ export default function RoleUserDetails(props: RoleUserDetailsProps) {
               title={childMenu.name}
               key={childMenu.id}
               parent={false}
-              checked={childMenu.is_checked}
+              headerContent={
+                <Control
+                  label=""
+                  key={parentMenu.id}
+                  control={<Checkbox checked={false} />}
+                />
+              }
             >
               {childMenu.child.map((superChildMenu) => (
                 <HorizontalContent key={superChildMenu.id}>
@@ -331,9 +346,14 @@ export default function RoleUserDetails(props: RoleUserDetailsProps) {
           <Grid item xs={12}>
             <Card>
               <Menu>Role Access Management</Menu>
-              <BackButton startIcon={<ArrowBackIosIcon />}>
-                <TitlePage>Details</TitlePage>
-              </BackButton>
+              <Link style={{ textDecoration: 'none' }} to="/role-access">
+                <BackButton
+                  sx={{ '&:hover': { backgroundColor: '#ffff' } }}
+                  startIcon={<ArrowBackIosIcon />}
+                >
+                  <TitlePage>Details</TitlePage>
+                </BackButton>
+              </Link>
             </Card>
           </Grid>
         </Grid>
