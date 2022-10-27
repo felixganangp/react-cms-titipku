@@ -289,45 +289,53 @@ function SideBar(props: SideBarProps) {
         backgroundColor: '#fafafa',
       }}
     >
-      <Drawer
-        variant="permanent"
-        open={open}
-        onMouseEnter={() => {
-          setOpen(false);
-        }}
-        onMouseLeave={() => {
-          setOpen(true);
-        }}
-        sx={{
-          width: open
-            ? { xs: '0px', sm: drawerWidthClose }
-            : { xs: drawerWidthClose, sm: drawerWidthOpen },
-          transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: open
-              ? theme.transitions.duration.leavingScreen
-              : theme.transitions.duration.enteringScreen,
-          }),
-          '& .MuiDrawer-paper': {
-            justifyContent: 'flex-start',
-            overflowX: 'hidden',
+      <Box
+        width={drawerWidthClose}
+        height="calc(100% - 56px)"
+        boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
+      />
+      <Box position="absolute" height="calc(100% - 56px)">
+        <Drawer
+          variant="permanent"
+          open={open}
+          onMouseEnter={() => {
+            setOpen(false);
+          }}
+          onMouseLeave={() => {
+            setOpen(true);
+          }}
+          sx={{
+            height: '100%',
             width: open
               ? { xs: '0px', sm: drawerWidthClose }
               : { xs: drawerWidthClose, sm: drawerWidthOpen },
-            borderRight: '0px',
-            boxShadow: theme.shadows[0],
-            backgroundColor: open ? '#fafafa' : '#fafafa',
             transition: theme.transitions.create('width', {
               easing: theme.transitions.easing.sharp,
               duration: open
                 ? theme.transitions.duration.leavingScreen
                 : theme.transitions.duration.enteringScreen,
             }),
-          },
-        }}
-      >
-        {drawerContent}
-      </Drawer>
+            '& .MuiDrawer-paper': {
+              justifyContent: 'flex-start',
+              overflowX: 'hidden',
+              width: open
+                ? { xs: '0px', sm: drawerWidthClose }
+                : { xs: drawerWidthClose, sm: drawerWidthOpen },
+              borderRight: '0px',
+              boxShadow: theme.shadows[0],
+              backgroundColor: open ? '#fafafa' : '#fafafa',
+              transition: theme.transitions.create('width', {
+                easing: theme.transitions.easing.sharp,
+                duration: open
+                  ? theme.transitions.duration.leavingScreen
+                  : theme.transitions.duration.enteringScreen,
+              }),
+            },
+          }}
+        >
+          {drawerContent}
+        </Drawer>
+      </Box>
     </Box>
   );
 }

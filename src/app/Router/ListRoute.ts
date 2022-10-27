@@ -10,7 +10,7 @@ const RoleAccessDetails = lazy(() => import('pages/RoleAccess/Details'));
 interface RouteProps {
   path: string;
   index: boolean;
-  comp: React.LazyExoticComponent<() => JSX.Element>;
+  comp: React.LazyExoticComponent<(props: any) => JSX.Element>;
   auth: string;
 }
 
@@ -37,13 +37,13 @@ const ListRoute: RouteProps[] = [
     comp: RoleAccess,
     path: '/role-access',
     index: true,
-    auth: 'Public',
+    auth: 'Private',
   },
   {
     comp: RoleAccessDetails,
     path: '/role-access-details',
     index: true,
-    auth: 'Public',
+    auth: 'Private',
   },
   {
     comp: NotFound,

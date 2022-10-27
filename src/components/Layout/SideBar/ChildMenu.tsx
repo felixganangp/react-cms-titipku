@@ -109,7 +109,7 @@ export default function ChildMenu(props: ChildMenuProps) {
                   minWidth: '126px',
                 }}
               />
-              <div style={{ marginRight: '8px' }}>
+              <Box position="absolute" top="25%" right="5px">
                 {
                   // eslint-disable-next-line no-nested-ternary
                   item.child.length > 0 && openList !== item.id
@@ -118,7 +118,7 @@ export default function ChildMenu(props: ChildMenuProps) {
                     ? iconClosed
                     : null
                 }
-              </div>
+              </Box>
             </ListItemButton>
             <Collapse in={openList === item.id && !open}>
               <Box

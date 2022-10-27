@@ -12,7 +12,9 @@
     "lint:eslint": "eslint --ignore-path .gitignore",
     "lint:eslint:fix": "eslint --ignore-path .gitignore --fix",
     "lint:js": "yarn run lint:eslint -- . ",
-    "lint:staged": "lint-staged"
+    "lint:staged": "lint-staged",
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "lint-staged": {
     "*.{js,ts,tsx}": [
@@ -46,6 +48,10 @@
     "yup": "^0.32.11"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/user-event": "^14.4.3",
     "@types/node": "^18.8.2",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
@@ -61,11 +67,13 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
+    "jsdom": "^20.0.1",
     "lint-staged": "^13.0.3",
     "pre-commit": "^1.2.2",
     "prettier": "^2.7.1",
     "typescript": "^4.6.4",
     "vite": "^3.0.7",
-    "vite-tsconfig-paths": "^3.5.0"
+    "vite-tsconfig-paths": "^3.5.0",
+    "vitest": "^0.24.3"
   }
 }

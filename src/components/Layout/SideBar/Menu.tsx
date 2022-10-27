@@ -83,14 +83,17 @@ function Menu(props: MenuProps) {
                   minWidth: '126px',
                 }}
               />
-              {
-                // eslint-disable-next-line no-nested-ternary
-                menu.child.length > 0 && openList !== menu.id
-                  ? iconOpened
-                  : menu.child.length > 0 && openList === menu.id
-                  ? iconClosed
-                  : null
-              }
+              <Box position="absolute" top="30%" right="5px">
+                {
+                  // eslint-disable-next-line no-nested-ternary
+                  menu.child.length > 0 && openList !== menu.id
+                    ? iconOpened
+                    : menu.child.length > 0 && openList === menu.id
+                    ? iconClosed
+                    : null
+                }
+              </Box>
+
               {/* {item.subNav.length > 0 &&
               (openList !== item.id ? iconOpened : iconClosed)} */}
               {/* {item.subNav.length === 0 && null} */}
@@ -131,14 +134,16 @@ function Menu(props: MenuProps) {
                   minWidth: '126px',
                 }}
               />
-              {
-                // eslint-disable-next-line no-nested-ternary
-                menu.child.length > 0 && openList !== menu.id
-                  ? iconOpened
-                  : menu.child.length > 0 && openList === menu.id
-                  ? iconClosed
-                  : null
-              }
+              <Box position="absolute" top="30%" right="5px">
+                {
+                  // eslint-disable-next-line no-nested-ternary
+                  menu.child.length > 0 && openList !== menu.id
+                    ? iconOpened
+                    : menu.child.length > 0 && openList === menu.id
+                    ? iconClosed
+                    : null
+                }
+              </Box>
             </ListItemButton>
             <Collapse in={openList === menu.id && !open}>
               <Box
