@@ -25,10 +25,19 @@ interface Props {
   value: Blob | string;
   type?: 'cube' | 'rectangle';
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  cropable?: boolean;
 }
 
-function InputImage({ label, width, height, value, type, onChange }: Props) {
-  const [imageCrop, setImageCrop] = useState(false);
+function InputImage({
+  label,
+  width,
+  height,
+  value,
+  type,
+  onChange,
+  cropable,
+}: Props) {
+  const [imageCrop, setImageCrop] = useState<any>(false);
   const fileInputField = useRef<HTMLInputElement>(null);
 
   // const handleNewFileUpload = (e: React.ChangeEvent<HTMLElement>) => {
@@ -41,8 +50,11 @@ function InputImage({ label, width, height, value, type, onChange }: Props) {
   const handleNewFileUpload = (e: any) => {
     const { files: newFiles } = e.target;
     if (newFiles?.length) {
-      // onChange(newFiles[0]);
-      setImageCrop(newFiles[0]);
+      if (cropable) {
+        setImageCrop(newFiles[0]);
+      } else {
+        onChange(newFiles[0]);
+      }
     }
   };
 
@@ -52,6 +64,10 @@ function InputImage({ label, width, height, value, type, onChange }: Props) {
 
   const handleUploadBtnClick = () => {
     fileInputField.current?.click();
+  };
+
+  const handleSetImageCrop = (e: any) => {
+    setImageCrop(e);
   };
 
   return (
@@ -116,9 +132,7 @@ function InputImage({ label, width, height, value, type, onChange }: Props) {
       <ImageCrop
         open={Boolean(imageCrop)}
         image={imageCrop}
-        setClose={(e: any) => {
-          setImageCrop(e);
-        }}
+        setClose={handleSetImageCrop}
         onChange={handleSaveCropedImage}
       />
     </div>
@@ -127,6 +141,7 @@ function InputImage({ label, width, height, value, type, onChange }: Props) {
 
 InputImage.defaultProps = {
   type: 'cube',
+  cropable: false,
 };
 
 export default InputImage;
