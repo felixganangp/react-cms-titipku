@@ -38,8 +38,8 @@ function Modal({ onClose, open, title, children, width, padding }: ModalProps) {
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ width }}>
-        <Box sx={{ width: '100%', p: padding, mt: '10px' }}>{children}</Box>
+      <DialogContent sx={{ width, padding: 0 }}>
+        <Box sx={{ width: '100%', p: padding }}>{children}</Box>
       </DialogContent>
     </Dialog>
   );
@@ -47,7 +47,7 @@ function Modal({ onClose, open, title, children, width, padding }: ModalProps) {
 
 Modal.defaultProps = {
   width: '600px',
-  padding: '5px',
+  padding: '0px',
 };
 
 export default Modal;

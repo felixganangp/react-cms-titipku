@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 // import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import CloseIcon from '@mui/icons-material/Close';
@@ -26,9 +27,16 @@ interface Props {
   // onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   maxImage?: number;
   cropable?: boolean;
+  label: string;
 }
 
-function InputMultiImages({ values, onChange, maxImage, cropable }: Props) {
+function InputMultiImages({
+  values,
+  onChange,
+  maxImage,
+  cropable,
+  label,
+}: Props) {
   const [imageCrop, setImageCrop] = useState<any>(false);
   const fileInputField = useRef<HTMLInputElement>(null);
 
@@ -184,6 +192,15 @@ function InputMultiImages({ values, onChange, maxImage, cropable }: Props) {
           </Box>
         )}
       </Box>
+      <Typography
+        sx={{
+          fontSize: '12px',
+          color: '#8B95A5',
+          marginTop: 1,
+        }}
+      >
+        Maximum {label} images: {maxImage}
+      </Typography>
       <ImageCrop
         open={Boolean(imageCrop)}
         image={imageCrop}

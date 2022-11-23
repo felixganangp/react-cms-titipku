@@ -20,8 +20,8 @@ const Image = styled.img`
 
 interface Props {
   label: string;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   value: Blob | string;
   type?: 'cube' | 'rectangle';
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -142,6 +142,8 @@ function InputImage({
 InputImage.defaultProps = {
   type: 'cube',
   cropable: false,
+  width: 50,
+  height: 50,
 };
 
 export default InputImage;
