@@ -56,68 +56,74 @@ export default function Form() {
   return (
     <Box>
       <form onSubmit={handleSubmit}>
-        <FormLabel
-          text="Name"
-          error={touched.name && Boolean(errors.name)}
-          helperText={touched.name && errors.name && `${errors.name}`}
-        >
-          <TextField
-            type="text"
-            name="name"
-            placeholder="Input Category name"
-            value={values.name}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            fullWidth
-          />
-        </FormLabel>
-        <FormLabel
-          text="Email"
-          error={touched.email && Boolean(errors.email)}
-          helperText={touched.email && errors.email && `${errors.email}`}
-        >
-          <TextField
-            type="text"
-            name="email"
-            placeholder="Input Category name"
-            value={values.email}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            fullWidth
-          />
-        </FormLabel>
-        <FormLabel
-          text="Role Access"
-          error={touched.roleAccess && Boolean(errors.roleAccess)}
-          helperText={
-            touched.roleAccess && errors.roleAccess && `${errors.roleAccess}`
-          }
-        >
-          <Autocomplete
-            id="role"
-            options={[]}
-            onChange={(e, value) => {
-              setFieldValue('roleAccess', value);
-            }}
-            isOptionEqualToValue={(option) => option === values.roleAccess}
-            getOptionLabel={(option) => `${option}`}
-            value={values.roleAccess}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                name="roleAccess"
-                onBlur={handleBlur}
-                placeholder="Select Role Access"
-              />
-            )}
-          />
-        </FormLabel>
+        <Box sx={{ padding: '24px', margin: 0 }}>
+          <FormLabel
+            text="Name"
+            error={touched.name && Boolean(errors.name)}
+            helperText={touched.name && errors.name && `${errors.name}`}
+          >
+            <TextField
+              type="text"
+              name="name"
+              placeholder="Input Category name"
+              value={values.name}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              fullWidth
+            />
+          </FormLabel>
+          <FormLabel
+            text="Email"
+            error={touched.email && Boolean(errors.email)}
+            helperText={touched.email && errors.email && `${errors.email}`}
+          >
+            <TextField
+              type="text"
+              name="email"
+              placeholder="Input Category name"
+              value={values.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              fullWidth
+            />
+          </FormLabel>
+          <FormLabel
+            text="Role Access"
+            error={touched.roleAccess && Boolean(errors.roleAccess)}
+            helperText={
+              touched.roleAccess && errors.roleAccess && `${errors.roleAccess}`
+            }
+          >
+            <Autocomplete
+              id="role"
+              options={[]}
+              onChange={(e, value) => {
+                setFieldValue('roleAccess', value);
+              }}
+              isOptionEqualToValue={(option) => option === values.roleAccess}
+              getOptionLabel={(option) => `${option}`}
+              value={values.roleAccess}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  name="roleAccess"
+                  onBlur={handleBlur}
+                  placeholder="Select Role Access"
+                />
+              )}
+            />
+          </FormLabel>
+        </Box>
         <Box
           width="100%"
           display="flex"
           gap="10px"
           justifyContent="end"
-          mt="50px"
+          // mt="50px"
+          sx={{
+            padding: '24px',
+            boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
+          }}
         >
           <Button variant="text" color="error">
             Cancel

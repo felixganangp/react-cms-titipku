@@ -11,20 +11,26 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
-import Table from 'components/Table';
+
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { skuManagementAction } from 'store/slice/SkuManagement';
+import useModal from 'hooks/useModal';
+import Table from 'components/Table';
+import Modal from 'components/Modal';
+
 import { Image } from './SkuManagement.styled';
+import FormSku from './components/form';
 
 // type Props = {};
 
 export default function SkuManagement() {
   // {}: Props
   // const dispatch = useAppDispatch();
-  const skus = useAppSelector((state) => state.skuManagement.data);
+  const skus = useAppSelector((state: any) => state.skuManagement.data);
   // React.useEffect(() => {
   //   dispatch(skuManagementAction.fetchData());
   // }, []);
+  const formModal = useModal();
 
   const headCell = [
     {
@@ -86,12 +92,7 @@ export default function SkuManagement() {
         <Grid item xs={12}>
           <Card>
             <Box display="flex" gap="20px" flexWrap="wrap">
-              <Button
-                startIcon={<AddIcon />}
-                onClick={() => {
-                  console.log('test');
-                }}
-              >
+              <Button startIcon={<AddIcon />} onClick={formModal.openModal}>
                 Add New
               </Button>
               <TextField
@@ -130,6 +131,13 @@ export default function SkuManagement() {
           </Box>
         </Grid>
       </Grid>
+      <Modal
+        open={formModal.open}
+        title="Input New SKU"
+        onClose={formModal.closeModal}
+      >
+        <FormSku onClose={formModal.closeModal} />
+      </Modal>
     </Box>
   );
 }

@@ -7,9 +7,9 @@ import ReportIcon from '@mui/icons-material/Report';
 interface FormControlPros {
   text: string;
   children: JSX.Element;
-  helperText: string | false | undefined;
+  helperText?: string | false | undefined;
   required?: boolean | undefined | null;
-  error: boolean | undefined;
+  error?: boolean | undefined;
 }
 
 const FormControl = (props: FormControlPros) => (
@@ -44,6 +44,8 @@ const FormControl = (props: FormControlPros) => (
 
 FormControl.defaultProps = {
   required: false,
+  helperText: '',
+  error: false,
 };
 
 export default FormControl;
