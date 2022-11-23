@@ -6,6 +6,7 @@ const Login = lazy(() => import('pages/Auth/login'));
 const RoleUser = lazy(() => import('pages/RoleUser'));
 const RoleAccess = lazy(() => import('pages/RoleAccess'));
 const RoleAccessDetails = lazy(() => import('pages/RoleAccess/Details'));
+const SkuManagement = lazy(() => import('pages/SkuManagement'));
 
 interface RouteProps {
   path: string;
@@ -42,6 +43,12 @@ const ListRoute: RouteProps[] = [
   {
     comp: RoleAccessDetails,
     path: '/role-access-details',
+    index: true,
+    auth: 'Private',
+  },
+  {
+    comp: SkuManagement,
+    path: '/sku-management',
     index: true,
     auth: 'Private',
   },
