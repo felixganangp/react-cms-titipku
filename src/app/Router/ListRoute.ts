@@ -3,6 +3,7 @@ import { lazy } from 'react';
 const Home = lazy(() => import('pages/Home'));
 const NotFound = lazy(() => import('pages/NotFound'));
 const Login = lazy(() => import('pages/Auth/login'));
+const googleOauth = lazy(() => import('pages/Auth/googleOauth'));
 const RoleUser = lazy(() => import('pages/RoleUser'));
 const RoleAccess = lazy(() => import('pages/RoleAccess'));
 const RoleAccessDetails = lazy(() => import('pages/RoleAccess/Details'));
@@ -25,6 +26,12 @@ const ListRoute: RouteProps[] = [
   {
     comp: Login,
     path: '/sign-in',
+    index: true,
+    auth: 'Public',
+  },
+  {
+    comp: googleOauth,
+    path: '/dashboard',
     index: true,
     auth: 'Public',
   },
