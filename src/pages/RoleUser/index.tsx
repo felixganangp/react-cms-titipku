@@ -20,6 +20,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
 
 import FormRoleUser from './components/form';
+import MenuList from 'components/MenuList';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { Bullet, Status } from './roleuser.styled';
 
 export default function RoleUser() {
   // const toast = useToast();
@@ -35,14 +38,94 @@ export default function RoleUser() {
     {
       id: 'name',
       label: 'Name',
-      align: 'center',
+      align: 'left',
     },
     {
-      id: 'value',
-      label: 'Value',
-      align: 'center',
+      id: 'email',
+      label: 'Email',
+      align: 'left',
+    },
+    {
+      id: 'role',
+      label: 'Role',
+      align: 'left',
+      format: (val: any) => (
+        <Bullet>{`\u2022  ${val.role}`}</Bullet>
+      )
+    },
+    {
+      id: 'last_update',
+      label: 'Last Update',
+      align: 'left',
+    },
+    {
+      id: 'status',
+      label: 'Status',
+      align: 'left',
+      format: (val: any) => (
+        <Status status={val.status}>
+          <span>{ val.status ? 'Active' : 'Inactive' }</span>
+        </Status>
+      )
+    },
+    {
+      id: 'menu',
+      label: '',
+      align: 'left',
+      format: (val: any) => (
+        <>
+          <MenuList
+            menu={[
+              {
+                label: 'Change Role Access',
+                onClick: () => {
+                  console.log('change role access');
+                },
+              },
+              {
+                label: `Set to Inactive`,
+                color: '#c10000',
+                onClick: () => {
+                  console.log('set active inactive');
+                },
+              },
+            ]}
+          >
+            <IconButton>
+              <MoreVertIcon />
+            </IconButton>
+          </MenuList>
+        </>
+      ),
     },
   ];
+
+  const data = [
+    {
+      id: 1,
+      name: 'Role User Name',
+      email: 'email@titipku.com',
+      role: 'Super Admin',
+      status: false,
+      last_update: 'Januari, 8, 2023 12:00 AM',
+    },
+    {
+      id: 2,
+      name: 'Role User Name',
+      email: 'email@titipku.com',
+      role: 'Super Admin',
+      status: true,
+      last_update: 'Januari, 8, 2023 12:00 AM',
+    },
+    {
+      id: 3,
+      name: 'Role User Name',
+      email: 'email@titipku.com',
+      role: 'Super Admin',
+      status: true,
+      last_update: 'Januari, 8, 2023 12:00 AM',
+    }
+  ]
 
   return (
     <div>
@@ -60,7 +143,7 @@ export default function RoleUser() {
                   Add New
                 </Button>
                 <TextField
-                  placeholder="Search for Category Name, Category ID..."
+                  placeholder="Search for name or email"
                   size="small"
                   sx={{ bgcolor: '#ebeff3', maxWidth: '560px' }}
                   fullWidth
@@ -93,7 +176,7 @@ export default function RoleUser() {
               boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
             >
               <Table
-                data={[{ name: 'Testign' }]}
+                data={data}
                 selected={[]}
                 headCells={headCell}
                 page={1}
