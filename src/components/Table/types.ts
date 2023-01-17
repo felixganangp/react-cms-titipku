@@ -16,23 +16,31 @@ export interface HeadCells {
   align?: string;
 }
 
+interface TableOrder {
+  orderType: Order;
+  orderBy: string;
+}
 export interface EnhancedTableHeadProps {
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  order: Order;
-  orderBy: string;
+  orderType: Order;
+  orderBy: string | undefined;
   numSelected: number;
   rowCount: number;
   enableCheckBox: boolean;
   headCells: HeadCells[];
   bgHeader?: string;
   disableNumber: boolean;
+  onRequestSort?: (order: TableOrder) => void;
 }
 
 export interface EnhancedTableProps {
   enableCheckBox?: boolean;
   disableNumber?: boolean;
   loading?: boolean;
+  orderType?: Order;
+  orderBy?: string | undefined | null;
   totalPage: number;
+  handleRequestSort?: (order: TableOrder) => void;
   page: number;
   onChangePage: (page: number) => void;
   setSelected?: (array: (string | number)[]) => void;
