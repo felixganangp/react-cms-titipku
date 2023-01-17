@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import { Navigate } from 'react-router-dom';
 import GooleIcon from 'components/Icon/Google';
 
 export default function Login() {
@@ -32,6 +33,13 @@ export default function Login() {
     );
     // w?.focus();
   };
+
+  const authToken = localStorage.getItem('auth');
+  const parsAuthToken = JSON.parse(authToken || '{}');
+  const isAuth = parsAuthToken.token;
+  if (isAuth) {
+    return <Navigate to="/role-user" />;
+  }
 
   return (
     <Box>

@@ -2,9 +2,12 @@ import { all, call, put, takeLatest } from 'redux-saga/effects';
 import { roleUserAction } from 'store/slice/RoleUser';
 import { uiAction } from 'store/slice/ui';
 
+import * as AdministratorService from 'service/Administrator';
+
 function* fetchData() {
   try {
     // const response: ListResponse<City> = yield call(cityApi.getAll);
+    const response = yield call(AdministratorService.getAllAdministrator);
     yield put(
       uiAction.openToast({
         headMsg: 'Success data',

@@ -189,7 +189,7 @@ const TopBar = (props: TopBarInterface) => {
                       </Role>
                     </Stack>
                   </Box>
-                  <Link to="login" style={{ textDecoration: 'none' }}>
+                  <Link to="/sign-in" style={{ textDecoration: 'none' }}>
                     <LogoutButton onClick={() => logout()}>
                       Sign Out
                       <PowerSettingsNewOutlinedIcon />
