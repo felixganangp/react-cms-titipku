@@ -86,9 +86,9 @@ function Menu(props: MenuProps) {
               <Box position="absolute" top="30%" right="5px">
                 {
                   // eslint-disable-next-line no-nested-ternary
-                  menu.child.length > 0 && openList !== menu.id
+                  menu.child.length > 0 && openList !== menu.id && open
                     ? iconOpened
-                    : menu.child.length > 0 && openList === menu.id
+                    : menu.child.length > 0 && openList === menu.id && open
                     ? iconClosed
                     : null
                 }
@@ -137,9 +137,9 @@ function Menu(props: MenuProps) {
               <Box position="absolute" top="30%" right="5px">
                 {
                   // eslint-disable-next-line no-nested-ternary
-                  menu.child.length > 0 && openList !== menu.id
+                  menu.child.length > 0 && openList !== menu.id && !open
                     ? iconOpened
-                    : menu.child.length > 0 && openList === menu.id
+                    : menu.child.length > 0 && openList === menu.id && !open
                     ? iconClosed
                     : null
                 }
