@@ -19,9 +19,10 @@ import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
 
-import FormRoleUser from './components/form';
 import MenuList from 'components/MenuList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import FormRoleUser from './components/form';
+
 import { Bullet, Status } from './roleuser.styled';
 
 export default function RoleUser() {
@@ -51,9 +52,7 @@ export default function RoleUser() {
       id: 'role',
       label: 'Role',
       align: 'left',
-      format: (val: any) => (
-        <Bullet>{`\u2022  ${val.role}`}</Bullet>
-      )
+      format: (val: any) => <Bullet>{`\u2022  ${val.role}`}</Bullet>,
     },
     {
       id: 'last_update',
@@ -66,9 +65,9 @@ export default function RoleUser() {
       align: 'left',
       format: (val: any) => (
         <Status status={val.status}>
-          <span>{ val.status ? 'Active' : 'Inactive' }</span>
+          <span>{val.status ? 'Active' : 'Inactive'}</span>
         </Status>
-      )
+      ),
     },
     {
       id: 'menu',
@@ -126,8 +125,8 @@ export default function RoleUser() {
       role: 'Super Admin',
       status: true,
       last_update: 'Januari, 8, 2023 12:00 AM',
-    }
-  ]
+    },
+  ];
 
   return (
     <div>

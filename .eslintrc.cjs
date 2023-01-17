@@ -29,6 +29,7 @@ module.exports = {
   plugins: ['react', '@typescript-eslint', 'prettier'],
   rules: {
     'prettier/prettier': ['error', prettierOptions],
+    'no-async-promise-executor': 0,
     'react/function-component-definition': 0,
     'react/no-array-index-key': 0,
     'react/destructuring-assignment': 0,
