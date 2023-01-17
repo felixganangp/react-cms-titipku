@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -29,6 +29,8 @@ export default function RoleUser() {
   const formModal = useModal();
   const formModal2 = useModal();
   const dispatch = useAppDispatch();
+  const [orderType, setOrderType] = useState<'asc' | 'desc'>('asc');
+  const [orderBy, setOrderBy] = useState<string | null>(null);
 
   React.useEffect(() => {
     dispatch(roleUserAction.fetchData());
@@ -182,7 +184,12 @@ export default function RoleUser() {
                 page={1}
                 totalPage={10}
                 onChangePage={(e) => console.log(e)}
-                // loading
+                handleRequestSort={(e) => {
+                  setOrderBy(e.orderBy);
+                  setOrderType(e.orderType);
+                }}
+                orderType={orderType}
+                orderBy={orderBy}
                 enableCheckBox
               />
             </Box>

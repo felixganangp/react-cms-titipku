@@ -1,20 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-
+import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { EnhancedTableHeadProps, Align } from './types';
 
 export default function EnhancedTableHead(props: EnhancedTableHeadProps) {
   const {
     onSelectAllClick,
-    order,
+    orderType,
     orderBy,
     numSelected,
     rowCount,
     enableCheckBox,
     disableNumber,
+    onRequestSort,
   } = props;
 
   return (
@@ -66,10 +67,23 @@ export default function EnhancedTableHead(props: EnhancedTableHeadProps) {
             key={headCell.id}
             align={headCell.align as Align}
             padding={headCell.disablePadding ? 'none' : 'normal'}
-            sortDirection={orderBy === headCell.id ? order : false}
-            width={headCell.width}
+            // sortDirection={orderBy === headCell.id ? orderType : false}
           >
-            {headCell.label}
+            <TableSortLabel
+              active={orderBy === headCell.id}
+              direction={orderBy === headCell.id ? orderType : 'asc'}
+              onClick={() => {
+                if (onRequestSort) {
+                  const order = orderType === 'desc' ? 'asc' : 'desc';
+                  onRequestSort({
+                    orderBy: headCell.id,
+                    orderType: orderBy !== headCell.id ? 'asc' : order,
+                  });
+                }
+              }}
+            >
+              {headCell.label}
+            </TableSortLabel>
           </TableCell>
         ))}
       </TableRow>

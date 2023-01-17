@@ -79,23 +79,17 @@ function stableSort<T>(
 function EnhancedTable({
   disableNumber = false,
   enableCheckBox = false,
+  handleRequestSort,
   selected = [],
   setSelected = () => [],
+  orderType = 'asc',
+  orderBy,
   ...props
 }: EnhancedTableProps) {
-  const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState('');
+  // const [order, setOrder] = React.useState<Order>('asc');
+  // const [orderBy, setOrderBy] = React.useState('');
   const [page] = React.useState(0);
   const [rowsPerPage] = React.useState(10);
-
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: string,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -166,10 +160,10 @@ function EnhancedTable({
         >
           <EnhancedTableHead
             numSelected={enableCheckBox ? selected.length : 0}
-            order={order}
+            orderType={orderType}
             orderBy={orderBy}
             onSelectAllClick={handleSelectAllClick}
-            // onRequestSort={handleRequestSort}
+            onRequestSort={handleRequestSort}
             rowCount={props.data.length}
             headCells={props.headCells}
             bgHeader={props.bgHeader}
@@ -178,67 +172,67 @@ function EnhancedTable({
           />
           <TableBody>
             {!props.loading &&
-              stableSort(props.data, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row, index) => {
-                  const isItemSelected = isSelected(row.id);
-                  const labelId = `enhanced-table-checkbox-${index}`;
-                  return (
-                    <TableRow
-                      hover
-                      // role="checkbox"
-                      aria-checked={isItemSelected}
-                      tabIndex={-1}
-                      key={String(index)}
-                      selected={isItemSelected}
-                    >
-                      {!props.loading && enableCheckBox && (
-                        <TableCell
-                          padding="checkbox"
-                          sx={{ border: 'none', bgcolor: '#fff' }}
-                        >
-                          <Checkbox
-                            color="primary"
-                            checked={isItemSelected}
-                            inputProps={{
-                              'aria-labelledby': labelId,
-                            }}
-                            onClick={(event) => handleClick(event, row.id)}
-                          />
-                        </TableCell>
-                      )}
-                      {!props.loading && !disableNumber && (
-                        <TableCell
-                          padding="checkbox"
-                          sx={{
-                            border: 'none',
-                            whiteSpace: 'nowrap',
-                            bgcolor: '#fff',
+              // stableSort(props.data, getComparator(orderType, orderBy))
+              //   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              props.data.map((row, index) => {
+                const isItemSelected = isSelected(row.id);
+                const labelId = `enhanced-table-checkbox-${index}`;
+                return (
+                  <TableRow
+                    hover
+                    // role="checkbox"
+                    aria-checked={isItemSelected}
+                    tabIndex={-1}
+                    key={String(index)}
+                    selected={isItemSelected}
+                  >
+                    {!props.loading && enableCheckBox && (
+                      <TableCell
+                        padding="checkbox"
+                        sx={{ border: 'none', bgcolor: '#fff' }}
+                      >
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          inputProps={{
+                            'aria-labelledby': labelId,
                           }}
-                          align="center"
-                        >
-                          {index + 1}
-                        </TableCell>
-                      )}
-                      {props.headCells.map((val, key) => (
-                        <TableCell
-                          sx={{
-                            padding: '10px',
-                            border: 'none',
-                            whiteSpace: 'wrap',
-                            fontSize: '14px',
-                            color: '#626b79',
-                            bgcolor: '#fff',
-                          }}
-                          align={val.align as Align}
-                          key={String(key)}
-                        >
-                          {val.format ? val.format(row) : row[val.id]}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  );
-                })}
+                          onClick={(event) => handleClick(event, row.id)}
+                        />
+                      </TableCell>
+                    )}
+                    {!props.loading && !disableNumber && (
+                      <TableCell
+                        padding="checkbox"
+                        sx={{
+                          border: 'none',
+                          whiteSpace: 'nowrap',
+                          bgcolor: '#fff',
+                        }}
+                        align="center"
+                      >
+                        {index + 1}
+                      </TableCell>
+                    )}
+                    {props.headCells.map((val, key) => (
+                      <TableCell
+                        sx={{
+                          padding: '10px',
+                          border: 'none',
+                          whiteSpace: 'wrap',
+                          fontSize: '14px',
+                          color: '#626b79',
+                          bgcolor: '#fff',
+                        }}
+                        align={val.align as Align}
+                        key={String(key)}
+                      >
+                        {val.format ? val.format(row) : row[val.id]}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })}
             {!props.loading && props.data.length === 0 && (
               <TableRow>
                 <TableCell
