@@ -31,7 +31,7 @@ const ListRoute: RouteProps[] = [
   },
   {
     comp: googleOauth,
-    path: '/dashboard',
+    path: '/oauth',
     index: true,
     auth: 'Public',
   },
