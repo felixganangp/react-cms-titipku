@@ -13,7 +13,7 @@ export default function IndexRoute() {
           key={index}
           element={
             val.auth === 'Private' ? (
-              <PrivateRoute redirect="/">
+              <PrivateRoute redirect="/sign-in">
                 <Suspense>
                   <val.comp />
                 </Suspense>

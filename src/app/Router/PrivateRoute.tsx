@@ -13,8 +13,10 @@ export default function PrivateRoute({
   children,
 }: PrivateRouteProps) {
   const [open, setOpen] = useState(true);
+  const authToken = localStorage.getItem('auth');
+  const parsAuthToken = JSON.parse(authToken || '{}');
 
-  const isAuth = true;
+  const isAuth = parsAuthToken.token;
   if (!isAuth) {
     return <Navigate to={redirect} />;
   }
