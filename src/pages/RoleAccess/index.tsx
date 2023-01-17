@@ -14,6 +14,8 @@ import Table from 'components/Table';
 import Typography from '@mui/material/Typography';
 import RoleAccessForm from './Form/Form';
 import useModal from '../../hooks/useModal';
+import MenuList from '@/components/MenuList';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export default function RoleAccess() {
   const toast = useToast();
@@ -46,6 +48,36 @@ export default function RoleAccess() {
       id: 'numberOfUser',
       label: 'User',
       align: 'left',
+    },
+    {
+      id: 'menu',
+      label: 'Action',
+      align: 'left',
+      format: (val: any) => (
+        <>
+          <MenuList
+            menu={[
+              {
+                label: 'Change Role Access',
+                onClick: () => {
+                  console.log('change role access');
+                },
+              },
+              {
+                label: `Set to Inactive`,
+                color: '#c10000',
+                onClick: () => {
+                  console.log('set active inactive');
+                },
+              },
+            ]}
+          >
+            <IconButton>
+              <MoreVertIcon />
+            </IconButton>
+          </MenuList>
+        </>
+      ),
     },
   ];
 
