@@ -100,6 +100,7 @@ class ImageCrop extends React.Component<Props, State> {
         open={open}
         width="auto"
         padding="0px"
+        data-testid="test-modal-1"
       >
         <div>
           <Box position="relative">
