@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
@@ -6,18 +6,29 @@ import Button from '@mui/material/Button';
 import GooleIcon from 'components/Icon/Google';
 
 export default function Login() {
+  const [errMessage, setErrMessage] = useState('');
   useEffect(() => {
-    // window.addEventListener('message', (evt) => {
-    //   console.log('listen-login', evt);
-    //   // window.location.href = 'http://127.0.0.1:3000/ssdfcasdf';
-    // });
+    if (window.location.search) {
+      let getSuccess = window.location.search.split('success=');
+      getSuccess = getSuccess[1].split('&');
+      if (getSuccess[0] === 'false') {
+        let getErrMessage = getSuccess[1].split('message=');
+        getErrMessage = getErrMessage[1].split('%20');
+        const strErrMsg = getErrMessage.join(' ');
+        setErrMessage(strErrMsg);
+      }
+    }
   }, []);
-
-  const openPopUp = () => {
-    const popup = window.open(
-      'https://accounts.google.com/o/oauth2/auth/oauthchooseaccount?client_id=1091036882687-dkacgde26l3167obt07136si6q9equf1.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fcms.titipku.space%2Fapi-dev%2Fv1%2Fauth%2Fgoogle%2Fcallback&response_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fuserinfo.email&state=c3BtIyMjaHR0cDovL2xvY2FsaG9zdDozMDAwIyMjYmF3MDk4Y3Z5QVMqJlQxMnJl&service=lso&o2v=1&flowName=GeneralOAuthFlow',
+  const link = `https://cms.titipku.space/api-dev/v2/auth/login/google?account_type=cms&redirect_url=${window.location.origin}/oauth`;
+  const openPopUp = (popUpWidth: number, popUpHeight: number) => {
+    // eslint-disable-next-line no-restricted-globals
+    const left: number = (screen.width - popUpWidth) / 2;
+    // eslint-disable-next-line no-restricted-globals
+    const top: number = (screen.height - popUpHeight) / 2;
+    window.open(
+      link,
       '_blank',
-      'width=400,height=400,scrollbars=1',
+      `width=${popUpWidth},height=${popUpHeight},scrollbars=1,left=${left},top=${top}`,
     );
     // w?.focus();
   };
@@ -73,15 +84,17 @@ export default function Login() {
                 fullWidth
                 sx={{ borderRadius: '20px' }}
                 startIcon={<GooleIcon />}
-                onClick={() => openPopUp()}
+                onClick={() => openPopUp(400, 400)}
               >
                 Sign in with Google
               </Button>
-              <Box bgcolor="#EC6470" p="10px" color="#fff" borderRadius="5px">
-                <Typography>
-                  Login failed, please try again later or contact support
-                </Typography>
-              </Box>
+              {errMessage ? (
+                <Box bgcolor="#EC6470" p="10px" color="#fff" borderRadius="5px">
+                  <Typography>Login failed: {errMessage}</Typography>
+                </Box>
+              ) : (
+                <></>
+              )}
             </Box>
           </Box>
         </Grid>
