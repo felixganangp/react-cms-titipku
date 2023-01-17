@@ -92,10 +92,12 @@ function InputImage({
           value=""
           style={{ display: 'none' }}
           accept="image/png, image/jpg, image/jpeg"
+          data-testid="test-input-1"
           // {...otherProps}
         />
         {value ? (
           <Image
+            data-testid="test-img-1"
             src={typeof value !== 'string' ? URL.createObjectURL(value) : value}
           />
         ) : (
@@ -123,8 +125,7 @@ function InputImage({
                 color: '#8b95a5',
               }}
             >
-              Please upload {label} with {width}x{height}
-              Pixels
+              Please upload {label} with {width}x{height} Pixels
             </Typography>
           </Box>
         )}
