@@ -29,6 +29,9 @@ const RoleAccessSlice = createSlice({
     add(state: RoleAccessProps) {
       state.loadingForm = true;
     },
+    update(state: RoleAccessProps) {
+      state.loadingForm = true;
+    },
   },
 });
 
