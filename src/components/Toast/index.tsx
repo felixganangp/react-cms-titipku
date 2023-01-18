@@ -25,7 +25,7 @@ export interface ToastProsp {
   duration?: number;
   severity?: AlertColor;
   headMsg: string;
-  message?: string;
+  message?: string | undefined;
   deleted?: boolean;
 }
 

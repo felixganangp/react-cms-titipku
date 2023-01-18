@@ -10,8 +10,25 @@ import Theme from 'theme';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
+console.log(import.meta.env);
+
+const { PROD } = import.meta.env;
+
+if (PROD) {
+  ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+    <React.StrictMode>
+      <Provider store={store}>
+        <BrowserRouter>
+          <ThemeProvider theme={Theme}>
+            <CssBaseline />
+            <App />
+          </ThemeProvider>
+        </BrowserRouter>
+      </Provider>
+    </React.StrictMode>,
+  );
+} else {
+  ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <Provider store={store}>
       <BrowserRouter>
         <ThemeProvider theme={Theme}>
@@ -19,6 +36,6 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
           <App />
         </ThemeProvider>
       </BrowserRouter>
-    </Provider>
-  </React.StrictMode>,
-);
+    </Provider>,
+  );
+}
