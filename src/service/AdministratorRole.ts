@@ -18,14 +18,13 @@ export const fetchAdministratorRole  = (params: any) =>
   });
 
 
-export const createAdministratorRole  = (params: any) =>
+export const createAdministratorRole  = (body: any) =>
   new Promise(async (resolve, reject) => {
     try {
-      const respon = await http.post(`/administrator`, {
-        params,
-      });
-      if (respon.data) {
-        resolve(respon.data);
+      const response = await http.post(`/administrator/role`, body);
+      console.log('response', response);
+      if (response) {
+        resolve(response);
       }
     } catch (err: any) {
       const message = err.response
@@ -36,10 +35,12 @@ export const createAdministratorRole  = (params: any) =>
   });
 
 
-export const fetchAdministratorControl = () =>
+export const fetchAdministratorControl = (params: any) =>
   new Promise(async (resolve, reject) => {
     try {
-        const respon = await http.get(`/administrator/control?account_type=cms`);
+        const respon = await http.get(`/administrator/control`, {
+          params,
+        });
         if (respon.data) resolve(respon.data);
     } catch (err: any) {
         const message = err.response

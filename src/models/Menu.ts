@@ -1,3 +1,5 @@
+import { ListOfMenu } from "./ListOfMenu";
+
 export interface Menu {
   timestamp: number;
   status: string;

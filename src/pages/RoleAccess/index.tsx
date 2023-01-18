@@ -14,12 +14,20 @@ import Table from 'components/Table';
 import Typography from '@mui/material/Typography';
 import RoleAccessForm from './Form/Form';
 import useModal from '../../hooks/useModal';
-import MenuList from '@/components/MenuList';
+import MenuList from '../../components/MenuList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { useAppDispatch } from 'store/hooks';
+import { roleAccessAction } from '../../store/slice/RoleAccess';
 
 export default function RoleAccess() {
   const toast = useToast();
   const formModal = useModal();
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    console.log('calling....');
+    dispatch(roleAccessAction.fetchMenuList());
+  }, []);
 
   // data table
   const callToast = () => {

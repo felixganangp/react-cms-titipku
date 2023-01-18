@@ -17,10 +17,11 @@ interface AccordionOnDetailsProps {
   children: any;
   parent: boolean;
   headerContent: any;
+  havingChild: boolean;
 }
 
 export default function AccordionOnDetails(props: AccordionOnDetailsProps) {
-  const { title, children, parent, headerContent } = props;
+  const { title, children, parent, headerContent, havingChild } = props;
   // content
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const contentRef = useRef<any>();
@@ -43,7 +44,7 @@ export default function AccordionOnDetails(props: AccordionOnDetailsProps) {
           <Icon rotate={isOpen ? 1 : 0}>
             <KeyboardArrowRightIcon
               sx={{
-                color: parent ? '#626b79' : '#ffff',
+                color: parent && havingChild ? '#626b79' : 'transparent',
                 width: '16px',
                 height: '16px',
               }}

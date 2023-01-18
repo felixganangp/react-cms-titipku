@@ -70,10 +70,10 @@ export const HorizontalContent = styled(Box)`
   height: 30px;
   padding-top: 0px;
   padding-bottom: 0px;
-  :nth-child(odd) {
+  :nth-of-type(odd) {
     background-color: #fafafa;
   }
-  :nth-child(even) {
+  :nth-of-type(even) {
     background-color: #ffff;
   }
 `;

@@ -8,6 +8,7 @@ import { RoleUserResponse } from 'models/RoleUser';
 function* fetchData() {
   try {
     // const response: ListResponse<City> = yield call(cityApi.getAll);
+    console.log('fetch role user list');
     const params = {
       page: 1,
       count: 10,

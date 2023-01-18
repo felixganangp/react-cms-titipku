@@ -33,9 +33,9 @@ export default function RoleUser() {
   const [orderType, setOrderType] = useState<'asc' | 'desc'>('asc');
   const [orderBy, setOrderBy] = useState<string | null>(null);
 
-  // React.useEffect(() => {
-  //   dispatch(roleUserAction.fetchData());
-  // }, []);
+  React.useEffect(() => {
+    dispatch(roleUserAction.fetchData());
+  }, []);
 
   const headCell = [
     {
