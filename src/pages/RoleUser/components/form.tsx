@@ -30,10 +30,6 @@ export default function Form({ onClose }: FormProps) {
   // fetching role user
   const dispatch = useAppDispatch();
   const roleUserSelector = useAppSelector((state) => state.roleUser);
-  console.log(
-    '🚀 ~ file: form.tsx:30 ~ Form ~ roleUserSelector',
-    roleUserSelector,
-  );
   useEffect(() => {
     dispatch(
       roleUserAction.fetchData({
