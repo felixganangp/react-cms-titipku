@@ -29,6 +29,7 @@ export default function Form() {
   const formik = useFormik({
     initialValues,
     onSubmit: async (value) => {
+      console.log(value);
       try {
         toast.openToast({
           headMsg: 'Success',
@@ -45,7 +46,10 @@ export default function Form() {
     },
     validationSchema: yup.object({
       name: yup.string().required('Name is required'),
-      email: yup.string().required('Email is required'),
+      email: yup
+        .string()
+        .email('Invalid email format')
+        .required('Email is required'),
       roleAccess: yup.mixed().required('Role access is required'),
     }),
     enableReinitialize: true,
@@ -105,12 +109,12 @@ export default function Form() {
           >
             <Autocomplete
               id="role"
-              options={[]}
+              options={roleAccesses.data}
               onChange={(e, value) => {
                 setFieldValue('roleAccess', value);
               }}
               isOptionEqualToValue={(option) => option === values.roleAccess}
-              getOptionLabel={(option) => `${option}`}
+              getOptionLabel={(option: any) => `${option.name}`}
               value={values.roleAccess}
               renderInput={(params) => (
                 <TextField

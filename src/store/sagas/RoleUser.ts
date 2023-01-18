@@ -16,7 +16,7 @@ function* fetchData() {
       is_exist: true,
     };
     const response: RoleUserResponse = yield call(
-      AdministratorService.getAllAdministrator,
+      AdministratorService.getAllAdministratorRole,
       params,
     );
     yield put(
