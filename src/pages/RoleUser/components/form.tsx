@@ -8,6 +8,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { roleUserAction } from 'store/slice/RoleUser';
+import { roleAccessAction } from 'store/slice/RoleAccess';
 import useToast from 'hooks/useToast';
 import FormLabel from 'components/FormLabel';
 
@@ -30,9 +31,10 @@ export default function Form({ onClose }: FormProps) {
   // fetching role user
   const dispatch = useAppDispatch();
   const roleUserSelector = useAppSelector((state) => state.roleUser);
+  const roleAccessSelector = useAppSelector((state) => state.roleAccess);
   useEffect(() => {
     dispatch(
-      roleUserAction.fetchData({
+      roleAccessAction.fetchData({
         account_type: 'cms',
       }),
     );
@@ -120,7 +122,7 @@ export default function Form({ onClose }: FormProps) {
           >
             <Autocomplete
               id="role"
-              options={roleUserSelector.data}
+              options={roleAccessSelector.data}
               onChange={(e, value) => {
                 setFieldValue('roleAccess', value);
               }}

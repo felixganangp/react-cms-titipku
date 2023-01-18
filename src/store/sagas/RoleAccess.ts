@@ -5,11 +5,11 @@ import { uiAction } from 'store/slice/ui';
 
 import * as AdministratorService from 'service/Administrator';
 import { ListResponse } from 'models/fetch';
-import { RoleUser, RoleUserParams } from 'models/RoleUser';
+import { RoleAccess, RoleAccessParams } from 'models/RoleAccess';
 
-function* fetchData(params: PayloadAction<RoleUserParams>) {
+function* fetchData(params: PayloadAction<RoleAccessParams>) {
   try {
-    const response: ListResponse<RoleUser> = yield call(
+    const response: ListResponse<RoleAccess> = yield call(
       AdministratorService.getAllAdministratorRole,
       params.payload,
     );

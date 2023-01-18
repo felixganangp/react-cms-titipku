@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RoleAccess } from 'models/RoleAccess';
+import { RoleAccess, RoleAccessParams } from 'models/RoleAccess';
 
 interface RoleAccessProps {
   data: RoleAccess[];
@@ -17,7 +17,7 @@ const RoleAccessSlice = createSlice({
   name: 'RoleAccess',
   initialState,
   reducers: {
-    fetchData(state: RoleAccessProps) {
+    fetchData(state: RoleAccessProps, action: PayloadAction<RoleAccessParams>) {
       state.loading = true;
     },
     fetchDataSuccess(
