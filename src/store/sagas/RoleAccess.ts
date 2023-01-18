@@ -1,37 +1,42 @@
-import { put, takeLatest } from 'redux-saga/effects';
-import { uiAction } from '../slice/ui';
-import { roleAccessAction } from '../slice/RoleAccess';
+import { call, put, takeLatest } from 'redux-saga/effects';
+import { PayloadAction } from '@reduxjs/toolkit';
+import { roleAccessAction } from 'store/slice/RoleAccess';
+import { uiAction } from 'store/slice/ui';
 
-function* fetchRoleAccess() {
-  try {
-    // const res = yield call()
-    yield put(
-      uiAction.openToast({
-        headMsg: 'Success data',
-        message: 'Succes Fetch data',
-        severity: 'success',
-      }),
-    );
-  } catch (error) {
-    console.log(`Failed to fetch city list`, error);
-  }
-}
+import * as AdministratorService from 'service/Administrator';
+import { ListResponse } from 'models/fetch';
+import { RoleUser, RoleUserParams } from 'models/RoleUser';
 
-function* addRoleAccess() {
+function* fetchData(params: PayloadAction<RoleUserParams>) {
   try {
-    yield put(
-      uiAction.openToast({
-        headMsg: 'Success add Role Access',
-        message: 'Succesfully add new role access',
-        severity: 'success',
-      }),
+    const response: ListResponse<RoleUser> = yield call(
+      AdministratorService.getAllAdministratorRole,
+      params.payload,
     );
-  } catch (error) {
-    console.log('Failed to add role access', error);
+
+    yield put(roleAccessAction.fetchDataSuccess(response.data));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Success data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Success data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
   }
 }
 
 export default function* saga() {
-  yield takeLatest(roleAccessAction.get, fetchRoleAccess);
-  yield takeLatest(roleAccessAction.add, addRoleAccess);
+  yield takeLatest(roleAccessAction.fetchData.type, fetchData);
 }

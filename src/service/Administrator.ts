@@ -1,7 +1,8 @@
 import http from 'utils/request';
+import { RoleAccessParams } from 'models/RoleAccess';
 
-export const getAllAdministratorRole = (params: any) =>
-  new Promise(async (resolve, reject) => {
+export const getAllAdministratorRole = (params: RoleAccessParams) =>
+  new Promise<RoleAccessParams>(async (resolve, reject) => {
     try {
       const respon = await http.get(`administrator/role`, {
         params,
