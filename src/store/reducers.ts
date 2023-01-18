@@ -7,6 +7,7 @@ const reducers = {
   ui: uiReducer,
   roleUser: roleUserReducer,
   skuManagement: skuManagementReducer,
+  roleAccess: roleAccessReducer,
 };
 
 export default reducers;

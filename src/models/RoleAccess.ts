@@ -1,3 +1,4 @@
+import { C } from 'vitest/dist/global-732f9b14';
 import { ListParams } from './fetch';
 
 export interface RoleAccess {
@@ -10,4 +11,5 @@ export interface RoleAccess {
 export interface RoleAccessParams extends ListParams {
   account_type: string;
   search?: string | undefined | null;
+  is_exist?: boolean;
 }
