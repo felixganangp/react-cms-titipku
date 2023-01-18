@@ -4,6 +4,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Checkbox from '@mui/material/Checkbox';
+import SwapVertIcon from '@mui/icons-material/SwapVert';
+
 import { EnhancedTableHeadProps, Align } from './types';
 
 export default function EnhancedTableHead(props: EnhancedTableHeadProps) {
@@ -72,6 +74,7 @@ export default function EnhancedTableHead(props: EnhancedTableHeadProps) {
             <TableSortLabel
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? orderType : 'asc'}
+              IconComponent={SwapVertIcon}
               onClick={() => {
                 if (onRequestSort) {
                   const order = orderType === 'desc' ? 'asc' : 'desc';
