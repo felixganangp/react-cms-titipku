@@ -10,4 +10,5 @@ export interface RoleAccess {
 export interface RoleAccessParams extends ListParams {
   account_type: string;
   search?: string | undefined | null;
+  is_exist: boolean;
 }

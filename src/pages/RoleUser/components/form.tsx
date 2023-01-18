@@ -11,17 +11,14 @@ import { roleUserAction } from 'store/slice/RoleUser';
 import { roleAccessAction } from 'store/slice/RoleAccess';
 import useToast from 'hooks/useToast';
 import FormLabel from 'components/FormLabel';
+import { CreateRoleUser } from 'models/RoleUser';
 
-interface FormValue {
-  name: string;
-  email: string;
-  roleAccess: any | null;
-}
-
-const initial: FormValue = {
+const initial: CreateRoleUser = {
   name: '',
   email: '',
   roleAccess: null,
+  id_status: 1,
+  account_type: 'cms',
 };
 interface FormProps {
   onClose: () => void;
@@ -36,6 +33,7 @@ export default function Form({ onClose }: FormProps) {
     dispatch(
       roleAccessAction.fetchData({
         account_type: 'cms',
+        is_exist: true,
       }),
     );
   }, []);
@@ -48,9 +46,9 @@ export default function Form({ onClose }: FormProps) {
       const payload = {
         full_name: value.name,
         email: value.email,
-        id_role: value.roleAccess.id,
-        id_status: 1,
-        account_type: 'cms',
+        id_role: value.roleAccess?.id,
+        id_status: value.id_status,
+        account_type: value.account_type,
       };
       await dispatch(roleUserAction.addRoleUser(payload));
       if (!roleUserSelector.error) {

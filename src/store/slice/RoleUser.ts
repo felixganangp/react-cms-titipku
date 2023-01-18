@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RoleUser, RoleUserParams } from 'models/RoleUser';
+import {
+  RoleUser,
+  RoleUserParams,
+  CreateRoleUserPayload,
+} from 'models/RoleUser';
 
 interface RoleUserProps {
   data: RoleUser[];
@@ -26,10 +30,16 @@ const RoleUserSlice = createSlice({
       state.loading = false;
       state.data = action.payload;
     },
-    addRoleUser(state: RoleUserProps, action: PayloadAction<any>) {
+    addRoleUser(
+      state: RoleUserProps,
+      action: PayloadAction<CreateRoleUserPayload>,
+    ) {
       state.loadingForm = true;
     },
-    addRoleUserSuccess(state: RoleUserProps, action: PayloadAction<any>) {
+    addRoleUserSuccess(
+      state: RoleUserProps,
+      action: PayloadAction<{ error: boolean }>,
+    ) {
       state.loadingForm = false;
       state.error = action.payload.error;
     },
