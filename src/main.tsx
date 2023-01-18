@@ -10,8 +10,6 @@ import Theme from 'theme';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
-console.log(import.meta.env);
-
 const { PROD } = import.meta.env;
 
 if (PROD) {

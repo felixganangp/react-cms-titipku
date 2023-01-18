@@ -14,7 +14,7 @@ import Pagination from '@mui/material/Pagination';
 
 import EnhancedTableHead from './TableHead';
 
-import { Order, EnhancedTableProps, Align } from './types';
+import { EnhancedTableProps, Align } from './types';
 
 const PaginationStyle = styled(Pagination)`
   button {
@@ -39,44 +39,7 @@ const PaginationStyle = styled(Pagination)`
   }
 `;
 
-function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator<Key extends keyof any>(
-  order: Order,
-  orderBy: Key,
-): (
-  a: { [key in Key]: number | string },
-  b: { [key in Key]: number | string },
-) => number {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort<T>(
-  array: readonly T[],
-  comparator: (a: T, b: T) => number,
-) {
-  const stabilizedThis = array.map((el, index) => [el, index] as [T, number]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
-
-function EnhancedTable({
+function EnhancedTable<T>({
   disableNumber = false,
   enableCheckBox = false,
   handleRequestSort,
@@ -85,7 +48,7 @@ function EnhancedTable({
   orderType = 'asc',
   orderBy,
   ...props
-}: EnhancedTableProps) {
+}: EnhancedTableProps<T>) {
   // const [order, setOrder] = React.useState<Order>('asc');
   // const [orderBy, setOrderBy] = React.useState('');
   const [page] = React.useState(0);
@@ -102,8 +65,9 @@ function EnhancedTable({
 
   const handleClick = (
     event: React.MouseEvent<unknown>,
-    id: number | string,
+    id: string | number,
   ) => {
+    if (!id) return null;
     const selectedIndex = selected.indexOf(id);
     let newSelected: (string | number)[] = [];
 
@@ -123,8 +87,11 @@ function EnhancedTable({
     setSelected(newSelected);
   };
 
-  const isSelected = (id: number | string) =>
-    enableCheckBox ? selected.indexOf(id) !== -1 : false;
+  const isSelected = (id: string | number) => {
+    if (!id) return false;
+
+    return enableCheckBox ? selected.indexOf(id) !== -1 : false;
+  };
 
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
@@ -144,6 +111,15 @@ function EnhancedTable({
     }
 
     return col;
+  };
+
+  // eslint-disable-next-line consistent-return
+  const totalPage = () => {
+    if (props?.totalData && props?.count) {
+      return Math.ceil(props.totalData / props.count);
+    }
+
+    return 0;
   };
 
   return (
@@ -306,7 +282,7 @@ function EnhancedTable({
       </TableContainer>
       <Box marginY={3}>
         <PaginationStyle
-          count={props.totalPage}
+          count={totalPage()}
           shape="rounded"
           color="primary"
           page={props.page}

@@ -1,51 +1,66 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import useToast from 'hooks/useToast';
-import AddIcon from '@mui/icons-material/Add';
 import InputAdornment from '@mui/material/InputAdornment';
-import SearchIcon from '@mui/icons-material/Search';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
-import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
+
 import Table from 'components/Table';
-import Typography from '@mui/material/Typography';
-import RoleAccessForm from './Form/Form';
-import useModal from '../../hooks/useModal';
-import MenuList from '@/components/MenuList';
+import { HeadCells } from 'components/Table/types';
+import MenuList from 'components/MenuList';
+import debounce from 'utils/debounce';
+
+import AddIcon from '@mui/icons-material/Add';
+import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import SearchIcon from '@mui/icons-material/Search';
+import Typography from '@mui/material/Typography';
 
-export default function RoleAccess() {
-  const toast = useToast();
-  const formModal = useModal();
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { roleAccessAction } from 'store/slice/RoleAccess';
+import { RoleAccess } from 'models/RoleAccess';
 
-  // data table
-  const callToast = () => {
-    toast.openToast({
-      headMsg: 'Successfully Add Role',
-      deleted: false,
-      severity: 'success',
-    });
+import RoleAccessForm from './Form/Form';
+
+export default function RoleAccesPage() {
+  const dispatch = useAppDispatch();
+  const roleAccesses = useAppSelector((state) => state.roleAccess);
+
+  useEffect(() => {
+    dispatch(roleAccessAction.fetchData(roleAccesses.params));
+  }, [roleAccesses.params]);
+
+  const handleSearch = (value: string) => {
+    dispatch(
+      roleAccessAction.setParams({
+        account_type: 'cms',
+        page: 0,
+        search: value,
+      }),
+    );
+  };
+  const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
+
+  const handleChangePage = (value: number) => {
+    dispatch(
+      roleAccessAction.setParams({
+        account_type: 'cms',
+        page: value,
+      }),
+    );
   };
 
-  const callToast2 = () => {
-    toast.openToast({
-      headMsg: 'Successfully Download Role Access Data',
-      deleted: false,
-      severity: 'success',
-    });
-  };
-
-  const headCell = [
+  const headCell: HeadCells<RoleAccess>[] = [
     {
-      id: 'roleName',
+      id: 'name',
       label: 'Role Name',
       align: 'left',
     },
     {
-      id: 'numberOfUser',
+      id: 'total_admin',
       label: 'User',
       align: 'left',
     },
@@ -53,8 +68,9 @@ export default function RoleAccess() {
       id: 'menu',
       label: 'Action',
       align: 'left',
-      format: (val: any) => (
-        <>
+      width: '20px',
+      format: (val) => (
+        <div>
           <MenuList
             menu={[
               {
@@ -76,19 +92,8 @@ export default function RoleAccess() {
               <MoreVertIcon />
             </IconButton>
           </MenuList>
-        </>
+        </div>
       ),
-    },
-  ];
-
-  const dataTest = [
-    {
-      roleName: 'Super Admin',
-      numberOfUser: 4,
-    },
-    {
-      roleName: 'Manager',
-      numberOfUser: 12,
     },
   ];
 
@@ -314,7 +319,7 @@ export default function RoleAccess() {
 
   // form
   const [open, setOpen] = useState<boolean>(false);
-  const openForm = () => setOpen(!open);
+
   // const [isEdit, setIsEdit] = useState<boolean>(false);
   const [formData, setFormData] = useState<{
     name: string;
@@ -405,17 +410,10 @@ export default function RoleAccess() {
                       </InputAdornment>
                     ),
                   }}
-                />
-                <IconButton
-                  sx={{
-                    borderRadius: '4px',
-                    boxShadow: '0 3px 8px 0 rgba(0, 0, 0, 0.1)',
-                    border: 'solid 1px #ebeff3',
+                  onChange={(event) => {
+                    debounceSearch(event.target.value);
                   }}
-                  onClick={callToast2}
-                >
-                  <SimCardDownloadOutlinedIcon />
-                </IconButton>
+                />
               </Box>
             </Card>
           </Grid>
@@ -427,14 +425,13 @@ export default function RoleAccess() {
               boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
             >
               <Table
-                data={dataTest}
-                selected={[]}
+                data={roleAccesses.data}
                 headCells={headCell}
-                page={1}
-                totalPage={10}
-                onChangePage={(e) => console.log(e)}
-                // loading
-                enableCheckBox
+                page={roleAccesses.params.page}
+                totalData={roleAccesses.total}
+                count={roleAccesses.params.count}
+                onChangePage={(page) => handleChangePage(page)}
+                loading={roleAccesses.loading}
               />
             </Box>
           </Grid>

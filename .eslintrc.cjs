@@ -36,6 +36,7 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'react/no-unstable-nested-components': 'off',
     'no-param-reassign': 'off',
+    'consistent-return': 0,
     'react-hooks/exhaustive-deps': 'off',
     'import/no-extraneous-dependencies': [
       'error',
