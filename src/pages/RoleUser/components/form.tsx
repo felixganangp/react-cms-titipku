@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { roleUserAction } from 'store/slice/RoleUser';
 import useToast from 'hooks/useToast';
 import FormLabel from 'components/FormLabel';
 
@@ -15,8 +17,14 @@ const initial = {
 };
 
 export default function Form() {
-  const [initialValues, setInitialValues] = useState(initial);
+  // fetching role user
+  const dispatch = useAppDispatch();
+  const roleAccesses = useAppSelector((state) => state.roleUser);
+  useEffect(() => {
+    dispatch(roleUserAction.fetchData());
+  }, []);
 
+  const [initialValues, setInitialValues] = useState(initial);
   const toast = useToast();
   const formik = useFormik({
     initialValues,
