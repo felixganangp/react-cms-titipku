@@ -16,3 +16,18 @@ export const getAllAdministratorRole = (params: any) =>
       reject(message);
     }
   });
+
+export const createAdministrator = (payload: any) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const respon = await http.post(`administrator`, payload);
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });

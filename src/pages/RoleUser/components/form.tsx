@@ -3,6 +3,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
@@ -10,16 +11,29 @@ import { roleUserAction } from 'store/slice/RoleUser';
 import useToast from 'hooks/useToast';
 import FormLabel from 'components/FormLabel';
 
-const initial = {
+interface FormValue {
+  name: string;
+  email: string;
+  roleAccess: any | null;
+}
+
+const initial: FormValue = {
   name: '',
   email: '',
   roleAccess: null,
 };
+interface FormProps {
+  onClose: () => void;
+}
 
-export default function Form() {
+export default function Form({ onClose }: FormProps) {
   // fetching role user
   const dispatch = useAppDispatch();
-  const roleAccesses = useAppSelector((state) => state.roleUser);
+  const roleUserSelector = useAppSelector((state) => state.roleUser);
+  console.log(
+    '🚀 ~ file: form.tsx:30 ~ Form ~ roleUserSelector',
+    roleUserSelector,
+  );
   useEffect(() => {
     dispatch(roleUserAction.fetchData());
   }, []);
@@ -29,19 +43,16 @@ export default function Form() {
   const formik = useFormik({
     initialValues,
     onSubmit: async (value) => {
-      console.log(value);
-      try {
-        toast.openToast({
-          headMsg: 'Success',
-          message: 'please connect api first',
-          severity: 'success',
-        });
-      } catch (error) {
-        toast.openToast({
-          headMsg: 'Failed',
-          message: 'please connect api first',
-          severity: 'error',
-        });
+      const payload = {
+        full_name: value.name,
+        email: value.email,
+        id_role: value.roleAccess.id,
+        id_status: 1,
+        account_type: 'cms',
+      };
+      await dispatch(roleUserAction.addRoleUser(payload));
+      if (!roleUserSelector.error) {
+        await onClose();
       }
     },
     validationSchema: yup.object({
@@ -109,7 +120,7 @@ export default function Form() {
           >
             <Autocomplete
               id="role"
-              options={roleAccesses.data}
+              options={roleUserSelector.data}
               onChange={(e, value) => {
                 setFieldValue('roleAccess', value);
               }}
@@ -141,8 +152,15 @@ export default function Form() {
           <Button variant="text" color="error">
             Cancel
           </Button>
-          <Button type="submit" disabled={!(isValid && dirty)}>
-            Add
+          <Button
+            type="submit"
+            disabled={!(isValid && dirty) || roleUserSelector.loadingForm}
+          >
+            {roleUserSelector.loadingForm ? (
+              <CircularProgress size="1rem" />
+            ) : (
+              'Add'
+            )}
           </Button>
         </Box>
       </form>
