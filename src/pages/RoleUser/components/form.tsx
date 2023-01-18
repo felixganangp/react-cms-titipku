@@ -35,7 +35,11 @@ export default function Form({ onClose }: FormProps) {
     roleUserSelector,
   );
   useEffect(() => {
-    dispatch(roleUserAction.fetchData());
+    dispatch(
+      roleUserAction.fetchData({
+        account_type: 'cms',
+      }),
+    );
   }, []);
 
   const [initialValues, setInitialValues] = useState(initial);

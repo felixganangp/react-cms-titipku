@@ -10,7 +10,7 @@ export const getAllAdministratorRole = (params: any) =>
         resolve(respon.data);
       }
     } catch (err: any) {
-      const message = err.response
+      const message: string = err.response
         ? `${err.response.data.message}`
         : 'Oops, something wrong with our server, please try again later.';
       reject(message);
