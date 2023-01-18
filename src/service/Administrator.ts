@@ -1,6 +1,6 @@
 import http from 'utils/request';
 
-export const getAllAdministrator = (params: any) =>
+export const getAllAdministratorRole = (params: any) =>
   new Promise(async (resolve, reject) => {
     try {
       const respon = await http.get(`administrator/role`, {
