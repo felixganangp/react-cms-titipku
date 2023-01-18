@@ -52,8 +52,7 @@ function SideBarHeader(props: SideBarHeaderProps) {
           <img src={BaseLogo} alt="logo titipku" />
         </Box>
       )}
-
-      <Button
+      <Box
         onClick={onLogoClick}
         sx={{
           minWidth: 'initial',
@@ -68,13 +67,15 @@ function SideBarHeader(props: SideBarHeaderProps) {
         }}
       >
         {!open ? (
-          <VectorSmall alt="expand" src={expand} />
+          <IconButton size="large" color="inherit">
+            <VectorSmall alt="expand" src={expand} />
+          </IconButton>
         ) : (
           <IconButton size="large" color="inherit">
             <img src={logo} alt="Titipku" />
           </IconButton>
         )}
-      </Button>
+      </Box>
     </Box>
   );
 }

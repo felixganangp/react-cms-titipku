@@ -100,7 +100,7 @@ function Menu(props: MenuProps) {
             </ListItemButton>
           </Link>
         ) : (
-          <>
+          <div key={menu.id}>
             <ListItemButton
               sx={{
                 margin: '6px 14px',
@@ -155,7 +155,7 @@ function Menu(props: MenuProps) {
                 <ChildMenu key={menu.id} child={menu.child} open={open} />
               </Box>
             </Collapse>
-          </>
+          </div>
         ),
       )}
     </List>

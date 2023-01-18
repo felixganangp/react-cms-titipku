@@ -7,7 +7,16 @@ import * as AdministratorService from 'service/Administrator';
 function* fetchData() {
   try {
     // const response: ListResponse<City> = yield call(cityApi.getAll);
-    const response = yield call(AdministratorService.getAllAdministrator);
+    const params = {
+      page: 1,
+      count: 10,
+      id_status: 1,
+      account_type: 'cms',
+    };
+    const response = yield call(
+      AdministratorService.getAllAdministrator,
+      params,
+    );
     yield put(
       uiAction.openToast({
         headMsg: 'Success data',

@@ -76,7 +76,7 @@ export default function ChildMenu(props: ChildMenuProps) {
             </ListItemButton>
           </Link>
         ) : (
-          <>
+          <div key={item.path}>
             <ListItemButton
               sx={{
                 margin: '6px 14px',
@@ -167,7 +167,7 @@ export default function ChildMenu(props: ChildMenuProps) {
                 </List>
               </Box>
             </Collapse>
-          </>
+          </div>
         ),
       )}
     </List>
