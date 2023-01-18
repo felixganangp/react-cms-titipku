@@ -3,7 +3,7 @@ import http from 'utils/request';
 export const getAllAdministrator = (params: any) =>
   new Promise(async (resolve, reject) => {
     try {
-      const respon = await http.get(`administrator`, {
+      const respon = await http.get(`administrator/role?account_type=cms`, {
         params,
       });
       if (respon.data) {

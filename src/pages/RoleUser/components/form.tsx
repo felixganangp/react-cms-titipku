@@ -37,8 +37,8 @@ export default function Form() {
     },
     validationSchema: yup.object({
       name: yup.string().required('Name is required'),
-      email: yup.string().required('Name is required'),
-      roleAccess: yup.string().required('Name is required'),
+      email: yup.string().required('Email is required'),
+      roleAccess: yup.mixed().required('Role access is required'),
     }),
     enableReinitialize: true,
   });
@@ -52,6 +52,7 @@ export default function Form() {
     touched,
     setFieldValue,
     isValid,
+    dirty,
   } = formik;
   return (
     <Box>
@@ -128,7 +129,7 @@ export default function Form() {
           <Button variant="text" color="error">
             Cancel
           </Button>
-          <Button type="submit" disabled={isValid}>
+          <Button type="submit" disabled={!(isValid && dirty)}>
             Add
           </Button>
         </Box>
