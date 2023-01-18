@@ -197,10 +197,10 @@ export default function RoleUser() {
       </Box>
       <Modal
         open={formModal.open}
-        title="Role User"
+        title="Add New Role User"
         onClose={formModal.closeModal}
       >
-        <FormRoleUser />
+        <FormRoleUser onClose={formModal.closeModal} />
       </Modal>
     </div>
   );

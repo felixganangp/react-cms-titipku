@@ -18,7 +18,22 @@ export const getAllAdministratorRole = (params: RoleAccessParams) =>
     }
   });
 
-export const getAllAdministratorUser = (params: RoleAccessParams) =>
+export const createAdministrator = (payload: any) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const respon = await http.post(`administrator`, payload);
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+  
+  export const getAllAdministratorUser = (params: RoleAccessParams) =>
   new Promise<RoleAccessParams>(async (resolve, reject) => {
     try {
       const respon = await http.get(`administrator`, {

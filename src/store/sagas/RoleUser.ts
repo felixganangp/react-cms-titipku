@@ -37,18 +37,30 @@ function* fetchData(params: PayloadAction<RoleUserParams>) {
   }
 }
 
-function* addRoleUser() {
+function* addRoleUser({ payload }: any) {
   try {
-    // const response: ListResponse<City> = yield call(cityApi.getAll);
+    const response = yield call(
+      AdministratorService.createAdministrator,
+      payload,
+    );
     yield put(
       uiAction.openToast({
-        headMsg: 'Success add role',
+        headMsg: 'Success add new role user',
         // message: 'Succes Fetch data',
         severity: 'success',
       }),
     );
+    yield put(roleUserAction.addRoleUserSuccess({ error: false }));
   } catch (error) {
-    console.log(`Failed to fetch city list`, error);
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Failed to add new role user',
+        message: error as string,
+        severity: 'error',
+      }),
+    );
+    yield put(roleUserAction.addRoleUserSuccess({ error: true }));
+    console.log(`Failed to create user: `, error);
   }
 }
 
