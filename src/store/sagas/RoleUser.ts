@@ -11,7 +11,7 @@ function* fetchData(params: PayloadAction<RoleUserParams>) {
   try {
     const response: ListResponse<RoleUser> = yield call(
       AdministratorService.getAllAdministratorRole,
-      params,
+      params.payload,
     );
 
     yield put(roleUserAction.fetchDataSuccess(response.data));
