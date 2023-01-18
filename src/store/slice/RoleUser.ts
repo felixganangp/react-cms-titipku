@@ -5,12 +5,14 @@ interface RoleUserProps {
   data: RoleUser[];
   loading: boolean;
   loadingForm: boolean;
+  error?: any;
 }
 
 const initialState: RoleUserProps = {
   data: [],
   loading: false,
   loadingForm: false,
+  error: null,
 };
 
 const RoleUserSlice = createSlice({
@@ -24,8 +26,16 @@ const RoleUserSlice = createSlice({
       state.loading = false;
       state.data = action.payload;
     },
-    addRoleUser(state: RoleUserProps) {
+    addRoleUser(state: RoleUserProps, action: PayloadAction<any>) {
       state.loadingForm = true;
+    },
+    addRoleUserSuccess(state: RoleUserProps, action: PayloadAction<any>) {
+      state.loadingForm = false;
+      state.error = action.payload.error;
+    },
+    failedError(state: RoleUserProps, action: PayloadAction<any>) {
+      state.loadingForm = false;
+      state.error = action.payload.error;
     },
   },
 });
