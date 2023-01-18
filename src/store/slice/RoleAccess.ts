@@ -6,6 +6,12 @@ interface RoleAccessProps {
   loadingForm: boolean;
 }
 
+interface MenuProps {
+  data: [];
+  loading: boolean;
+  loadingForm: boolean;
+}
+
 const initialState: RoleAccessProps = {
   data: [],
   loading: false,
@@ -22,6 +28,16 @@ const RoleAccessSlice = createSlice({
     getDataSuccess(
       state: RoleAccessProps,
       action: PayloadAction<RoleAccessProps>,
+    ) {
+      state.loading = false;
+      state.data = action.payload.data;
+    },
+    getMenuList(state: MenuProps) {
+      state.loading = true;
+    },
+    setMenuList(
+      state: MenuProps,
+      action: PayloadAction<MenuProps>,
     ) {
       state.loading = false;
       state.data = action.payload.data;

@@ -1,10 +1,11 @@
-import { put, takeLatest } from 'redux-saga/effects';
+import { call, put, takeLatest } from 'redux-saga/effects';
 import { uiAction } from '../slice/ui';
 import { roleAccessAction } from '../slice/RoleAccess';
+import * as service from '../../service/AdministratorRole';
 
 function* fetchRoleAccess() {
   try {
-    // const res = yield call()
+    const res = yield call()
     yield put(
       uiAction.openToast({
         headMsg: 'Success data',
@@ -17,8 +18,9 @@ function* fetchRoleAccess() {
   }
 }
 
-function* addRoleAccess() {
+function* addRoleAccess(body: any) {
   try {
+    const res: any = yield call(service.createAdministratorRole(body));
     yield put(
       uiAction.openToast({
         headMsg: 'Success add Role Access',
@@ -46,8 +48,21 @@ function* updateRoleAccess() {
   }
 }
 
+function* fetchAdministratorControl() {
+  try {
+    const res = yield call(service.fetchAdministratorControl);
+    const menuList = res.data;
+    // yield put(roleAccessAction.setMenuList({
+    //   payload
+    // }))
+  } catch (error) {
+
+  }
+}
+
 export default function* saga() {
   yield takeLatest(roleAccessAction.get, fetchRoleAccess);
   yield takeLatest(roleAccessAction.add, addRoleAccess);
   yield takeLatest(roleAccessAction.update, updateRoleAccess);
+  yield takeLatest(roleAccessAction.getMenuList, fetchAdministratorControl);
 }
