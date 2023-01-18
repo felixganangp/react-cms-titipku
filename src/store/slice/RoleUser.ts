@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RoleUserResponse } from 'models/RoleUser';
 
 interface RoleUserProps {
   data: [];
@@ -21,7 +22,7 @@ const RoleUserSlice = createSlice({
     },
     fetchDataSuccess(
       state: RoleUserProps,
-      action: PayloadAction<RoleUserProps>,
+      action: PayloadAction<RoleUserResponse>,
     ) {
       state.loading = false;
       state.data = action.payload.data;

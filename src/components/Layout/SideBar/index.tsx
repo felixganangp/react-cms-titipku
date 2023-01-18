@@ -58,7 +58,7 @@ function SideBar(props: SideBarProps) {
               path: '/jatiper-management',
             },
             {
-              id: 13,
+              id: 14,
               title: 'Jatiper Registration',
               path: '/jatiper-registration',
             },

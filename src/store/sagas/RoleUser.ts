@@ -3,11 +3,22 @@ import { roleUserAction } from 'store/slice/RoleUser';
 import { uiAction } from 'store/slice/ui';
 
 import * as AdministratorService from 'service/Administrator';
+import { RoleUserResponse } from 'models/RoleUser';
 
 function* fetchData() {
   try {
     // const response: ListResponse<City> = yield call(cityApi.getAll);
-    const response = yield call(AdministratorService.getAllAdministrator);
+    const params = {
+      page: 1,
+      count: 10,
+      id_status: 1,
+      account_type: 'cms',
+      is_exist: true,
+    };
+    const response: RoleUserResponse = yield call(
+      AdministratorService.getAllAdministrator,
+      params,
+    );
     yield put(
       uiAction.openToast({
         headMsg: 'Success data',
@@ -15,6 +26,7 @@ function* fetchData() {
         severity: 'success',
       }),
     );
+    yield put(roleUserAction.fetchDataSuccess(response));
   } catch (error) {
     console.log(`Failed to fetch city list`, error);
   }
