@@ -14,13 +14,13 @@ function* fetchData(params: PayloadAction<RoleAccessParams>) {
       params.payload,
     );
 
-    yield put(roleAccessAction.fetchDataSuccess(response.data));
+    yield put(roleAccessAction.fetchDataSuccess(response));
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
         uiAction.openToast({
-          headMsg: 'Success data',
+          headMsg: 'Error get data',
           message: error,
           severity: 'error',
         }),
@@ -28,12 +28,13 @@ function* fetchData(params: PayloadAction<RoleAccessParams>) {
     } else {
       yield put(
         uiAction.openToast({
-          headMsg: 'Success data',
+          headMsg: 'Error get data',
           message: 'interval server error',
           severity: 'error',
         }),
       );
     }
+    yield put(roleAccessAction.failedFetch());
   }
 }
 

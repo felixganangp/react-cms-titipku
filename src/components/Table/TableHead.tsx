@@ -8,7 +8,7 @@ import SwapVertIcon from '@mui/icons-material/SwapVert';
 
 import { EnhancedTableHeadProps, Align } from './types';
 
-export default function EnhancedTableHead(props: EnhancedTableHeadProps) {
+export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
   const {
     onSelectAllClick,
     orderType,
@@ -60,7 +60,8 @@ export default function EnhancedTableHead(props: EnhancedTableHeadProps) {
             sx={{
               bgcolor: props.bgHeader || '#ebeff3',
               padding: '10px',
-              minWidth: headCell.width,
+              width: headCell.width,
+              minWidth: headCell.minWidth,
               whiteSpace: 'nowrap',
               fontWeight: 'normal',
               color: '#626b79',
