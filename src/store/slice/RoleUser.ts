@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ListResponse } from 'models/fetch';
 import { RoleUser, RoleUserParams } from 'models/RoleUser';
 
 interface RoleUserProps {
@@ -6,6 +7,8 @@ interface RoleUserProps {
   loading: boolean;
   loadingForm: boolean;
   error?: any;
+  total: number;
+  params: RoleUserParams;
 }
 
 const initialState: RoleUserProps = {
@@ -13,18 +16,39 @@ const initialState: RoleUserProps = {
   loading: false,
   loadingForm: false,
   error: null,
+  total: 0,
+  params: {
+    page: 1,
+    count: 10,
+    search: '',
+    account_type: 'cms',
+  },
 };
 
 const RoleUserSlice = createSlice({
   name: 'RoleUser',
   initialState,
   reducers: {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fetchData(state: RoleUserProps, action: PayloadAction<RoleUserParams>) {
       state.loading = true;
     },
-    fetchDataSuccess(state: RoleUserProps, action: PayloadAction<RoleUser[]>) {
+    failedFetch(state: RoleUserProps) {
       state.loading = false;
-      state.data = action.payload;
+    },
+    setParams(state: RoleUserProps, action: PayloadAction<RoleUserParams>) {
+      state.params = {
+        ...state.params,
+        ...action.payload,
+      };
+    },
+    fetchDataSuccess(
+      state: RoleUserProps,
+      action: PayloadAction<ListResponse<RoleUser>>,
+    ) {
+      state.loading = false;
+      state.data = action.payload.data;
+      state.total = action.payload.total;
     },
     addRoleUser(state: RoleUserProps, action: PayloadAction<any>) {
       state.loadingForm = true;

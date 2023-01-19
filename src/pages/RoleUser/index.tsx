@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -8,38 +9,71 @@ import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
 
 import Table from 'components/Table';
+import { HeadCells } from 'components/Table/types';
 import Modal from 'components/Modal';
-import useToast from 'hooks/useToast';
+import MenuList from 'components/MenuList';
 import useModal from 'hooks/useModal';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { roleUserAction } from 'store/slice/RoleUser';
+import debounce from 'utils/debounce';
+import moment from 'moment';
 
 import AddIcon from '@mui/icons-material/Add';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
-import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
-
-import MenuList from 'components/MenuList';
+// import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { roleUserAction } from 'store/slice/RoleUser';
+import { RoleAccess } from 'models/RoleAccess';
+
 import FormRoleUser from './components/form';
 
 import { Bullet, Status } from './roleuser.styled';
 
+interface FormDataType {
+  isEdit: boolean;
+  data: object | null;
+}
 export default function RoleUser() {
-  // const toast = useToast();
-  const formModal = useModal();
-  const formModal2 = useModal();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [orderType, setOrderType] = useState<'asc' | 'desc'>('asc');
-  const [orderBy, setOrderBy] = useState<string | null>(null);
+  const roleUser = useAppSelector((state) => state.roleUser);
 
-  // React.useEffect(() => {
-  //   dispatch(roleUserAction.fetchData());
-  // }, []);
+  const formModal = useModal();
+  const [formData, setFormData] = useState<FormDataType>({
+    isEdit: false,
+    data: null,
+  });
+  // const [orderType, setOrderType] = useState<'asc' | 'desc'>('asc');
+  // const [orderBy, setOrderBy] = useState<string | null>(null);
 
-  const headCell = [
+  React.useEffect(() => {
+    dispatch(roleUserAction.fetchData(roleUser.params));
+  }, [roleUser.params]);
+
+  const handleSearch = (value: string) => {
+    dispatch(
+      roleUserAction.setParams({
+        account_type: 'cms',
+        page: 1,
+        search: value,
+      }),
+    );
+  };
+  const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
+
+  const handleChangePage = (value: number) => {
+    dispatch(
+      roleUserAction.setParams({
+        account_type: 'cms',
+        page: value,
+      }),
+    );
+  };
+
+  const headCell: HeadCells<RoleAccess>[] = [
     {
-      id: 'name',
+      id: 'full_name',
       label: 'Name',
       align: 'left',
     },
@@ -52,12 +86,19 @@ export default function RoleUser() {
       id: 'role',
       label: 'Role',
       align: 'left',
-      format: (val: any) => <Bullet>{`\u2022  ${val.role}`}</Bullet>,
+      format: (val: any) => (
+        <Bullet>{`\u2022  ${val.administrator_detail[0].administrator_role.name}`}</Bullet>
+      ),
     },
     {
       id: 'last_update',
       label: 'Last Update',
       align: 'left',
+      format: (val: any) => {
+        return (
+          <p>{moment.unix(val.created_at).format('MMMM DD, YYYY hh.mm A')}</p>
+        );
+      },
     },
     {
       id: 'status',
@@ -78,15 +119,26 @@ export default function RoleUser() {
           <MenuList
             menu={[
               {
-                label: 'Change Role Access',
+                label: 'Edit',
                 onClick: () => {
-                  console.log('change role access');
+                  setFormData(val);
+                  const data = {
+                    isEdit: true,
+                    data: {
+                      name: val.full_name,
+                      email: val.email,
+                      roleAccess: val.administrator_role,
+                      id: val.id,
+                    },
+                  };
+                  setFormData(data);
                 },
               },
               {
                 label: `Set to Inactive`,
                 color: '#c10000',
                 onClick: () => {
+                  console.log(val);
                   console.log('set active inactive');
                 },
               },
@@ -98,33 +150,6 @@ export default function RoleUser() {
           </MenuList>
         </>
       ),
-    },
-  ];
-
-  const data = [
-    {
-      id: 1,
-      name: 'Role User Name',
-      email: 'email@titipku.com',
-      role: 'Super Admin',
-      status: false,
-      last_update: 'Januari, 8, 2023 12:00 AM',
-    },
-    {
-      id: 2,
-      name: 'Role User Name',
-      email: 'email@titipku.com',
-      role: 'Super Admin',
-      status: true,
-      last_update: 'Januari, 8, 2023 12:00 AM',
-    },
-    {
-      id: 3,
-      name: 'Role User Name',
-      email: 'email@titipku.com',
-      role: 'Super Admin',
-      status: true,
-      last_update: 'Januari, 8, 2023 12:00 AM',
     },
   ];
 
@@ -155,8 +180,11 @@ export default function RoleUser() {
                       </InputAdornment>
                     ),
                   }}
+                  onChange={(event) => {
+                    debounceSearch(event.target.value);
+                  }}
                 />
-                <IconButton
+                {/* <IconButton
                   sx={{
                     borderRadius: '4px',
                     boxShadow: '0 3px 8px 0 rgba(0, 0, 0, 0.1)',
@@ -165,7 +193,7 @@ export default function RoleUser() {
                   onClick={formModal2.openModal}
                 >
                   <SimCardDownloadOutlinedIcon />
-                </IconButton>
+                </IconButton> */}
               </Box>
             </Card>
           </Grid>
@@ -177,19 +205,20 @@ export default function RoleUser() {
               boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
             >
               <Table
-                data={data}
-                selected={[]}
+                data={roleUser.data}
                 headCells={headCell}
-                page={1}
-                totalPage={10}
-                onChangePage={(e) => console.log(e)}
-                handleRequestSort={(e) => {
-                  setOrderBy(e.orderBy);
-                  setOrderType(e.orderType);
-                }}
-                orderType={orderType}
-                orderBy={orderBy}
-                enableCheckBox
+                page={roleUser.params.page}
+                totalData={roleUser.total}
+                count={roleUser.params.count}
+                loading={roleUser.loading}
+                onChangePage={(page) => handleChangePage(page)}
+
+                // handleRequestSort={(e) => {
+                //   setOrderBy(e.orderBy);
+                //   setOrderType(e.orderType);
+                // }}
+                // orderType={orderType}
+                // orderBy={orderBy}
               />
             </Box>
           </Grid>

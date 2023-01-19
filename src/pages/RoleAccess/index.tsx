@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import useToast from 'hooks/useToast';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
@@ -14,7 +14,6 @@ import MenuList from 'components/MenuList';
 import debounce from 'utils/debounce';
 
 import AddIcon from '@mui/icons-material/Add';
-import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SearchIcon from '@mui/icons-material/Search';
 import Typography from '@mui/material/Typography';
@@ -26,6 +25,7 @@ import { RoleAccess } from 'models/RoleAccess';
 import RoleAccessForm from './Form/Form';
 
 export default function RoleAccesPage() {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const roleAccesses = useAppSelector((state) => state.roleAccess);
 
@@ -37,7 +37,7 @@ export default function RoleAccesPage() {
     dispatch(
       roleAccessAction.setParams({
         account_type: 'cms',
-        page: 0,
+        page: 1,
         search: value,
       }),
     );
@@ -74,13 +74,19 @@ export default function RoleAccesPage() {
           <MenuList
             menu={[
               {
-                label: 'Change Role Access',
+                label: 'Details',
                 onClick: () => {
-                  console.log('change role access');
+                  navigate(`/role-access/${val.id}`);
                 },
               },
               {
-                label: `Set to Inactive`,
+                label: 'Edit',
+                onClick: () => {
+                  console.log(val);
+                },
+              },
+              {
+                label: 'Delete',
                 color: '#c10000',
                 onClick: () => {
                   console.log('set active inactive');
@@ -430,8 +436,8 @@ export default function RoleAccesPage() {
                 page={roleAccesses.params.page}
                 totalData={roleAccesses.total}
                 count={roleAccesses.params.count}
-                onChangePage={(page) => handleChangePage(page)}
                 loading={roleAccesses.loading}
+                onChangePage={(page) => handleChangePage(page)}
               />
             </Box>
           </Grid>
