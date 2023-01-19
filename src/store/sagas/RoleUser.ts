@@ -14,17 +14,17 @@ import {
 function* fetchData(params: PayloadAction<RoleUserParams>) {
   try {
     const response: ListResponse<RoleUser> = yield call(
-      AdministratorService.getAllAdministratorRole,
+      AdministratorService.getAllAdministratorUser,
       params.payload,
     );
 
-    yield put(roleUserAction.fetchDataSuccess(response.data));
+    yield put(roleUserAction.fetchDataSuccess(response));
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
         uiAction.openToast({
-          headMsg: 'Success data',
+          headMsg: 'Error get data',
           message: error,
           severity: 'error',
         }),
@@ -32,12 +32,13 @@ function* fetchData(params: PayloadAction<RoleUserParams>) {
     } else {
       yield put(
         uiAction.openToast({
-          headMsg: 'Success data',
+          headMsg: 'Error get data',
           message: 'interval server error',
           severity: 'error',
         }),
       );
     }
+    yield put(roleUserAction.failedFetch());
   }
 }
 

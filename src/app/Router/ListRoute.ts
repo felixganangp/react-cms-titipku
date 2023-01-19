@@ -49,7 +49,7 @@ const ListRoute: RouteProps[] = [
   },
   {
     comp: RoleAccessDetails,
-    path: '/role-access-details',
+    path: '/role-access/:id',
     index: true,
     auth: 'Private',
   },
