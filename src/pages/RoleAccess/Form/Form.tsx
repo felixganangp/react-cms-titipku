@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from 'react';
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable radix */
+/* eslint-disable guard-for-in */
+import React, { useEffect, useState, useCallback } from 'react';
 import Dialog from '@mui/material/Dialog';
 import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
@@ -10,44 +13,115 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import useToast from 'hooks/useToast';
 import FormLabel from 'components/FormLabel';
-import { FormControlLabel } from '@mui/material';
 import { useAppDispatch } from 'store/hooks';
-import { 
-  ActionWrapper,
+import { useSelector } from 'react-redux';
+import { debounce } from 'lodash';
+import {
   CancelButton,
   ChildMenu,
-  ContentWrapper,
   Control,
   HorizontalContent,
   Menu,
   SubmitButton,
   Title,
   TitleWrapper,
+  ActionWrapper,
+  ContentWrapper,
 } from './form.styled';
-import { roleAccessAction, selectMenu } from '../../../store/slice/RoleAccess';
-import { useSelector } from 'react-redux';
+import { roleAccessAction } from '../../../store/slice/RoleAccess';
+// eslint-disable-next-line import/no-named-as-default
 import RoleAccess from '../../../models/RoleAccess';
 
 interface RoleAccessFormProps {
   open: boolean;
   onClose(): void;
-  initialValues: { name: string; access: { [id: number]: boolean } };
-  categorizedMenu: {
-    parent: number;
-    menu: number[];
-  }[];
+  isEdit: boolean;
 }
 
 export default function RoleAccessForm(props: RoleAccessFormProps) {
+  const { open, onClose, isEdit } = props;
   const dispatch = useAppDispatch();
-  const { open, onClose, initialValues, categorizedMenu } = props;
-  const [accordionMenu, setAccordionMenu] = useState<any>([]);
-  const listOfMenu = useSelector((state: any) => state.roleAccess.menuData);
 
-  const collectItems = (obj: any) => Object.keys(obj).filter(k => obj[k]);
+  // form
+  const [accessMenu, setAccessMenu] = useState<{ [id: number]: boolean }>({});
+  const [defaultMenu, setDefaultMenu] = useState<{ [id: number]: boolean }>({});
+  const toast = useToast();
+  const initialFormValue = {
+    name: '',
+    access: defaultMenu,
+  };
+  const [initialValues, setInitialValues] = useState<{
+    name: string;
+    access: { [id: number]: boolean };
+  }>(initialFormValue);
+
+  useEffect(() => {
+    if (!isEdit) {
+      setInitialValues(initialFormValue);
+      setAccessMenu(defaultMenu);
+    }
+  }, [open, isEdit]);
+
+  const formik = useFormik({
+    initialValues,
+    onSubmit: async (value) => {
+      const controls = [];
+      let body: RoleAccess;
+      try {
+        for (const key in accessMenu) {
+          controls.push({
+            id: parseInt(key),
+            activation: accessMenu[key],
+          });
+        }
+
+        body = {
+          name: value.name,
+          description: '',
+          account_type: 'cms',
+          controls,
+        };
+        dispatch(roleAccessAction.add(body));
+        toast.openToast({
+          headMsg: 'Success add Role Access',
+          message: 'Succesfully add new role access',
+          severity: 'success',
+        });
+        onClose();
+        // eslint-disable-next-line @typescript-eslint/no-use-before-define
+        resetForm({ name: '', access: defaultMenu });
+      } catch (error) {
+        toast.openToast({
+          headMsg: 'Failed',
+          message: 'toast message',
+          severity: 'error',
+        });
+      }
+    },
+    validationSchema: yup.object({
+      name: yup.string().required('Role name is required'),
+    }),
+    enableReinitialize: true,
+  });
+
+  const {
+    handleSubmit,
+    values,
+    handleBlur,
+    handleChange,
+    errors,
+    touched,
+    setFieldValue,
+    isValid,
+    dirty,
+    resetForm,
+  } = formik;
 
   // handle menu access
-  const [accessMenu, setAccessMenu] = useState<{ [id: number]: boolean }>({});
+  const [accordionMenu, setAccordionMenu] = useState<any>([]);
+  const listOfMenu = useSelector((state: any) => state.roleAccess.menuData);
+  const collectItems = (obj: any) => Object.keys(obj).filter((k) => obj[k]);
+
   const handleChangeAccessMenu = (
     event: React.ChangeEvent<HTMLInputElement>,
     id: number,
@@ -68,6 +142,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
       }
     }
     setAccessMenu({ ...access });
+    if (!isEdit) setDefaultMenu({ ...access });
   }, [listOfMenu]);
 
   useEffect(() => {
@@ -94,7 +169,6 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
     id: number,
   ) => {
     const changedChild: { [id: number]: boolean } = {};
-    console.log('changed child, parent id', id);
     for (let i = 0; i < accordionMenu.length; i += 1) {
       if (accordionMenu[i].parent === id) {
         if (accordionMenu[i].child) {
@@ -130,207 +204,200 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
     }
   };
 
-  // formik
-  const toast = useToast();
-  const formik = useFormik({
-    initialValues,
-    onSubmit: async (value) => {
-      const controls = [];
-      let body: RoleAccess;
-      try {
-        for (const key in accessMenu) {
-          controls.push({
-            id: parseInt(key),
-            activation: accessMenu[key],
-          });
-        }
+  // validation role name exist
+  const errorName = useSelector(
+    (state: any) => state.roleAccess.errorName.data,
+  );
+  const nameIsExist = `Role Name is exist, please use another name`;
 
-        body = {
-          name: value.name,
-          description: '',
-          account_type: 'cms',
-          controls,
-        }
-        dispatch(roleAccessAction.add(body));
+  const handleCheckName = async (value: string) => {
+    dispatch(roleAccessAction.checkRoleName(value));
+  };
 
-        toast.openToast({
-          headMsg: 'Success',
-          message: 'toast message',
-          severity: 'success',
-        });
+  const checkingName = useCallback(debounce(handleCheckName, 100), []);
 
-        onClose();
-
-      } catch (error) {
-        toast.openToast({
-          headMsg: 'Failed',
-          message: 'toast message',
-          severity: 'error',
-        });
-      }
-    },
-    validationSchema: yup.object({
-      name: yup.string().required('Role name is required'),
-    }),
-    enableReinitialize: true,
-  });
-
-  const {
-    handleSubmit,
-    values,
-    handleBlur,
-    handleChange,
-    errors,
-    touched,
-    setFieldValue,
-    isValid,
-    dirty,
-  } = formik;
+  const handleChangeRoleName = (value: string) => {
+    checkingName(value);
+  };
 
   return (
-    <div>
-      <div>
-        <Dialog open={open} onClose={() => onClose()}>
-          <TitleWrapper>
-            <Title>Add New Role Access</Title>
-            <CloseIcon onClick={() => onClose()} />
-          </TitleWrapper>
-          <form onSubmit={handleSubmit}>
-          <Box sx={{ padding: '24px', margin: 0 }}>
-              <FormLabel
-                text="Role Name"
-                error={touched.name && Boolean(errors.name)}
-                helperText={touched.name && errors.name && `${errors.name}`}
-                required
-              >
-                <TextField
-                  type="text"
-                  name="name"
-                  fullWidth
-                  placeholder="Input Role Name"
-                  value={values.name}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                />
-              </FormLabel>
-              <FormGroup>
-                {listOfMenu.map((parentMenu: any) => (
-                  <AccordionOnDetails
-                    title={parentMenu.menu}
+    <Dialog
+      open={open}
+      onClose={() => {
+        setAccessMenu(defaultMenu);
+        // setInitialValues(initialFormValue);
+        onClose();
+        resetForm();
+      }}
+    >
+      <form onSubmit={handleSubmit}>
+        <TitleWrapper>
+          <Title>Add New Role Access</Title>
+          <CloseIcon
+            onClick={() => {
+              setAccessMenu(defaultMenu);
+              // setInitialValues(initialFormValue);
+              onClose();
+              resetForm();
+            }}
+          />
+        </TitleWrapper>
+        <ContentWrapper>
+          <FormLabel
+            text="Role Name"
+            required
+            error={
+              (touched.name && Boolean(errors.name)) ||
+              (touched.name && errorName)
+            }
+            helperText={
+              (touched.name && errors.name && `${errors.name}`) ||
+              (touched.name && errorName && nameIsExist)
+            }
+          >
+            <TextField
+              type="text"
+              name="name"
+              fullWidth
+              placeholder="Input Role Name"
+              value={values.name}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setFieldValue('name', e.target.value);
+                if (!errors.name) handleChangeRoleName(e.target.value);
+              }}
+              onBlur={(
+                e: React.FocusEvent<
+                  HTMLInputElement | HTMLTextAreaElement,
+                  Element
+                >,
+              ) => {
+                handleBlur(e);
+                if (!errors.name) handleChangeRoleName(e.target.value);
+              }}
+            />
+          </FormLabel>
+          <FormGroup>
+            {listOfMenu.map((parentMenu: any) => (
+              <AccordionOnDetails
+                title={parentMenu.menu}
+                key={parentMenu.id}
+                parent
+                havingChild={parentMenu.sub_menu}
+                headerContent={
+                  <Control
+                    style={{ marginRight: '0px' }}
+                    label=""
                     key={parentMenu.id}
-                    parent
-                    havingChild={parentMenu.sub_menu}
-                    headerContent={
-                      <Control
-                        style={{ marginRight: '0px' }}
-                        label=""
-                        key={parentMenu.id}
-                        control={
-                          <Checkbox
-                            checked={accessMenu[parentMenu.id]}
-                            onChange={(e) => {
-                              handleChangeChild(e, parentMenu.id);
-                            }}
-                          />
-                        }
+                    control={
+                      <Checkbox
+                        checked={accessMenu[parentMenu.id]}
+                        onChange={(e) => {
+                          handleChangeChild(e, parentMenu.id);
+                        }}
                       />
                     }
-                  >
-                    {parentMenu.sub_menu !== null && parentMenu.sub_menu.map((menu: any) =>
-                      menu.sub_menu !== null ? (
-                        <HorizontalContent>
-                          <Menu>{menu.menu}</Menu>
-                          <Control
-                            label=""
-                            key={menu.id}
-                            control={
-                              <Checkbox
-                                checked={accessMenu[menu.id]}
-                                onChange={(e) => {
-                                  handleChangeParentChild(
-                                    e,
-                                    parentMenu.id,
-                                    menu.id,
-                                  );
-                                }}
-                              />
-                            }
-                          />
-                        </HorizontalContent>
-                      ) : (
-                        <Box style={{ paddingLeft: '18px' }}>
-                          <AccordionOnDetails
-                            title={menu.menu}
-                            key={menu.id}
-                            parent={false}
-                            havingChild={menu.sub_menu}
-                            headerContent={
+                  />
+                }
+              >
+                {parentMenu.sub_menu !== null &&
+                  parentMenu.sub_menu.map((menu: any) =>
+                    menu.sub_menu !== null ? (
+                      <HorizontalContent>
+                        <Menu>{menu.menu}</Menu>
+                        <Control
+                          label=""
+                          key={menu.id}
+                          control={
+                            <Checkbox
+                              checked={accessMenu[menu.id]}
+                              onChange={(e) => {
+                                handleChangeParentChild(
+                                  e,
+                                  parentMenu.id,
+                                  menu.id,
+                                );
+                              }}
+                            />
+                          }
+                        />
+                      </HorizontalContent>
+                    ) : (
+                      <Box style={{ paddingLeft: '18px' }}>
+                        <AccordionOnDetails
+                          title={menu.menu}
+                          key={menu.id}
+                          parent={false}
+                          havingChild={menu.sub_menu}
+                          headerContent={
+                            <Control
+                              label=""
+                              key={menu.id}
+                              control={
+                                <Checkbox
+                                  checked={accessMenu[menu.id]}
+                                  onChange={(e) => {
+                                    handleChangeParentChild(
+                                      e,
+                                      parentMenu.id,
+                                      menu.id,
+                                    );
+                                    // handleChangeAccessMenu(e, menu.id);
+                                  }}
+                                />
+                              }
+                            />
+                          }
+                        >
+                          {menu.child.map((childMenu: any) => (
+                            <HorizontalContent key={childMenu.id}>
+                              <ChildMenu>{childMenu.menu}</ChildMenu>
                               <Control
                                 label=""
-                                key={menu.id}
+                                key={childMenu.id}
                                 control={
                                   <Checkbox
-                                    checked={accessMenu[menu.id]}
-                                    onChange={(e) => {
-                                      handleChangeParentChild(
-                                        e,
-                                        parentMenu.id,
-                                        menu.id,
-                                      );
-                                      // handleChangeAccessMenu(e, menu.id);
-                                    }}
+                                    checked={accessMenu[childMenu.id]}
+                                    onChange={(e) =>
+                                      handleChangeAccessMenu(e, childMenu.id)
+                                    }
                                   />
                                 }
                               />
-                            }
-                          >
-                            {menu.child.map((childMenu: any) => (
-                              <HorizontalContent key={childMenu.id}>
-                                <ChildMenu>{childMenu.menu}</ChildMenu>
-                                <Control
-                                  label=""
-                                  key={childMenu.id}
-                                  control={
-                                    <Checkbox
-                                      checked={accessMenu[childMenu.id]}
-                                      onChange={(e) =>
-                                        handleChangeAccessMenu(e, childMenu.id)
-                                      }
-                                    />
-                                  }
-                                />
-                              </HorizontalContent>
-                            ))}
-                          </AccordionOnDetails>
-                        </Box>
-                      ),
-                    )}
-                  </AccordionOnDetails>
-                ))}
-              </FormGroup>
-              </Box>
-              <Box
-                width="100%"
-                display="flex"
-                gap="10px"
-                justifyContent="end"
-                // mt="50px"
-                sx={{
-                  padding: '24px',
-                  boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
-                }}
-              >
-                <CancelButton onClick={() => onClose()}>Cancel</CancelButton>
-                <SubmitButton 
-                  type="submit" 
-                  disabled={!(isValid && dirty && collectItems(accessMenu).length > 0)}
-                >
-                  Add
-                </SubmitButton>
-              </Box>
-            </form>
-        </Dialog>
-      </div>
-    </div>
+                            </HorizontalContent>
+                          ))}
+                        </AccordionOnDetails>
+                      </Box>
+                    ),
+                  )}
+              </AccordionOnDetails>
+            ))}
+          </FormGroup>
+        </ContentWrapper>
+        <ActionWrapper>
+          <CancelButton
+            onClick={() => {
+              setAccessMenu(defaultMenu);
+              resetForm();
+              onClose();
+            }}
+          >
+            Cancel
+          </CancelButton>
+          <SubmitButton
+            type="submit"
+            disabled={
+              !(
+                isValid &&
+                dirty &&
+                !errorName &&
+                collectItems(accessMenu).length > 0
+              )
+            }
+          >
+            Add
+          </SubmitButton>
+        </ActionWrapper>
+      </form>
+    </Dialog>
   );
 }

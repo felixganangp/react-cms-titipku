@@ -1,8 +1,33 @@
-import AccessMenu from "./AccessMenu";
+import { ListParams } from './fetch';
 
-export default interface RoleAccess {
-    name: string;
-    description: string;
-    account_type: string;
-    controls: AccessMenu[];
+export interface RoleAccess {
+  id?: number;
+  name: string;
+  is_exist: true;
+  account_type: string;
+}
+
+export interface RoleAccessParams extends ListParams {
+  account_type: string;
+  search?: string | undefined | null;
+}
+
+// add
+export default interface AddRoleAccess {
+  id?: number;
+  name: string;
+  description: string;
+  account_type: string;
+  controls?: AccessMenu[];
+  is_exist?: boolean;
+}
+interface AccessMenu {
+  id: number;
+  activation: boolean;
+}
+
+export interface CheckRoleNameParams {
+  role_name: string;
+  account_type: string;
+  exclude_id?: number;
 }
