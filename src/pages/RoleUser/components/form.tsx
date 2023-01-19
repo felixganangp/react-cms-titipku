@@ -12,6 +12,7 @@ import { roleAccessAction } from 'store/slice/RoleAccess';
 import useToast from 'hooks/useToast';
 import FormLabel from 'components/FormLabel';
 import { CreateRoleUser } from 'models/RoleUser';
+import { createAdministrator } from 'service/Administrator';
 
 const initial: CreateRoleUser = {
   name: '',
@@ -40,6 +41,7 @@ export default function Form({ onClose }: FormProps) {
 
   const [initialValues, setInitialValues] = useState(initial);
   const toast = useToast();
+  const [errorRsp, setErrorRsp] = useState({ error: false, message: '' });
   const formik = useFormik({
     initialValues,
     onSubmit: async (value) => {
@@ -50,16 +52,32 @@ export default function Form({ onClose }: FormProps) {
         id_status: value.id_status,
         account_type: value.account_type,
       };
-      dispatch(roleUserAction.addRoleUser(payload));
-      if (!roleUserSelector.loadingForm) {
+      try {
+        const addUser = await createAdministrator(payload);
+        toast.openToast({
+          headMsg: 'New Role User Added',
+          // message: 'New Role User Added',
+          severity: 'success',
+        });
         onClose();
+      } catch (error: any) {
+        let errMsg = error;
+        if (errMsg === 'Email already exist') {
+          errMsg = 'Email address already registered';
+        }
+        setErrorRsp({ error: true, message: errMsg });
+        console.log('🚀 ~ file: form.tsx:57 ~ onSubmit: ~ error', errMsg);
       }
+      // dispatch(roleUserAction.addRoleUser(payload));
+      // if (!roleUserSelector.loadingForm) {
+      //   onClose();
+      // }
     },
     validationSchema: yup.object({
       name: yup.string().required('Name is required'),
       email: yup
         .string()
-        .email('Invalid email format')
+        .email('Please input a valid email address')
         .required('Email is required'),
       roleAccess: yup.mixed().required('Role access is required'),
     }),
@@ -98,15 +116,21 @@ export default function Form({ onClose }: FormProps) {
           </FormLabel>
           <FormLabel
             text="Email"
-            error={touched.email && Boolean(errors.email)}
-            helperText={touched.email && errors.email && `${errors.email}`}
+            error={(touched.email && Boolean(errors.email)) || errorRsp.error}
+            helperText={
+              (touched.email && errors.email && `${errors.email}`) ||
+              errorRsp.message
+            }
           >
             <TextField
               type="text"
               name="email"
               placeholder="Input Category name"
               value={values.email}
-              onChange={handleChange}
+              onChange={(event) => {
+                handleChange(event);
+                setErrorRsp({ error: false, message: '' });
+              }}
               onBlur={handleBlur}
               fullWidth
             />
@@ -154,7 +178,11 @@ export default function Form({ onClose }: FormProps) {
           </Button>
           <Button
             type="submit"
-            disabled={!(isValid && dirty) || roleUserSelector.loadingForm}
+            disabled={
+              !(isValid && dirty) ||
+              roleUserSelector.loadingForm ||
+              errorRsp.error
+            }
           >
             {roleUserSelector.loadingForm ? (
               <CircularProgress size="1rem" />

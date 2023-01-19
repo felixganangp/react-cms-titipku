@@ -32,8 +32,8 @@ export const createAdministrator = (payload: any) =>
       reject(message);
     }
   });
-  
-  export const getAllAdministratorUser = (params: RoleAccessParams) =>
+
+export const getAllAdministratorUser = (params: RoleAccessParams) =>
   new Promise<RoleAccessParams>(async (resolve, reject) => {
     try {
       const respon = await http.get(`administrator`, {
