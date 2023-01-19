@@ -5,7 +5,11 @@ import { uiAction } from 'store/slice/ui';
 
 import * as AdministratorService from 'service/Administrator';
 import { ListResponse } from 'models/fetch';
-import { RoleUser, RoleUserParams } from 'models/RoleUser';
+import {
+  RoleUser,
+  RoleUserParams,
+  CreateRoleUserPayload,
+} from 'models/RoleUser';
 
 function* fetchData(params: PayloadAction<RoleUserParams>) {
   try {
@@ -38,9 +42,9 @@ function* fetchData(params: PayloadAction<RoleUserParams>) {
   }
 }
 
-function* addRoleUser({ payload }: any) {
+function* addRoleUser({ payload }: PayloadAction<CreateRoleUserPayload>) {
   try {
-    const response = yield call(
+    const response: ListResponse<RoleUser> = yield call(
       AdministratorService.createAdministrator,
       payload,
     );
