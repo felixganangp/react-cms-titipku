@@ -50,9 +50,9 @@ export default function Form({ onClose }: FormProps) {
         id_status: value.id_status,
         account_type: value.account_type,
       };
-      await dispatch(roleUserAction.addRoleUser(payload));
-      if (!roleUserSelector.error) {
-        await onClose();
+      dispatch(roleUserAction.addRoleUser(payload));
+      if (!roleUserSelector.loadingForm) {
+        onClose();
       }
     },
     validationSchema: yup.object({
@@ -149,7 +149,7 @@ export default function Form({ onClose }: FormProps) {
             boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
           }}
         >
-          <Button variant="text" color="error">
+          <Button variant="text" color="error" onClick={onClose}>
             Cancel
           </Button>
           <Button
