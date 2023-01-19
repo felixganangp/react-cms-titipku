@@ -11,17 +11,15 @@ import { roleUserAction } from 'store/slice/RoleUser';
 import { roleAccessAction } from 'store/slice/RoleAccess';
 import useToast from 'hooks/useToast';
 import FormLabel from 'components/FormLabel';
+import { CreateRoleUser } from 'models/RoleUser';
+import { createAdministrator } from 'service/Administrator';
 
-interface FormValue {
-  name: string;
-  email: string;
-  roleAccess: any | null;
-}
-
-const initial: FormValue = {
+const initial: CreateRoleUser = {
   name: '',
   email: '',
   roleAccess: null,
+  id_status: 1,
+  account_type: 'cms',
 };
 interface FormProps {
   onClose: () => void;
@@ -36,32 +34,50 @@ export default function Form({ onClose }: FormProps) {
     dispatch(
       roleAccessAction.fetchData({
         account_type: 'cms',
+        is_exist: true,
       }),
     );
   }, []);
 
   const [initialValues, setInitialValues] = useState(initial);
   const toast = useToast();
+  const [errorRsp, setErrorRsp] = useState({ error: false, message: '' });
   const formik = useFormik({
     initialValues,
     onSubmit: async (value) => {
       const payload = {
         full_name: value.name,
         email: value.email,
-        id_role: value.roleAccess.id,
-        id_status: 1,
-        account_type: 'cms',
+        id_role: value.roleAccess?.id,
+        id_status: value.id_status,
+        account_type: value.account_type,
       };
-      await dispatch(roleUserAction.addRoleUser(payload));
-      if (!roleUserSelector.error) {
-        await onClose();
+      try {
+        const addUser = await createAdministrator(payload);
+        toast.openToast({
+          headMsg: 'New Role User Added',
+          // message: 'New Role User Added',
+          severity: 'success',
+        });
+        onClose();
+      } catch (error: any) {
+        let errMsg = error;
+        if (errMsg === 'Email already exist') {
+          errMsg = 'Email address already registered';
+        }
+        setErrorRsp({ error: true, message: errMsg });
+        console.log('🚀 ~ file: form.tsx:57 ~ onSubmit: ~ error', errMsg);
       }
+      // dispatch(roleUserAction.addRoleUser(payload));
+      // if (!roleUserSelector.loadingForm) {
+      //   onClose();
+      // }
     },
     validationSchema: yup.object({
       name: yup.string().required('Name is required'),
       email: yup
         .string()
-        .email('Invalid email format')
+        .email('Please input a valid email address')
         .required('Email is required'),
       roleAccess: yup.mixed().required('Role access is required'),
     }),
@@ -100,15 +116,21 @@ export default function Form({ onClose }: FormProps) {
           </FormLabel>
           <FormLabel
             text="Email"
-            error={touched.email && Boolean(errors.email)}
-            helperText={touched.email && errors.email && `${errors.email}`}
+            error={(touched.email && Boolean(errors.email)) || errorRsp.error}
+            helperText={
+              (touched.email && errors.email && `${errors.email}`) ||
+              errorRsp.message
+            }
           >
             <TextField
               type="text"
               name="email"
               placeholder="Input Category name"
               value={values.email}
-              onChange={handleChange}
+              onChange={(event) => {
+                handleChange(event);
+                setErrorRsp({ error: false, message: '' });
+              }}
               onBlur={handleBlur}
               fullWidth
             />
@@ -151,12 +173,16 @@ export default function Form({ onClose }: FormProps) {
             boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
           }}
         >
-          <Button variant="text" color="error">
+          <Button variant="text" color="error" onClick={onClose}>
             Cancel
           </Button>
           <Button
             type="submit"
-            disabled={!(isValid && dirty) || roleUserSelector.loadingForm}
+            disabled={
+              !(isValid && dirty) ||
+              roleUserSelector.loadingForm ||
+              errorRsp.error
+            }
           >
             {roleUserSelector.loadingForm ? (
               <CircularProgress size="1rem" />

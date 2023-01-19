@@ -1,59 +1,68 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
-import useToast from 'hooks/useToast';
-import AddIcon from '@mui/icons-material/Add';
 import InputAdornment from '@mui/material/InputAdornment';
-import SearchIcon from '@mui/icons-material/Search';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
-import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
+
 import Table from 'components/Table';
+import { HeadCells } from 'components/Table/types';
+import debounce from 'utils/debounce';
+
+import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
 import Typography from '@mui/material/Typography';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { useAppDispatch } from 'store/hooks';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { roleAccessAction } from 'store/slice/RoleAccess';
+import { RoleAccess } from 'models/RoleAccess';
 import RoleAccessForm from './Form/Form';
-import useModal from '../../hooks/useModal';
 import MenuList from '../../components/MenuList';
-import { roleAccessAction } from '../../store/slice/RoleAccess';
 
-export default function RoleAccess() {
-  const toast = useToast();
-  const formModal = useModal();
+export default function RoleAccesPage() {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const roleAccesses = useAppSelector((state) => state.roleAccess);
 
   useEffect(() => {
-    console.log('calling....');
     dispatch(roleAccessAction.fetchMenuList());
   }, []);
 
-  // data table
-  const callToast = () => {
-    toast.openToast({
-      headMsg: 'Successfully Add Role',
-      deleted: false,
-      severity: 'success',
-    });
+  useEffect(() => {
+    dispatch(roleAccessAction.fetchData(roleAccesses.params));
+  }, [roleAccesses.params]);
+
+  const handleSearch = (value: string) => {
+    dispatch(
+      roleAccessAction.setParams({
+        account_type: 'cms',
+        page: 1,
+        search: value,
+      }),
+    );
+  };
+  const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
+
+  const handleChangePage = (value: number) => {
+    dispatch(
+      roleAccessAction.setParams({
+        account_type: 'cms',
+        page: value,
+      }),
+    );
   };
 
-  const callToast2 = () => {
-    toast.openToast({
-      headMsg: 'Successfully Download Role Access Data',
-      deleted: false,
-      severity: 'success',
-    });
-  };
-
-  const headCell = [
+  const headCell: HeadCells<RoleAccess>[] = [
     {
-      id: 'roleName',
+      id: 'name',
       label: 'Role Name',
       align: 'left',
     },
     {
-      id: 'numberOfUser',
+      id: 'total_admin',
       label: 'User',
       align: 'left',
     },
@@ -61,18 +70,25 @@ export default function RoleAccess() {
       id: 'menu',
       label: 'Action',
       align: 'left',
-      format: (val: any) => (
-        <>
+      width: '20px',
+      format: (val) => (
+        <div>
           <MenuList
             menu={[
               {
-                label: 'Change Role Access',
+                label: 'Details',
                 onClick: () => {
-                  console.log('change role access');
+                  navigate(`/role-access/${val.id}`);
                 },
               },
               {
-                label: `Set to Inactive`,
+                label: 'Edit',
+                onClick: () => {
+                  console.log(val);
+                },
+              },
+              {
+                label: 'Delete',
                 color: '#c10000',
                 onClick: () => {
                   console.log('set active inactive');
@@ -84,245 +100,15 @@ export default function RoleAccess() {
               <MoreVertIcon />
             </IconButton>
           </MenuList>
-        </>
+        </div>
       ),
     },
   ];
 
-  const dataTest = [
-    {
-      roleName: 'Super Admin',
-      numberOfUser: 4,
-    },
-    {
-      roleName: 'Manager',
-      numberOfUser: 12,
-    },
-  ];
-
-  // const listOfMenu = [
-  //   {
-  //     id: 1,
-  //     name: 'Admin Panel',
-  //     is_checked: false,
-  //     child: [
-  //       {
-  //         id: 101,
-  //         name: 'Role User',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 102,
-  //         name: 'Role Access',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'Products',
-  //     is_checked: false,
-  //     child: [
-  //       {
-  //         id: 201,
-  //         name: 'Product Mangement',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 202,
-  //         name: 'SKU Management',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 203,
-  //         name: 'Category Management',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 3,
-  //     name: 'Lapak',
-  //     is_checked: false,
-  //     child: [
-  //       {
-  //         id: 301,
-  //         name: 'Area',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 302,
-  //         name: 'Lapak',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 4,
-  //     name: 'User',
-  //     is_checked: false,
-  //     child: [
-  //       {
-  //         id: 401,
-  //         name: 'Nitiper',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 402,
-  //         name: 'Jatiper',
-  //         is_checked: false,
-  //         child: [
-  //           {
-  //             id: 40201,
-  //             name: 'Jatiper Management',
-  //             is_checked: false,
-  //           },
-  //           {
-  //             id: 40202,
-  //             name: 'Jatiper Registration',
-  //             is_checked: false,
-  //           },
-  //         ],
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 5,
-  //     name: 'Transaction',
-  //     is_checked: false,
-  //     child: [
-  //       {
-  //         id: 501,
-  //         name: 'Transaction',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 502,
-  //         name: 'Urgent Order',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 6,
-  //     name: 'Application',
-  //     is_checked: false,
-  //     child: [
-  //       {
-  //         id: 601,
-  //         name: 'Notification',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 602,
-  //         name: 'Banner',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 603,
-  //         name: 'Event',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 604,
-  //         name: 'Giveaway',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 7,
-  //     name: 'Promo & Voucher',
-  //     is_checked: false,
-  //     child: [
-  //       {
-  //         id: 701,
-  //         name: 'Promo Product',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 702,
-  //         name: 'Join Promo',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 703,
-  //         name: 'Voucher',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 704,
-  //         name: 'Mass Voucher',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 705,
-  //         name: 'Giveaway',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 8,
-  //     name: 'Request',
-  //     is_checked: false,
-  //     child: [
-  //       {
-  //         id: 801,
-  //         name: 'Withdraw Request',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 802,
-  //         name: 'Join Promo Request',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 803,
-  //         name: 'New Product Request',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 804,
-  //         name: 'Master Data Config',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //       {
-  //         id: 805,
-  //         name: 'App Service',
-  //         is_checked: false,
-  //         child: [],
-  //       },
-  //     ],
-  //   },
-  // ];
-
   // form
   const [open, setOpen] = useState<boolean>(false);
   const [isEdit, setIsEdit] = useState<boolean>(false);
+
   const [formData, setFormData] = useState<{
     name: string;
     access: { [x: number]: boolean };
@@ -368,17 +154,10 @@ export default function RoleAccess() {
                       </InputAdornment>
                     ),
                   }}
-                />
-                <IconButton
-                  sx={{
-                    borderRadius: '4px',
-                    boxShadow: '0 3px 8px 0 rgba(0, 0, 0, 0.1)',
-                    border: 'solid 1px #ebeff3',
+                  onChange={(event) => {
+                    debounceSearch(event.target.value);
                   }}
-                  onClick={callToast2}
-                >
-                  <SimCardDownloadOutlinedIcon />
-                </IconButton>
+                />
               </Box>
             </Card>
           </Grid>
@@ -390,14 +169,13 @@ export default function RoleAccess() {
               boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
             >
               <Table
-                data={dataTest}
-                selected={[]}
+                data={roleAccesses.data}
                 headCells={headCell}
-                page={1}
-                totalPage={10}
-                onChangePage={(e) => console.log(e)}
-                // loading
-                enableCheckBox
+                page={roleAccesses.params.page}
+                totalData={roleAccesses.total}
+                count={roleAccesses.params.count}
+                loading={roleAccesses.loading}
+                onChangePage={(page) => handleChangePage(page)}
               />
             </Box>
           </Grid>

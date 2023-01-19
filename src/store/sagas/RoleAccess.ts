@@ -49,13 +49,13 @@ function* fetchData(params: PayloadAction<RoleAccessParams>) {
       params.payload,
     );
 
-    yield put(roleAccessAction.fetchDataSuccess(response.data));
+    yield put(roleAccessAction.fetchDataSuccess(response));
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
         uiAction.openToast({
-          headMsg: 'Success data',
+          headMsg: 'Error get data',
           message: error,
           severity: 'error',
         }),
@@ -63,12 +63,13 @@ function* fetchData(params: PayloadAction<RoleAccessParams>) {
     } else {
       yield put(
         uiAction.openToast({
-          headMsg: 'Success data',
+          headMsg: 'Error get data',
           message: 'interval server error',
           severity: 'error',
         }),
       );
     }
+    yield put(roleAccessAction.failedFetch());
   }
 }
 
@@ -89,7 +90,6 @@ function* updateRoleAccess() {
 
 function* fetchMenu() {
   try {
-    console.log('fetch administrator control');
     const params = {
       page: 1,
       account_type: 'cms',
@@ -98,7 +98,6 @@ function* fetchMenu() {
       service.fetchAdministratorControl,
       params,
     );
-    console.log('response menulist', res);
     const menuList = res.data.map((item: any) => ({
       id: item.id,
       menu: item.menu,
@@ -111,7 +110,6 @@ function* fetchMenu() {
           }))
         : null,
     }));
-    console.log('menulist', menuList);
     yield put(roleAccessAction.fetchMenuListSuccess(menuList));
   } catch (err) {
     if (typeof err === 'string') {
@@ -141,7 +139,6 @@ function* checkRoleName(params: PayloadAction<CheckRoleNameParams>) {
       role_name: params.payload,
       account_type: 'cms',
     };
-    console.log('params', params);
     const res: IsExistResponse = yield call(service.checkRoleNameExist, param);
     yield put(roleAccessAction.checkRoleNameSuccess(res));
   } catch (err) {

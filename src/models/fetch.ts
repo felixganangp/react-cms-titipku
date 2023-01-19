@@ -2,9 +2,9 @@ export interface ListResponse<T> {
   timestamp: number;
   status: string;
   message: string;
-  page: number;
-  count: number;
-  total: number;
+  page?: number;
+  count?: number;
+  total?: number;
   data: T[];
 }
 
