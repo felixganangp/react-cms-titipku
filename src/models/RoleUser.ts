@@ -3,9 +3,6 @@ import { RoleAccess } from './RoleAccess';
 
 export interface RoleUser {
   id?: number;
-  name: string;
-  is_exist: true;
-  account_type: string;
   full_name: string;
   email: true;
   created_at: number;
