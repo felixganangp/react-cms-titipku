@@ -14,8 +14,8 @@ export const TitleWrapper = styled(DialogTitle)`
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px 20px 24px;
-  width: 606px;
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+  width: 580px;
 `;
 
 export const Title = styled(Typography)`
@@ -26,6 +26,7 @@ export const Title = styled(Typography)`
 
 export const ContentWrapper = styled(DialogContentText)`
   padding: 24px;
+  width: 580px;
 `;
 
 export const ActionWrapper = styled(DialogActions)`
@@ -36,6 +37,7 @@ export const ActionWrapper = styled(DialogActions)`
   padding: 24px;
   gap: 10px;
   box-shadow: 3px 0px 10px rgba(0, 0, 0, 0.1);
+  width: 580px;
 `;
 
 export const SubmitButton = styled(Button)`
@@ -70,10 +72,10 @@ export const HorizontalContent = styled(Box)`
   height: 30px;
   padding-top: 0px;
   padding-bottom: 0px;
-  :nth-child(odd) {
+  :nth-of-type(odd) {
     background-color: #fafafa;
   }
-  :nth-child(even) {
+  :nth-of-type(even) {
     background-color: #ffff;
   }
 `;

@@ -6,7 +6,6 @@ import {
   CreateRoleUserPayload,
 } from 'models/RoleUser';
 
-
 interface RoleUserProps {
   data: RoleUser[];
   loading: boolean;

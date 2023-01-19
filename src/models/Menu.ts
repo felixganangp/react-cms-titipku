@@ -1,0 +1,17 @@
+export interface Menu {
+  id: number;
+  menu: string;
+  created_at: number;
+  is_exist: boolean;
+  is_parent: boolean;
+  parent_id: number;
+  active_role: string;
+  sub_menu: Menu[] | null;
+}
+
+export interface AccessMenu {
+  id: number;
+  menu: string;
+  is_checked: boolean;
+  sub_menu: AccessMenu[] | null;
+}

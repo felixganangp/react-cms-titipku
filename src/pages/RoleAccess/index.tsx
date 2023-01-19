@@ -10,24 +10,26 @@ import IconButton from '@mui/material/IconButton';
 
 import Table from 'components/Table';
 import { HeadCells } from 'components/Table/types';
-import MenuList from 'components/MenuList';
 import debounce from 'utils/debounce';
 
 import AddIcon from '@mui/icons-material/Add';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import SearchIcon from '@mui/icons-material/Search';
 import Typography from '@mui/material/Typography';
-
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { roleAccessAction } from 'store/slice/RoleAccess';
 import { RoleAccess } from 'models/RoleAccess';
-
 import RoleAccessForm from './Form/Form';
+import MenuList from '../../components/MenuList';
 
 export default function RoleAccesPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const roleAccesses = useAppSelector((state) => state.roleAccess);
+
+  useEffect(() => {
+    dispatch(roleAccessAction.fetchMenuList());
+  }, []);
 
   useEffect(() => {
     dispatch(roleAccessAction.fetchData(roleAccesses.params));
@@ -103,287 +105,22 @@ export default function RoleAccesPage() {
     },
   ];
 
-  const listOfMenu = [
-    {
-      id: 1,
-      name: 'Admin Panel',
-      is_checked: false,
-      child: [
-        {
-          id: 101,
-          name: 'Role User',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 102,
-          name: 'Role Access',
-          is_checked: false,
-          child: [],
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: 'Products',
-      is_checked: false,
-      child: [
-        {
-          id: 201,
-          name: 'Product Mangement',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 202,
-          name: 'SKU Management',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 203,
-          name: 'Category Management',
-          is_checked: false,
-          child: [],
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: 'Lapak',
-      is_checked: false,
-      child: [
-        {
-          id: 301,
-          name: 'Area',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 302,
-          name: 'Lapak',
-          is_checked: false,
-          child: [],
-        },
-      ],
-    },
-    {
-      id: 4,
-      name: 'User',
-      is_checked: false,
-      child: [
-        {
-          id: 401,
-          name: 'Nitiper',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 402,
-          name: 'Jatiper',
-          is_checked: false,
-          child: [
-            {
-              id: 40201,
-              name: 'Jatiper Management',
-              is_checked: false,
-            },
-            {
-              id: 40202,
-              name: 'Jatiper Registration',
-              is_checked: false,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: 5,
-      name: 'Transaction',
-      is_checked: false,
-      child: [
-        {
-          id: 501,
-          name: 'Transaction',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 502,
-          name: 'Urgent Order',
-          is_checked: false,
-          child: [],
-        },
-      ],
-    },
-    {
-      id: 6,
-      name: 'Application',
-      is_checked: false,
-      child: [
-        {
-          id: 601,
-          name: 'Notification',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 602,
-          name: 'Banner',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 603,
-          name: 'Event',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 604,
-          name: 'Giveaway',
-          is_checked: false,
-          child: [],
-        },
-      ],
-    },
-    {
-      id: 7,
-      name: 'Promo & Voucher',
-      is_checked: false,
-      child: [
-        {
-          id: 701,
-          name: 'Promo Product',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 702,
-          name: 'Join Promo',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 703,
-          name: 'Voucher',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 704,
-          name: 'Mass Voucher',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 705,
-          name: 'Giveaway',
-          is_checked: false,
-          child: [],
-        },
-      ],
-    },
-    {
-      id: 8,
-      name: 'Request',
-      is_checked: false,
-      child: [
-        {
-          id: 801,
-          name: 'Withdraw Request',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 802,
-          name: 'Join Promo Request',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 803,
-          name: 'New Product Request',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 804,
-          name: 'Master Data Config',
-          is_checked: false,
-          child: [],
-        },
-        {
-          id: 805,
-          name: 'App Service',
-          is_checked: false,
-          child: [],
-        },
-      ],
-    },
-  ];
-
   // form
   const [open, setOpen] = useState<boolean>(false);
+  const [isEdit, setIsEdit] = useState<boolean>(false);
 
-  // const [isEdit, setIsEdit] = useState<boolean>(false);
   const [formData, setFormData] = useState<{
     name: string;
     access: { [x: number]: boolean };
   }>({ name: '', access: { 0: false } });
-  const [categorizedMenu, setCategorizedMenu] = useState<
-    {
-      parent: number;
-      menu: number[];
-    }[]
-  >([]);
-
-  const getInitialData = () => {
-    const accessMenu: { [x: number]: boolean } = {};
-    accessMenu[listOfMenu[0].child[0].id] = false;
-    if (listOfMenu !== undefined) {
-      for (let i = 0; i < listOfMenu.length; i += 1) {
-        accessMenu[listOfMenu[i].id] = false;
-        if (listOfMenu[i].child.length > 0) {
-          for (let a = 0; a < listOfMenu[i].child.length; a += 1) {
-            accessMenu[listOfMenu[i].child[a].id] = false;
-            if (listOfMenu[i].child[a].child.length > 0) {
-              for (let b = 0; b < listOfMenu[i].child[a].child.length; b += 1) {
-                accessMenu[listOfMenu[i].child[a].child[b].id] = false;
-              }
-            }
-          }
-        }
-      }
-    }
-    return { name: '', access: accessMenu };
-  };
-
-  useEffect(() => {
-    const mappedData: {
-      parent: number;
-      menu: number[];
-    }[] = [];
-    if (listOfMenu.length > 0) {
-      for (let i = 0; i < listOfMenu.length; i += 1) {
-        if (listOfMenu[i].child.length > 0) {
-          mappedData.push({
-            parent: listOfMenu[i].id,
-            menu: listOfMenu[i].child.map((a) => a.id),
-          });
-        }
-      }
-    }
-    setCategorizedMenu(mappedData);
-  }, []);
 
   return (
     <div>
       <RoleAccessForm
         open={open}
         onClose={() => setOpen(!open)}
-        initialValues={formData}
-        categorizedMenu={categorizedMenu}
+        // initialValues={formData}
+        isEdit={isEdit}
       />
       <Box p="20px" bgcolor="#F5F7FA">
         <Grid container spacing={2}>
@@ -399,7 +136,8 @@ export default function RoleAccesPage() {
                   startIcon={<AddIcon />}
                   onClick={() => {
                     setOpen(!open);
-                    setFormData(getInitialData());
+                    // setFormData(getInitialData());
+                    setIsEdit(false);
                   }}
                 >
                   Add New

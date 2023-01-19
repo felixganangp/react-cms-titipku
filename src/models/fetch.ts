@@ -8,6 +8,20 @@ export interface ListResponse<T> {
   data: T[];
 }
 
+export interface AddResponse<T> {
+  timestamp: number;
+  status: string;
+  message: string;
+  data: T;
+}
+
+export interface IsExistResponse {
+  timestamp: number;
+  status: string;
+  message: string;
+  data: boolean;
+}
+
 export interface ListParams {
   page?: number;
   count?: number;
