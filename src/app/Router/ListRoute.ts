@@ -21,7 +21,7 @@ const ListRoute: RouteProps[] = [
     comp: Home,
     path: '/',
     index: true,
-    auth: 'Public',
+    auth: 'Private',
   },
   {
     comp: Login,
