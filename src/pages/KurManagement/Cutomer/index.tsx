@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import {
   Card,
@@ -8,8 +8,10 @@ import {
   TextField,
   Typography,
   InputAdornment,
+  Autocomplete,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
@@ -22,58 +24,51 @@ import Modal from 'components/Modal';
 
 export default function KurCustomer() {
   const skus = useAppSelector((state: any) => state.skuManagement.data);
-  // React.useEffect(() => {
-  //   dispatch(skuManagementAction.fetchData());
-  // }, []);
+  const [openFilter, setOpenFilter] = useState(false);
+
   const formModal = useModal();
 
   const headCell = [
     {
-      id: 'image',
-      label: 'Image',
-      align: 'center',
-      format: (val: any) => (
-        <div
-          aria-hidden="true"
-          style={{
-            cursor: 'pointer',
-            height: '100%',
-            position: 'relative',
-          }}
-        >
-          {/* <Image src={val.image} alt={val.sku_name} /> */}
-        </div>
-      ),
+      id: 'customer_id',
+      label: 'Cust. ID',
+      align: 'left',
+      format: (val: any) => <div>Customer ID</div>,
     },
     {
-      id: 'sku_name',
-      label: 'SKU Name',
-      align: 'center',
+      id: 'name',
+      label: 'Name',
+      align: 'left',
     },
     {
-      id: 'origin',
-      label: 'Origin',
-      align: 'center',
+      id: 'kur_type',
+      label: 'KUR Type',
+      align: 'left',
     },
     {
-      id: 'weight',
-      label: 'Weight Per Pcs (Gram)',
-      align: 'center',
+      id: 'create_date',
+      label: 'Create Date',
+      align: 'left',
     },
     {
-      id: 'available_stock',
-      label: 'Available Stock',
-      align: 'center',
+      id: 'merchant',
+      label: 'Merchant',
+      align: 'left',
     },
     {
-      id: 'last_supply_date',
-      label: 'Last Supply Date',
-      align: 'center',
+      id: 'pasar',
+      label: 'Pasar',
+      align: 'left',
+    },
+    {
+      id: 'credit_score',
+      label: 'Credit Score',
+      align: 'left',
     },
     {
       id: 'action',
       label: 'Action',
-      align: 'center',
+      align: 'left',
     },
   ];
   return (
@@ -87,23 +82,141 @@ export default function KurCustomer() {
         <Grid item xs={12}>
           <Card>
             <Box display="flex" gap="20px" flexWrap="wrap">
-              <Button startIcon={<AddIcon />} onClick={formModal.openModal}>
-                Add Customer
-              </Button>
-              <TextField
-                placeholder="Search for customer name"
-                size="small"
-                sx={{ bgcolor: '#ebeff3', maxWidth: '560px' }}
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
+              <Box
+                width="100%"
+                sx={{ display: 'flex', gap: 2, alignContent: 'center' }}
+              >
+                <Button
+                  sx={{ width: '15%' }}
+                  startIcon={<AddIcon />}
+                  onClick={formModal.openModal}
+                >
+                  Add Customer
+                </Button>
+                <Box
+                  width="85%"
+                  sx={{ display: 'flex', justifyContent: 'space-between' }}
+                >
+                  <TextField
+                    placeholder="Search for customer name"
+                    size="small"
+                    sx={{ bgcolor: '#fafafa', maxWidth: '560px', width: '60%' }}
+                    fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <Button
+                    endIcon={<KeyboardArrowDownIcon />}
+                    onClick={() => setOpenFilter(!openFilter)}
+                  >
+                    Filter
+                  </Button>
+                </Box>
+              </Box>
             </Box>
+            {openFilter ? (
+              <>
+                <Grid container spacing={2} sx={{ marginTop: '2rem' }}>
+                  <Grid item xs={4}>
+                    <Typography
+                      sx={{
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        marginBottom: 1,
+                      }}
+                    >
+                      Type
+                    </Typography>
+                    <Autocomplete
+                      id="type"
+                      options={[]}
+                      onChange={(e, value) => {
+                        console.log('onchange');
+                      }}
+                      isOptionEqualToValue={(option) => {
+                        return false;
+                      }}
+                      getOptionLabel={(option) => `${option}`}
+                      value=""
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          name="type"
+                          placeholder="Select Type of KUR"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Typography
+                      sx={{
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        marginBottom: 1,
+                      }}
+                    >
+                      Pasar
+                    </Typography>
+                    <TextField
+                      placeholder="Select Pasar"
+                      size="small"
+                      sx={{ bgcolor: '#fafafa' }}
+                      fullWidth
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Typography
+                      sx={{
+                        fontSize: '14px',
+                        fontWeight: '500',
+                        marginBottom: 1,
+                      }}
+                    >
+                      Credit Score
+                    </Typography>
+                    <TextField
+                      placeholder="Credit Score"
+                      size="small"
+                      sx={{ bgcolor: '#fafafa' }}
+                      fullWidth
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        gap: 2,
+                      }}
+                    >
+                      <Button variant="text">Reset</Button>
+                      <Button>Apply</Button>
+                    </Box>
+                  </Grid>
+                </Grid>
+              </>
+            ) : (
+              <></>
+            )}
           </Card>
         </Grid>
         <Grid item xs={12}>
@@ -122,6 +235,7 @@ export default function KurCustomer() {
               onChangePage={(e) => console.log(e)}
               // loading
               enableCheckBox
+              disableNumber
             />
           </Box>
         </Grid>
