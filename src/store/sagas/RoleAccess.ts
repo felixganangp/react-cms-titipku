@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
+import { call, put, select, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 import * as AdministratorService from 'service/Administrator';
 import { ListResponse } from 'models/fetch';
@@ -16,7 +16,9 @@ import { IsExistResponse, MenuListParam } from '../../models/fetch';
 
 function* addRoleAccess(body: PayloadAction<RoleAccessForm>) {
   try {
+    const params = yield select((state: any) => state.roleAccess.params);
     yield call(service.createAdministratorRole(body.payload));
+    yield put(roleAccessAction.fetchData(params));
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
@@ -39,10 +41,19 @@ function* addRoleAccess(body: PayloadAction<RoleAccessForm>) {
   }
 }
 
-function* updateRoleAccess(body: PayloadAction<RoleAccessForm>) {
+function* updateRoleAccess(payload: PayloadAction<RoleAccessForm>) {
   try {
-    console.log('masuk saga', body);
-    yield call(service.updateRoleAccess(body));
+    const params = yield select((state: any) => state.roleAccess.params);
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const { name, account_type, controls, description, is_exist, id } =
+      payload.payload;
+    yield call(
+      service.updateRoleAccess(
+        { name, account_type, controls, description, is_exist },
+        id,
+      ),
+    );
+    yield put(roleAccessAction.fetchData(params));
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;

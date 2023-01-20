@@ -66,27 +66,25 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
     }
   }, [open, editValue]);
 
-  const handleSubmitForm = async (body: any) => {
+  const handleSubmitForm = (body: any) => {
     if (!editValue) {
       body.description = '';
-      await dispatch(roleAccessAction.add(body));
+      dispatch(roleAccessAction.add(body));
       toast.openToast({
         headMsg: 'Success add',
         message: 'Succesfully add new role access',
         severity: 'success',
       });
-      await dispatch(roleAccessAction.fetchData(selectRoleAccess.params));
     } else {
       body.id = editValue.id;
       body.is_exist = editValue.is_exist;
       body.description = '';
-      await dispatch(roleAccessAction.update(body));
+      dispatch(roleAccessAction.update(body));
       toast.openToast({
         headMsg: 'Success update',
         message: 'Succesfully update role access',
         severity: 'success',
       });
-      await dispatch(roleAccessAction.fetchData(selectRoleAccess.params));
     }
   };
 
@@ -110,11 +108,18 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
         };
 
         await handleSubmitForm(body);
+        dispatch(roleAccessAction.fetchData(selectRoleAccess.params));
         onClose();
       } catch (error) {
+        let message = '';
+        if (!editValue) {
+          message = 'Failed to create new role access';
+        } else {
+          message = 'Failed to update role access';
+        }
         toast.openToast({
           headMsg: 'Failed',
-          message: 'toast message',
+          message,
           severity: 'error',
         });
       }
@@ -240,7 +245,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
     dispatch(roleAccessAction.checkRoleName(value));
   };
 
-  const checkingName = useCallback(debounce(handleCheckName, 100), []);
+  const checkingName = useCallback(debounce(handleCheckName, 80), []);
 
   const handleChangeRoleName = (value: string) => {
     checkingName(value);

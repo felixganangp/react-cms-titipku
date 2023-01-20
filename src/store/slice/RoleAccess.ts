@@ -119,6 +119,7 @@ export const roleAccessAction = RoleAccessSlice.actions;
 // selector
 export const selectRoleAccess = (state: RoleAccessProps) => state.data;
 export const selectMenu = (state: MenuProps) => state.menuData;
+export const selectParams = (state: RoleAccessProps) => state.params;
 // reducer
 const roleAccessReducer = RoleAccessSlice.reducer;
 export default roleAccessReducer;

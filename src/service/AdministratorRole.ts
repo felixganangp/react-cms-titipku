@@ -1,4 +1,5 @@
 import http from 'utils/request';
+import RoleAccessForm from '../models/RoleAccess';
 
 export const fetchAdministratorRole = (params: any) =>
   new Promise(async (resolve, reject) => {
@@ -32,25 +33,11 @@ export const createAdministratorRole = (body: any) =>
     }
   });
 
-export const updateRoleAccess = (params: any) =>
+export const updateRoleAccess = (body: RoleAccessForm, id: number) =>
   new Promise(async (resolve, reject) => {
     try {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      const { name, account_type, controls, description, is_exist } =
-        params.payload;
-
-      const body = {
-        name,
-        account_type,
-        controls,
-        description,
-        is_exist,
-      };
-
-      const response = await http.put(
-        `/administrator/role/${params.payload.id}`,
-        body,
-      );
+      const response = await http.put(`/administrator/role/${id}`, body);
 
       if (response.data) {
         resolve(response.data);
