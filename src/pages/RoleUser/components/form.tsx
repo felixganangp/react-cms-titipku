@@ -91,7 +91,6 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
           errMsg = 'Email address already registered';
         }
         setErrorRsp({ error: true, message: errMsg });
-        console.log('🚀 ~ file: form.tsx:57 ~ onSubmit: ~ error', errMsg);
       }
       // dispatch(roleUserAction.addRoleUser(payload));
       // if (!roleUserSelector.loadingForm) {
@@ -121,6 +120,14 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
     dirty,
   } = formik;
   const handleValidEmail = async (value: string) => {
+    // await dispatch(
+    //   await roleUserAction.checkEmailValid({
+    //     email: value,
+    //     account_type: 'cms',
+    //     excluded_id: 0,
+    //   }),
+    // );
+    await console.log(roleUserSelector.validMsg, '<<<<<<<');
     const response: CheckValidResponse = await checkValidEmail({
       email: value,
       account_type: 'cms',
@@ -130,7 +137,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
       setErrorRsp({ error: true, message: 'Email address already registered' });
     }
   };
-  const debounceValidEmail = useCallback(debounce(handleValidEmail, 100), []);
+  const debounceValidEmail = useCallback(debounce(handleValidEmail, 1000), []);
   return (
     <Box>
       <form onSubmit={handleSubmit}>

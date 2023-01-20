@@ -96,8 +96,29 @@ function* editRoleUser({ payload }: PayloadAction<CreateRoleUserPayload>) {
   }
 }
 
+function* checkEmailValid(params: any) {
+  try {
+    const response: ListResponse<any> = yield call(
+      AdministratorService.checkValidEmail,
+      params.payload,
+    );
+    yield put(roleUserAction.checkEmailValidSuccess(response));
+  } catch (error) {
+    // yield put(
+    //   uiAction.openToast({
+    //     headMsg: 'Failed to add new role user',
+    //     message: error as string,
+    //     severity: 'error',
+    //   }),
+    // );
+    // yield put(roleUserAction.addOrEditRoleUserSuccess({ error: true }));
+    console.log(`Failed to create user: `, error);
+  }
+}
+
 export default function* roleUserSagas() {
   yield takeLatest(roleUserAction.fetchData.type, fetchData);
   yield takeLatest(roleUserAction.addRoleUser.type, addRoleUser);
   yield takeLatest(roleUserAction.editRoleUser.type, editRoleUser);
+  yield takeLatest(roleUserAction.checkEmailValid.type, checkEmailValid);
 }
