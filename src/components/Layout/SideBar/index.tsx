@@ -248,6 +248,12 @@ function SideBar(props: SideBarProps) {
       icon: <LocalAtmIcon />,
       child: [
         {
+          id: 11,
+          title: 'Request',
+          path: '/kur/request',
+          child: [],
+        },
+        {
           id: 10,
           title: 'Customer',
           path: '/kur/customer',
