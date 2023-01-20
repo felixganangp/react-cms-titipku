@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -11,9 +11,14 @@ import { roleUserAction } from 'store/slice/RoleUser';
 import { roleAccessAction } from 'store/slice/RoleAccess';
 import useToast from 'hooks/useToast';
 import FormLabel from 'components/FormLabel';
-import { CreateRoleUser } from 'models/RoleUser';
+import { CreateRoleUser, CheckValidResponse } from 'models/RoleUser';
 import { RoleAccess } from 'models/RoleAccess';
-import { createAdministrator, editAdministrator } from 'service/Administrator';
+import {
+  createAdministrator,
+  editAdministrator,
+  checkValidEmail,
+} from 'service/Administrator';
+import debounce from 'utils/debounce';
 
 const initial: CreateRoleUser = {
   name: '',
@@ -115,6 +120,17 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
     isValid,
     dirty,
   } = formik;
+  const handleValidEmail = async (value: string) => {
+    const response: CheckValidResponse = await checkValidEmail({
+      email: value,
+      account_type: 'cms',
+      excluded_id: 0,
+    });
+    if (response.data) {
+      setErrorRsp({ error: true, message: 'Email address already registered' });
+    }
+  };
+  const debounceValidEmail = useCallback(debounce(handleValidEmail, 100), []);
   return (
     <Box>
       <form onSubmit={handleSubmit}>
@@ -154,6 +170,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
               placeholder="Input Category name"
               value={values.email}
               onChange={(event) => {
+                debounceValidEmail(event.target.value);
                 handleChange(event);
                 setErrorRsp({ error: false, message: '' });
               }}
