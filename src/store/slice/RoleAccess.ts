@@ -1,16 +1,24 @@
-import AddRoleAccess, { RoleAccess, RoleAccessParams } from 'models/RoleAccess';
+import RoleAccessForm, {
+  RoleAccess,
+  RoleAccessParams,
+} from 'models/RoleAccess';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AccessMenu, Menu } from '../../models/Menu';
-import { IsExistResponse, ListResponse } from '../../models/fetch';
+import { AccessMenu } from '../../models/Menu';
+import {
+  IsExistResponse,
+  ListResponse,
+  MenuListParam,
+} from '../../models/fetch';
 
 interface RoleAccessProps {
   data: RoleAccess[];
-  menuData: [];
   loading: boolean;
   loadingForm: boolean;
-  errorName: IsExistResponse;
   total: number;
   params: RoleAccessParams;
+  menuData: [];
+  errorName: IsExistResponse;
+  menulistParams: MenuListParam;
 }
 
 interface MenuProps {
@@ -43,6 +51,10 @@ const initialState: RoleAccessProps = {
     account_type: 'cms',
     is_exist: true,
   },
+  menulistParams: {
+    page: 1,
+    account_type: 'cms',
+  },
 };
 
 const RoleAccessSlice = createSlice({
@@ -70,7 +82,8 @@ const RoleAccessSlice = createSlice({
       state.data = action.payload.data;
       state.total = action.payload.total;
     },
-    fetchMenuList(state: MenuProps) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    fetchMenuList(state: MenuProps, action: PayloadAction<MenuListParam>) {
       state.loading = true;
     },
     fetchMenuListSuccess(
@@ -90,10 +103,13 @@ const RoleAccessSlice = createSlice({
       state.loading = false;
       state.errorName = action.payload;
     },
-    add(state: RoleAccessProps, action: PayloadAction<AddRoleAccess>) {
+    add(state: RoleAccessProps, action: PayloadAction<RoleAccessForm>) {
       state.loadingForm = true;
     },
     addRoleUser(state: RoleAccessProps) {
+      state.loadingForm = true;
+    },
+    update(state: RoleAccessProps, action: PayloadAction<RoleAccessForm>) {
       state.loadingForm = true;
     },
   },
