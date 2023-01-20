@@ -77,7 +77,7 @@ function* editRoleUser({ payload }: PayloadAction<CreateRoleUserPayload>) {
     );
     yield put(
       uiAction.openToast({
-        headMsg: 'Success add new role user',
+        headMsg: 'Role User Edited',
         // message: 'Succes Fetch data',
         severity: 'success',
       }),
@@ -86,7 +86,7 @@ function* editRoleUser({ payload }: PayloadAction<CreateRoleUserPayload>) {
   } catch (error) {
     yield put(
       uiAction.openToast({
-        headMsg: 'Failed to add new role user',
+        headMsg: 'Failed to edit role user',
         message: error as string,
         severity: 'error',
       }),
