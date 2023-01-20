@@ -12,7 +12,8 @@ import { roleAccessAction } from 'store/slice/RoleAccess';
 import useToast from 'hooks/useToast';
 import FormLabel from 'components/FormLabel';
 import { CreateRoleUser } from 'models/RoleUser';
-import { createAdministrator } from 'service/Administrator';
+import { RoleAccess } from 'models/RoleAccess';
+import { createAdministrator, editAdministrator } from 'service/Administrator';
 
 const initial: CreateRoleUser = {
   name: '',
@@ -23,13 +24,18 @@ const initial: CreateRoleUser = {
 };
 interface FormProps {
   onClose: () => void;
+  isEdit?: boolean;
+  data: CreateRoleUser;
 }
 
-export default function Form({ onClose }: FormProps) {
+export default function Form({ onClose, isEdit, data }: FormProps) {
   // fetching role user
   const dispatch = useAppDispatch();
   const roleUserSelector = useAppSelector((state) => state.roleUser);
   const roleAccessSelector = useAppSelector((state) => state.roleAccess);
+
+  const [textButton, setTextButton] = useState('Add');
+  const [initialValues, setInitialValues] = useState(initial);
   useEffect(() => {
     dispatch(
       roleAccessAction.fetchData({
@@ -37,29 +43,43 @@ export default function Form({ onClose }: FormProps) {
         is_exist: true,
       }),
     );
+    if (isEdit) {
+      setInitialValues(data);
+      setTextButton('Edit');
+    }
   }, []);
-
-  const [initialValues, setInitialValues] = useState(initial);
   const toast = useToast();
   const [errorRsp, setErrorRsp] = useState({ error: false, message: '' });
   const formik = useFormik({
     initialValues,
-    onSubmit: async (value) => {
+    onSubmit: async (value, { resetForm }) => {
       const payload = {
         full_name: value.name,
         email: value.email,
         id_role: value.roleAccess?.id,
         id_status: value.id_status,
         account_type: value.account_type,
+        id: initialValues.id,
       };
       try {
-        const addUser = await createAdministrator(payload);
-        toast.openToast({
-          headMsg: 'New Role User Added',
-          // message: 'New Role User Added',
-          severity: 'success',
-        });
-        onClose();
+        if (isEdit) {
+          // const addUser = await editAdministrator(payload);
+          await dispatch(roleUserAction.editRoleUser(payload));
+          toast.openToast({
+            headMsg: 'Role User Edited',
+            // message: 'New Role User Added',
+            severity: 'success',
+          });
+        } else {
+          const addUser = await createAdministrator(payload);
+          toast.openToast({
+            headMsg: 'New Role User Added',
+            // message: 'New Role User Added',
+            severity: 'success',
+          });
+        }
+        await onClose();
+        await resetForm();
       } catch (error: any) {
         let errMsg = error;
         if (errMsg === 'Email already exist') {
@@ -112,6 +132,12 @@ export default function Form({ onClose }: FormProps) {
               onChange={handleChange}
               onBlur={handleBlur}
               fullWidth
+              disabled={isEdit}
+              sx={{
+                '& .MuiInputBase-input': {
+                  backgroundColor: (isEdit && '#f5f7fa') || '',
+                },
+              }}
             />
           </FormLabel>
           <FormLabel
@@ -132,7 +158,13 @@ export default function Form({ onClose }: FormProps) {
                 setErrorRsp({ error: false, message: '' });
               }}
               onBlur={handleBlur}
+              disabled={isEdit}
               fullWidth
+              sx={{
+                '& .MuiInputBase-input': {
+                  backgroundColor: (isEdit && '#f5f7fa') || '',
+                },
+              }}
             />
           </FormLabel>
           <FormLabel
@@ -148,8 +180,10 @@ export default function Form({ onClose }: FormProps) {
               onChange={(e, value) => {
                 setFieldValue('roleAccess', value);
               }}
-              isOptionEqualToValue={(option) => option === values.roleAccess}
-              getOptionLabel={(option: any) => `${option.name}`}
+              isOptionEqualToValue={(option: RoleAccess) => {
+                return option.id === values.roleAccess?.id;
+              }}
+              getOptionLabel={(option: RoleAccess) => `${option.name}`}
               value={values.roleAccess}
               renderInput={(params) => (
                 <TextField
@@ -179,7 +213,7 @@ export default function Form({ onClose }: FormProps) {
           <Button
             type="submit"
             disabled={
-              !(isValid && dirty) ||
+              (!(isValid && dirty) && !isEdit) ||
               roleUserSelector.loadingForm ||
               errorRsp.error
             }
@@ -187,7 +221,7 @@ export default function Form({ onClose }: FormProps) {
             {roleUserSelector.loadingForm ? (
               <CircularProgress size="1rem" />
             ) : (
-              'Add'
+              textButton
             )}
           </Button>
         </Box>
@@ -195,3 +229,7 @@ export default function Form({ onClose }: FormProps) {
     </Box>
   );
 }
+
+Form.defaultProps = {
+  isEdit: false,
+};
