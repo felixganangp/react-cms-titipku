@@ -55,7 +55,7 @@ function* addRoleUser({ payload }: PayloadAction<CreateRoleUserPayload>) {
         severity: 'success',
       }),
     );
-    yield put(roleUserAction.addRoleUserSuccess({ error: false }));
+    yield put(roleUserAction.addOrEditRoleUserSuccess({ error: false }));
   } catch (error) {
     yield put(
       uiAction.openToast({
@@ -64,7 +64,34 @@ function* addRoleUser({ payload }: PayloadAction<CreateRoleUserPayload>) {
         severity: 'error',
       }),
     );
-    yield put(roleUserAction.addRoleUserSuccess({ error: true }));
+    yield put(roleUserAction.addOrEditRoleUserSuccess({ error: true }));
+    console.log(`Failed to create user: `, error);
+  }
+}
+
+function* editRoleUser({ payload }: PayloadAction<CreateRoleUserPayload>) {
+  try {
+    const response: ListResponse<RoleUser> = yield call(
+      AdministratorService.editAdministrator,
+      payload,
+    );
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Success add new role user',
+        // message: 'Succes Fetch data',
+        severity: 'success',
+      }),
+    );
+    yield put(roleUserAction.addOrEditRoleUserSuccess({ error: false }));
+  } catch (error) {
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Failed to add new role user',
+        message: error as string,
+        severity: 'error',
+      }),
+    );
+    yield put(roleUserAction.addOrEditRoleUserSuccess({ error: true }));
     console.log(`Failed to create user: `, error);
   }
 }
@@ -72,4 +99,5 @@ function* addRoleUser({ payload }: PayloadAction<CreateRoleUserPayload>) {
 export default function* roleUserSagas() {
   yield takeLatest(roleUserAction.fetchData.type, fetchData);
   yield takeLatest(roleUserAction.addRoleUser.type, addRoleUser);
+  yield takeLatest(roleUserAction.editRoleUser.type, editRoleUser);
 }

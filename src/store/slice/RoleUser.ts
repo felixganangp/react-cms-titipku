@@ -6,7 +6,6 @@ import {
   CreateRoleUserPayload,
 } from 'models/RoleUser';
 
-
 interface RoleUserProps {
   data: RoleUser[];
   loading: boolean;
@@ -61,7 +60,13 @@ const RoleUserSlice = createSlice({
     ) {
       state.loadingForm = true;
     },
-    addRoleUserSuccess(
+    editRoleUser(
+      state: RoleUserProps,
+      action: PayloadAction<CreateRoleUserPayload>,
+    ) {
+      state.loadingForm = true;
+    },
+    addOrEditRoleUserSuccess(
       state: RoleUserProps,
       action: PayloadAction<{ error: boolean }>,
     ) {

@@ -22,6 +22,7 @@ export interface CreateRoleUser {
   roleAccess: RoleAccess | null;
   id_status: 1;
   account_type: 'cms';
+  id?: number;
 }
 
 export interface CreateRoleUserPayload {
@@ -30,4 +31,5 @@ export interface CreateRoleUserPayload {
   id_role: number | undefined;
   id_status: 1;
   account_type: 'cms';
+  id?: number;
 }
