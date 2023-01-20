@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import * as React from 'react';
+import { useState } from 'react';
 import {
   Box,
   Card,
@@ -8,13 +9,19 @@ import {
   Button,
   TextField,
   InputAdornment,
+  Autocomplete,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import Table from 'components/Table';
 import useModal from 'hooks/useModal';
+import ArrowDown from '@mui/icons-material/KeyboardArrowDown';
+import { values } from 'lodash';
+import FormLabel from 'components/FormLabel';
 import {
   CustomerStatus,
+  FilterButton,
+  FilterDataBox,
   InvoiceLabel,
   InvoiceStatus,
   RowBox,
@@ -98,9 +105,59 @@ const data = [
   },
 ];
 
+const areas = [
+  {
+    id: 15,
+    name: 'Pasar Paramount',
+    address: '',
+  },
+  {
+    id: 16,
+    name: 'Pasar Modern Bintaro',
+    address: '',
+  },
+  {
+    id: 17,
+    name: 'Pasar Segar Graha',
+    address: '',
+  },
+  {
+    id: 18,
+    name: 'Pasar Modern Town Market',
+    address: '',
+  },
+  {
+    id: 19,
+    name: 'Pasar Sinpasa GS',
+    address: '',
+  },
+  {
+    id: 20,
+    name: 'Pasar Laris Kosambi',
+    address: '',
+  },
+  {
+    id: 21,
+    name: 'Pasar Laris Palm Paradise',
+    address: '',
+  },
+];
+
+const kurType = [
+  {
+    id: 1,
+    type: 'B2B',
+  },
+  {
+    id: 2,
+    type: 'B2BWC',
+  },
+];
+
 export default function RequestKUR() {
   const formModal = useModal();
 
+  // table
   const headCell = [
     {
       id: 'no_request',
@@ -171,31 +228,130 @@ export default function RequestKUR() {
     },
   ];
 
+  // filter
+  const [openFilter, setOpenFilter] = useState<boolean>(false);
+  const [selectedArea, setSelectedArea] = useState<number>();
+  const [selectedKurType, setSelectedKurType] = useState<number>();
+
   return (
     <Box p="20px" bgcolor="#F5F7FA">
       <Grid container spacing={2}>
-        {/* <Grid item xs={12}>
-          <Card>
-            <Typography variant="titlePage">KUR Customer</Typography>
-          </Card>
-        </Grid> */}
         <Grid item xs={12}>
           <Card>
-            <Box display="flex" gap="20px" flexWrap="wrap">
-              <TextField
-                placeholder="Search item"
-                size="small"
-                sx={{ bgcolor: '#ebeff3', maxWidth: '560px' }}
-                fullWidth
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            </Box>
+            <FilterDataBox>
+              <Box
+                display="flex"
+                flexDirection="row"
+                width="100%"
+                justifyContent="space-between"
+              >
+                <TextField
+                  placeholder="Search item"
+                  size="small"
+                  sx={{ bgcolor: '#ebeff3', maxWidth: '560px' }}
+                  fullWidth
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                <FilterButton
+                  endIcon={<ArrowDown />}
+                  onClick={() => setOpenFilter(!openFilter)}
+                >
+                  Filter
+                </FilterButton>
+              </Box>
+
+              <Box
+                display={openFilter ? 'flex' : 'none'}
+                flexDirection="row"
+                width="100%"
+                justifyContent="space-between"
+                gap="28px"
+              >
+                <FormLabel text="Pasar">
+                  <Autocomplete
+                    id="filterPasar"
+                    options={areas}
+                    onChange={(e, value) => {
+                      setSelectedArea(value?.id);
+                    }}
+                    isOptionEqualToValue={(option: any) =>
+                      option === values?.name
+                    }
+                    getOptionLabel={(option: any) => option.name}
+                    renderInput={(params: any) => (
+                      <TextField {...params} placeholder="Select Pasar" />
+                    )}
+                    sx={{
+                      display: openFilter ? 'block' : 'none',
+                    }}
+                    fullWidth
+                  />
+                </FormLabel>
+                <FormLabel text="Type">
+                  <Autocomplete
+                    id="filterKURType"
+                    options={kurType}
+                    onChange={(e, value) => {
+                      setSelectedKurType(value?.id);
+                    }}
+                    isOptionEqualToValue={(option: any) =>
+                      option === values?.name
+                    }
+                    getOptionLabel={(option: any) => option.type}
+                    renderInput={(params: any) => (
+                      <TextField {...params} placeholder="Select Type of KUR" />
+                    )}
+                    sx={{
+                      display: openFilter ? 'block' : 'none',
+                    }}
+                    fullWidth
+                  />
+                </FormLabel>
+                <FormLabel text="Submit Date">
+                  <Autocomplete
+                    id="submitDate"
+                    options={kurType}
+                    onChange={(e, value) => {
+                      setSelectedKurType(value?.id);
+                    }}
+                    isOptionEqualToValue={(option: any) =>
+                      option === values?.name
+                    }
+                    getOptionLabel={(option: any) => option.type}
+                    renderInput={(params: any) => (
+                      <TextField {...params} placeholder="Select Type of KUR" />
+                    )}
+                    sx={{
+                      display: openFilter ? 'block' : 'none',
+                    }}
+                    fullWidth
+                  />
+                </FormLabel>
+              </Box>
+              <Box
+                display={openFilter ? 'flex' : 'none'}
+                flexDirection="row"
+                justifyContent="flex-end"
+                width="100%"
+                gap="20px"
+              >
+                <Button
+                  sx={{
+                    bgcolor: '#ffff',
+                    color: '#008E58',
+                  }}
+                >
+                  Reset
+                </Button>
+                <Button>Apply</Button>
+              </Box>
+            </FilterDataBox>
           </Card>
         </Grid>
         <Grid item xs={12}>

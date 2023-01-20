@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import styled from '@emotion/styled';
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, Button } from '@mui/material';
 
 interface CustomerStatusProps {
   status: number;
@@ -49,4 +49,18 @@ export const InvoiceStatus = styled(Box)<Pick<InvoiceStatusProps, 'status'>>`
   border-radius: 10px;
   width: 80px;
   font-size: 12px;
+`;
+
+export const FilterButton = styled(Button)`
+  box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.24);
+`;
+
+export const FilterDataBox = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  height: fit-content;
 `;
