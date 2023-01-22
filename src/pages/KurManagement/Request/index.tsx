@@ -11,13 +11,14 @@ import {
   InputAdornment,
   Autocomplete,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
 import Table from 'components/Table';
 import useModal from 'hooks/useModal';
 import ArrowDown from '@mui/icons-material/KeyboardArrowDown';
+import CalendarIcon from '@mui/icons-material/CalendarToday';
 import { values } from 'lodash';
 import FormLabel from 'components/FormLabel';
+
 import {
   CustomerStatus,
   FilterButton,
@@ -232,6 +233,7 @@ export default function RequestKUR() {
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [selectedArea, setSelectedArea] = useState<number>();
   const [selectedKurType, setSelectedKurType] = useState<number>();
+  // const [date, setDate] = React.useState<DateRange<Dayjs>>([null, null]);
 
   return (
     <Box p="20px" bgcolor="#F5F7FA">
@@ -314,24 +316,41 @@ export default function RequestKUR() {
                   />
                 </FormLabel>
                 <FormLabel text="Submit Date">
-                  <Autocomplete
-                    id="submitDate"
-                    options={kurType}
-                    onChange={(e, value) => {
-                      setSelectedKurType(value?.id);
-                    }}
-                    isOptionEqualToValue={(option: any) =>
-                      option === values?.name
-                    }
-                    getOptionLabel={(option: any) => option.type}
-                    renderInput={(params: any) => (
-                      <TextField {...params} placeholder="Select Type of KUR" />
-                    )}
-                    sx={{
-                      display: openFilter ? 'block' : 'none',
-                    }}
+                  <TextField
+                    placeholder="Select Order Date Range"
+                    size="small"
                     fullWidth
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <CalendarIcon />
+                        </InputAdornment>
+                      ),
+                    }}
                   />
+                  {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <StaticDateRangePicker
+                      displayStaticWrapperAs="desktop"
+                      value={date}
+                      onChange={(newValue) => {
+                        setDate(newValue);
+                      }}
+                      renderInput={(startProps, endProps) => (
+                        <>
+                          <TextField {...startProps} />
+                          <Box sx={{ mx: 2 }}> to </Box>
+                          <TextField {...endProps} />
+                        </>
+                      )}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <CalendarIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </LocalizationProvider> */}
                 </FormLabel>
               </Box>
               <Box
@@ -349,7 +368,7 @@ export default function RequestKUR() {
                 >
                   Reset
                 </Button>
-                <Button>Apply</Button>
+                <FilterButton>Apply</FilterButton>
               </Box>
             </FilterDataBox>
           </Card>
