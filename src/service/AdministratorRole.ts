@@ -33,10 +33,19 @@ export const createAdministratorRole = (body: any) =>
     }
   });
 
-export const updateRoleAccess = (body: RoleAccessForm, id: number) =>
+export const updateRoleAccess = (params: RoleAccessForm) =>
   new Promise(async (resolve, reject) => {
     try {
       // eslint-disable-next-line @typescript-eslint/naming-convention
+      const { name, account_type, controls, description, is_exist, id } =
+        params;
+      const body = {
+        name,
+        account_type,
+        controls,
+        description,
+        is_exist,
+      };
       const response = await http.put(`/administrator/role/${id}`, body);
 
       if (response.data) {

@@ -1,7 +1,7 @@
 import { call, put, select, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 import * as AdministratorService from 'service/Administrator';
-import { ListResponse } from 'models/fetch';
+import { ListParams, ListResponse } from 'models/fetch';
 import RoleAccessForm, {
   CheckRoleNameParams,
   RoleAccess,
@@ -17,7 +17,7 @@ import { IsExistResponse, MenuListParam } from '../../models/fetch';
 function* addRoleAccess(body: PayloadAction<RoleAccessForm>) {
   try {
     const params = yield select((state: any) => state.roleAccess.params);
-    yield call(service.createAdministratorRole(body.payload));
+    yield call(service.createAdministratorRole, body.payload);
     yield put(roleAccessAction.fetchData(params));
   } catch (err) {
     if (typeof err === 'string') {
@@ -44,15 +44,7 @@ function* addRoleAccess(body: PayloadAction<RoleAccessForm>) {
 function* updateRoleAccess(payload: PayloadAction<RoleAccessForm>) {
   try {
     const params = yield select((state: any) => state.roleAccess.params);
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { name, account_type, controls, description, is_exist, id } =
-      payload.payload;
-    yield call(
-      service.updateRoleAccess(
-        { name, account_type, controls, description, is_exist },
-        id,
-      ),
-    );
+    yield call(service.updateRoleAccess, payload.payload);
     yield put(roleAccessAction.fetchData(params));
   } catch (err) {
     if (typeof err === 'string') {
