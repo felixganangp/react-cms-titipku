@@ -10,6 +10,7 @@ import {
   TextField,
   InputAdornment,
   Autocomplete,
+  IconButton,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Table from 'components/Table';
@@ -18,7 +19,10 @@ import ArrowDown from '@mui/icons-material/KeyboardArrowDown';
 import CalendarIcon from '@mui/icons-material/CalendarToday';
 import { values } from 'lodash';
 import FormLabel from 'components/FormLabel';
-
+import MenuList from 'components/MenuList';
+import { useAppDispatch } from 'store/hooks';
+import { Link, useNavigate } from 'react-router-dom';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
   CustomerStatus,
   FilterButton,
@@ -30,6 +34,7 @@ import {
 
 const data = [
   {
+    id: 1,
     customer_id: 1,
     no_request: 'REQ/019221121',
     name: 'Lastri',
@@ -45,6 +50,7 @@ const data = [
     status: 1,
   },
   {
+    id: 2,
     customer_id: 2,
     no_request: 'REQ/019221122',
     name: 'Har',
@@ -60,6 +66,7 @@ const data = [
     status: 2,
   },
   {
+    id: 3,
     customer_id: 3,
     no_request: 'REQ/019221123',
     name: 'Yayok',
@@ -75,6 +82,7 @@ const data = [
     status: 3,
   },
   {
+    id: 4,
     customer_id: 4,
     no_request: 'REQ/019221124',
     name: 'Bowo',
@@ -90,6 +98,7 @@ const data = [
     status: 2,
   },
   {
+    id: 5,
     customer_id: 5,
     no_request: 'REQ/019221125',
     name: 'Tejo',
@@ -157,6 +166,8 @@ const kurType = [
 
 export default function RequestKUR() {
   const formModal = useModal();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   // table
   const headCell = [
@@ -164,7 +175,11 @@ export default function RequestKUR() {
       id: 'no_request',
       label: 'No Request',
       align: 'left',
-      format: (val: any) => <InvoiceLabel>{val.no_request}</InvoiceLabel>,
+      format: (val: any) => (
+        <Link to={`/kur/request/${val.id}`} style={{ textDecoration: 'none' }}>
+          <InvoiceLabel>{val.no_request}</InvoiceLabel>
+        </Link>
+      ),
     },
     {
       id: 'name',
@@ -223,9 +238,40 @@ export default function RequestKUR() {
       ),
     },
     {
-      id: 'action',
+      id: 'menu',
       label: 'Action',
-      align: 'center',
+      align: 'left',
+      width: '20px',
+      format: (val) => (
+        <div>
+          <MenuList
+            menu={[
+              {
+                label: 'Details',
+                onClick: () => {
+                  navigate(`/kur/request/${val.id}`);
+                },
+              },
+              {
+                label: 'Approve',
+                onClick: () => {
+                  console.log('approve request');
+                },
+              },
+              {
+                label: 'Reject',
+                onClick: () => {
+                  console.log('reject request');
+                },
+              },
+            ]}
+          >
+            <IconButton>
+              <MoreVertIcon />
+            </IconButton>
+          </MenuList>
+        </div>
+      ),
     },
   ];
 
@@ -240,6 +286,11 @@ export default function RequestKUR() {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Card>
+            <Typography variant="titlePage">Request KUR</Typography>
+          </Card>
+        </Grid>
+        <Grid item xs={12}>
+          <Card>
             <FilterDataBox>
               <Box
                 display="flex"
@@ -250,7 +301,7 @@ export default function RequestKUR() {
                 <TextField
                   placeholder="Search item"
                   size="small"
-                  sx={{ bgcolor: '#ebeff3', maxWidth: '560px' }}
+                  sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
                   fullWidth
                   InputProps={{
                     startAdornment: (
@@ -360,14 +411,7 @@ export default function RequestKUR() {
                 width="100%"
                 gap="20px"
               >
-                <Button
-                  sx={{
-                    bgcolor: '#ffff',
-                    color: '#008E58',
-                  }}
-                >
-                  Reset
-                </Button>
+                <Button variant="text">Reset</Button>
                 <FilterButton>Apply</FilterButton>
               </Box>
             </FilterDataBox>

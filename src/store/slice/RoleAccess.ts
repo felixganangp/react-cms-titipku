@@ -14,7 +14,7 @@ interface RoleAccessProps {
   data: RoleAccess[];
   loading: boolean;
   loadingForm: boolean;
-  total: number;
+  total: number | undefined;
   params: RoleAccessParams;
   menuData: [];
   errorName: IsExistResponse;
