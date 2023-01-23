@@ -8,13 +8,6 @@ export interface ListResponse<T> {
   data: T[];
 }
 
-export interface AddResponse<T> {
-  timestamp: number;
-  status: string;
-  message: string;
-  data: T;
-}
-
 export interface IsExistResponse {
   timestamp: number;
   status: string;
@@ -32,4 +25,10 @@ export interface ErrorRespons {
   timestamp: number;
   status: string;
   message: string;
+}
+
+export interface MenuListParam {
+  page?: number;
+  role_id?: number;
+  account_type?: string;
 }

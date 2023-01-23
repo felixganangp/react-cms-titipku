@@ -13,8 +13,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import useToast from 'hooks/useToast';
 import FormLabel from 'components/FormLabel';
-import { useAppDispatch } from 'store/hooks';
-import { useSelector } from 'react-redux';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { debounce } from 'lodash';
 import {
   CancelButton,
@@ -35,20 +34,20 @@ import RoleAccess from '../../../models/RoleAccess';
 interface RoleAccessFormProps {
   open: boolean;
   onClose(): void;
-  isEdit: boolean;
+  editValue: RoleAccess | null;
 }
 
 export default function RoleAccessForm(props: RoleAccessFormProps) {
-  const { open, onClose, isEdit } = props;
+  const { open, onClose, editValue } = props;
   const dispatch = useAppDispatch();
+  const selectRoleAccess = useAppSelector((state) => state.roleAccess);
 
-  // form
+  // handle form
   const [accessMenu, setAccessMenu] = useState<{ [id: number]: boolean }>({});
-  const [defaultMenu, setDefaultMenu] = useState<{ [id: number]: boolean }>({});
   const toast = useToast();
   const initialFormValue = {
     name: '',
-    access: defaultMenu,
+    access: accessMenu,
   };
   const [initialValues, setInitialValues] = useState<{
     name: string;
@@ -56,11 +55,38 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
   }>(initialFormValue);
 
   useEffect(() => {
-    if (!isEdit) {
+    if (!editValue) {
       setInitialValues(initialFormValue);
-      setAccessMenu(defaultMenu);
+      setAccessMenu(accessMenu);
+    } else {
+      setInitialValues({
+        name: editValue.name,
+        access: accessMenu,
+      });
     }
-  }, [open, isEdit]);
+  }, [open, editValue]);
+
+  const handleSubmitForm = (body: any) => {
+    if (!editValue) {
+      body.description = '';
+      dispatch(roleAccessAction.add(body));
+      toast.openToast({
+        headMsg: 'Success add',
+        message: 'Succesfully add new role access',
+        severity: 'success',
+      });
+    } else {
+      body.id = editValue.id;
+      body.is_exist = editValue.is_exist;
+      body.description = '';
+      dispatch(roleAccessAction.update(body));
+      toast.openToast({
+        headMsg: 'Success update',
+        message: 'Succesfully update role access',
+        severity: 'success',
+      });
+    }
+  };
 
   const formik = useFormik({
     initialValues,
@@ -77,23 +103,23 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
 
         body = {
           name: value.name,
-          description: '',
           account_type: 'cms',
           controls,
         };
-        dispatch(roleAccessAction.add(body));
-        toast.openToast({
-          headMsg: 'Success add Role Access',
-          message: 'Succesfully add new role access',
-          severity: 'success',
-        });
+
+        await handleSubmitForm(body);
+        dispatch(roleAccessAction.fetchData(selectRoleAccess.params));
         onClose();
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        resetForm({ name: '', access: defaultMenu });
       } catch (error) {
+        let message = '';
+        if (!editValue) {
+          message = 'Failed to create new role access';
+        } else {
+          message = 'Failed to update role access';
+        }
         toast.openToast({
           headMsg: 'Failed',
-          message: 'toast message',
+          message,
           severity: 'error',
         });
       }
@@ -108,7 +134,6 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
     handleSubmit,
     values,
     handleBlur,
-    handleChange,
     errors,
     touched,
     setFieldValue,
@@ -119,7 +144,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
 
   // handle menu access
   const [accordionMenu, setAccordionMenu] = useState<any>([]);
-  const listOfMenu = useSelector((state: any) => state.roleAccess.menuData);
+  const listOfMenu = useAppSelector((state: any) => state.roleAccess.menuData);
   const collectItems = (obj: any) => Object.keys(obj).filter((k) => obj[k]);
 
   const handleChangeAccessMenu = (
@@ -130,22 +155,25 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
   };
 
   useEffect(() => {
+    // for checked attribute on checkbox
     const access: { [x: number]: boolean } = {};
     if (listOfMenu !== undefined) {
       for (let i = 0; i < listOfMenu.length; i += 1) {
-        access[listOfMenu[i].id] = false;
+        access[listOfMenu[i].id] = listOfMenu[i].is_checked;
         if (listOfMenu[i].sub_menu !== null) {
           for (let a = 0; a < listOfMenu[i].sub_menu.length; a += 1) {
-            access[listOfMenu[i].sub_menu[a].id] = false;
+            access[listOfMenu[i].sub_menu[a].id] =
+              listOfMenu[i].sub_menu[a].is_checked;
           }
         }
       }
     }
     setAccessMenu({ ...access });
-    if (!isEdit) setDefaultMenu({ ...access });
   }, [listOfMenu]);
 
   useEffect(() => {
+    // defining parent menu / child menu,
+    // use for checking child when parent is checked
     const mappedData = [];
     if (listOfMenu !== undefined || listOfMenu.length > 0) {
       for (let i = 0; i < listOfMenu.length; i += 1) {
@@ -165,6 +193,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
   }, [listOfMenu]);
 
   const handleChangeChild = (
+    // checking child when parent is checked
     e: React.ChangeEvent<HTMLInputElement>,
     id: number,
   ) => {
@@ -186,6 +215,8 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
   };
 
   const handleChangeParentChild = (
+    // checking another child from same parent
+    // + checking parent when one of its child checked
     e: React.ChangeEvent<HTMLInputElement>,
     parentId: number,
     childId: number,
@@ -205,7 +236,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
   };
 
   // validation role name exist
-  const errorName = useSelector(
+  const errorName = useAppSelector(
     (state: any) => state.roleAccess.errorName.data,
   );
   const nameIsExist = `Role Name is exist, please use another name`;
@@ -214,7 +245,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
     dispatch(roleAccessAction.checkRoleName(value));
   };
 
-  const checkingName = useCallback(debounce(handleCheckName, 100), []);
+  const checkingName = useCallback(debounce(handleCheckName, 80), []);
 
   const handleChangeRoleName = (value: string) => {
     checkingName(value);
@@ -224,35 +255,47 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
     <Dialog
       open={open}
       onClose={() => {
-        setAccessMenu(defaultMenu);
-        // setInitialValues(initialFormValue);
         onClose();
         resetForm();
       }}
     >
       <form onSubmit={handleSubmit}>
         <TitleWrapper>
-          <Title>Add New Role Access</Title>
+          <Title>
+            {editValue ? 'Edit Role Access' : 'Add New Role Access'}
+          </Title>
           <CloseIcon
             onClick={() => {
-              setAccessMenu(defaultMenu);
-              // setInitialValues(initialFormValue);
               onClose();
               resetForm();
             }}
           />
         </TitleWrapper>
+
         <ContentWrapper>
           <FormLabel
             text="Role Name"
             required
             error={
               (touched.name && Boolean(errors.name)) ||
-              (touched.name && errorName)
+              (touched.name &&
+                errorName &&
+                !errors.name &&
+                ((!editValue && errorName) ||
+                  (editValue &&
+                    errorName &&
+                    values.name.trim() !== initialValues.name)))
             }
             helperText={
               (touched.name && errors.name && `${errors.name}`) ||
-              (touched.name && errorName && nameIsExist)
+              (touched.name &&
+                errorName &&
+                !errors.name &&
+                ((!editValue && errorName) ||
+                  (editValue &&
+                    errorName &&
+                    values.name.trim() !== initialValues.name)) &&
+                `${nameIsExist}`)
             }
           >
             <TextField
@@ -341,7 +384,6 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
                                       parentMenu.id,
                                       menu.id,
                                     );
-                                    // handleChangeAccessMenu(e, menu.id);
                                   }}
                                 />
                               }
@@ -376,7 +418,6 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
         <ActionWrapper>
           <CancelButton
             onClick={() => {
-              setAccessMenu(defaultMenu);
               resetForm();
               onClose();
             }}
@@ -386,15 +427,27 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
           <SubmitButton
             type="submit"
             disabled={
+              // !(
+              //   isValid &&
+              //   dirty &&
+              //   !errorName &&
+              //   collectItems(accessMenu).length > 0
+              // )
               !(
                 isValid &&
                 dirty &&
+                !editValue &&
                 !errorName &&
                 collectItems(accessMenu).length > 0
-              )
+              ) &&
+              (!editValue ||
+                (editValue &&
+                  errorName &&
+                  values.name !== initialValues.name) ||
+                collectItems(accessMenu).length < 1)
             }
           >
-            Add
+            {editValue ? 'Update' : 'Add'}
           </SubmitButton>
         </ActionWrapper>
       </form>

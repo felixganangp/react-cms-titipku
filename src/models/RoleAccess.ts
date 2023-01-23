@@ -14,10 +14,10 @@ export interface RoleAccessParams extends ListParams {
 }
 
 // add
-export default interface AddRoleAccess {
+export default interface RoleAccessForm {
   id?: number;
   name: string;
-  description: string;
+  description?: string;
   account_type: string;
   controls?: AccessMenu[];
   is_exist?: boolean;

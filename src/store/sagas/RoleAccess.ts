@@ -1,8 +1,8 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
+import { call, put, select, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 import * as AdministratorService from 'service/Administrator';
-import { AddResponse, ListResponse } from 'models/fetch';
-import AddRoleAccess, {
+import { ListParams, ListResponse } from 'models/fetch';
+import RoleAccessForm, {
   CheckRoleNameParams,
   RoleAccess,
   RoleAccessParams,
@@ -12,20 +12,19 @@ import { roleAccessAction } from '../slice/RoleAccess';
 import * as service from '../../service/AdministratorRole';
 import { Menu } from '../../models/Menu';
 
-import { IsExistResponse } from '../../models/fetch';
+import { IsExistResponse, MenuListParam } from '../../models/fetch';
 
-function* addRoleAccess(body: PayloadAction<AddRoleAccess>) {
+function* addRoleAccess(body: PayloadAction<RoleAccessForm>) {
   try {
-    console.log('masuk saga~', body.payload);
-    const res: AddResponse<AddRoleAccess> = yield call(
-      service.createAdministratorRole(body.payload),
-    );
+    const params = yield select((state: any) => state.roleAccess.params);
+    yield call(service.createAdministratorRole, body.payload);
+    yield put(roleAccessAction.fetchData(params));
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
         uiAction.openToast({
-          headMsg: 'Success data',
+          headMsg: 'Error',
           message: error,
           severity: 'error',
         }),
@@ -33,7 +32,34 @@ function* addRoleAccess(body: PayloadAction<AddRoleAccess>) {
     } else {
       yield put(
         uiAction.openToast({
-          headMsg: 'Success data',
+          headMsg: 'Error',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* updateRoleAccess(payload: PayloadAction<RoleAccessForm>) {
+  try {
+    const params = yield select((state: any) => state.roleAccess.params);
+    yield call(service.updateRoleAccess, payload.payload);
+    yield put(roleAccessAction.fetchData(params));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error',
           message: 'interval server error',
           severity: 'error',
         }),
@@ -73,27 +99,14 @@ function* fetchData(params: PayloadAction<RoleAccessParams>) {
   }
 }
 
-function* updateRoleAccess() {
+function* fetchMenu(param: PayloadAction<MenuListParam>) {
   try {
-    // const res = yield call()
-    yield put(
-      uiAction.openToast({
-        headMsg: 'Success update Role Access',
-        message: 'Succesfully update new role access',
-        severity: 'success',
-      }),
-    );
-  } catch (error) {
-    console.log('Failed to update role access', error);
-  }
-}
-
-function* fetchMenu() {
-  try {
-    const params = {
+    const params: { page: number; account_type: string; role_id?: number } = {
       page: 1,
       account_type: 'cms',
     };
+    const roleId = param.payload.role_id || 0;
+
     const res: ListResponse<Menu> = yield call(
       service.fetchAdministratorControl,
       params,
@@ -101,15 +114,18 @@ function* fetchMenu() {
     const menuList = res.data.map((item: any) => ({
       id: item.id,
       menu: item.menu,
-      is_checked: false,
+      is_checked:
+        item.active_role.split(',').map(Number).indexOf(roleId) !== -1,
       sub_menu: item.sub_menu
         ? item.sub_menu.map((child: any) => ({
             id: child.id,
             menu: child.menu,
-            is_checked: false,
+            is_checked:
+              child.active_role.split(',').map(Number).indexOf(roleId) !== -1,
           }))
         : null,
     }));
+
     yield put(roleAccessAction.fetchMenuListSuccess(menuList));
   } catch (err) {
     if (typeof err === 'string') {
@@ -167,5 +183,6 @@ export default function* saga() {
   yield takeLatest(roleAccessAction.fetchData.type, fetchData);
   yield takeLatest(roleAccessAction.fetchMenuList.type, fetchMenu);
   yield takeLatest(roleAccessAction.add.type, addRoleAccess);
+  yield takeLatest(roleAccessAction.update.type, updateRoleAccess);
   yield takeLatest(roleAccessAction.checkRoleName.type, checkRoleName);
 }

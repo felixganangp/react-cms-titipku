@@ -26,9 +26,10 @@ export default function RoleAccesPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const roleAccesses = useAppSelector((state) => state.roleAccess);
+  const [open, setOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    dispatch(roleAccessAction.fetchMenuList());
+    dispatch(roleAccessAction.fetchMenuList({}));
   }, []);
 
   useEffect(() => {
@@ -54,6 +55,14 @@ export default function RoleAccesPage() {
       }),
     );
   };
+
+  // form
+  const [editValue, setEditValue] = useState<RoleAccess | null>({
+    account_type: '',
+    id: 0,
+    is_exist: true,
+    name: '',
+  });
 
   const headCell: HeadCells<RoleAccess>[] = [
     {
@@ -84,7 +93,9 @@ export default function RoleAccesPage() {
               {
                 label: 'Edit',
                 onClick: () => {
-                  console.log(val);
+                  dispatch(roleAccessAction.fetchMenuList({ role_id: val.id }));
+                  setEditValue(val);
+                  setOpen(!open);
                 },
               },
               {
@@ -105,22 +116,13 @@ export default function RoleAccesPage() {
     },
   ];
 
-  // form
-  const [open, setOpen] = useState<boolean>(false);
-  const [isEdit, setIsEdit] = useState<boolean>(false);
-
-  const [formData, setFormData] = useState<{
-    name: string;
-    access: { [x: number]: boolean };
-  }>({ name: '', access: { 0: false } });
-
   return (
     <div>
       <RoleAccessForm
         open={open}
         onClose={() => setOpen(!open)}
-        // initialValues={formData}
-        isEdit={isEdit}
+        editValue={editValue}
+        // isEdit={isEdit}
       />
       <Box p="20px" bgcolor="#F5F7FA">
         <Grid container spacing={2}>
@@ -135,9 +137,9 @@ export default function RoleAccesPage() {
                 <Button
                   startIcon={<AddIcon />}
                   onClick={() => {
+                    dispatch(roleAccessAction.fetchMenuList({}));
                     setOpen(!open);
-                    // setFormData(getInitialData());
-                    setIsEdit(false);
+                    setEditValue(null);
                   }}
                 >
                   Add New
