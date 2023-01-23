@@ -25,14 +25,14 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { roleUserAction } from 'store/slice/RoleUser';
 import { RoleAccess } from 'models/RoleAccess';
-
+import { CreateRoleUser } from 'models/RoleUser';
 import FormRoleUser from './components/form';
 
 import { Bullet, Status } from './roleuser.styled';
 
 interface FormDataType {
   isEdit: boolean;
-  data: object | null;
+  data: CreateRoleUser;
 }
 export default function RoleUser() {
   const navigate = useNavigate();
@@ -42,11 +42,39 @@ export default function RoleUser() {
   const formModal = useModal();
   const [formData, setFormData] = useState<FormDataType>({
     isEdit: false,
-    data: null,
+    data: {
+      account_type: 'cms',
+      email: '',
+      id_status: 1,
+      name: '',
+      roleAccess: {
+        account_type: 'cms',
+        is_exist: true,
+        name: '',
+      },
+    },
   });
   // const [orderType, setOrderType] = useState<'asc' | 'desc'>('asc');
   // const [orderBy, setOrderBy] = useState<string | null>(null);
 
+  const onCloseForm = async () => {
+    await dispatch(roleUserAction.fetchData(roleUser.params));
+    setFormData({
+      isEdit: false,
+      data: {
+        account_type: 'cms',
+        email: '',
+        id_status: 1,
+        name: '',
+        roleAccess: {
+          account_type: 'cms',
+          is_exist: true,
+          name: '',
+        },
+      },
+    });
+    formModal.closeModal();
+  };
   React.useEffect(() => {
     dispatch(roleUserAction.fetchData(roleUser.params));
   }, [roleUser.params]);
@@ -122,16 +150,20 @@ export default function RoleUser() {
                 label: 'Edit',
                 onClick: () => {
                   setFormData(val);
-                  const data = {
+                  const data: FormDataType = {
                     isEdit: true,
                     data: {
                       name: val.full_name,
                       email: val.email,
-                      roleAccess: val.administrator_role,
+                      roleAccess:
+                        val.administrator_detail[0].administrator_role,
                       id: val.id,
+                      id_status: 1,
+                      account_type: 'cms',
                     },
                   };
                   setFormData(data);
+                  formModal.openModal();
                 },
               },
               {
@@ -229,7 +261,11 @@ export default function RoleUser() {
         title="Add New Role User"
         onClose={formModal.closeModal}
       >
-        <FormRoleUser onClose={formModal.closeModal} />
+        <FormRoleUser
+          onClose={onCloseForm}
+          data={formData.data}
+          isEdit={formData.isEdit}
+        />
       </Modal>
     </div>
   );

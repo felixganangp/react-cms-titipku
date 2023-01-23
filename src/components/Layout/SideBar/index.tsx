@@ -6,6 +6,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import StoreIcon from '@mui/icons-material/Store';
 import PhonelinkSetupIcon from '@mui/icons-material/PhonelinkSetup';
 import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
+import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
@@ -242,6 +243,20 @@ function SideBar(props: SideBarProps) {
     },
     {
       id: 9,
+      title: 'KUR',
+      path: '',
+      icon: <LocalAtmIcon />,
+      child: [
+        {
+          id: 10,
+          title: 'Customer',
+          path: '/kur/customer',
+          child: [],
+        },
+      ],
+    },
+    {
+      id: 10,
       title: 'Admin Panel',
       path: '',
       icon: <PersonIcon />,
