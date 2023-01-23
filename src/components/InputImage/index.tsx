@@ -8,14 +8,25 @@ import React, { useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import EditIcon from '@mui/icons-material/Edit';
 
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import ImageCrop from '../ImageCrop';
 
-const Image = styled.img`
+interface ImageCustomerProps {
+  imageCustomer: boolean | undefined;
+}
+
+const Image = styled.img<ImageCustomerProps>`
   height: 170px;
+  width: ${(props) => (props.imageCustomer ? '170px' : '')};
   max-width: 100%;
   object-fit: cover;
+  border-radius: ${(props) => (props.imageCustomer ? '50%' : '')};
+`;
+
+const IconWrapper = styled.div`
+  background-color: #008e58;
 `;
 
 interface Props {
@@ -26,6 +37,7 @@ interface Props {
   type?: 'cube' | 'rectangle';
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   cropable?: boolean;
+  imageCustomer?: boolean;
 }
 
 function InputImage({
@@ -36,6 +48,7 @@ function InputImage({
   type,
   onChange,
   cropable,
+  imageCustomer,
 }: Props) {
   const [imageCrop, setImageCrop] = useState<any>(false);
   const fileInputField = useRef<HTMLInputElement>(null);
@@ -79,7 +92,7 @@ function InputImage({
           justifyContent: 'center',
           borderRadius: '5px',
           padding: '10px',
-          border: '1px solid #c4c4c4',
+          border: `${imageCustomer ? '' : '1px solid #c4c4c4'}`,
           cursor: 'pointer',
         }}
         onClick={handleUploadBtnClick}
@@ -96,10 +109,38 @@ function InputImage({
           // {...otherProps}
         />
         {value ? (
-          <Image
-            data-testid="test-img-1"
-            src={typeof value !== 'string' ? URL.createObjectURL(value) : value}
-          />
+          <>
+            <Image
+              imageCustomer={imageCustomer}
+              data-testid="test-img-1"
+              src={
+                typeof value !== 'string' ? URL.createObjectURL(value) : value
+              }
+            />
+            {/* <IconWrapper> */}
+            {imageCustomer && (
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column-reverse',
+                  marginLeft: '-2.5em',
+                  marginBottom: '.5em',
+                }}
+              >
+                <EditIcon
+                  sx={{
+                    width: '35px',
+                    height: '35px',
+                    backgroundColor: '#008e58',
+                    borderRadius: '50%',
+                    color: '#fff',
+                    padding: 0.8,
+                  }}
+                />
+              </Box>
+            )}
+            {/* </IconWrapper> */}
+          </>
         ) : (
           <Box
             sx={{
@@ -145,6 +186,7 @@ InputImage.defaultProps = {
   cropable: false,
   width: 50,
   height: 50,
+  imageCustomer: false,
 };
 
 export default InputImage;

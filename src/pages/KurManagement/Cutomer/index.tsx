@@ -19,8 +19,7 @@ import { skuManagementAction } from 'store/slice/SkuManagement';
 import useModal from 'hooks/useModal';
 import Table from 'components/Table';
 import Modal from 'components/Modal';
-
-// type Props = {};
+import FormCustomer from './components/form';
 
 export default function KurCustomer() {
   const skus = useAppSelector((state: any) => state.skuManagement.data);
@@ -240,6 +239,13 @@ export default function KurCustomer() {
           </Box>
         </Grid>
       </Grid>
+      <Modal
+        open={formModal.open}
+        title="Add Customer"
+        onClose={formModal.closeModal}
+      >
+        <FormCustomer onClose={formModal.closeModal} />
+      </Modal>
     </Box>
   );
 }
