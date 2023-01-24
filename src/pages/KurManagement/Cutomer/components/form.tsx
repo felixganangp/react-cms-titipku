@@ -12,7 +12,6 @@ import {
   Grid,
 } from '@mui/material';
 import ErrorIcon from '@mui/icons-material/Error';
-import moment from 'moment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -21,6 +20,8 @@ import * as yup from 'yup';
 
 import FormLabel from 'components/FormLabel';
 import InputImage from 'components/InputImage';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { CreateCustomer } from 'models/Customer';
 
 function a11yProps(index: number) {
   return {
@@ -57,7 +58,7 @@ function TabPanel(props: TabPanelProps) {
 interface Props {
   onClose: () => void;
 }
-const initial = {
+const initial: CreateCustomer = {
   imageCustomer: '',
   idCustomer: '',
   name: '',
@@ -78,7 +79,7 @@ const initial = {
   imageSKUsaha: '',
 };
 function Form({ onClose }: Props) {
-  const [valueTab, setValueTab] = useState(1);
+  const [valueTab, setValueTab] = useState(0);
   const [openCalendaer, setOpenCalendar] = useState(false);
   const [disabledAddressDom, setDisabledAddressDom] = useState(false);
 
@@ -90,6 +91,8 @@ function Form({ onClose }: Props) {
     initialValues,
     onSubmit: async (value, { resetForm }) => {
       console.log(value);
+      resetForm();
+      onClose();
     },
     validationSchema: yup.object({
       name: yup.string().required('Name is required'),
@@ -97,7 +100,7 @@ function Form({ onClose }: Props) {
         .string()
         .email('Please input a valid email address')
         .required('Email is required'),
-      kurType: yup.mixed().required('KUR Type is required'),
+      // kurType: yup.mixed().required('KUR Type is required'),
       adminFee: yup
         .number()
         .required('Admin fee is required')
@@ -161,7 +164,7 @@ function Form({ onClose }: Props) {
           />
         </Tabs>
       </Box>
-      <form>
+      <form onSubmit={handleSubmit}>
         <TabPanel value={valueTab} index={0}>
           <Box sx={{ px: 3 }}>
             <Box sx={{ marginTop: 2 }}>
@@ -418,7 +421,7 @@ function Form({ onClose }: Props) {
                 )
               }
               onClick={(e) => handleChangeTab(e, 1)}
-              type="submit"
+              // type="submit"
             >
               Next
             </Button>
@@ -599,7 +602,7 @@ function Form({ onClose }: Props) {
             </Button>
             <Button
               disabled={!(isValid && dirty)}
-              onClick={(e) => handleChangeTab(e, 1)}
+              // onClick={(e) => handleChangeTab(e, 1)}
               type="submit"
             >
               Save

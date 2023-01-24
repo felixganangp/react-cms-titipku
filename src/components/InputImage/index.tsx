@@ -25,10 +25,6 @@ const Image = styled.img<ImageCustomerProps>`
   border-radius: ${(props) => (props.imageCustomer ? '50%' : '')};
 `;
 
-const IconWrapper = styled.div`
-  background-color: #008e58;
-`;
-
 interface Props {
   label: string;
   width?: number;
@@ -71,7 +67,7 @@ function InputImage({
     }
   };
 
-  const handleSaveCropedImage = (e: any) => {
+  const handleSaveCropedImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e);
   };
 
@@ -79,7 +75,7 @@ function InputImage({
     fileInputField.current?.click();
   };
 
-  const handleSetImageCrop = (e: any) => {
+  const handleSetImageCrop = (e: React.ChangeEvent<HTMLInputElement>) => {
     setImageCrop(e);
   };
 
