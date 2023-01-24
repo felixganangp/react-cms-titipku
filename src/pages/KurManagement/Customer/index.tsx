@@ -22,7 +22,6 @@ import Modal from 'components/Modal';
 import FormCustomer from './components/form';
 
 export default function KurCustomer() {
-  const skus = useAppSelector((state: any) => state.skuManagement.data);
   const [openFilter, setOpenFilter] = useState(false);
 
   const formModal = useModal();
@@ -226,7 +225,7 @@ export default function KurCustomer() {
             boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
           >
             <Table
-              data={skus}
+              data={[]}
               selected={[]}
               headCells={headCell}
               page={1}

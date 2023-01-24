@@ -47,6 +47,7 @@ function InputImage({
   imageCustomer,
 }: Props) {
   const [imageCrop, setImageCrop] = useState<any>(false);
+  const [imageFile, setImageFile] = useState<File | undefined>(undefined);
   const fileInputField = useRef<HTMLInputElement>(null);
 
   // const handleNewFileUpload = (e: React.ChangeEvent<HTMLElement>) => {
@@ -60,7 +61,8 @@ function InputImage({
     const { files: newFiles } = e.target;
     if (newFiles?.length) {
       if (cropable) {
-        setImageCrop(newFiles[0]);
+        setImageCrop(true);
+        setImageFile(newFiles[0]);
       } else {
         onChange(newFiles[0]);
       }
@@ -169,7 +171,7 @@ function InputImage({
       </Box>
       <ImageCrop
         open={Boolean(imageCrop)}
-        image={imageCrop}
+        image={imageFile}
         setClose={handleSetImageCrop}
         onChange={handleSaveCropedImage}
       />

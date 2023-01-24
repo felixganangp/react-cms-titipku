@@ -14,7 +14,7 @@ import Modal from 'components/Modal';
 
 interface Props {
   open: boolean;
-  image: File;
+  image: File | undefined;
   setClose: any;
   onChange: any;
   width?: number;
@@ -70,7 +70,7 @@ class ImageCrop extends React.Component<Props, State> {
     while (n--) {
       u8arr[n] = bstr.charCodeAt(n);
     }
-    return new File([u8arr], this.props.image.name, { type: mime });
+    return new File([u8arr], `${this.props.image?.name}`, { type: mime });
   };
 
   onRotata = () => {
@@ -106,7 +106,7 @@ class ImageCrop extends React.Component<Props, State> {
           <Box position="relative">
             <AvatarEditor
               ref={this.setEditorRef}
-              image={image}
+              image={image || ''}
               width={width}
               height={height}
               border={20}

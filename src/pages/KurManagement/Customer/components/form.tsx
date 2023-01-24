@@ -46,11 +46,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 0 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 0 }}>{children}</Box>}
     </div>
   );
 }
@@ -63,7 +59,7 @@ const initial: CreateCustomer = {
   idCustomer: '',
   name: '',
   kurType: null,
-  adminFee: null,
+  adminFee: undefined,
   birthDate: null,
   phoneNumber: '',
   email: '',
