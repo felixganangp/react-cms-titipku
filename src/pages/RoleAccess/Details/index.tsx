@@ -10,9 +10,11 @@ import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import { Link } from 'react-router-dom';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Table from '../../../components/Table';
-import AccordionOnDetails from '../../../components/Accordion/Details';
-import FileDownload from '../../../assets/file-download-outline.svg';
+import Table from 'components/Table';
+import AccordionOnDetails from 'components/Accordion/Details';
+import FileDownload from 'assets/file-download-outline.svg';
+import SubDetailsPagesWrapper from 'components/Accordion/SubDetailsPagesWrapper';
+
 import {
   TitleWrapper,
   ContentWrapper,
@@ -396,6 +398,9 @@ export default function RoleUserDetails(props: RoleUserDetailsProps) {
           </ContentGrid>
         </ContentWrapper>
         {/* MENU ACCESS */}
+        <SubDetailsPagesWrapper title="ds" defaultOpen>
+          <div>adsd</div>
+        </SubDetailsPagesWrapper>
         <TitleWrapper>
           <ExpandMore sx={{ marginRight: '5px' }} />
           <span>Menu Access</span>

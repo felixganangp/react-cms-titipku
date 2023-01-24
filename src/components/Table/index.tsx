@@ -39,7 +39,11 @@ const PaginationStyle = styled(Pagination)`
   }
 `;
 
-function EnhancedTable<T>({
+export interface Data {
+  [key: string]: any;
+}
+
+function EnhancedTable<T extends Data>({
   disableNumber = false,
   enableCheckBox = false,
   handleRequestSort,
@@ -56,7 +60,7 @@ function EnhancedTable<T>({
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelecteds = props.data.map((n) => n.id);
+      const newSelecteds = props.data.map((n: { id: string }) => n.id);
       setSelected(newSelecteds);
       return;
     }
@@ -65,7 +69,7 @@ function EnhancedTable<T>({
 
   const handleClick = (
     event: React.MouseEvent<unknown>,
-    id: string | number,
+    id: string | number | undefined,
   ) => {
     if (!id) return null;
     const selectedIndex = selected.indexOf(id);
@@ -87,7 +91,7 @@ function EnhancedTable<T>({
     setSelected(newSelected);
   };
 
-  const isSelected = (id: string | number) => {
+  const isSelected = (id: string | number | undefined) => {
     if (!id) return false;
 
     return enableCheckBox ? selected.indexOf(id) !== -1 : false;
@@ -150,7 +154,7 @@ function EnhancedTable<T>({
             {!props.loading &&
               // stableSort(props.data, getComparator(orderType, orderBy))
               //   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              props.data.map((row, index) => {
+              props.data.map((row: T, index: number) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
                 return (
@@ -204,6 +208,7 @@ function EnhancedTable<T>({
                         key={String(key)}
                       >
                         {val.format ? val.format(row) : row[val.id]}
+                        {Object.keys(row).includes(val.id) ? row[val.id] : '-'}
                       </TableCell>
                     ))}
                   </TableRow>

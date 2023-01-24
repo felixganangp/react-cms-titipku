@@ -31,5 +31,4 @@ Example.args = {
   data: [{ name: 'Testign' }],
   selected: [],
   page: 1,
-  totalPage: 10,
 };

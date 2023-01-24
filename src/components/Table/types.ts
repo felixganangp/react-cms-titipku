@@ -3,12 +3,12 @@ import { ReactNode } from 'react';
 
 export type Order = 'asc' | 'desc';
 
-// export interface Data<T = any> {
-//   [key: string]: T;
-// }
+export interface Data<T> {
+  [key: string]: any;
+}
 
 export interface HeadCells<T> {
-  id: string | number;
+  id: string;
   label: string;
   width?: number | string;
   minWidth?: number | string;
@@ -35,7 +35,7 @@ export interface EnhancedTableHeadProps<T> {
   onRequestSort?: (order: TableOrder) => void;
 }
 
-export interface EnhancedTableProps<T> {
+export interface EnhancedTableProps<T extends { id?: string | number }> {
   enableCheckBox?: boolean;
   disableNumber?: boolean;
   loading?: boolean;
@@ -51,7 +51,7 @@ export interface EnhancedTableProps<T> {
   selected?: (string | number)[];
   bgHeader?: string;
   headCells: Array<HeadCells<T>>;
-  data: Array<T>;
+  data: Data<T>;
 }
 
 export type Align = 'inherit' | 'left' | 'center' | 'right' | 'justify';
