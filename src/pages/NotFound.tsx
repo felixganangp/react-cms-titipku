@@ -22,7 +22,7 @@ export default function Home() {
           <Typography variant="h1" fontSize="40px" fontWeight="400">
             Oops,
             <br />
-            Page not found!
+            Page not founds!
           </Typography>
           <Button
             variant="outlined"
