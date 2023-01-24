@@ -8,9 +8,11 @@ const RoleUser = lazy(() => import('pages/RoleUser'));
 const RoleAccess = lazy(() => import('pages/RoleAccess'));
 const RoleAccessDetails = lazy(() => import('pages/RoleAccess/Details'));
 const SkuManagement = lazy(() => import('pages/SkuManagement'));
-const KurCustomerManagement = lazy(() => import('pages/KurManagement/Cutomer'));
+const KurCustomerManagement = lazy(
+  () => import('pages/KurManagement/Customer'),
+);
 const KurCustomerDetailsManagement = lazy(
-  () => import('pages/KurManagement/Cutomer/Details'),
+  () => import('pages/KurManagement/Customer/Details'),
 );
 
 interface RouteProps {
