@@ -18,7 +18,7 @@ export const fetchAdministratorRole = (params: any) =>
     }
   });
 
-export const createAdministratorRole = (body: any) =>
+export const createAdministratorRole = (body: RoleAccessForm) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await http.post(`/administrator/role`, body);
