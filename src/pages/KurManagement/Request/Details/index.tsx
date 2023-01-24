@@ -1,5 +1,6 @@
 import { Box, Card, Grid, Button, Typography } from '@mui/material';
 import * as React from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import ArrowBack from '@mui/icons-material/ArrowBackIos';
 import CloseIcon from '@mui/icons-material/Close';
@@ -14,6 +15,8 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
 import { ExpandMore } from '@mui/icons-material';
 import Table from 'components/Table';
+import useModal from 'hooks/useModal';
+import Modal from 'components/Modal';
 import PageNotFound from '../../../../assets/page-not-found.svg';
 import {
   DetailsHeader,
@@ -30,6 +33,7 @@ import {
   RequestStatus,
   Amount,
 } from '../request.styled';
+import RefusalReason from './components/InputMessage';
 
 interface RequestKURProps {
   id: number;
@@ -59,7 +63,9 @@ const data = [
 export default function RequestKURDetails(props: RequestKURProps) {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { id } = props;
+  const formModal = useModal();
   const customerStatus = 3;
+  const [actionMessage, setActionMessage] = useState<string>('');
 
   const headCell = [
     {
@@ -134,6 +140,7 @@ export default function RequestKURDetails(props: RequestKURProps) {
                         }}
                       />
                     }
+                    onClick={formModal.openModal}
                   >
                     Reject
                   </Button>
@@ -150,6 +157,7 @@ export default function RequestKURDetails(props: RequestKURProps) {
                         }}
                       />
                     }
+                    onClick={() => console.log('Approve Request')}
                   >
                     Approve
                   </Button>
@@ -351,11 +359,18 @@ export default function RequestKURDetails(props: RequestKURProps) {
             selected={[]}
             headCells={headCell}
             page={1}
-            totalPage={1}
+            totalData={1}
             onChangePage={(e) => console.log(e)}
           />
         </Content>
       </Box>
+      <Modal
+        open={formModal.open}
+        title="Refusal Reason"
+        onClose={formModal.closeModal}
+      >
+        <RefusalReason />
+      </Modal>
     </div>
   );
 }
