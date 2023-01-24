@@ -119,6 +119,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
     isValid,
     dirty,
   } = formik;
+  const [loadingEmailValid, setLoadingEmailValid] = useState(true);
   const handleValidEmail = async (value: string) => {
     // await dispatch(
     //   await roleUserAction.checkEmailValid({
@@ -127,14 +128,18 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
     //     excluded_id: 0,
     //   }),
     // );
-    await console.log(roleUserSelector.validMsg, '<<<<<<<');
     const response: CheckValidResponse = await checkValidEmail({
       email: value,
       account_type: 'cms',
       excluded_id: 0,
     });
     if (response.data) {
-      setErrorRsp({ error: true, message: 'Email address already registered' });
+      await setErrorRsp({
+        error: true,
+        message: 'Email address already registered',
+      });
+    } else {
+      await setLoadingEmailValid(false);
     }
   };
   const debounceValidEmail = useCallback(debounce(handleValidEmail, 1000), []);
@@ -177,6 +182,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
               placeholder="Input Category name"
               value={values.email}
               onChange={(event) => {
+                setLoadingEmailValid(true);
                 debounceValidEmail(event.target.value);
                 handleChange(event);
                 setErrorRsp({ error: false, message: '' });
@@ -239,7 +245,8 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
             disabled={
               (!(isValid && dirty) && !isEdit) ||
               roleUserSelector.loadingForm ||
-              errorRsp.error
+              errorRsp.error ||
+              loadingEmailValid
             }
           >
             {roleUserSelector.loadingForm ? (
