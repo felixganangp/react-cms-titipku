@@ -16,7 +16,13 @@ import { IsExistResponse, MenuListParam } from '../../models/fetch';
 
 function* addRoleAccess(body: PayloadAction<RoleAccessForm>) {
   try {
-    const params = yield select((state: any) => state.roleAccess.params);
+    const params: {
+      page: number;
+      count: number;
+      search: string;
+      account_type: string;
+      is_exist: boolean;
+    } = yield select((state) => state.roleAccess.params);
     yield call(service.createAdministratorRole, body.payload);
     yield put(roleAccessAction.fetchData(params));
   } catch (err) {
@@ -43,7 +49,13 @@ function* addRoleAccess(body: PayloadAction<RoleAccessForm>) {
 
 function* updateRoleAccess(payload: PayloadAction<RoleAccessForm>) {
   try {
-    const params = yield select((state: any) => state.roleAccess.params);
+    const params: {
+      page: number;
+      count: number;
+      search: string;
+      account_type: string;
+      is_exist: boolean;
+    } = yield select((state) => state.roleAccess.params);
     yield call(service.updateRoleAccess, payload.payload);
     yield put(roleAccessAction.fetchData(params));
   } catch (err) {
