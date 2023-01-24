@@ -22,7 +22,7 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn install
+    - run: yarn install --frozen-lockfile
     - run: yarn build 
     - uses: actions/checkout@v2
     - name: Slack Notification
@@ -32,5 +32,5 @@ jobs:
         SLACK_ICON: https://titipku.s3.ap-southeast-1.amazonaws.com/product_category/30-11-2021_1638256074055589183.png
         SLACK_MESSAGE: 'CMS Development Build :rocket:'
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_USERNAME: mintip
+        SLACK_USERNAME: CMS DEV
 
