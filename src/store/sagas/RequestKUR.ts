@@ -4,7 +4,7 @@ import { uiAction } from 'store/slice/ui';
 
 function* fetchRequestKURData(params: any) {
   try {
-    const response = yield call(service.getAllRequestKUR(params));
+    yield call(service.getAllRequestKUR, params);
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;

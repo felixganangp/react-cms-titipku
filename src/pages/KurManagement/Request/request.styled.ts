@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import styled from '@emotion/styled';
 import { Typography, Box, Button, Grid } from '@mui/material';
+import { DayPicker } from 'react-day-picker';
 
 interface CustomerStatusProps {
   status: number;
@@ -174,4 +175,39 @@ export const Amount = styled(Typography)`
   font-weight: 500;
   font-size: 24px;
   color: #17231d;
+`;
+
+export const RangeDatePicker = styled(DayPicker)`
+  .rdp-day_selected {
+    background-color: #008e58;
+  }
+  .rdp-day_selected:hover {
+    background-color: #008e58;
+  }
+  .rdp {
+    accent-color: #008e58;
+    background-color: #b8e0d1;
+    accent-color-dark: #008e58;
+    background-color-dark: #008e58;
+    outline: 2px solid #008e58;
+    outline-selected: #008e58;
+  }
+`;
+
+export const FooterDatePicker = styled(Box)`
+  display: flex;
+  flex-direction: column;
+  width: inherit;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+`;
+
+export const SelectedDate = styled.p`
+  color: #626b79;
+  font-size: 14px;
+`;
+
+export const DateButton = styled(Button)`
+  width: 150px;
 `;

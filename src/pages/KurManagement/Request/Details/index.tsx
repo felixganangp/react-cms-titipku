@@ -72,7 +72,7 @@ export default function RequestKURDetails(props: RequestKURProps) {
       id: 'image',
       label: 'Image',
       align: 'left',
-      format: (val) => (
+      format: (val: any) => (
         <img
           src={val.img}
           alt="statement img"
@@ -84,6 +84,12 @@ export default function RequestKURDetails(props: RequestKURProps) {
       id: 'amount',
       label: 'Amount',
       align: 'left',
+      format: (val: any) => (
+        <Typography>
+          {' '}
+          Rp {new Intl.NumberFormat().format(val.amount)}
+        </Typography>
+      ),
     },
     {
       id: 'desc',
