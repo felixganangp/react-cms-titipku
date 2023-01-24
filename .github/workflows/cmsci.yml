@@ -29,5 +29,8 @@ jobs:
       uses: rtCamp/action-slack-notify@v2
       env:
         SLACK_CHANNEL: dev-cms
+        SLACK_ICON: https://titipku.s3.ap-southeast-1.amazonaws.com/product_category/30-11-2021_1638256074055589183.png
         SLACK_MESSAGE: 'CMS Development Build :rocket:'
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_USERNAME: mintip
+
