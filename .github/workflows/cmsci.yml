@@ -25,3 +25,10 @@ jobs:
     - run: yarn install
     - run: yarn build 
     - run: yarn test
+    - uses: actions/checkout@v2
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_CHANNEL: dev-cms
+        SLACK_MESSAGE: 'CMS Development Build :rocket:'
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
