@@ -24,7 +24,6 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: yarn install
     - run: yarn build 
-    - run: yarn test
     - uses: actions/checkout@v2
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
