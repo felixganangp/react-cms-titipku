@@ -1,7 +1,7 @@
 import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Online from 'assets/Online.svg';
+import Online from 'assets/online.svg';
 import { greating } from 'utils/greating';
 
 export default function Home() {
