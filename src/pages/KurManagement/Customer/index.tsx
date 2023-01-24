@@ -9,6 +9,7 @@ import {
   Typography,
   InputAdornment,
   Autocomplete,
+  Collapse,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -110,111 +111,108 @@ export default function KurCustomer() {
                   />
                   <Button
                     endIcon={<KeyboardArrowDownIcon />}
-                    onClick={() => setOpenFilter(!openFilter)}
+                    onClick={() => setOpenFilter((prev) => !prev)}
                   >
                     Filter
                   </Button>
                 </Box>
               </Box>
             </Box>
-            {openFilter ? (
-              <>
-                <Grid container spacing={2} sx={{ marginTop: '2rem' }}>
-                  <Grid item xs={4}>
-                    <Typography
-                      sx={{
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        marginBottom: 1,
-                      }}
-                    >
-                      Type
-                    </Typography>
-                    <Autocomplete
-                      id="type"
-                      options={[]}
-                      onChange={(e, value) => {
-                        console.log('onchange');
-                      }}
-                      isOptionEqualToValue={(option) => {
-                        return false;
-                      }}
-                      getOptionLabel={(option) => `${option}`}
-                      value=""
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          name="type"
-                          placeholder="Select Type of KUR"
-                        />
-                      )}
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography
-                      sx={{
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        marginBottom: 1,
-                      }}
-                    >
-                      Pasar
-                    </Typography>
-                    <TextField
-                      placeholder="Select Pasar"
-                      size="small"
-                      sx={{ bgcolor: '#fafafa' }}
-                      fullWidth
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <SearchIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Typography
-                      sx={{
-                        fontSize: '14px',
-                        fontWeight: '500',
-                        marginBottom: 1,
-                      }}
-                    >
-                      Credit Score
-                    </Typography>
-                    <TextField
-                      placeholder="Credit Score"
-                      size="small"
-                      sx={{ bgcolor: '#fafafa' }}
-                      fullWidth
-                      InputProps={{
-                        startAdornment: (
-                          <InputAdornment position="start">
-                            <SearchIcon />
-                          </InputAdornment>
-                        ),
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        gap: 2,
-                      }}
-                    >
-                      <Button variant="text">Reset</Button>
-                      <Button>Apply</Button>
-                    </Box>
-                  </Grid>
+
+            <Collapse in={openFilter}>
+              <Grid container spacing={2} sx={{ marginTop: '2rem' }}>
+                <Grid item xs={4}>
+                  <Typography
+                    sx={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      marginBottom: 1,
+                    }}
+                  >
+                    Type
+                  </Typography>
+                  <Autocomplete
+                    id="type"
+                    options={[]}
+                    onChange={(e, value) => {
+                      console.log('onchange');
+                    }}
+                    isOptionEqualToValue={(option) => {
+                      return false;
+                    }}
+                    getOptionLabel={(option) => `${option}`}
+                    value=""
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="type"
+                        placeholder="Select Type of KUR"
+                      />
+                    )}
+                  />
                 </Grid>
-              </>
-            ) : (
-              <></>
-            )}
+                <Grid item xs={4}>
+                  <Typography
+                    sx={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      marginBottom: 1,
+                    }}
+                  >
+                    Pasar
+                  </Typography>
+                  <TextField
+                    placeholder="Select Pasar"
+                    size="small"
+                    sx={{ bgcolor: '#fafafa' }}
+                    fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={4}>
+                  <Typography
+                    sx={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      marginBottom: 1,
+                    }}
+                  >
+                    Credit Score
+                  </Typography>
+                  <TextField
+                    placeholder="Credit Score"
+                    size="small"
+                    sx={{ bgcolor: '#fafafa' }}
+                    fullWidth
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'flex-end',
+                      gap: 2,
+                    }}
+                  >
+                    <Button variant="text">Reset</Button>
+                    <Button>Apply</Button>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Collapse>
           </Card>
         </Grid>
         <Grid item xs={12}>
