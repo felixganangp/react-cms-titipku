@@ -124,7 +124,7 @@ export default function RoleUser() {
       align: 'left',
       format: (val: any) => {
         return (
-          <p>{moment.unix(val.created_at).format('MMMM DD, YYYY hh.mm A')}</p>
+          <p>{moment.unix(val.updated_at).format('MMMM DD, YYYY hh.mm A')}</p>
         );
       },
     },
