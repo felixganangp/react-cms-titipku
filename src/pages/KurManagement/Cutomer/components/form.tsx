@@ -9,6 +9,7 @@ import {
   Button,
   Checkbox,
   FormControlLabel,
+  Grid,
 } from '@mui/material';
 import ErrorIcon from '@mui/icons-material/Error';
 import moment from 'moment';
@@ -21,29 +22,6 @@ import * as yup from 'yup';
 import FormLabel from 'components/FormLabel';
 import InputImage from 'components/InputImage';
 
-interface Props {
-  onClose: () => void;
-}
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-const initial = {
-  imageCustomer: '',
-  idCustomer: '',
-  name: '',
-  kurType: null,
-  adminFee: null,
-  birthDate: null,
-  phoneNumber: '',
-  email: '',
-  addressKtp: '',
-  addressDomisili: '',
-};
-
 function a11yProps(index: number) {
   return {
     id: `simple-tab-${index}`,
@@ -51,6 +29,11 @@ function a11yProps(index: number) {
   };
 }
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
@@ -71,8 +54,31 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
+interface Props {
+  onClose: () => void;
+}
+const initial = {
+  imageCustomer: '',
+  idCustomer: '',
+  name: '',
+  kurType: null,
+  adminFee: null,
+  birthDate: null,
+  phoneNumber: '',
+  email: '',
+  addressKtp: '',
+  addressDomisili: '',
+  lapakName: null,
+  nikKtp: '',
+  imageNik: '',
+  kkNumber: '',
+  imageKk: '',
+  npwp: '',
+  imageNpwp: '',
+  imageSKUsaha: '',
+};
 function Form({ onClose }: Props) {
-  const [valueTab, setValueTab] = useState(0);
+  const [valueTab, setValueTab] = useState(1);
   const [openCalendaer, setOpenCalendar] = useState(false);
   const [disabledAddressDom, setDisabledAddressDom] = useState(false);
 
@@ -101,6 +107,9 @@ function Form({ onClose }: Props) {
       phoneNumber: yup.string().required('Phone Number is required'),
       addressKtp: yup.string().required('Address (KTP) is required'),
       addressDomisili: yup.string().required('Address (Domicilie) is required'),
+      nikKtp: yup.string().required('NIK KTP is required'),
+      kkNumber: yup.string().required('Kartu Keluarga number is required'),
+      npwp: yup.string().required('NPWP number is required'),
     }),
     enableReinitialize: true,
   });
@@ -181,6 +190,7 @@ function Form({ onClose }: Props) {
               </Typography>
             </Box>
             <Box>
+              {/** NAME */}
               <FormLabel
                 text="Name"
                 error={touched.name && Boolean(errors.name)}
@@ -196,6 +206,7 @@ function Form({ onClose }: Props) {
                   fullWidth
                 />
               </FormLabel>
+              {/** KUR TYPE */}
               <FormLabel
                 text="KUR Type"
                 error={touched.kurType && Boolean(errors.kurType)}
@@ -224,6 +235,7 @@ function Form({ onClose }: Props) {
                   )}
                 />
               </FormLabel>
+              {/** ADMIN FEE */}
               <FormLabel
                 text="Admin Fee (%)"
                 error={touched.adminFee && Boolean(errors.adminFee)}
@@ -241,6 +253,7 @@ function Form({ onClose }: Props) {
                   fullWidth
                 />
               </FormLabel>
+              {/** BIRTH DATE */}
               <FormLabel
                 text="Birth Date"
                 error={touched.birthDate && Boolean(errors.birthDate)}
@@ -272,6 +285,7 @@ function Form({ onClose }: Props) {
                   />
                 </LocalizationProvider>
               </FormLabel>
+              {/** PHONE NUMBER */}
               <FormLabel
                 text="Phone Number"
                 error={touched.phoneNumber && Boolean(errors.phoneNumber)}
@@ -291,6 +305,7 @@ function Form({ onClose }: Props) {
                   fullWidth
                 />
               </FormLabel>
+              {/** EMAIL */}
               <FormLabel
                 text="Email"
                 error={touched.email && Boolean(errors.email)}
@@ -306,6 +321,7 @@ function Form({ onClose }: Props) {
                   fullWidth
                 />
               </FormLabel>
+              {/** ADDRESS KTP */}
               <FormLabel
                 text="Address (KTP)"
                 error={touched.addressKtp && Boolean(errors.addressKtp)}
@@ -327,6 +343,7 @@ function Form({ onClose }: Props) {
                   fullWidth
                 />
               </FormLabel>
+              {/** ADDRESS DOMICILE */}
               <FormLabel
                 text="Address (Domicile)"
                 error={
@@ -371,6 +388,7 @@ function Form({ onClose }: Props) {
               </FormLabel>
             </Box>
           </Box>
+          {/** BUTTON NEXT */}
           <Box
             width="100%"
             display="flex"
@@ -407,7 +425,186 @@ function Form({ onClose }: Props) {
           </Box>
         </TabPanel>
         <TabPanel value={valueTab} index={1}>
-          Form Two
+          <Box sx={{ px: 3, marginTop: 3 }}>
+            {/** LAPAK / PASAR */}
+            <Grid container spacing={2}>
+              <Grid item xs={7}>
+                <FormLabel
+                  text="Cari Pasar"
+                  error={touched.lapakName && Boolean(errors.lapakName)}
+                  helperText={
+                    touched.lapakName &&
+                    errors.lapakName &&
+                    `${errors.lapakName}`
+                  }
+                >
+                  <Autocomplete
+                    id="lapak-name"
+                    options={[]}
+                    onChange={(e, value) => {
+                      setFieldValue('lapakName', value);
+                    }}
+                    isOptionEqualToValue={(option: any) => {
+                      return option.id === values;
+                    }}
+                    getOptionLabel={(option) => `${option}`}
+                    value={values.lapakName}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="lapakName"
+                        onBlur={handleBlur}
+                        placeholder="Select KUR Type"
+                      />
+                    )}
+                  />
+                </FormLabel>
+              </Grid>
+              <Grid item xs={5}>
+                <FormLabel
+                  text="Pasar"
+                  // error={touched.name && Boolean(errors.name)}
+                  // helperText={touched.name && errors.name && `${errors.name}`}
+                >
+                  <TextField
+                    type="text"
+                    disabled
+                    // name="name"
+                    placeholder="Pasar"
+                    value={values.name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    fullWidth
+                  />
+                </FormLabel>
+              </Grid>
+            </Grid>
+            {/** NIK KTP */}
+            <FormLabel
+              text="Nomor Induk Kependudukan (KTP)"
+              error={touched.nikKtp && Boolean(errors.nikKtp)}
+              helperText={touched.nikKtp && errors.nikKtp && `${errors.nikKtp}`}
+            >
+              <TextField
+                type="text"
+                name="nikKtp"
+                placeholder="Input NIK KTP"
+                value={values.nikKtp}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                fullWidth
+              />
+            </FormLabel>
+            {/** IMAGE KTP */}
+            <FormLabel
+              text="Nomor Induk Kependudukan (KTP)"
+              error={touched.nikKtp && Boolean(errors.nikKtp)}
+              helperText={touched.nikKtp && errors.nikKtp && `${errors.nikKtp}`}
+            >
+              <InputImage
+                label="Image KTP"
+                value={values.imageNik}
+                onChange={(e: any) => setFieldValue('imageNik', e)}
+              />
+            </FormLabel>
+            {/** KK NUMBER */}
+            <FormLabel
+              text="Nomor Kartu Keluarga"
+              error={touched.kkNumber && Boolean(errors.kkNumber)}
+              helperText={
+                touched.kkNumber && errors.kkNumber && `${errors.kkNumber}`
+              }
+            >
+              <TextField
+                type="text"
+                name="kkNumber"
+                placeholder="Input Kartu Keluarga number"
+                value={values.kkNumber}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                fullWidth
+              />
+            </FormLabel>
+            {/** IMAGE KK (C1) */}
+            <FormLabel
+              text="Nomor Induk Kependudukan (KTP)"
+              error={touched.nikKtp && Boolean(errors.nikKtp)}
+              helperText={touched.nikKtp && errors.nikKtp && `${errors.nikKtp}`}
+            >
+              <InputImage
+                label="Image KK"
+                value={values.imageKk}
+                onChange={(e: any) => setFieldValue('imageKk', e)}
+              />
+            </FormLabel>
+            {/** NPWP */}
+            <FormLabel
+              text="Nomor NPWP"
+              error={touched.npwp && Boolean(errors.npwp)}
+              helperText={touched.npwp && errors.npwp && `${errors.npwp}`}
+            >
+              <TextField
+                type="text"
+                name="npwp"
+                placeholder="Input NPWP number"
+                value={values.npwp}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                fullWidth
+              />
+            </FormLabel>
+            {/** NPWP IMAGE */}
+            <FormLabel
+              text="Nomor Induk Kependudukan (KTP)"
+              error={touched.nikKtp && Boolean(errors.nikKtp)}
+              helperText={touched.nikKtp && errors.nikKtp && `${errors.nikKtp}`}
+            >
+              <InputImage
+                label="Image NPWP"
+                value={values.imageNpwp}
+                onChange={(e: any) => setFieldValue('imageNpwp', e)}
+              />
+            </FormLabel>
+            {/** SURAT KETERANGAN USAHA IMAGE */}
+            <FormLabel
+              text="Nomor Induk Kependudukan (KTP)"
+              error={touched.nikKtp && Boolean(errors.nikKtp)}
+              helperText={touched.nikKtp && errors.nikKtp && `${errors.nikKtp}`}
+            >
+              <InputImage
+                label="Image Surat Keterangan Usaha"
+                value={values.imageSKUsaha}
+                onChange={(e: any) => setFieldValue('imageSKUsaha', e)}
+              />
+            </FormLabel>
+          </Box>
+          {/** BUTTON SAVE */}
+          <Box
+            width="100%"
+            display="flex"
+            gap="10px"
+            justifyContent="end"
+            // mt="50px"
+            sx={{
+              padding: '24px',
+              boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <Button
+              variant="text"
+              color="primary"
+              onClick={() => setValueTab(0)}
+            >
+              Previous
+            </Button>
+            <Button
+              disabled={!(isValid && dirty)}
+              onClick={(e) => handleChangeTab(e, 1)}
+              type="submit"
+            >
+              Save
+            </Button>
+          </Box>
         </TabPanel>
       </form>
     </Box>
