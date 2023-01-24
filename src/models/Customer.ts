@@ -3,7 +3,7 @@ export interface CreateCustomer {
   idCustomer?: string;
   name: string;
   kurType: object | null;
-  adminFee: number | undefined;
+  adminFee: string;
   birthDate: object | null;
   phoneNumber: string;
   email: string;

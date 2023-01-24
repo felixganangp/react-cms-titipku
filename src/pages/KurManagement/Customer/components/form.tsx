@@ -59,7 +59,7 @@ const initial: CreateCustomer = {
   idCustomer: '',
   name: '',
   kurType: null,
-  adminFee: undefined,
+  adminFee: '',
   birthDate: null,
   phoneNumber: '',
   email: '',
@@ -413,7 +413,7 @@ function Form({ onClose }: Props) {
                   values.addressKtp &&
                   values.addressDomisili &&
                   values.imageCustomer &&
-                  values.adminFee > 1
+                  +values.adminFee > 1
                 )
               }
               onClick={(e) => handleChangeTab(e, 1)}
