@@ -303,6 +303,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
               name="name"
               fullWidth
               placeholder="Input Role Name"
+              inputProps={{ maxLength: 50 }}
               value={values.name}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setFieldValue('name', e.target.value);
