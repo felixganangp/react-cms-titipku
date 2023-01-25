@@ -48,7 +48,7 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
         //   child: [],
         // },
         {
-          id: 0,
+          id: 150,
           title: 'Jatiper',
           path: '/jatiper',
           child: [
@@ -67,7 +67,7 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
       ],
     },
     {
-      id: 0,
+      id: 140,
       title: 'Lapak',
       path: '',
       icon: <StoreIcon />,
@@ -87,7 +87,7 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
       ],
     },
     {
-      id: 0,
+      id: 320,
       title: 'Products',
       path: '',
       icon: <StoreIcon />,
@@ -133,7 +133,7 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
     //   ],
     // },
     {
-      id: 0,
+      id: 190,
       title: 'Application',
       path: '',
       icon: <PhonelinkSetupIcon />,
@@ -165,7 +165,7 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
       ],
     },
     {
-      id: 0,
+      id: 290,
       title: 'Promo & Voucher',
       path: '',
       icon: <ConfirmationNumberIcon />,
@@ -203,7 +203,7 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
       ],
     },
     {
-      id: 0,
+      id: 80,
       title: 'Service & Request',
       path: '',
       icon: <HeadsetMicIcon />,
@@ -241,13 +241,13 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
       ],
     },
     {
-      id: 0,
+      id: 14,
       title: 'KUR',
       path: '',
       icon: <LocalAtmIcon />,
       child: [
         {
-          id: 0,
+          id: 15,
           title: 'Customer',
           path: '/kur/customer',
           child: [],
