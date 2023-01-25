@@ -86,14 +86,14 @@ export default function KurCustomer() {
                 sx={{ display: 'flex', gap: 2, alignContent: 'center' }}
               >
                 <Button
-                  sx={{ width: '15%' }}
+                  sx={{ width: '12%' }}
                   startIcon={<AddIcon />}
                   onClick={formModal.openModal}
                 >
                   Add Customer
                 </Button>
                 <Box
-                  width="85%"
+                  width="90%"
                   sx={{ display: 'flex', justifyContent: 'space-between' }}
                 >
                   <TextField
