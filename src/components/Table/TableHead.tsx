@@ -72,22 +72,26 @@ export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
             padding={headCell.disablePadding ? 'none' : 'normal'}
             // sortDirection={orderBy === headCell.id ? orderType : false}
           >
-            <TableSortLabel
-              active={orderBy === headCell.id}
-              direction={orderBy === headCell.id ? orderType : 'asc'}
-              IconComponent={SwapVertIcon}
-              onClick={() => {
-                if (onRequestSort) {
-                  const order = orderType === 'desc' ? 'asc' : 'desc';
-                  onRequestSort({
-                    orderBy: headCell.id,
-                    orderType: orderBy !== headCell.id ? 'asc' : order,
-                  });
-                }
-              }}
-            >
-              {headCell.label}
-            </TableSortLabel>
+            {headCell.enableSort ? (
+              <TableSortLabel
+                active={orderBy === headCell.id}
+                direction={orderBy === headCell.id ? orderType : 'asc'}
+                IconComponent={SwapVertIcon}
+                onClick={() => {
+                  if (onRequestSort) {
+                    const order = orderType === 'desc' ? 'asc' : 'desc';
+                    onRequestSort({
+                      orderBy: headCell.id,
+                      orderType: orderBy !== headCell.id ? 'asc' : order,
+                    });
+                  }
+                }}
+              >
+                {headCell.label}
+              </TableSortLabel>
+            ) : (
+              <span>{headCell.label}</span>
+            )}
           </TableCell>
         ))}
       </TableRow>

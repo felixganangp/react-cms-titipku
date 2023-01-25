@@ -25,7 +25,7 @@ interface TableOrder {
 export interface EnhancedTableHeadProps<T> {
   onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
   orderType: Order;
-  orderBy: string | null | undefined;
+  orderBy: string | number | null | undefined;
   numSelected: number;
   rowCount: number;
   enableCheckBox: boolean;
@@ -40,13 +40,13 @@ export interface EnhancedTableProps<T extends { id?: string | number }> {
   disableNumber?: boolean;
   loading?: boolean;
   orderType?: Order;
-  orderBy?: string | undefined | null;
+  orderBy?: string | number | null | undefined;
   // totalPage: number;
   totalData?: number;
   count?: number;
-  handleRequestSort?: (order: TableOrder) => void;
-  page: number | undefined;
-  onChangePage: (page: number) => void;
+  onChangeSort?: (order: TableOrder) => void;
+  page: number;
+  onChangePage?: (page: number) => void;
   setSelected?: (array: (string | number | undefined)[]) => void;
   selected?: (string | number)[];
   bgHeader?: string;

@@ -11,6 +11,7 @@ import IconButton from '@mui/material/IconButton';
 import Table from 'components/Table';
 import { HeadCells } from 'components/Table/types';
 import Modal from 'components/Modal';
+import Status from 'components/Status';
 import MenuList from 'components/MenuList';
 import useModal from 'hooks/useModal';
 import debounce from 'utils/debounce';
@@ -28,7 +29,7 @@ import { RoleAccess } from 'models/RoleAccess';
 import { CreateRoleUser } from 'models/RoleUser';
 import FormRoleUser from './components/form';
 
-import { Bullet, Status } from './roleuser.styled';
+import { Bullet } from './roleuser.styled';
 
 interface FormDataType {
   isEdit: boolean;
@@ -99,11 +100,26 @@ export default function RoleUser() {
     );
   };
 
+  const handleChangeSort = (value: {
+    orderBy: string | number;
+    orderType: 'asc' | 'desc';
+  }) => {
+    dispatch(
+      roleUserAction.setParams({
+        account_type: 'cms',
+        page: 1,
+        order_by: value.orderBy,
+        order_type: value.orderType,
+      }),
+    );
+  };
+
   const headCell: HeadCells<RoleAccess>[] = [
     {
       id: 'full_name',
       label: 'Name',
       align: 'left',
+      enableSort: true,
     },
     {
       id: 'email',
@@ -114,14 +130,16 @@ export default function RoleUser() {
       id: 'role',
       label: 'Role',
       align: 'left',
+      enableSort: true,
       format: (val: any) => (
         <Bullet>{`\u2022  ${val.administrator_detail[0].administrator_role.name}`}</Bullet>
       ),
     },
     {
-      id: 'last_update',
+      id: 'updated_at',
       label: 'Last Update',
       align: 'left',
+      enableSort: true,
       format: (val: any) => {
         return (
           <p>{moment.unix(val.updated_at).format('MMMM DD, YYYY hh.mm A')}</p>
@@ -132,9 +150,10 @@ export default function RoleUser() {
       id: 'status',
       label: 'Status',
       align: 'left',
+      enableSort: true,
       format: (val: any) => (
-        <Status status={val.status}>
-          <span>{val.status ? 'Active' : 'Inactive'}</span>
+        <Status color="rgba(0,0,0,0.3)">
+          {val.administrator_detail[0].administrator_status.name}
         </Status>
       ),
     },
@@ -169,10 +188,7 @@ export default function RoleUser() {
               {
                 label: `Set to Inactive`,
                 color: '#c10000',
-                onClick: () => {
-                  console.log(val);
-                  console.log('set active inactive');
-                },
+                onClick: () => {},
               },
             ]}
           >
@@ -239,11 +255,14 @@ export default function RoleUser() {
               <Table
                 data={roleUser.data}
                 headCells={headCell}
-                page={roleUser.params.page}
                 totalData={roleUser.total}
-                count={roleUser.params.count}
                 loading={roleUser.loading}
+                count={roleUser.params.count}
+                page={roleUser.params.page}
+                orderBy={roleUser.params.order_by}
+                orderType={roleUser.params.order_type}
                 onChangePage={(page) => handleChangePage(page)}
+                onChangeSort={(value) => handleChangeSort(value)}
 
                 // handleRequestSort={(e) => {
                 //   setOrderBy(e.orderBy);

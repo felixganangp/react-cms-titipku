@@ -1,36 +1,33 @@
-import { call, put, select, takeLatest } from 'redux-saga/effects';
+import { call, put, all, select, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 import * as AdministratorService from 'service/Administrator';
-import { ListParams, ListResponse } from 'models/fetch';
+import { ListResponse } from 'models/fetch';
 import RoleAccessForm, {
   CheckRoleNameParams,
   RoleAccess,
   RoleAccessParams,
 } from 'models/RoleAccess';
-import { uiAction } from '../slice/ui';
-import { roleAccessAction } from '../slice/RoleAccess';
-import * as service from '../../service/AdministratorRole';
-import { Menu } from '../../models/Menu';
+import * as service from 'service/AdministratorRole';
+import { uiAction } from 'store/slice/ui';
+import { roleAccessAction } from 'store/slice/RoleAccess';
+import { Menu } from 'models/Menu';
 
 import { IsExistResponse, MenuListParam } from '../../models/fetch';
 
 function* addRoleAccess(body: PayloadAction<RoleAccessForm>) {
   try {
-    const params: {
-      page: number;
-      count: number;
-      search: string;
-      account_type: string;
-      is_exist: boolean;
-    } = yield select((state) => state.roleAccess.params);
+    const params: RoleAccessParams = yield select(
+      (state) => state.roleAccess.params,
+    );
     yield call(service.createAdministratorRole, body.payload);
     yield put(roleAccessAction.fetchData(params));
   } catch (err) {
+    const headMessage = 'Failed Create Role Access';
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
         uiAction.openToast({
-          headMsg: 'Error',
+          headMsg: headMessage,
           message: error,
           severity: 'error',
         }),
@@ -38,7 +35,7 @@ function* addRoleAccess(body: PayloadAction<RoleAccessForm>) {
     } else {
       yield put(
         uiAction.openToast({
-          headMsg: 'Error',
+          headMsg: headMessage,
           message: 'interval server error',
           severity: 'error',
         }),
@@ -59,11 +56,12 @@ function* updateRoleAccess(payload: PayloadAction<RoleAccessForm>) {
     yield call(service.updateRoleAccess, payload.payload);
     yield put(roleAccessAction.fetchData(params));
   } catch (err) {
+    const headMessage = 'Failed Update Role Access';
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
         uiAction.openToast({
-          headMsg: 'Error',
+          headMsg: headMessage,
           message: error,
           severity: 'error',
         }),
@@ -71,7 +69,43 @@ function* updateRoleAccess(payload: PayloadAction<RoleAccessForm>) {
     } else {
       yield put(
         uiAction.openToast({
-          headMsg: 'Error',
+          headMsg: headMessage,
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* deleteRoleAccess(body: PayloadAction<{ id: string | number }>) {
+  try {
+    const params: RoleAccessParams = yield select(
+      (state) => state.roleAccess.params,
+    );
+    yield call(service.deleteRoleAccess, body.payload.id);
+    yield put(roleAccessAction.fetchData(params));
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Success Delete Data',
+        severity: 'success',
+      }),
+    );
+  } catch (err) {
+    const headMessage = 'Failed Delete Role Access';
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: headMessage,
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: headMessage,
           message: 'interval server error',
           severity: 'error',
         }),
@@ -89,11 +123,12 @@ function* fetchData(params: PayloadAction<RoleAccessParams>) {
 
     yield put(roleAccessAction.fetchDataSuccess(response));
   } catch (err) {
+    const headMessage = 'Failed Get Role Access';
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
         uiAction.openToast({
-          headMsg: 'Error get data',
+          headMsg: headMessage,
           message: error,
           severity: 'error',
         }),
@@ -101,7 +136,7 @@ function* fetchData(params: PayloadAction<RoleAccessParams>) {
     } else {
       yield put(
         uiAction.openToast({
-          headMsg: 'Error get data',
+          headMsg: headMessage,
           message: 'interval server error',
           severity: 'error',
         }),
@@ -174,7 +209,7 @@ function* checkRoleName(params: PayloadAction<CheckRoleNameParams>) {
       const error = err as string;
       yield put(
         uiAction.openToast({
-          headMsg: 'Success data',
+          headMsg: 'Failed data',
           message: error,
           severity: 'error',
         }),
@@ -182,7 +217,7 @@ function* checkRoleName(params: PayloadAction<CheckRoleNameParams>) {
     } else {
       yield put(
         uiAction.openToast({
-          headMsg: 'Success data',
+          headMsg: 'Failed data',
           message: 'interval server error',
           severity: 'error',
         }),
@@ -195,6 +230,7 @@ export default function* saga() {
   yield takeLatest(roleAccessAction.fetchData.type, fetchData);
   yield takeLatest(roleAccessAction.fetchMenuList.type, fetchMenu);
   yield takeLatest(roleAccessAction.add.type, addRoleAccess);
+  yield takeLatest(roleAccessAction.delete.type, deleteRoleAccess);
   yield takeLatest(roleAccessAction.update.type, updateRoleAccess);
   yield takeLatest(roleAccessAction.checkRoleName.type, checkRoleName);
 }
