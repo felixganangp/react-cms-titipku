@@ -10,13 +10,14 @@ import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import HeadsetMicIcon from '@mui/icons-material/HeadsetMic';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
+import { UserDetails } from 'models/UserDetails';
 import SideBarProfile from './Profile';
 import Menu from './Menu';
 
 interface SideBarProps {
   open: boolean;
   setOpen(arg0: boolean): void;
-  userDetails: { fullName: string; email: string };
+  userDetails: UserDetails | null;
 }
 
 const drawerWidthOpen = 236;
@@ -26,49 +27,47 @@ const iconFontSize = 20;
 const drawerWidthClose =
   (paddingIconButton + marginIconButton) * 2 + iconFontSize;
 
-function SideBar(props: SideBarProps) {
-  const { open, setOpen, userDetails } = props;
-
+function SideBar({ open, setOpen, userDetails }: SideBarProps) {
   const theme = useTheme();
   const profileData = {
-    name: userDetails.fullName,
-    email: userDetails.email,
+    name: userDetails?.full_name,
+    email: userDetails?.email,
   };
 
   const sidebarData = [
     {
-      id: 1,
+      id: 11,
       title: 'User',
       path: '',
       icon: <PeopleIcon />,
       child: [
+        // {
+        //   id: 12,
+        //   title: 'Nitiper',
+        //   path: '/nitiper',
+        //   child: [],
+        // },
         {
-          id: 12,
-          title: 'Nitiper',
-          path: '/nitiper',
-          child: [],
-        },
-        {
-          id: 13,
+          id: 0,
           title: 'Jatiper',
           path: '/jatiper',
           child: [
             {
-              id: 13,
+              id: 15,
               title: 'Jatiper Management',
               path: '/jatiper-management',
             },
-            {
-              id: 14,
-              title: 'Jatiper Registration',
-              path: '/jatiper-registration',
-            },
+            // {
+            //   id: 14,
+            //   title: 'Jatiper Registration',
+            //   path: '/jatiper-registration',
+            // },
           ],
         },
       ],
     },
     {
-      id: 3,
+      id: 0,
       title: 'Lapak',
       path: '',
       icon: <StoreIcon />,
@@ -79,176 +78,176 @@ function SideBar(props: SideBarProps) {
           path: '/area',
           child: [],
         },
-        {
-          id: 14,
-          title: 'Lapak',
-          path: '/lapak',
-          child: [],
-        },
+        // {
+        //   id: 14,
+        //   title: 'Lapak',
+        //   path: '/lapak',
+        //   child: [],
+        // },
       ],
     },
     {
-      id: 4,
+      id: 0,
       title: 'Products',
       path: '',
       icon: <StoreIcon />,
       child: [
         {
-          id: 15,
+          id: 32,
           title: 'Product Mangement',
           path: '/product-management',
           child: [],
         },
         {
-          id: 15,
+          id: 33,
           title: 'SKU Mangement',
           path: '/sku-management',
           child: [],
         },
         {
-          id: 15,
+          id: 31,
           title: 'Category Mangement',
           path: '/category-management',
           child: [],
         },
       ],
     },
+    // {
+    //   id: 5,
+    //   title: 'Transaction',
+    //   path: '',
+    //   icon: <StoreIcon />,
+    //   child: [
+    //     {
+    //       id: 16,
+    //       title: 'Transaction',
+    //       path: '/transaction',
+    //       child: [],
+    //     },
+    //     {
+    //       id: 16,
+    //       title: 'Urgent Order',
+    //       path: '/urgent-order',
+    //       child: [],
+    //     },
+    //   ],
+    // },
     {
-      id: 5,
-      title: 'Transaction',
-      path: '',
-      icon: <StoreIcon />,
-      child: [
-        {
-          id: 16,
-          title: 'Transaction',
-          path: '/transaction',
-          child: [],
-        },
-        {
-          id: 16,
-          title: 'Urgent Order',
-          path: '/urgent-order',
-          child: [],
-        },
-      ],
-    },
-    {
-      id: 6,
+      id: 0,
       title: 'Application',
       path: '',
       icon: <PhonelinkSetupIcon />,
       child: [
         {
-          id: 17,
+          id: 19,
           title: 'Notification',
           path: '/notification',
           child: [],
         },
         {
-          id: 17,
+          id: 20,
           title: 'Banner',
           path: '/banner',
           child: [],
         },
         {
-          id: 17,
+          id: 22,
           title: 'Event',
           path: '/event',
           child: [],
         },
-        {
-          id: 17,
-          title: 'Giveaway',
-          path: '/giveaway',
-          child: [],
-        },
+        // {
+        //   id: 17,
+        //   title: 'Giveaway',
+        //   path: '/giveaway',
+        //   child: [],
+        // },
       ],
     },
     {
-      id: 7,
+      id: 0,
       title: 'Promo & Voucher',
       path: '',
       icon: <ConfirmationNumberIcon />,
       child: [
         {
-          id: 18,
+          id: 29,
           title: 'Promo Product',
           path: '/promo-product',
           child: [],
         },
-        {
-          id: 17,
-          title: 'Join Promo',
-          path: '/join-promo',
-          child: [],
-        },
-        {
-          id: 17,
-          title: 'Voucher',
-          path: '/voucher',
-          child: [],
-        },
-        {
-          id: 17,
-          title: 'Mass Voucher',
-          path: '/mass-voucher',
-          child: [],
-        },
-        {
-          id: 17,
-          title: 'Giveaway',
-          path: '/giveaway',
-          child: [],
-        },
+        // {
+        //   id: 17,
+        //   title: 'Join Promo',
+        //   path: '/join-promo',
+        //   child: [],
+        // },
+        // {
+        //   id: 17,
+        //   title: 'Voucher',
+        //   path: '/voucher',
+        //   child: [],
+        // },
+        // {
+        //   id: 17,
+        //   title: 'Mass Voucher',
+        //   path: '/mass-voucher',
+        //   child: [],
+        // },
+        // {
+        //   id: 17,
+        //   title: 'Giveaway',
+        //   path: '/giveaway',
+        //   child: [],
+        // },
       ],
     },
     {
-      id: 8,
+      id: 0,
       title: 'Service & Request',
       path: '',
       icon: <HeadsetMicIcon />,
       child: [
         {
-          id: 19,
+          id: 8,
           title: 'Withdraw Request',
           path: '/withdraw-request',
           child: [],
         },
-        {
-          id: 19,
-          title: 'Join Promo Request',
-          path: '/join-promo-request',
-          child: [],
-        },
-        {
-          id: 19,
-          title: 'New Product Request',
-          path: '/new-product-request',
-          child: [],
-        },
-        {
-          id: 19,
-          title: 'Master Data Config',
-          path: '/master-data-config',
-          child: [],
-        },
-        {
-          id: 19,
-          title: 'App Service',
-          path: '/app-service',
-          child: [],
-        },
+        // {
+        //   id: 19,
+        //   title: 'Join Promo Request',
+        //   path: '/join-promo-request',
+        //   child: [],
+        // },
+        // {
+        //   id: 19,
+        //   title: 'New Product Request',
+        //   path: '/new-product-request',
+        //   child: [],
+        // },
+        // {
+        //   id: 19,
+        //   title: 'Master Data Config',
+        //   path: '/master-data-config',
+        //   child: [],
+        // },
+        // {
+        //   id: 19,
+        //   title: 'App Service',
+        //   path: '/app-service',
+        //   child: [],
+        // },
       ],
     },
     {
-      id: 9,
+      id: 0,
       title: 'KUR',
       path: '',
       icon: <LocalAtmIcon />,
       child: [
         {
-          id: 10,
+          id: 0,
           title: 'Customer',
           path: '/kur/customer',
           child: [],
@@ -256,7 +255,7 @@ function SideBar(props: SideBarProps) {
       ],
     },
     {
-      id: 10,
+      id: 9,
       title: 'Admin Panel',
       path: '',
       icon: <PersonIcon />,
@@ -268,7 +267,7 @@ function SideBar(props: SideBarProps) {
           child: [],
         },
         {
-          id: 11,
+          id: 0,
           title: 'Role Access',
           path: '/role-access',
           child: [],

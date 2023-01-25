@@ -38,7 +38,7 @@ export default function Login() {
   const parsAuthToken = JSON.parse(authToken || '{}');
   const isAuth = parsAuthToken.token;
   if (isAuth) {
-    return <Navigate to="/role-user" />;
+    return <Navigate to="/" />;
   }
 
   return (

@@ -8,6 +8,16 @@ export interface ListResponse<T> {
   data: T[];
 }
 
+export interface Response<T> {
+  timestamp: number;
+  status: string;
+  message: string;
+  page?: number;
+  count?: number;
+  total?: number;
+  data: T;
+}
+
 export interface IsExistResponse {
   timestamp: number;
   status: string;

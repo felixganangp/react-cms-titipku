@@ -1,7 +1,7 @@
 import { call, put, select, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 import * as AdministratorService from 'service/Administrator';
-import { ListParams, ListResponse } from 'models/fetch';
+import { ListResponse } from 'models/fetch';
 import RoleAccessForm, {
   CheckRoleNameParams,
   RoleAccess,
