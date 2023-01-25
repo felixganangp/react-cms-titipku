@@ -18,4 +18,8 @@ export interface CreateCustomer {
   npwp: string;
   imageNpwp: string | File | Blob;
   imageSKUsaha: string;
+  creditLimit: string;
+  bankName: object | null;
+  bankNumberPrimary: string;
+  nobuAccountNumber: string;
 }

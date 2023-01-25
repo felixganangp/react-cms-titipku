@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Box,
   Tabs,
@@ -75,14 +75,23 @@ const initial: CreateCustomer = {
   npwp: '',
   imageNpwp: '',
   imageSKUsaha: '',
+  creditLimit: '',
+  bankName: null,
+  bankNumberPrimary: '',
+  nobuAccountNumber: '',
 };
 function Form({ onClose }: Props) {
   const [valueTab, setValueTab] = useState(0);
   const [openCalendaer, setOpenCalendar] = useState(false);
   const [disabledAddressDom, setDisabledAddressDom] = useState(false);
-
+  const divRef: any = useRef(null);
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setValueTab(newValue);
+    divRef.current.firstElementChild.scrollIntoView();
+    // divRef.current.scroll({
+    //   top: 0,
+    //   behavior: 'smooth',
+    // });
   };
   const [initialValues, setInitialValues] = useState(initial);
   const formik = useFormik({
@@ -112,10 +121,19 @@ function Form({ onClose }: Props) {
       birthDate: yup.string().required('Birth Day is required'),
       phoneNumber: yup.string().required('Phone Number is required'),
       addressKtp: yup.string().required('Address (KTP) is required'),
-      addressDomisili: yup.string().required('Address (Domicilie) is required'),
+      addressDomisili: yup.string().required('Address (Domicile) is required'),
       nikKtp: yup.string().required('NIK KTP is required'),
       kkNumber: yup.string().required('Kartu Keluarga number is required'),
       npwp: yup.string().required('NPWP number is required'),
+      creditLimit: yup
+        .number()
+        .required('Credit limit is required')
+        .min(1, 'Please input positive value credit limit')
+        .max(500000000, 'Maximal credit limit is 500.000.000'),
+      // bankName: yup.mixed().required('Bank account is required'),
+      bankNumberPrimary: yup
+        .string()
+        .required('Bank account number (primary) is required'),
     }),
     enableReinitialize: true,
   });
@@ -130,8 +148,9 @@ function Form({ onClose }: Props) {
     isValid,
     dirty,
   } = formik;
+
   return (
-    <Box>
+    <Box ref={divRef}>
       <Box sx={{ mx: 1 }}>
         <Tabs
           value={valueTab}
@@ -153,12 +172,17 @@ function Form({ onClose }: Props) {
               !(
                 values.name &&
                 values.adminFee &&
+                +values.adminFee > 1 &&
+                values.dpdRate &&
+                +values.dpdRate > 1 &&
                 values.birthDate &&
                 values.phoneNumber &&
                 values.email &&
                 values.addressKtp &&
                 values.addressDomisili &&
-                +values.adminFee > 1
+                values.creditLimit &&
+                +values.creditLimit > 1 &&
+                values.bankNumberPrimary
               )
             }
             sx={{ borderBottom: 1, borderColor: 'divider', color: '#8B95A5' }}
@@ -423,6 +447,112 @@ function Form({ onClose }: Props) {
                   />
                 </>
               </FormLabel>
+              {/** CREDIT LIMIT */}
+              <FormLabel
+                text="Credit Limit"
+                error={touched.creditLimit && Boolean(errors.creditLimit)}
+                helperText={
+                  touched.creditLimit &&
+                  errors.creditLimit &&
+                  `${errors.creditLimit}`
+                }
+              >
+                <TextField
+                  type="number"
+                  name="creditLimit"
+                  placeholder="Input credit limit"
+                  value={values.creditLimit}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  fullWidth
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">Rp.</InputAdornment>
+                    ),
+                  }}
+                />
+              </FormLabel>
+              {/** ACCOUNT BANK PRIMARY */}
+              <FormLabel text="Acccount Bank (Primary)">
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <FormLabel
+                      text="List Bank"
+                      error={touched.bankName && Boolean(errors.bankName)}
+                      helperText={
+                        touched.bankName &&
+                        errors.bankName &&
+                        `${errors.bankName}`
+                      }
+                    >
+                      <Autocomplete
+                        id="list-bank"
+                        options={[]}
+                        onChange={(e, value) => {
+                          setFieldValue('bankName', value);
+                        }}
+                        isOptionEqualToValue={(option: any) => {
+                          return option.id === values;
+                        }}
+                        getOptionLabel={(option) => `${option}`}
+                        value={values.bankName}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            name="bankName"
+                            onBlur={handleBlur}
+                            placeholder="Select your bank account"
+                          />
+                        )}
+                      />
+                    </FormLabel>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormLabel
+                      text="Bank account number"
+                      error={
+                        touched.bankNumberPrimary &&
+                        Boolean(errors.bankNumberPrimary)
+                      }
+                      helperText={
+                        touched.bankNumberPrimary &&
+                        errors.bankNumberPrimary &&
+                        `${errors.bankNumberPrimary}`
+                      }
+                    >
+                      <TextField
+                        type="text"
+                        name="bankNumberPrimary"
+                        placeholder="Bank account number"
+                        value={values.bankNumberPrimary}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        fullWidth
+                      />
+                    </FormLabel>
+                  </Grid>
+                </Grid>
+              </FormLabel>
+              {/** ACCOUNT BANK NOBU */}
+              <FormLabel
+                text="Acccount Bank (Nobu)"
+                // error={touched.phoneNumber && Boolean(errors.phoneNumber)}
+                // helperText={
+                //   touched.phoneNumber &&
+                //   errors.phoneNumber &&
+                //   `${errors.phoneNumber}`
+                // }
+              >
+                <TextField
+                  type="text"
+                  name="nobuAccountNumber"
+                  placeholder="Input Phone Number"
+                  value={values.nobuAccountNumber}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  fullWidth
+                />
+              </FormLabel>
             </Box>
           </Box>
           {/** BUTTON NEXT */}
@@ -445,12 +575,17 @@ function Form({ onClose }: Props) {
                 !(
                   values.name &&
                   values.adminFee &&
+                  +values.adminFee > 1 &&
+                  values.dpdRate &&
+                  +values.dpdRate > 1 &&
                   values.birthDate &&
                   values.phoneNumber &&
                   values.email &&
                   values.addressKtp &&
                   values.addressDomisili &&
-                  +values.adminFee > 1
+                  values.creditLimit &&
+                  +values.creditLimit > 1 &&
+                  values.bankNumberPrimary
                 )
               }
               onClick={(e) => handleChangeTab(e, 1)}
