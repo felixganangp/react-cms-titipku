@@ -1,11 +1,11 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
 name: CMS CI
 
 on:
   push:
-    branches: [ development ]
+    branches: [ "development" ]
 
 jobs:
   build:
@@ -17,14 +17,15 @@ jobs:
         node-version: [16.x]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v2
+      uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
     - run: yarn install
     - run: yarn build 
-    - uses: actions/checkout@v2
+    - run: yarn test
+
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
       env:
@@ -32,5 +33,4 @@ jobs:
         SLACK_ICON: https://titipku.s3.ap-southeast-1.amazonaws.com/product_category/30-11-2021_1638256074055589183.png
         SLACK_MESSAGE: 'CMS Development Build :rocket:'
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_USERNAME: mintip
-
+        SLACK_USERNAME: CMS DEV
