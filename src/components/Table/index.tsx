@@ -46,7 +46,7 @@ export interface Data {
 function EnhancedTable<T extends Data>({
   disableNumber = false,
   enableCheckBox = false,
-  handleRequestSort,
+  onChangeSort,
   selected = [],
   setSelected = () => [],
   orderType = 'asc',
@@ -126,6 +126,8 @@ function EnhancedTable<T extends Data>({
     return 0;
   };
 
+  const numberSumPages = props.page > 1 ? props.page * 10 - 10 : 0;
+
   return (
     <Box width="100%">
       <TableContainer>
@@ -143,7 +145,7 @@ function EnhancedTable<T extends Data>({
             orderType={orderType}
             orderBy={orderBy}
             onSelectAllClick={handleSelectAllClick}
-            onRequestSort={handleRequestSort}
+            onRequestSort={onChangeSort}
             rowCount={props.data.length}
             headCells={props.headCells}
             bgHeader={props.bgHeader}
@@ -152,8 +154,6 @@ function EnhancedTable<T extends Data>({
           />
           <TableBody>
             {!props.loading &&
-              // stableSort(props.data, getComparator(orderType, orderBy))
-              //   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               props.data.map((row: T, index: number) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
@@ -191,7 +191,7 @@ function EnhancedTable<T extends Data>({
                         }}
                         align="center"
                       >
-                        {index + 1}
+                        {index + 1 + numberSumPages}
                       </TableCell>
                     )}
                     {props.headCells.map((val, key) => (
@@ -208,7 +208,6 @@ function EnhancedTable<T extends Data>({
                         key={String(key)}
                       >
                         {val.format ? val.format(row) : row[val.id]}
-                        {Object.keys(row).includes(val.id) ? row[val.id] : '-'}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -292,7 +291,9 @@ function EnhancedTable<T extends Data>({
           color="primary"
           page={props.page}
           onChange={(_, e) => {
-            props.onChangePage(e);
+            if (props.onChangePage) {
+              props.onChangePage(e);
+            }
           }}
         />
       </Box>
@@ -300,4 +301,7 @@ function EnhancedTable<T extends Data>({
   );
 }
 
+EnhancedTable.defaultProps = {
+  page: 1,
+};
 export default EnhancedTable;

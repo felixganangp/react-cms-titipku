@@ -88,3 +88,16 @@ export const checkRoleNameExist = (params: any) =>
       reject(message);
     }
   });
+
+export const deleteRoleAccess = (id: number | string) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.delete(`/administrator/role/${id}`);
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });

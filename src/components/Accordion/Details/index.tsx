@@ -17,7 +17,7 @@ interface AccordionOnDetailsProps {
   children: any;
   parent: boolean;
   headerContent: any;
-  havingChild: boolean;
+  havingChild?: boolean;
 }
 
 export default function AccordionOnDetails(props: AccordionOnDetailsProps) {

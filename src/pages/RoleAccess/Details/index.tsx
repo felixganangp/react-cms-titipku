@@ -303,40 +303,42 @@ export default function RoleUserDetails(props: RoleUserDetailsProps) {
           />
         }
       >
-        {parentMenu.child.map((childMenu) =>
-          childMenu.child.length === 0 ? (
-            <HorizontalContent>
-              <ChildMenu>{childMenu.name}</ChildMenu>
-              <Checkbox
-                checked={childMenu.is_checked}
-                sx={{ color: '#d5d5d5' }}
-              />
-            </HorizontalContent>
-          ) : (
-            <AccordionOnDetails
-              title={childMenu.name}
-              key={childMenu.id}
-              parent={false}
-              headerContent={
-                <Control
-                  label=""
-                  key={parentMenu.id}
-                  control={<Checkbox checked={false} />}
+        <div>
+          {parentMenu.child.map((childMenu) =>
+            childMenu.child.length === 0 ? (
+              <HorizontalContent>
+                <ChildMenu>{childMenu.name}</ChildMenu>
+                <Checkbox
+                  checked={childMenu.is_checked}
+                  sx={{ color: '#d5d5d5' }}
                 />
-              }
-            >
-              {childMenu.child.map((superChildMenu) => (
-                <HorizontalContent key={superChildMenu.id}>
-                  <SuperChildMenu>{superChildMenu.name}</SuperChildMenu>
-                  <Checkbox
-                    checked={superChildMenu.is_checked}
-                    sx={{ color: '#d5d5d5' }}
+              </HorizontalContent>
+            ) : (
+              <AccordionOnDetails
+                title={childMenu.name}
+                key={childMenu.id}
+                parent={false}
+                headerContent={
+                  <Control
+                    label=""
+                    key={parentMenu.id}
+                    control={<Checkbox checked={false} />}
                   />
-                </HorizontalContent>
-              ))}
-            </AccordionOnDetails>
-          ),
-        )}
+                }
+              >
+                {childMenu.child.map((superChildMenu) => (
+                  <HorizontalContent key={superChildMenu.id}>
+                    <SuperChildMenu>{superChildMenu.name}</SuperChildMenu>
+                    <Checkbox
+                      checked={superChildMenu.is_checked}
+                      sx={{ color: '#d5d5d5' }}
+                    />
+                  </HorizontalContent>
+                ))}
+              </AccordionOnDetails>
+            ),
+          )}
+        </div>
       </AccordionOnDetails>
     ));
   };
@@ -436,7 +438,6 @@ export default function RoleUserDetails(props: RoleUserDetailsProps) {
             selected={[]}
             headCells={headOfTable}
             page={1}
-            totalPage={1}
             onChangePage={(e) => console.log(e)}
             enableCheckBox
           />

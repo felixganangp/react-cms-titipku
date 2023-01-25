@@ -12,7 +12,7 @@ interface DescriptionDetailTypes {
 const DescriptionDetail = (props: DescriptionDetailTypes) => {
   return (
     <Grid container spacing="4px">
-      <Grid item xs={2}>
+      <Grid item xs={2} maxWidth="40px !important">
         {props.icon}
       </Grid>
       <Grid item xs={10}>

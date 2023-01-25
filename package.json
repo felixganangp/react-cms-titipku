@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc & vite build",
     "preview": "vite preview",
     "lint": "yarn run lint:js && yarn run lint:css",
     "lint:css": "stylelint app/**/*.js",
