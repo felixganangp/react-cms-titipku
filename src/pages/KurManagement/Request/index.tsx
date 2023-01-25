@@ -417,7 +417,7 @@ export default function RequestKUR() {
                 >
                   <FormLabel text="Pasar">
                     <FormControl
-                      sx={{ width: 'inherit', maxWidth: '350px', height: 20 }}
+                      sx={{ width: 'inherit', maxWidth: 'inherit', height: 20 }}
                     >
                       <Select
                         multiple
@@ -452,7 +452,7 @@ export default function RequestKUR() {
                   </FormLabel>
                   <FormLabel text="Type">
                     <FormControl
-                      sx={{ width: 'inherit', maxWidth: '350px', height: 20 }}
+                      sx={{ width: 'inherit', maxWidth: 'inherit', height: 20 }}
                     >
                       <Select
                         multiple
@@ -489,12 +489,13 @@ export default function RequestKUR() {
                     <div>
                       <TextField
                         value={
-                          range?.from && range?.to
-                            ? `${format(range.from, 'dd/mm/yyyy')} - ${format(
+                          range?.from && range?.to && range?.from !== range?.to
+                            ? `${format(range.from, 'dd MMM yyyy')} - ${format(
                                 range.to,
-                                'dd/mm/yyyy',
+                                'dd MMM yyyy',
                               )}`
-                            : `${format(today, 'dd/mm/yyyy')}`
+                            : range?.from &&
+                              `${format(range?.from, 'dd MMM yyyy')}`
                         }
                         placeholder={
                           range?.from && range?.to

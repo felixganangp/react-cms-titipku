@@ -34,6 +34,7 @@ import {
   Amount,
 } from '../request.styled';
 import RefusalReason from './components/InputMessage';
+import CustomerData from './components/CustomerData';
 
 interface RequestKURProps {
   id: number;
@@ -43,19 +44,19 @@ const data = [
   {
     id: 1,
     image: PageNotFound,
-    amount: 'Rp 2,000,000.00',
+    amount: 2000000,
     desc: 'Description here',
   },
   {
     id: 2,
     image: PageNotFound,
-    amount: 'Rp 2,000,000.00',
+    amount: 5400000,
     desc: 'Description here',
   },
   {
     id: 3,
     image: PageNotFound,
-    amount: 'Rp 2,100,000.00',
+    amount: 7800000,
     desc: 'Description here',
   },
 ];
@@ -65,7 +66,6 @@ export default function RequestKURDetails(props: RequestKURProps) {
   const { id } = props;
   const formModal = useModal();
   const customerStatus = 3;
-  const [actionMessage, setActionMessage] = useState<string>('');
 
   const headCell = [
     {
@@ -208,75 +208,71 @@ export default function RequestKURDetails(props: RequestKURProps) {
               </CustomerStatusDetail>
             </ProfileContainer>
             <ContentGrid>
-              <Field>
-                <Person2OutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />
-                <DescriptionBox>
-                  <FieldName>Customer ID</FieldName>
-                  <FieldContent>1892</FieldContent>
-                </DescriptionBox>
-              </Field>
+              <CustomerData
+                icon={
+                  <Person2OutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />
+                }
+                fieldName="Customer ID"
+                fieldContent="1892"
+              />
 
-              <Field>
-                <ErrorOutlineOutlinedIcon
-                  sx={{ color: '#008e58', mr: '4px' }}
-                />
-                <DescriptionBox>
-                  <FieldName>NIK</FieldName>
-                  <FieldContent>7351823736857485956</FieldContent>
-                </DescriptionBox>
-              </Field>
+              <CustomerData
+                icon={
+                  <ErrorOutlineOutlinedIcon
+                    sx={{ color: '#008e58', mr: '4px' }}
+                  />
+                }
+                fieldName="NIK"
+                fieldContent="7351823736857485956"
+              />
 
-              <Field>
-                <CalendarTodayOutlinedIcon
-                  sx={{ color: '#008e58', mr: '4px' }}
-                />
-                <DescriptionBox>
-                  <FieldName>Birth Date</FieldName>
-                  <FieldContent>19 August 1992</FieldContent>
-                </DescriptionBox>
-              </Field>
+              <CustomerData
+                icon={
+                  <CalendarTodayOutlinedIcon
+                    sx={{ color: '#008e58', mr: '4px' }}
+                  />
+                }
+                fieldName="Birth Date"
+                fieldContent="19 August 1992"
+              />
 
-              <Field>
-                <EmailOutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />
-                <DescriptionBox>
-                  <FieldName>Email</FieldName>
-                  <FieldContent>customer.email@gmail.com</FieldContent>
-                </DescriptionBox>
-              </Field>
+              <CustomerData
+                icon={
+                  <EmailOutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />
+                }
+                fieldName="Email"
+                fieldContent="customer.email@gmail.com"
+              />
             </ContentGrid>
 
             <ContentGrid>
-              <Field>
-                <CallOutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />
-                <DescriptionBox>
-                  <FieldName>Phone Number</FieldName>
-                  <FieldContent>+62836349393</FieldContent>
-                </DescriptionBox>
-              </Field>
+              <CustomerData
+                icon={<CallOutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />}
+                fieldName="Phone Number"
+                fieldContent="+62836349393"
+              />
 
-              <Field>
-                <LocationOnOutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />
-                <DescriptionBox>
-                  <FieldName>Address (KTP)</FieldName>
-                  <FieldContent>
-                    Foresta Business Loft 2 unit 29, Jl. BSD Raya Utama,
-                    Tangerang, Banten
-                  </FieldContent>
-                </DescriptionBox>
-              </Field>
+              <CustomerData
+                icon={
+                  <LocationOnOutlinedIcon
+                    sx={{ color: '#008e58', mr: '4px' }}
+                  />
+                }
+                fieldName="Address (KTP)"
+                fieldContent="Foresta Business Loft 2 unit 29, Jl. BSD Raya Utama,
+                Tangerang, Banten"
+              />
 
-              <Field>
-                <LocationOnOutlinedIcon
-                  sx={{ color: 'transparent', mr: '4px' }}
-                />
-                <DescriptionBox>
-                  <FieldName>Address (Domicile)</FieldName>
-                  <FieldContent>
-                    Foresta Business Loft 2 unit 29, Jl. BSD Raya Utama,
-                    Tangerang, Banten
-                  </FieldContent>
-                </DescriptionBox>
-              </Field>
+              <CustomerData
+                icon={
+                  <LocationOnOutlinedIcon
+                    sx={{ color: '#008e58', mr: '4px' }}
+                  />
+                }
+                fieldName="Address (Domicile)"
+                fieldContent="Foresta Business Loft 2 unit 29, Jl. BSD Raya Utama,
+                Tangerang, Banten"
+              />
             </ContentGrid>
 
             <ContentGrid>
