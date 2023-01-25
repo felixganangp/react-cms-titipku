@@ -19,7 +19,7 @@ import { EnhancedTableProps, Align } from './types';
 const PaginationStyle = styled(Pagination)`
   button {
     border: 0.8px solid #d5d5d5;
-    color: ${(props: any) => props.theme.palette.primary.main};
+    color: ${(props: any) => props.theme.palette?.primary.main};
     margin: 0;
     margin: 0 2px;
     border-radius: 5px;

@@ -75,7 +75,9 @@ export default function KurCustomer() {
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Card>
-            <Typography variant="titlePage">KUR Customer</Typography>
+            <Typography data-testid="header-page" variant="titlePage">
+              KUR Customer
+            </Typography>
           </Card>
         </Grid>
         <Grid item xs={12}>
@@ -86,6 +88,7 @@ export default function KurCustomer() {
                 sx={{ display: 'flex', gap: 2, alignContent: 'center' }}
               >
                 <Button
+                  data-testid="button-add-customer"
                   sx={{ width: '12%' }}
                   startIcon={<AddIcon />}
                   onClick={formModal.openModal}
@@ -97,6 +100,7 @@ export default function KurCustomer() {
                   sx={{ display: 'flex', justifyContent: 'space-between' }}
                 >
                   <TextField
+                    data-testid="search-customer"
                     placeholder="Search for customer name"
                     size="small"
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px', width: '60%' }}
@@ -119,7 +123,7 @@ export default function KurCustomer() {
               </Box>
             </Box>
 
-            <Collapse in={openFilter}>
+            <Collapse in={openFilter} data-testid="filter-collapse-customer">
               <Grid container spacing={2} sx={{ marginTop: '2rem' }}>
                 <Grid item xs={4}>
                   <Typography
@@ -132,6 +136,7 @@ export default function KurCustomer() {
                     Type
                   </Typography>
                   <Autocomplete
+                    data-testid="filter-type-customer"
                     id="type"
                     options={[]}
                     onChange={(e, value) => {
@@ -162,6 +167,7 @@ export default function KurCustomer() {
                     Pasar
                   </Typography>
                   <TextField
+                    data-testid="filter-pasar-customer"
                     placeholder="Select Pasar"
                     size="small"
                     sx={{ bgcolor: '#fafafa' }}
@@ -186,6 +192,7 @@ export default function KurCustomer() {
                     Credit Score
                   </Typography>
                   <TextField
+                    data-testid="filter-credit-score-customer"
                     placeholder="Credit Score"
                     size="small"
                     sx={{ bgcolor: '#fafafa' }}
@@ -221,6 +228,7 @@ export default function KurCustomer() {
             p="7px"
             borderRadius="5px"
             boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
+            data-testid="table-customer"
           >
             <Table
               data={[]}
