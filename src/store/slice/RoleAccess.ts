@@ -106,6 +106,12 @@ const RoleAccessSlice = createSlice({
     add(state: RoleAccessProps, action: PayloadAction<RoleAccessForm>) {
       state.loadingForm = true;
     },
+    delete(
+      state: RoleAccessProps,
+      action: PayloadAction<{ id: string | number }>,
+    ) {
+      state.loadingForm = true;
+    },
     addRoleUser(state: RoleAccessProps) {
       state.loadingForm = true;
     },

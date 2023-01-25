@@ -343,75 +343,77 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
                   />
                 }
               >
-                {parentMenu.sub_menu !== null &&
-                  parentMenu.sub_menu.map((menu: any) =>
-                    menu.sub_menu !== null ? (
-                      <HorizontalContent>
-                        <Menu>{menu.menu}</Menu>
-                        <Control
-                          label=""
-                          key={menu.id}
-                          control={
-                            <Checkbox
-                              checked={accessMenu[menu.id]}
-                              onChange={(e) => {
-                                handleChangeParentChild(
-                                  e,
-                                  parentMenu.id,
-                                  menu.id,
-                                );
-                              }}
-                            />
-                          }
-                        />
-                      </HorizontalContent>
-                    ) : (
-                      <Box style={{ paddingLeft: '18px' }}>
-                        <AccordionOnDetails
-                          title={menu.menu}
-                          key={menu.id}
-                          parent={false}
-                          havingChild={menu.sub_menu}
-                          headerContent={
-                            <Control
-                              label=""
-                              key={menu.id}
-                              control={
-                                <Checkbox
-                                  checked={accessMenu[menu.id]}
-                                  onChange={(e) => {
-                                    handleChangeParentChild(
-                                      e,
-                                      parentMenu.id,
-                                      menu.id,
-                                    );
-                                  }}
-                                />
-                              }
-                            />
-                          }
-                        >
-                          {menu.child.map((childMenu: any) => (
-                            <HorizontalContent key={childMenu.id}>
-                              <ChildMenu>{childMenu.menu}</ChildMenu>
+                <div>
+                  {parentMenu.sub_menu !== null &&
+                    parentMenu.sub_menu.map((menu: any) =>
+                      menu.sub_menu !== null ? (
+                        <HorizontalContent>
+                          <Menu>{menu.menu}</Menu>
+                          <Control
+                            label=""
+                            key={menu.id}
+                            control={
+                              <Checkbox
+                                checked={accessMenu[menu.id]}
+                                onChange={(e) => {
+                                  handleChangeParentChild(
+                                    e,
+                                    parentMenu.id,
+                                    menu.id,
+                                  );
+                                }}
+                              />
+                            }
+                          />
+                        </HorizontalContent>
+                      ) : (
+                        <Box style={{ paddingLeft: '18px' }}>
+                          <AccordionOnDetails
+                            title={menu.menu}
+                            key={menu.id}
+                            parent={false}
+                            havingChild={menu.sub_menu}
+                            headerContent={
                               <Control
                                 label=""
-                                key={childMenu.id}
+                                key={menu.id}
                                 control={
                                   <Checkbox
-                                    checked={accessMenu[childMenu.id]}
-                                    onChange={(e) =>
-                                      handleChangeAccessMenu(e, childMenu.id)
-                                    }
+                                    checked={accessMenu[menu.id]}
+                                    onChange={(e) => {
+                                      handleChangeParentChild(
+                                        e,
+                                        parentMenu.id,
+                                        menu.id,
+                                      );
+                                    }}
                                   />
                                 }
                               />
-                            </HorizontalContent>
-                          ))}
-                        </AccordionOnDetails>
-                      </Box>
-                    ),
-                  )}
+                            }
+                          >
+                            {menu.child.map((childMenu: any) => (
+                              <HorizontalContent key={childMenu.id}>
+                                <ChildMenu>{childMenu.menu}</ChildMenu>
+                                <Control
+                                  label=""
+                                  key={childMenu.id}
+                                  control={
+                                    <Checkbox
+                                      checked={accessMenu[childMenu.id]}
+                                      onChange={(e) =>
+                                        handleChangeAccessMenu(e, childMenu.id)
+                                      }
+                                    />
+                                  }
+                                />
+                              </HorizontalContent>
+                            ))}
+                          </AccordionOnDetails>
+                        </Box>
+                      ),
+                    )}
+                </div>
               </AccordionOnDetails>
             ))}
           </FormGroup>

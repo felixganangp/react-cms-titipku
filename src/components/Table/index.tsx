@@ -19,7 +19,7 @@ import { EnhancedTableProps, Align } from './types';
 const PaginationStyle = styled(Pagination)`
   button {
     border: 0.8px solid #d5d5d5;
-    color: ${(props: any) => props.theme.palette.primary.main};
+    color: ${(props: any) => props.theme.palette?.primary.main};
     margin: 0;
     margin: 0 2px;
     border-radius: 5px;
@@ -39,10 +39,14 @@ const PaginationStyle = styled(Pagination)`
   }
 `;
 
-function EnhancedTable<T>({
+export interface Data {
+  [key: string]: any;
+}
+
+function EnhancedTable<T extends Data>({
   disableNumber = false,
   enableCheckBox = false,
-  handleRequestSort,
+  onChangeSort,
   selected = [],
   setSelected = () => [],
   orderType = 'asc',
@@ -56,7 +60,7 @@ function EnhancedTable<T>({
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelecteds = props.data.map((n) => n.id);
+      const newSelecteds = props.data.map((n: { id: string }) => n.id);
       setSelected(newSelecteds);
       return;
     }
@@ -65,7 +69,7 @@ function EnhancedTable<T>({
 
   const handleClick = (
     event: React.MouseEvent<unknown>,
-    id: string | number,
+    id: string | number | undefined,
   ) => {
     if (!id) return null;
     const selectedIndex = selected.indexOf(id);
@@ -87,7 +91,7 @@ function EnhancedTable<T>({
     setSelected(newSelected);
   };
 
-  const isSelected = (id: string | number) => {
+  const isSelected = (id: string | number | undefined) => {
     if (!id) return false;
 
     return enableCheckBox ? selected.indexOf(id) !== -1 : false;
@@ -122,6 +126,8 @@ function EnhancedTable<T>({
     return 0;
   };
 
+  const numberSumPages = props.page > 1 ? props.page * 10 - 10 : 0;
+
   return (
     <Box width="100%">
       <TableContainer>
@@ -139,7 +145,7 @@ function EnhancedTable<T>({
             orderType={orderType}
             orderBy={orderBy}
             onSelectAllClick={handleSelectAllClick}
-            onRequestSort={handleRequestSort}
+            onRequestSort={onChangeSort}
             rowCount={props.data.length}
             headCells={props.headCells}
             bgHeader={props.bgHeader}
@@ -148,9 +154,7 @@ function EnhancedTable<T>({
           />
           <TableBody>
             {!props.loading &&
-              // stableSort(props.data, getComparator(orderType, orderBy))
-              //   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              props.data.map((row, index) => {
+              props.data.map((row: T, index: number) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
                 return (
@@ -187,7 +191,7 @@ function EnhancedTable<T>({
                         }}
                         align="center"
                       >
-                        {index + 1}
+                        {index + 1 + numberSumPages}
                       </TableCell>
                     )}
                     {props.headCells.map((val, key) => (
@@ -287,7 +291,9 @@ function EnhancedTable<T>({
           color="primary"
           page={props.page}
           onChange={(_, e) => {
-            props.onChangePage(e);
+            if (props.onChangePage) {
+              props.onChangePage(e);
+            }
           }}
         />
       </Box>
@@ -295,4 +301,7 @@ function EnhancedTable<T>({
   );
 }
 
+EnhancedTable.defaultProps = {
+  page: 1,
+};
 export default EnhancedTable;

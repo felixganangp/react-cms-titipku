@@ -29,6 +29,8 @@ export interface ListParams {
   page?: number;
   count?: number;
   search?: string | undefined | null;
+  order_by?: string | number | null;
+  order_type?: 'asc' | 'desc';
 }
 
 export interface ErrorRespons {

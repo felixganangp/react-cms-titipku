@@ -11,7 +11,7 @@ interface RoleUserProps {
   loading: boolean;
   loadingForm: boolean;
   error?: any;
-  total: number;
+  total: number | undefined;
   params: RoleUserParams;
 }
 
