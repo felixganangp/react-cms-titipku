@@ -50,7 +50,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
     );
     if (isEdit) {
       setInitialValues(data);
-      setTextButton('Edit');
+      setTextButton('Save');
     } else {
       setInitialValues(initial);
     }
@@ -102,12 +102,12 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
     validationSchema: yup.object({
       name: yup
         .string()
+        .required('Please input name')
         .test(
           'len',
           'Maximal character length for name is 100',
           (val: string | undefined) => val !== undefined && val?.length < 101,
-        )
-        .required('Please input name'),
+        ),
       email: yup
         .string()
         .email('Please input a valid email address')
