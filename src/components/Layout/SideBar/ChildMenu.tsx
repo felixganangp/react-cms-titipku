@@ -8,6 +8,9 @@ import ListItemText from '@mui/material/ListItemText';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import Box from '@mui/material/Box';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { CurrentActiveMenu } from 'models/Menu';
+import { userDetailsAction } from 'store/slice/UserDetails';
 
 interface ChildMenuProps {
   child: {
@@ -28,6 +31,15 @@ interface ChildMenuProps {
 export default function ChildMenu(props: ChildMenuProps) {
   const { child, open } = props;
   const [openList, setOpenList] = useState<number | null>(null);
+  const dispatch = useAppDispatch();
+  const currentActiveMenu = useAppSelector(
+    (state) => state.userDetails.currentActiveMenu,
+  );
+
+  const handleChangeActiveMenu = (id: number) => {
+    console.log('calling setCurrentActiveMenu action....');
+    dispatch(userDetailsAction.setCurrentActiveMenu({ id }));
+  };
 
   const toggleOpenList = (item: { id: number }) => {
     if (item.id !== openList) setOpenList(item.id);
@@ -47,12 +59,15 @@ export default function ChildMenu(props: ChildMenuProps) {
             }}
             to={item.path}
             key={item.path}
+            onClick={() => handleChangeActiveMenu(item.id)}
           >
             <ListItemButton
               sx={{
                 margin: '6px 20px',
                 padding: '10px',
                 borderRadius: '8px',
+                backgroundColor:
+                  currentActiveMenu === item.id ? '#ebeff3' : 'transparent',
               }}
             >
               <ListItemIcon sx={{ minWidth: '46px', fontSize: '20px' }} />
@@ -82,6 +97,8 @@ export default function ChildMenu(props: ChildMenuProps) {
                 margin: '6px 14px',
                 padding: '10px',
                 borderRadius: '8px',
+                backgroundColor:
+                  currentActiveMenu === item.id ? '#ebeff3' : 'transparent',
               }}
               onClick={() =>
                 item.child.length === 0 ? (
@@ -134,12 +151,17 @@ export default function ChildMenu(props: ChildMenuProps) {
                         textDecoration: 'none',
                       }}
                       to={superchild.path}
+                      onClick={() => handleChangeActiveMenu(superchild.id)}
                     >
                       <ListItemButton
                         sx={{
                           margin: '6px 20px',
                           padding: '10px',
                           borderRadius: '8px',
+                          backgroundColor:
+                            currentActiveMenu === superchild.id
+                              ? '#ebeff3'
+                              : 'transparent',
                         }}
                       >
                         <ListItemIcon
