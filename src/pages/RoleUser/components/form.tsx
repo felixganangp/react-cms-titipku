@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -11,9 +11,14 @@ import { roleUserAction } from 'store/slice/RoleUser';
 import { roleAccessAction } from 'store/slice/RoleAccess';
 import useToast from 'hooks/useToast';
 import FormLabel from 'components/FormLabel';
-import { CreateRoleUser } from 'models/RoleUser';
+import { CreateRoleUser, CheckValidResponse } from 'models/RoleUser';
 import { RoleAccess } from 'models/RoleAccess';
-import { createAdministrator, editAdministrator } from 'service/Administrator';
+import {
+  createAdministrator,
+  editAdministrator,
+  checkValidEmail,
+} from 'service/Administrator';
+import debounce from 'utils/debounce';
 
 const initial: CreateRoleUser = {
   name: '',
@@ -46,6 +51,8 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
     if (isEdit) {
       setInitialValues(data);
       setTextButton('Edit');
+    } else {
+      setInitialValues(initial);
     }
   }, []);
   const toast = useToast();
@@ -78,15 +85,14 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
             severity: 'success',
           });
         }
-        await onClose();
         await resetForm();
+        await onClose();
       } catch (error: any) {
         let errMsg = error;
         if (errMsg === 'Email already exist') {
           errMsg = 'Email address already registered';
         }
         setErrorRsp({ error: true, message: errMsg });
-        console.log('🚀 ~ file: form.tsx:57 ~ onSubmit: ~ error', errMsg);
       }
       // dispatch(roleUserAction.addRoleUser(payload));
       // if (!roleUserSelector.loadingForm) {
@@ -94,12 +100,24 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
       // }
     },
     validationSchema: yup.object({
-      name: yup.string().required('Name is required'),
+      name: yup
+        .string()
+        .test(
+          'len',
+          'Maximal character length for name is 100',
+          (val: string | undefined) => val !== undefined && val?.length < 101,
+        )
+        .required('Please input name'),
       email: yup
         .string()
         .email('Please input a valid email address')
-        .required('Email is required'),
-      roleAccess: yup.mixed().required('Role access is required'),
+        .matches(
+          // eslint-disable-next-line no-useless-escape
+          /^([a-zA-Z0-9]+)([\.{1}])?([a-zA-Z0-9]+)\@titipku([\.])com/g,
+          'Email domain should be @titipku',
+        )
+        .required('Please input email'),
+      roleAccess: yup.mixed().required('Please select role access'),
     }),
     enableReinitialize: true,
   });
@@ -115,24 +133,54 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
     isValid,
     dirty,
   } = formik;
+  const [loadingEmailValid, setLoadingEmailValid] = useState(true);
+  const handleValidEmail = async (value: string) => {
+    // await dispatch(
+    //   await roleUserAction.checkEmailValid({
+    //     email: value,
+    //     account_type: 'cms',
+    //     excluded_id: 0,
+    //   }),
+    // );
+    if (!isEdit) {
+      const response: CheckValidResponse = await checkValidEmail({
+        email: value,
+        account_type: 'cms',
+        excluded_id: 0,
+      });
+      if (response.data) {
+        await setErrorRsp({
+          error: true,
+          message: 'Email address already registered',
+        });
+      } else {
+        await setLoadingEmailValid(false);
+      }
+    }
+  };
+  const debounceValidEmail = useCallback(debounce(handleValidEmail, 1000), []);
   return (
     <Box>
       <form onSubmit={handleSubmit}>
         <Box sx={{ padding: '24px', margin: 0 }}>
           <FormLabel
             text="Name"
+            required
             error={touched.name && Boolean(errors.name)}
             helperText={touched.name && errors.name && `${errors.name}`}
           >
             <TextField
               type="text"
               name="name"
-              placeholder="Input Category name"
+              placeholder="Input Name"
               value={values.name}
               onChange={handleChange}
               onBlur={handleBlur}
               fullWidth
               disabled={isEdit}
+              inputProps={{
+                maxLength: 100,
+              }}
               sx={{
                 '& .MuiInputBase-input': {
                   backgroundColor: (isEdit && '#f5f7fa') || '',
@@ -142,6 +190,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
           </FormLabel>
           <FormLabel
             text="Email"
+            required
             error={(touched.email && Boolean(errors.email)) || errorRsp.error}
             helperText={
               (touched.email && errors.email && `${errors.email}`) ||
@@ -151,9 +200,11 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
             <TextField
               type="text"
               name="email"
-              placeholder="Input Category name"
+              placeholder="Input Email"
               value={values.email}
               onChange={(event) => {
+                setLoadingEmailValid(true);
+                debounceValidEmail(event.target.value);
                 handleChange(event);
                 setErrorRsp({ error: false, message: '' });
               }}
@@ -169,6 +220,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
           </FormLabel>
           <FormLabel
             text="Role Access"
+            required
             error={touched.roleAccess && Boolean(errors.roleAccess)}
             helperText={
               touched.roleAccess && errors.roleAccess && `${errors.roleAccess}`
@@ -213,10 +265,12 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
           <Button
             type="submit"
             disabled={
-              (!(isValid && dirty) && !isEdit) ||
+              !(isValid && (dirty || isEdit)) ||
               roleUserSelector.loadingForm ||
-              errorRsp.error
+              errorRsp.error ||
+              (!isEdit && loadingEmailValid)
             }
+            color="primary"
           >
             {roleUserSelector.loadingForm ? (
               <CircularProgress size="1rem" />
