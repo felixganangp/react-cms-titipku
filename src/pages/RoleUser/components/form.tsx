@@ -50,7 +50,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
     );
     if (isEdit) {
       setInitialValues(data);
-      setTextButton('Edit');
+      setTextButton('Save');
     } else {
       setInitialValues(initial);
     }
