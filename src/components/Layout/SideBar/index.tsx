@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
@@ -43,7 +44,7 @@ const sidebarData = [
       //   child: [],
       // },
       {
-        id: 150,
+        id: 15,
         title: 'Jatiper',
         path: '/jatiper',
         child: [
@@ -62,7 +63,7 @@ const sidebarData = [
     ],
   },
   {
-    id: 140,
+    id: 14,
     title: 'Lapak',
     path: '',
     icon: <StoreIcon />,
@@ -82,7 +83,7 @@ const sidebarData = [
     ],
   },
   {
-    id: 320,
+    id: 32,
     title: 'Products',
     path: '',
     icon: <StoreIcon />,
@@ -128,7 +129,7 @@ const sidebarData = [
   //   ],
   // },
   {
-    id: 190,
+    id: 19,
     title: 'Application',
     path: '',
     icon: <PhonelinkSetupIcon />,
@@ -160,7 +161,7 @@ const sidebarData = [
     ],
   },
   {
-    id: 290,
+    id: 29,
     title: 'Promo & Voucher',
     path: '',
     icon: <ConfirmationNumberIcon />,
@@ -198,7 +199,7 @@ const sidebarData = [
     ],
   },
   {
-    id: 80,
+    id: 8,
     title: 'Service & Request',
     path: '',
     icon: <HeadsetMicIcon />,
@@ -262,7 +263,7 @@ const sidebarData = [
         child: [],
       },
       {
-        id: 0,
+        id: 100,
         title: 'Role Access',
         path: '/role-access',
         child: [],
@@ -282,9 +283,21 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
   };
 
   useEffect(() => {
-    const filtered = sidebarData.filter(
-      (item) => menuData.find((menu) => menu.id === item.id) !== undefined,
-    );
+    const filtered: FilteredMenu[] = [...sidebarData];
+    filtered.map((menu, i) => {
+      if (menuData.find((item) => item.id === menu.id) === undefined)
+        filtered.splice(i, 1);
+      else {
+        menu.child.map((childMenu, j) => {
+          if (
+            menuData.find((subitem) => subitem.id === childMenu.id) ===
+              undefined &&
+            childMenu.id !== 100
+          )
+            filtered[i].child.splice(j, 1);
+        });
+      }
+    });
     setFilteredMenu(filtered);
   }, [menuData]);
 
@@ -303,7 +316,7 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
       >
         <SideBarProfile value={profileData} />
       </Box>
-      <Menu listOfMenu={sidebarData} open={open} />
+      <Menu listOfMenu={filteredMenu} open={open} />
     </>
   );
 
