@@ -237,13 +237,13 @@ const sidebarData = [
     ],
   },
   {
-    id: 14,
+    id: 101,
     title: 'KUR',
     path: '',
     icon: <LocalAtmIcon />,
     child: [
       {
-        id: 15,
+        id: 102,
         title: 'Customer',
         path: '/kur/customer',
         child: [],
@@ -285,14 +285,17 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
   useEffect(() => {
     const filtered: FilteredMenu[] = [...sidebarData];
     filtered.map((menu, i) => {
-      if (menuData.find((item) => item.id === menu.id) === undefined)
+      if (
+        menuData.find((item) => item.id === menu.id) === undefined &&
+        menu.id.toString().length !== 3
+      )
         filtered.splice(i, 1);
       else {
         menu.child.map((childMenu, j) => {
           if (
             menuData.find((subitem) => subitem.id === childMenu.id) ===
               undefined &&
-            childMenu.id !== 100
+            childMenu.id.toString().length !== 3
           )
             filtered[i].child.splice(j, 1);
         });
