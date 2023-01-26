@@ -78,12 +78,13 @@ export default function RoleAccesPage() {
   };
 
   // form
-  const [editValue, setEditValue] = useState<RoleAccess | null>({
-    account_type: '',
-    id: 0,
-    is_exist: true,
-    name: '',
-  });
+  // const [editValue, setEditValue] = useState<RoleAccess | null>({
+  //   account_type: '',
+  //   id: 0,
+  //   is_exist: true,
+  //   name: '',
+  // });
+  const [editValue, setEditValue] = useState<RoleAccess | null>(null);
 
   const headCell: HeadCells<RoleAccess>[] = [
     {
