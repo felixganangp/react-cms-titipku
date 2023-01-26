@@ -9,6 +9,8 @@ import ListItemText from '@mui/material/ListItemText';
 import { Link } from 'react-router-dom';
 import Collapse from '@mui/material/Collapse';
 import Box from '@mui/material/Box';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { userDetailsAction } from 'store/slice/UserDetails';
 import ChildMenu from './ChildMenu';
 
 const IconButton = styled.nav`
@@ -42,6 +44,10 @@ interface MenuProps {
 function Menu(props: MenuProps) {
   const { listOfMenu, open } = props;
   const [openList, setOpenList] = useState(0);
+  const dispatch = useAppDispatch();
+  const currentActiveMenu = useAppSelector(
+    (state) => state.userDetails.currentActiveMenu,
+  );
 
   const iconOpened = <ExpandMore sx={{ fontSize: '20px', color: '#626b79' }} />;
   const iconClosed = <ExpandLess sx={{ fontSize: '20px', color: '#626b79' }} />;
@@ -51,16 +57,29 @@ function Menu(props: MenuProps) {
     else setOpenList(0);
   };
 
+  const handleChangeActiveMenu = (id: number) => {
+    dispatch(userDetailsAction.setCurrentActiveMenu({ id }));
+  };
+
   return (
     <List dense>
       {listOfMenu?.map((menu) =>
         menu?.child?.length === 0 ? (
-          <Link key={menu.id} style={{ textDecoration: 'none' }} to={menu.path}>
+          <Link
+            key={menu.id}
+            style={{
+              textDecoration: 'none',
+            }}
+            to={menu.path}
+            onClick={() => handleChangeActiveMenu(menu.id)}
+          >
             <ListItemButton
               sx={{
                 margin: '6px 14px',
                 padding: '10px',
                 borderRadius: '8px',
+                backgroundColor:
+                  currentActiveMenu === menu.id ? '#ebeff3' : 'transparent',
               }}
               key={menu.id}
             >
@@ -152,7 +171,13 @@ function Menu(props: MenuProps) {
                   marginLeft: '0px',
                 }}
               >
-                <ChildMenu key={menu.id} child={menu.child} open={open} />
+                <ChildMenu
+                  key={menu.id}
+                  child={menu.child}
+                  open={open}
+                  onSetCurrentMenu={handleChangeActiveMenu}
+                  currentActiveMenu={currentActiveMenu}
+                />
               </Box>
             </Collapse>
           </div>

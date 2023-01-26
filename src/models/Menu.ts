@@ -45,3 +45,7 @@ export interface FilteredMenu {
     }[];
   }[];
 }
+
+export interface CurrentActiveMenu {
+  id: number;
+}

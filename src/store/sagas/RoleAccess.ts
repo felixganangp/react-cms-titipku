@@ -10,8 +10,9 @@ import RoleAccessForm, {
 import * as service from 'service/AdministratorRole';
 import { uiAction } from 'store/slice/ui';
 import { roleAccessAction } from 'store/slice/RoleAccess';
-import { Menu } from 'models/Menu';
+import { Menu, MenuParams } from 'models/Menu';
 
+import { userDetailsAction } from 'store/slice/UserDetails';
 import { IsExistResponse, MenuListParam } from '../../models/fetch';
 
 function* addRoleAccess(body: PayloadAction<RoleAccessForm>) {
@@ -49,7 +50,11 @@ function* updateRoleAccess(payload: PayloadAction<RoleAccessForm>) {
     const params: RoleAccessParams = yield select(
       (state) => state.roleAccess.params,
     );
+    const menuParams: MenuParams = yield select(
+      (state) => state.userDetails.menuParams,
+    );
     yield call(service.updateRoleAccess, payload.payload);
+    yield put(userDetailsAction.fetchMenu(menuParams));
     yield put(roleAccessAction.fetchData(params));
   } catch (err) {
     const headMessage = 'Failed Update Role Access';

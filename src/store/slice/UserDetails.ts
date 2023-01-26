@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { UserDetails } from 'models/UserDetails';
-import { ListResponse, MenuListParam, Response } from 'models/fetch';
-import { Menu, SideBarMenu } from 'models/Menu';
+import { MenuListParam, Response } from 'models/fetch';
+import { CurrentActiveMenu, SideBarMenu } from 'models/Menu';
 import { MenuParams } from '../../models/Menu';
 
 export interface UserDetailsProps {
@@ -11,6 +11,7 @@ export interface UserDetailsProps {
   loadingMenu: boolean;
   error?: any;
   menuParams: MenuListParam;
+  currentActiveMenu: number;
 }
 
 const initialState: UserDetailsProps = {
@@ -24,6 +25,7 @@ const initialState: UserDetailsProps = {
     account_type: 'cms',
     role_id: 0,
   },
+  currentActiveMenu: 0,
 };
 
 const UserDetailsSlice = createSlice({
@@ -53,6 +55,12 @@ const UserDetailsSlice = createSlice({
         ...state.menuParams,
         ...action.payload,
       };
+    },
+    setCurrentActiveMenu(
+      state: UserDetailsProps,
+      action: PayloadAction<CurrentActiveMenu>,
+    ) {
+      state.currentActiveMenu = action.payload.id;
     },
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fetchMenu(state: UserDetailsProps, action: PayloadAction<MenuParams>) {
