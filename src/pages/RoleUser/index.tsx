@@ -258,8 +258,8 @@ export default function RoleUser() {
       </Box>
       <Modal
         open={formModal.open}
-        title={`${formData.isEdit ? 'Edit ' : 'Add '}New Role User`}
-        onClose={formModal.closeModal}
+        title={`${formData.isEdit ? 'Edit ' : 'Add New '} Role User`}
+        onClose={onCloseForm}
       >
         <FormRoleUser
           onClose={onCloseForm}

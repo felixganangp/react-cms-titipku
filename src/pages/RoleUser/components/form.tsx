@@ -51,6 +51,8 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
     if (isEdit) {
       setInitialValues(data);
       setTextButton('Edit');
+    } else {
+      setInitialValues(initial);
     }
   }, []);
   const toast = useToast();
@@ -263,7 +265,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
           <Button
             type="submit"
             disabled={
-              (!(isValid && dirty) && !isEdit) ||
+              !(isValid && (dirty || isEdit)) ||
               roleUserSelector.loadingForm ||
               errorRsp.error ||
               (!isEdit && loadingEmailValid)
