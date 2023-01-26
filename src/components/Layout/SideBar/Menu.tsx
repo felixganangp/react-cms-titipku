@@ -58,7 +58,6 @@ function Menu(props: MenuProps) {
   };
 
   const handleChangeActiveMenu = (id: number) => {
-    console.log('calling setCurrentActiveMenu action....');
     dispatch(userDetailsAction.setCurrentActiveMenu({ id }));
   };
 
@@ -172,7 +171,13 @@ function Menu(props: MenuProps) {
                   marginLeft: '0px',
                 }}
               >
-                <ChildMenu key={menu.id} child={menu.child} open={open} />
+                <ChildMenu
+                  key={menu.id}
+                  child={menu.child}
+                  open={open}
+                  onSetCurrentMenu={handleChangeActiveMenu}
+                  currentActiveMenu={currentActiveMenu}
+                />
               </Box>
             </Collapse>
           </div>

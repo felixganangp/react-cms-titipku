@@ -26,20 +26,17 @@ interface ChildMenuProps {
       | [];
   }[];
   open: boolean;
+  onSetCurrentMenu: (id: number) => void;
+  currentActiveMenu: number;
 }
 
-export default function ChildMenu(props: ChildMenuProps) {
-  const { child, open } = props;
+export default function ChildMenu({
+  child,
+  open,
+  onSetCurrentMenu,
+  currentActiveMenu,
+}: ChildMenuProps) {
   const [openList, setOpenList] = useState<number | null>(null);
-  const dispatch = useAppDispatch();
-  const currentActiveMenu = useAppSelector(
-    (state) => state.userDetails.currentActiveMenu,
-  );
-
-  const handleChangeActiveMenu = (id: number) => {
-    console.log('calling setCurrentActiveMenu action....');
-    dispatch(userDetailsAction.setCurrentActiveMenu({ id }));
-  };
 
   const toggleOpenList = (item: { id: number }) => {
     if (item.id !== openList) setOpenList(item.id);
@@ -59,7 +56,7 @@ export default function ChildMenu(props: ChildMenuProps) {
             }}
             to={item.path}
             key={item.path}
-            onClick={() => handleChangeActiveMenu(item.id)}
+            onClick={() => onSetCurrentMenu(item.id)}
           >
             <ListItemButton
               sx={{
@@ -151,7 +148,7 @@ export default function ChildMenu(props: ChildMenuProps) {
                         textDecoration: 'none',
                       }}
                       to={superchild.path}
-                      onClick={() => handleChangeActiveMenu(superchild.id)}
+                      onClick={() => onSetCurrentMenu(superchild.id)}
                     >
                       <ListItemButton
                         sx={{

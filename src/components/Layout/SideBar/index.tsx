@@ -282,18 +282,11 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
   };
 
   useEffect(() => {
-    const filtered: FilteredMenu[] = sidebarData.filter(
+    const filtered = sidebarData.filter(
       (item) => menuData.find((menu) => menu.id === item.id) !== undefined,
     );
-    const filtered2: FilteredMenu[] = [...sidebarData];
-    filtered2.map((menu, i) =>
-      filtered2[i].child.filter(
-        (child) => menuData.find((a) => a.id === child.id) !== undefined,
-      ),
-    );
-    console.log(filteredMenu);
     setFilteredMenu(filtered);
-  }, []);
+  }, [menuData]);
 
   const drawerContent = (
     <>
