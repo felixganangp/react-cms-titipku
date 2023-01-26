@@ -28,7 +28,7 @@ export default function GoogleOauth() {
         'auth',
         `{"token": "${decodedJWT.raw}", "email": "${decodedJWT.payload.email}", "id": "${decodedJWT.payload.id_admin}"}`,
       );
-      window.opener.location.href = `/role-user${window.location.search}`;
+      window.opener.location.href = `/${window.location.search}`;
     }
     if (getSuccess[0] === 'false') {
       window.opener.location.href = `/sign-in${window.location.search}`;

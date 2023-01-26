@@ -1,10 +1,7 @@
 import React, { useRef, useState } from 'react';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
-import { Checkbox } from '@mui/material';
-import Box from '@mui/material/Box';
 import {
   ButtonAccordion,
-  Content,
   HeaderBox,
   Icon,
   Title,
@@ -40,7 +37,7 @@ export default function AccordionOnDetails(props: AccordionOnDetailsProps) {
   return (
     <Wrapper>
       <HeaderBox parent={parent}>
-        <ButtonAccordion onClick={toggleClick} parent={parent}>
+        <ButtonAccordion onClick={toggleClick} parent={parent} type="button">
           <Icon rotate={isOpen ? 1 : 0}>
             <KeyboardArrowRightIcon
               sx={{

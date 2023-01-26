@@ -16,6 +16,7 @@ import Popper from '@mui/material/Popper';
 import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOutlined';
 import { Link } from 'react-router-dom';
 import SideBarHeader from '../SideBar/Header';
+import { UserDetails } from '../../../models/UserDetails';
 import {
   EmailDetails,
   EmailHeader,
@@ -30,15 +31,10 @@ import {
 interface TopBarInterface {
   open: boolean;
   onLogoClick(): void;
-  userDetails: {
-    email: string;
-    fullName: string;
-    roleName: string;
-  };
+  userDetails: UserDetails | null;
 }
 
-const TopBar = (props: TopBarInterface) => {
-  const { open, onLogoClick, userDetails } = props;
+const TopBar = ({ open, onLogoClick, userDetails }: TopBarInterface) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const menuActions = useRef(null);
@@ -132,7 +128,7 @@ const TopBar = (props: TopBarInterface) => {
 
                   <Stack sx={{ marginLeft: '8px' }}>
                     <UsernameHeader>
-                      {userDetails ? userDetails.fullName : 'loading...'}
+                      {userDetails ? userDetails.full_name : 'loading...'}
                     </UsernameHeader>
                     <EmailHeader>
                       {userDetails ? userDetails.email : 'loading...'}
@@ -177,14 +173,14 @@ const TopBar = (props: TopBarInterface) => {
                     />
                     <Stack style={{ marginTop: '5%', paddingLeft: '2%' }}>
                       <Username>
-                        {userDetails ? userDetails.fullName : 'loading...'}
+                        {userDetails?.full_name || 'loading...'}
                       </Username>
                       <EmailDetails ml="7px">
-                        {userDetails ? userDetails.email : 'loading...'}
+                        {userDetails?.email || 'loading...'}
                       </EmailDetails>
                       <Role>
                         {userDetails
-                          ? `\u2022  ${userDetails.roleName}`
+                          ? `\u2022  ${userDetails?.administrator_detail[0].administrator_role.name}`
                           : 'loading...'}
                       </Role>
                     </Stack>

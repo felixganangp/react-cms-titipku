@@ -1,5 +1,6 @@
 import http from 'utils/request';
 import RoleAccessForm from '../models/RoleAccess';
+import { MenuParams } from '../models/Menu';
 
 export const fetchAdministratorRole = (params: any) =>
   new Promise(async (resolve, reject) => {
@@ -74,7 +75,7 @@ export const updateRoleAccess = (params: RoleAccessForm) =>
     }
   });
 
-export const fetchAdministratorControl = (params: any) =>
+export const fetchAdministratorControl = (params: MenuParams) =>
   new Promise(async (resolve, reject) => {
     try {
       const respon = await http.get(`/administrator/control`, {
