@@ -83,8 +83,8 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
             severity: 'success',
           });
         }
-        await onClose();
         await resetForm();
+        await onClose();
       } catch (error: any) {
         let errMsg = error;
         if (errMsg === 'Email already exist') {
@@ -98,12 +98,24 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
       // }
     },
     validationSchema: yup.object({
-      name: yup.string().required('Name is required'),
+      name: yup
+        .string()
+        .test(
+          'len',
+          'Maximal character length for name is 100',
+          (val: string | undefined) => val !== undefined && val?.length < 101,
+        )
+        .required('Please input name'),
       email: yup
         .string()
         .email('Please input a valid email address')
-        .required('Email is required'),
-      roleAccess: yup.mixed().required('Role access is required'),
+        .matches(
+          // eslint-disable-next-line no-useless-escape
+          /^([a-zA-Z0-9]+)([\.{1}])?([a-zA-Z0-9]+)\@titipku([\.])com/g,
+          'Email domain should be @titipku',
+        )
+        .required('Please input email'),
+      roleAccess: yup.mixed().required('Please select role access'),
     }),
     enableReinitialize: true,
   });
@@ -128,18 +140,20 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
     //     excluded_id: 0,
     //   }),
     // );
-    const response: CheckValidResponse = await checkValidEmail({
-      email: value,
-      account_type: 'cms',
-      excluded_id: 0,
-    });
-    if (response.data) {
-      await setErrorRsp({
-        error: true,
-        message: 'Email address already registered',
+    if (!isEdit) {
+      const response: CheckValidResponse = await checkValidEmail({
+        email: value,
+        account_type: 'cms',
+        excluded_id: 0,
       });
-    } else {
-      await setLoadingEmailValid(false);
+      if (response.data) {
+        await setErrorRsp({
+          error: true,
+          message: 'Email address already registered',
+        });
+      } else {
+        await setLoadingEmailValid(false);
+      }
     }
   };
   const debounceValidEmail = useCallback(debounce(handleValidEmail, 1000), []);
@@ -149,18 +163,22 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
         <Box sx={{ padding: '24px', margin: 0 }}>
           <FormLabel
             text="Name"
+            required
             error={touched.name && Boolean(errors.name)}
             helperText={touched.name && errors.name && `${errors.name}`}
           >
             <TextField
               type="text"
               name="name"
-              placeholder="Input Category name"
+              placeholder="Input Name"
               value={values.name}
               onChange={handleChange}
               onBlur={handleBlur}
               fullWidth
               disabled={isEdit}
+              inputProps={{
+                maxLength: 100,
+              }}
               sx={{
                 '& .MuiInputBase-input': {
                   backgroundColor: (isEdit && '#f5f7fa') || '',
@@ -170,6 +188,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
           </FormLabel>
           <FormLabel
             text="Email"
+            required
             error={(touched.email && Boolean(errors.email)) || errorRsp.error}
             helperText={
               (touched.email && errors.email && `${errors.email}`) ||
@@ -179,7 +198,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
             <TextField
               type="text"
               name="email"
-              placeholder="Input Category name"
+              placeholder="Input Email"
               value={values.email}
               onChange={(event) => {
                 setLoadingEmailValid(true);
@@ -199,6 +218,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
           </FormLabel>
           <FormLabel
             text="Role Access"
+            required
             error={touched.roleAccess && Boolean(errors.roleAccess)}
             helperText={
               touched.roleAccess && errors.roleAccess && `${errors.roleAccess}`
@@ -246,8 +266,9 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
               (!(isValid && dirty) && !isEdit) ||
               roleUserSelector.loadingForm ||
               errorRsp.error ||
-              loadingEmailValid
+              (!isEdit && loadingEmailValid)
             }
+            color="primary"
           >
             {roleUserSelector.loadingForm ? (
               <CircularProgress size="1rem" />

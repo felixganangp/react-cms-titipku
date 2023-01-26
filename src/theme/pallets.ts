@@ -18,6 +18,14 @@ export const light: PaletteOptions = {
     primary: '#008E58',
     secondary: '#0774D1',
   },
+
+  error: {
+    main: '#c10000',
+  },
+
+  success: {
+    main: '#008E58',
+  },
 };
 
 export const dark: PaletteOptions = {
@@ -34,6 +42,14 @@ export const dark: PaletteOptions = {
   example: {
     primary: '#008E58',
     secondary: '#0774D1',
+  },
+
+  error: {
+    main: '#c10000',
+  },
+
+  success: {
+    main: '#008E58',
   },
 };
 
