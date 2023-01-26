@@ -18,6 +18,21 @@ export const fetchAdministratorRole = (params: any) =>
     }
   });
 
+export const fetchAdministratorRoleDetails = (id: number | string) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`/administrator/role/${id}`);
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
 export const createAdministratorRole = (body: RoleAccessForm) =>
   new Promise(async (resolve, reject) => {
     try {

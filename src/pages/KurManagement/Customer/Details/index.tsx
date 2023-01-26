@@ -3,8 +3,6 @@ import React from 'react';
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
 import { Link } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
 
@@ -16,6 +14,8 @@ import Status from 'components/Status';
 
 import TypesIcon from 'components/Icon/Types';
 import PhoneIcon from '@mui/icons-material/Phone';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';

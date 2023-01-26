@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import TextField from '@mui/material/TextField';
 import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
 
 import Table from 'components/Table';
 import { HeadCells } from 'components/Table/types';
@@ -18,15 +19,13 @@ import debounce from 'utils/debounce';
 import moment from 'moment';
 
 import AddIcon from '@mui/icons-material/Add';
-import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 // import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { roleUserAction } from 'store/slice/RoleUser';
-import { RoleAccess } from 'models/RoleAccess';
-import { CreateRoleUser } from 'models/RoleUser';
+import { CreateRoleUser, RoleUser as RoleUserTypes } from 'models/RoleUser';
 import FormRoleUser from './components/form';
 
 import { Bullet } from './roleuser.styled';
@@ -52,6 +51,7 @@ export default function RoleUser() {
         account_type: 'cms',
         is_exist: true,
         name: '',
+        total_admin: 0,
       },
     },
   });
@@ -114,17 +114,19 @@ export default function RoleUser() {
     );
   };
 
-  const headCell: HeadCells<RoleAccess>[] = [
+  const headCell: HeadCells<RoleUserTypes>[] = [
     {
       id: 'full_name',
       label: 'Name',
       align: 'left',
       enableSort: true,
+      isSticky: true,
     },
     {
       id: 'email',
       label: 'Email',
       align: 'left',
+      isSticky: true,
     },
     {
       id: 'role',
@@ -263,13 +265,6 @@ export default function RoleUser() {
                 orderType={roleUser.params.order_type}
                 onChangePage={(page) => handleChangePage(page)}
                 onChangeSort={(value) => handleChangeSort(value)}
-
-                // handleRequestSort={(e) => {
-                //   setOrderBy(e.orderBy);
-                //   setOrderType(e.orderType);
-                // }}
-                // orderType={orderType}
-                // orderBy={orderBy}
               />
             </Box>
           </Grid>

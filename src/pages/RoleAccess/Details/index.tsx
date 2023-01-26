@@ -1,347 +1,158 @@
+import React, { useEffect, useState, useCallback } from 'react';
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
-import React from 'react';
 import Grid from '@mui/material/Grid';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
-import Checkbox from '@mui/material/Checkbox';
+import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
-import SearchIcon from '@mui/icons-material/Search';
-import { Link } from 'react-router-dom';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Table from 'components/Table';
-import AccordionOnDetails from 'components/Accordion/Details';
-import FileDownload from 'assets/file-download-outline.svg';
-import SubDetailsPagesWrapper from 'components/Accordion/SubDetailsPagesWrapper';
+import Checkbox from '@mui/material/Checkbox';
 
+import Table from 'components/Table';
+import { HeadCells } from 'components/Table/types';
+import SubDetailsPagesWrapper from 'components/Accordion/SubDetailsPagesWrapper';
+import DescDetails from 'components/DescDetails';
+import Status from 'components/Status';
+import AccordionOnDetails from 'components/Accordion/Details';
+import debounce from 'utils/debounce';
+import moment from 'moment';
+
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
+import SearchIcon from '@mui/icons-material/Search';
+
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { roleAccessAction } from 'store/slice/RoleAccess';
+import { roleUserAction } from 'store/slice/RoleUser';
+import { RoleUser as RoleUserTypes } from 'models/RoleUser';
+
+import { Bullet } from 'pages/RoleUser/roleuser.styled';
+import { Link, useParams } from 'react-router-dom';
+import { Typography } from '@mui/material';
 import {
-  TitleWrapper,
-  ContentWrapper,
-  TableWrapper,
   TitlePage,
-  ContentGrid,
-  FieldBox,
-  DescriptionBox,
-  HorizontalContent,
   BackButton,
-  FieldName,
-  FieldContent,
   Menu,
-  ChildMenu,
-  SuperChildMenu,
-  TablesProperty,
-  Search,
-  DownloadButton,
+  HorizontalContent,
   Control,
+  ChildMenu,
 } from './details.styled';
 
-interface RoleUserDetailsProps {
-  id: number;
-}
+export default function RoleUserDetails() {
+  const { id } = useParams();
+  const dispatch = useAppDispatch();
+  const roleAccesses = useAppSelector((state) => state.roleAccess);
+  const listOfMenu = useAppSelector((state: any) => state.roleAccess.menuData);
 
-const listOfMenu = [
-  {
-    id: 1,
-    name: 'Admin Panel',
-    is_checked: false,
-    child: [
-      {
-        id: 2,
-        name: 'Role User',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 3,
-        name: 'Role Access',
-        is_checked: false,
-        child: [],
-      },
-    ],
-  },
-  {
-    id: 4,
-    name: 'Products',
-    is_checked: false,
-    child: [
-      {
-        id: 5,
-        name: 'Product Mangement',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 6,
-        name: 'SKU Management',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 7,
-        name: 'Category Management',
-        is_checked: false,
-        child: [],
-      },
-    ],
-  },
-  {
-    id: 8,
-    name: 'Lapak',
-    is_checked: false,
-    child: [
-      {
-        id: 9,
-        name: 'Area',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 10,
-        name: 'Lapak',
-        is_checked: false,
-        child: [],
-      },
-    ],
-  },
-  {
-    id: 11,
-    name: 'User',
-    is_checked: false,
-    child: [
-      {
-        id: 12,
-        name: 'Nitiper',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 13,
-        name: 'Jatiper',
-        is_checked: false,
-        child: [
-          {
-            id: 14,
-            name: 'Jatiper Management',
-            is_checked: false,
-          },
-          {
-            id: 15,
-            name: 'Jatiper Registration',
-            is_checked: false,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 16,
-    name: 'Transaction',
-    is_checked: false,
-    child: [
-      {
-        id: 17,
-        name: 'Transaction',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 18,
-        name: 'Urgent Order',
-        is_checked: false,
-        child: [],
-      },
-    ],
-  },
-  {
-    id: 19,
-    name: 'Application',
-    is_checked: false,
-    child: [
-      {
-        id: 20,
-        name: 'Notification',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 21,
-        name: 'Banner',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 22,
-        name: 'Event',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 23,
-        name: 'Giveaway',
-        is_checked: false,
-        child: [],
-      },
-    ],
-  },
-  {
-    id: 24,
-    name: 'Promo & Voucher',
-    is_checked: false,
-    child: [
-      {
-        id: 25,
-        name: 'Promo Product',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 26,
-        name: 'Join Promo',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 27,
-        name: 'Voucher',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 28,
-        name: 'Mass Voucher',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 29,
-        name: 'Giveaway',
-        is_checked: false,
-        child: [],
-      },
-    ],
-  },
-  {
-    id: 30,
-    name: 'Request',
-    is_checked: false,
-    child: [
-      {
-        id: 31,
-        name: 'Withdraw Request',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 32,
-        name: 'Join Promo Request',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 33,
-        name: 'New Product Request',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 34,
-        name: 'Master Data Config',
-        is_checked: false,
-        child: [],
-      },
-      {
-        id: 35,
-        name: 'App Service',
-        is_checked: false,
-        child: [],
-      },
-    ],
-  },
-];
+  const roleUser = useAppSelector((state) => state.roleUser);
+  const [accessMenu, setAccessMenu] = useState<{ [id: number]: boolean }>({});
 
-export default function RoleUserDetails(props: RoleUserDetailsProps) {
-  const { id } = props;
+  useEffect(() => {
+    if (id) {
+      dispatch(roleAccessAction.fetchDataDetail({ id }));
+      // eslint-disable-next-line radix
+    }
+  }, []);
 
-  const contentOfTable = [
+  useEffect(() => {
+    dispatch(roleUserAction.fetchData({ ...roleUser.params, id_role: id }));
+  }, [roleUser.params]);
+
+  useEffect(() => {
+    // for checked attribute on checkbox
+    const access: { [x: number]: boolean } = {};
+    if (listOfMenu !== undefined) {
+      for (let i = 0; i < listOfMenu.length; i += 1) {
+        access[listOfMenu[i].id] = listOfMenu[i].is_checked;
+        if (listOfMenu[i].sub_menu !== null) {
+          for (let a = 0; a < listOfMenu[i].sub_menu.length; a += 1) {
+            access[listOfMenu[i].sub_menu[a].id] =
+              listOfMenu[i].sub_menu[a].is_checked;
+          }
+        }
+      }
+    }
+    setAccessMenu({ ...access });
+  }, [listOfMenu]);
+
+  const handleSearch = (value: string) => {
+    dispatch(
+      roleUserAction.setParams({
+        account_type: 'cms',
+        page: 1,
+        search: value,
+      }),
+    );
+  };
+  const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
+
+  const handleChangePage = (value: number) => {
+    dispatch(
+      roleUserAction.setParams({
+        account_type: 'cms',
+        page: value,
+      }),
+    );
+  };
+
+  const handleChangeSort = (value: {
+    orderBy: string | number;
+    orderType: 'asc' | 'desc';
+  }) => {
+    dispatch(
+      roleUserAction.setParams({
+        account_type: 'cms',
+        page: 1,
+        order_by: value.orderBy,
+        order_type: value.orderType,
+      }),
+    );
+  };
+
+  const headCell: HeadCells<RoleUserTypes>[] = [
     {
-      name: 'Full Name 1',
-      email: 'full.name@titipku.com',
-      lastUpdate: 'January 8, 2022 12.00 AM',
-    },
-  ];
-
-  const headOfTable = [
-    {
-      id: 'name',
+      id: 'full_name',
       label: 'Name',
       align: 'left',
+      enableSort: true,
+      isSticky: true,
     },
     {
       id: 'email',
-      label: 'Email Address',
+      label: 'Email',
       align: 'left',
+      isSticky: true,
     },
     {
-      id: 'lastUpdate',
+      id: 'role',
+      label: 'Role',
+      align: 'left',
+      enableSort: true,
+      format: (val: any) => (
+        <Bullet>{`\u2022  ${val.administrator_detail[0].administrator_role.name}`}</Bullet>
+      ),
+    },
+    {
+      id: 'updated_at',
       label: 'Last Update',
       align: 'left',
+      enableSort: true,
+      format: (val: any) => {
+        return (
+          <p>{moment.unix(val.updated_at).format('MMMM DD, YYYY hh.mm A')}</p>
+        );
+      },
+    },
+    {
+      id: 'status',
+      label: 'Status',
+      align: 'left',
+      enableSort: true,
+      format: (val: any) => (
+        <Status color="rgba(0,0,0,0.3)">
+          {val.administrator_detail[0].administrator_status.name}
+        </Status>
+      ),
     },
   ];
-
-  const renderListOfMenu = () => {
-    return listOfMenu.map((parentMenu) => (
-      <AccordionOnDetails
-        title={parentMenu.name}
-        key={parentMenu.id}
-        parent
-        headerContent={
-          <Control
-            label=""
-            key={parentMenu.id}
-            control={<Checkbox checked={false} />}
-          />
-        }
-      >
-        <div>
-          {parentMenu.child.map((childMenu) =>
-            childMenu.child.length === 0 ? (
-              <HorizontalContent>
-                <ChildMenu>{childMenu.name}</ChildMenu>
-                <Checkbox
-                  checked={childMenu.is_checked}
-                  sx={{ color: '#d5d5d5' }}
-                />
-              </HorizontalContent>
-            ) : (
-              <AccordionOnDetails
-                title={childMenu.name}
-                key={childMenu.id}
-                parent={false}
-                headerContent={
-                  <Control
-                    label=""
-                    key={parentMenu.id}
-                    control={<Checkbox checked={false} />}
-                  />
-                }
-              >
-                {childMenu.child.map((superChildMenu) => (
-                  <HorizontalContent key={superChildMenu.id}>
-                    <SuperChildMenu>{superChildMenu.name}</SuperChildMenu>
-                    <Checkbox
-                      checked={superChildMenu.is_checked}
-                      sx={{ color: '#d5d5d5' }}
-                    />
-                  </HorizontalContent>
-                ))}
-              </AccordionOnDetails>
-            ),
-          )}
-        </div>
-      </AccordionOnDetails>
-    ));
-  };
 
   return (
     <div>
@@ -361,87 +172,173 @@ export default function RoleUserDetails(props: RoleUserDetailsProps) {
             </Card>
           </Grid>
         </Grid>
-        {/* BASIC INFO */}
-        <TitleWrapper>
-          <ExpandMore sx={{ marginRight: '5px' }} />
-          <span>Basic Info</span>
-        </TitleWrapper>
-        <ContentWrapper>
-          <ContentGrid container spacing={1}>
-            <FieldBox>
-              <Person2OutlinedIcon
-                sx={{ color: '#008e58', marginRight: '4px' }}
-              />
-              <DescriptionBox>
-                <FieldName>ID</FieldName>
-                <FieldContent>1</FieldContent>
-              </DescriptionBox>
-            </FieldBox>
-
-            <FieldBox>
-              <Person2OutlinedIcon
-                sx={{ color: '#008e58', marginRight: '4px' }}
-              />
-              <DescriptionBox>
-                <FieldName>Role Access Name</FieldName>
-                <FieldContent>Super Admin</FieldContent>
-              </DescriptionBox>
-            </FieldBox>
-
-            <FieldBox>
-              <Person2OutlinedIcon
-                sx={{ color: '#008e58', marginRight: '4px' }}
-              />
-              <DescriptionBox>
-                <FieldName>User</FieldName>
-                <FieldContent>10</FieldContent>
-              </DescriptionBox>
-            </FieldBox>
-          </ContentGrid>
-        </ContentWrapper>
-        {/* MENU ACCESS */}
-        <SubDetailsPagesWrapper title="ds" defaultOpen>
-          <div>adsd</div>
+        <SubDetailsPagesWrapper title="Basic Info" defaultOpen>
+          <Box p="20px">
+            <Grid container spacing={2}>
+              <Grid item xs={6} md={3}>
+                <DescDetails
+                  title="ID"
+                  icon={<Person2OutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={roleAccesses.detailsData?.id}
+                />
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <DescDetails
+                  title="Role Access Name"
+                  icon={<Person2OutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={roleAccesses.detailsData?.name}
+                />
+              </Grid>
+              <Grid item xs={6} md={3}>
+                <DescDetails
+                  title="User"
+                  icon={<Person2OutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={roleAccesses.detailsData?.total_admin}
+                />
+              </Grid>
+            </Grid>
+          </Box>
         </SubDetailsPagesWrapper>
-        <TitleWrapper>
-          <ExpandMore sx={{ marginRight: '5px' }} />
-          <span>Menu Access</span>
-        </TitleWrapper>
-        <ContentWrapper>{renderListOfMenu()}</ContentWrapper>
-        <TitleWrapper>
-          <ExpandMore sx={{ marginRight: '5px' }} />
-          <span>Role User List</span>
-        </TitleWrapper>
-        <TableWrapper>
-          <TablesProperty>
-            <Search
-              placeholder="Search for name or email"
-              size="small"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <DownloadButton>
-              <img
-                style={{ width: '24px', height: '24px' }}
-                src={FileDownload}
-                alt="Download data"
+        <SubDetailsPagesWrapper title="Menu Access" defaultOpen>
+          <Box p="20px">
+            {listOfMenu.map((parentMenu: any) => (
+              <AccordionOnDetails
+                title={parentMenu.menu}
+                key={parentMenu.id}
+                parent
+                havingChild={parentMenu.sub_menu}
+                headerContent={
+                  <Control
+                    style={{ marginRight: '0px' }}
+                    label=""
+                    key={parentMenu.id}
+                    disabled
+                    control={
+                      <Checkbox
+                        checked={accessMenu[parentMenu.id] || false}
+                        // onChange={(e) => {
+                        //   handleChangeChild(e, parentMenu.id);
+                        // }}
+                      />
+                    }
+                  />
+                }
+              >
+                <div>
+                  {parentMenu.sub_menu !== null &&
+                    parentMenu.sub_menu.map((menu: any) =>
+                      menu.sub_menu !== null ? (
+                        <HorizontalContent key={menu.id}>
+                          <Typography sx={{ ml: '40px', fontSize: '15px' }}>
+                            {menu.menu}
+                          </Typography>
+                          <Control
+                            label=""
+                            key={menu.id}
+                            control={
+                              <Checkbox
+                                disabled
+                                checked={accessMenu[menu.id] || false}
+                                // onChange={(e) => {
+                                // handleChangeParentChild(
+                                //   e,
+                                //   parentMenu.id,
+                                //   menu.id,
+                                // );
+                                // }}
+                              />
+                            }
+                          />
+                        </HorizontalContent>
+                      ) : (
+                        <Box sx={{ ml: '18px' }} key={menu.id}>
+                          <AccordionOnDetails
+                            title={menu.menu}
+                            key={menu.id}
+                            parent={false}
+                            havingChild={menu.sub_menu}
+                            headerContent={
+                              <Control
+                                label=""
+                                key={menu.id}
+                                disabled
+                                control={
+                                  <Checkbox
+                                    checked={accessMenu[menu.id] || false}
+                                    // onChange={(e) => {
+                                    // handleChangeParentChild(
+                                    //   e,
+                                    //   parentMenu.id,
+                                    //   menu.id,
+                                    // );
+                                    // }}
+                                  />
+                                }
+                              />
+                            }
+                          >
+                            <div>
+                              {menu.child.map((childMenu: any) => (
+                                <HorizontalContent key={childMenu.id}>
+                                  <ChildMenu>{childMenu.menu}</ChildMenu>
+                                  <Control
+                                    label=""
+                                    key={childMenu.id}
+                                    control={
+                                      <Checkbox
+                                        checked={
+                                          accessMenu[childMenu.id] || false
+                                        }
+                                        // onChange={(e) => {}}
+                                      />
+                                    }
+                                  />
+                                </HorizontalContent>
+                              ))}
+                            </div>
+                          </AccordionOnDetails>
+                        </Box>
+                      ),
+                    )}
+                </div>
+              </AccordionOnDetails>
+            ))}
+          </Box>
+        </SubDetailsPagesWrapper>
+        <SubDetailsPagesWrapper title="Role User List" defaultOpen>
+          <Box p="20px">
+            <Box display="flex" gap="20px" flexWrap="wrap" mb="20px">
+              <TextField
+                placeholder="Search for name or email"
+                size="small"
+                sx={{ bgcolor: '#ebeff3', maxWidth: '560px' }}
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                onChange={(event) => {
+                  debounceSearch(event.target.value);
+                }}
               />
-            </DownloadButton>
-          </TablesProperty>
-          <Table
-            data={contentOfTable}
-            selected={[]}
-            headCells={headOfTable}
-            page={1}
-            onChangePage={(e) => console.log(e)}
-            enableCheckBox
-          />
-        </TableWrapper>
+            </Box>
+            <Table
+              data={roleUser.data}
+              headCells={headCell}
+              totalData={roleUser.total}
+              loading={roleUser.loading}
+              count={roleUser.params.count}
+              page={roleUser.params.page}
+              orderBy={roleUser.params.order_by}
+              orderType={roleUser.params.order_type}
+              onChangePage={(page) => handleChangePage(page)}
+              onChangeSort={(value) => handleChangeSort(value)}
+            />
+          </Box>
+        </SubDetailsPagesWrapper>
       </Box>
     </div>
   );
