@@ -57,16 +57,25 @@ export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
         )}
         {props.headCells.map((headCell) => (
           <TableCell
-            sx={{
-              bgcolor: props.bgHeader || '#ebeff3',
-              padding: '10px',
-              width: headCell.width,
-              minWidth: headCell.minWidth,
-              whiteSpace: 'nowrap',
-              fontWeight: 'normal',
-              color: '#626b79',
-              fontSize: '14px',
-            }}
+            sx={[
+              {
+                bgcolor: props.bgHeader || '#ebeff3',
+                padding: '10px',
+                width: headCell.width,
+                minWidth: headCell.minWidth,
+                whiteSpace: 'nowrap',
+                fontWeight: 'normal',
+                color: '#626b79',
+                fontSize: '14px',
+              },
+              headCell.isSticky
+                ? {
+                    position: 'sticky',
+                    left: 0,
+                    zIndex: 10,
+                  }
+                : {},
+            ]}
             key={headCell.id}
             align={headCell.align as Align}
             padding={headCell.disablePadding ? 'none' : 'normal'}

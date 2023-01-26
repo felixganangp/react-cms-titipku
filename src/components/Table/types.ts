@@ -16,6 +16,7 @@ export interface HeadCells<T> {
   disablePadding?: boolean;
   enableSort?: boolean;
   align?: string;
+  isSticky?: boolean;
 }
 
 interface TableOrder {

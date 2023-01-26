@@ -41,6 +41,6 @@ export interface ErrorRespons {
 
 export interface MenuListParam {
   page?: number;
-  role_id?: number;
+  role_id?: number | string;
   account_type?: string;
 }

@@ -42,6 +42,12 @@ export default function AccordionOnDetails(props: AccordionOnDetailsProps) {
     }
   }, []);
 
+  useEffect(() => {
+    if (defaultOpen || isOpen) {
+      contentRef.current.style.maxHeight = `${contentRef.current.scrollHeight}px`;
+    }
+  }, [children]);
+
   return (
     <Wrapper>
       <HeaderBox>

@@ -5,6 +5,7 @@ export interface RoleAccess {
   name: string;
   is_exist: true;
   account_type: string;
+  total_admin: number;
 }
 
 export interface RoleAccessParams extends ListParams {

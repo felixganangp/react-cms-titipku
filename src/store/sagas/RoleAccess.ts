@@ -1,7 +1,7 @@
 import { call, put, all, select, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 import * as AdministratorService from 'service/Administrator';
-import { ListResponse } from 'models/fetch';
+import { Response, ListResponse } from 'models/fetch';
 import RoleAccessForm, {
   CheckRoleNameParams,
   RoleAccess,
@@ -46,13 +46,9 @@ function* addRoleAccess(body: PayloadAction<RoleAccessForm>) {
 
 function* updateRoleAccess(payload: PayloadAction<RoleAccessForm>) {
   try {
-    const params: {
-      page: number;
-      count: number;
-      search: string;
-      account_type: string;
-      is_exist: boolean;
-    } = yield select((state) => state.roleAccess.params);
+    const params: RoleAccessParams = yield select(
+      (state) => state.roleAccess.params,
+    );
     yield call(service.updateRoleAccess, payload.payload);
     yield put(roleAccessAction.fetchData(params));
   } catch (err) {
@@ -124,6 +120,39 @@ function* fetchData(params: PayloadAction<RoleAccessParams>) {
     yield put(roleAccessAction.fetchDataSuccess(response));
   } catch (err) {
     const headMessage = 'Failed Get Role Access';
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: headMessage,
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: headMessage,
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(roleAccessAction.failedFetch());
+  }
+}
+
+function* fetchDataDetail(params: PayloadAction<{ id: string | number }>) {
+  try {
+    const response: Response<RoleAccess> = yield call(
+      service.fetchAdministratorRoleDetails,
+      params.payload.id,
+    );
+
+    yield put(roleAccessAction.fetchDataDetailSuccess(response));
+    yield put(roleAccessAction.fetchMenuList({ role_id: params.payload.id }));
+  } catch (err) {
+    const headMessage = 'Failed Get Role Access Detail';
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
@@ -228,6 +257,7 @@ function* checkRoleName(params: PayloadAction<CheckRoleNameParams>) {
 
 export default function* saga() {
   yield takeLatest(roleAccessAction.fetchData.type, fetchData);
+  yield takeLatest(roleAccessAction.fetchDataDetail.type, fetchDataDetail);
   yield takeLatest(roleAccessAction.fetchMenuList.type, fetchMenu);
   yield takeLatest(roleAccessAction.add.type, addRoleAccess);
   yield takeLatest(roleAccessAction.delete.type, deleteRoleAccess);

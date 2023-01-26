@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import styled from '@emotion/styled';
 
 import Box from '@mui/material/Box';
@@ -57,6 +57,7 @@ function EnhancedTable<T extends Data>({
   // const [orderBy, setOrderBy] = React.useState('');
   const [page] = React.useState(0);
   const [rowsPerPage] = React.useState(10);
+  const tableRef = useRef<any>();
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -128,10 +129,16 @@ function EnhancedTable<T extends Data>({
 
   const numberSumPages = props.page > 1 ? props.page * 10 - 10 : 0;
 
+  // console.log(
+  //   tableRef.current.children[1].childNodes.forEach((item) => {
+  //     console.log(item.scrollWidth);
+  //   }),
+  // );
   return (
     <Box width="100%">
       <TableContainer>
         <Table
+          ref={tableRef}
           stickyHeader
           aria-labelledby="tableTitle"
           size="medium"
@@ -196,14 +203,23 @@ function EnhancedTable<T extends Data>({
                     )}
                     {props.headCells.map((val, key) => (
                       <TableCell
-                        sx={{
-                          padding: '10px',
-                          border: 'none',
-                          whiteSpace: 'wrap',
-                          fontSize: '14px',
-                          color: '#626b79',
-                          bgcolor: '#fff',
-                        }}
+                        sx={[
+                          {
+                            padding: '10px',
+                            border: 'none',
+                            whiteSpace: 'wrap',
+                            fontSize: '14px',
+                            color: '#626b79',
+                            bgcolor: '#fff',
+                          },
+                          val.isSticky
+                            ? {
+                                position: 'sticky',
+                                left: 0,
+                                zIndex: 10,
+                              }
+                            : {},
+                        ]}
                         align={val.align as Align}
                         key={String(key)}
                       >
