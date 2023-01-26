@@ -34,3 +34,10 @@ export interface CreateRoleUserPayload {
   account_type: 'cms';
   id?: number;
 }
+
+export interface CheckValidResponse {
+  timestamp: number;
+  status: string;
+  message: string;
+  data: boolean;
+}
