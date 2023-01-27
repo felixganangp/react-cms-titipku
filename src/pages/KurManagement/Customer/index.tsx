@@ -14,12 +14,13 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
-
+import moment from 'moment';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { customerAction } from 'store/slice/kur/Customer';
 import useModal from 'hooks/useModal';
 import Table from 'components/Table';
 import Modal from 'components/Modal';
+import { CreateCustomer, Customer, CustomerParams } from 'models/kur/Customer';
 import FormCustomer from './components/form';
 
 export default function KurCustomer() {
@@ -34,12 +35,24 @@ export default function KurCustomer() {
 
   const formModal = useModal();
 
+  const convertDate = (date: number) => {
+    const d = new Date(0); // The 0 there is the key, which sets the date to the epoch
+    d.setUTCSeconds(date);
+    const day = d.getDate();
+    let month = d.getMonth().toString();
+    const year = d.getFullYear();
+    if (+month < 10) {
+      month = `${month}`;
+    }
+    console.log('🚀 ~ file: index.tsx:43 ~ convertDate ~ d', d);
+    const result = `${day}/${month + 1}/${year}`;
+    return result;
+  };
   const headCell = [
     {
-      id: 'customer_id',
+      id: 'kur_user_number',
       label: 'Cust. ID',
       align: 'left',
-      format: (val: any) => <div>Customer ID</div>,
     },
     {
       id: 'name',
@@ -50,27 +63,30 @@ export default function KurCustomer() {
       id: 'kur_type',
       label: 'KUR Type',
       align: 'left',
+      format: (val: Customer) => <div>{val.kur_user_type.name}</div>,
     },
     {
       id: 'create_date',
       label: 'Create Date',
       align: 'left',
+      format: (val: Customer) => <div>{convertDate(val.created_at)}</div>,
     },
-    {
-      id: 'merchant',
-      label: 'Merchant',
-      align: 'left',
-    },
+    // {
+    //   id: 'merchant',
+    //   label: 'Merchant',
+    //   align: 'left',
+    //   format: (val: Customer) => <div>{val.user.name}</div>,
+    // },
     {
       id: 'pasar',
       label: 'Pasar',
       align: 'left',
     },
-    {
-      id: 'credit_score',
-      label: 'Credit Score',
-      align: 'left',
-    },
+    // {
+    //   id: 'credit_score',
+    //   label: 'Credit Score',
+    //   align: 'left',
+    // },
     {
       id: 'action',
       label: 'Action',

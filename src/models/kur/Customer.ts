@@ -1,4 +1,4 @@
-import { ListParams } from './fetch';
+import { ListParams } from '../fetch';
 
 export interface CreateCustomer {
   imageCustomer: string | File | Blob;
