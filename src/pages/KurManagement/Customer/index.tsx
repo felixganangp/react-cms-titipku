@@ -16,7 +16,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { customerAction } from 'store/slice/Kur/Customer';
+import { customerAction } from 'store/slice/kur/Customer';
 import useModal from 'hooks/useModal';
 import Table from 'components/Table';
 import Modal from 'components/Modal';

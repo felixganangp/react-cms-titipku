@@ -1,6 +1,6 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
-import { customerAction } from 'store/slice/Kur/Customer';
+import { customerAction } from 'store/slice/kur/Customer';
 import { uiAction } from 'store/slice/ui';
 
 import * as CustomerService from 'service/Kur/Customer';

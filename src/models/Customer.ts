@@ -96,6 +96,6 @@ export interface KurUserDocument {
 export interface CustomerParams extends ListParams {
   kur_user_type_id?: number;
   area_id?: number;
-  order_type?: string;
+  // order_type?: string | undefined | null;
   order_by?: string;
 }
