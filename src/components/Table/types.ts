@@ -33,7 +33,11 @@ export interface EnhancedTableHeadProps<T> {
   headCells: Array<HeadCells<T>>;
   bgHeader?: string;
   disableNumber: boolean;
+  countTotalSticky: number;
+  startIndexSticky: () => number;
+  currentWidth: (index: number) => any;
   onRequestSort?: (order: TableOrder) => void;
+  countLeftSticky: (indexTd: number) => number;
 }
 
 export interface EnhancedTableProps<T extends { id?: string | number }> {

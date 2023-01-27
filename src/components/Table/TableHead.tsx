@@ -18,6 +18,10 @@ export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
     enableCheckBox,
     disableNumber,
     onRequestSort,
+    countLeftSticky,
+    countTotalSticky,
+    startIndexSticky,
+    currentWidth,
   } = props;
 
   return (
@@ -26,7 +30,16 @@ export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
         {enableCheckBox && (
           <TableCell
             padding="checkbox"
-            sx={{ bgcolor: props.bgHeader || '#ebeff3' }}
+            sx={[
+              { bgcolor: props.bgHeader || '#ebeff3' },
+              countTotalSticky !== 0
+                ? {
+                    position: 'sticky',
+                    left: 0,
+                    zIndex: 10,
+                  }
+                : {},
+            ]}
           >
             <Checkbox
               color="primary"
@@ -42,20 +55,30 @@ export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
         {!disableNumber && (
           <TableCell
             padding="checkbox"
-            sx={{
-              border: 'none',
-              bgcolor: props.bgHeader || '#ebeff3',
-              whiteSpace: 'nowrap',
-              color: '#626b79',
-              fontWeight: 'normal',
-              fontSize: '14px',
-            }}
+            sx={[
+              {
+                border: 'none',
+                bgcolor: props.bgHeader || '#ebeff3',
+                whiteSpace: 'nowrap',
+                color: '#626b79',
+                fontWeight: 'normal',
+                fontSize: '14px',
+                minWidth: '50px',
+              },
+              countTotalSticky !== 0
+                ? {
+                    position: 'sticky',
+                    left: startIndexSticky() === 2 ? currentWidth(0) : 0,
+                    zIndex: 10,
+                  }
+                : {},
+            ]}
             align="center"
           >
             No
           </TableCell>
         )}
-        {props.headCells.map((headCell) => (
+        {props.headCells.map((headCell, key) => (
           <TableCell
             sx={[
               {
@@ -71,8 +94,12 @@ export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
               headCell.isSticky
                 ? {
                     position: 'sticky',
-                    left: 0,
+                    left: countLeftSticky(key),
                     zIndex: 10,
+                    borderRight:
+                      countTotalSticky === key + 1
+                        ? '1px solid rgba(0.1,0,0,0.2)'
+                        : 'none',
                   }
                 : {},
             ]}

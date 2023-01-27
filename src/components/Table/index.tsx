@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 import React, { useRef } from 'react';
 import styled from '@emotion/styled';
 
@@ -129,16 +130,50 @@ function EnhancedTable<T extends Data>({
 
   const numberSumPages = props.page > 1 ? props.page * 10 - 10 : 0;
 
-  // console.log(
-  //   tableRef.current.children[1].childNodes.forEach((item) => {
-  //     console.log(item.scrollWidth);
-  //   }),
-  // );
+  const headCell = props.headCells.sort((item1, item2) => {
+    if (item2.isSticky) {
+      return 1;
+    }
+
+    if (item1.isSticky) {
+      return -1;
+    }
+
+    return 0;
+  });
+  const countTotalSticky = props.headCells.filter((val) => val.isSticky).length;
+
+  const currentWidth = (index: number) =>
+    tableRef.current?.children[1]?.childNodes[index]?.scrollWidth;
+
+  const startIndexSticky = () => {
+    let countIndeSticky = 0;
+
+    if (enableCheckBox) {
+      countIndeSticky += 1;
+    }
+
+    if (!disableNumber) {
+      countIndeSticky += 1;
+    }
+
+    return countIndeSticky;
+  };
+
+  const countLeftSticky = (indexTd: number) => {
+    let left = 0;
+
+    for (let index = 0; index < indexTd + startIndexSticky(); index++) {
+      left += currentWidth(index);
+    }
+
+    return left;
+  };
+
   return (
     <Box width="100%">
       <TableContainer>
         <Table
-          ref={tableRef}
           stickyHeader
           aria-labelledby="tableTitle"
           size="medium"
@@ -154,12 +189,16 @@ function EnhancedTable<T extends Data>({
             onSelectAllClick={handleSelectAllClick}
             onRequestSort={onChangeSort}
             rowCount={props.data.length}
-            headCells={props.headCells}
+            headCells={headCell}
             bgHeader={props.bgHeader}
             enableCheckBox={enableCheckBox}
             disableNumber={disableNumber}
+            countLeftSticky={countLeftSticky}
+            countTotalSticky={countTotalSticky}
+            startIndexSticky={startIndexSticky}
+            currentWidth={currentWidth}
           />
-          <TableBody>
+          <TableBody ref={tableRef}>
             {!props.loading &&
               props.data.map((row: T, index: number) => {
                 const isItemSelected = isSelected(row.id);
@@ -176,7 +215,16 @@ function EnhancedTable<T extends Data>({
                     {!props.loading && enableCheckBox && (
                       <TableCell
                         padding="checkbox"
-                        sx={{ border: 'none', bgcolor: '#fff' }}
+                        sx={[
+                          { border: 'none', bgcolor: '#fff' },
+                          countTotalSticky !== 0
+                            ? {
+                                position: 'sticky',
+                                left: 0,
+                                zIndex: 10,
+                              }
+                            : {},
+                        ]}
                       >
                         <Checkbox
                           color="primary"
@@ -191,17 +239,30 @@ function EnhancedTable<T extends Data>({
                     {!props.loading && !disableNumber && (
                       <TableCell
                         padding="checkbox"
-                        sx={{
-                          border: 'none',
-                          whiteSpace: 'nowrap',
-                          bgcolor: '#fff',
-                        }}
+                        sx={[
+                          {
+                            border: 'none',
+                            whiteSpace: 'nowrap',
+                            bgcolor: '#fff',
+                            minWidth: '50px',
+                          },
+                          countTotalSticky !== 0
+                            ? {
+                                position: 'sticky',
+                                left:
+                                  startIndexSticky() === 2
+                                    ? currentWidth(0)
+                                    : 0,
+                                zIndex: 10,
+                              }
+                            : {},
+                        ]}
                         align="center"
                       >
                         {index + 1 + numberSumPages}
                       </TableCell>
                     )}
-                    {props.headCells.map((val, key) => (
+                    {headCell.map((val, key) => (
                       <TableCell
                         sx={[
                           {
@@ -215,14 +276,19 @@ function EnhancedTable<T extends Data>({
                           val.isSticky
                             ? {
                                 position: 'sticky',
-                                left: 0,
+                                left: countLeftSticky(key),
                                 zIndex: 10,
+                                borderRight:
+                                  countTotalSticky === key + 1
+                                    ? '1px solid rgba(0.1,0,0,0.2)'
+                                    : 'none',
                               }
                             : {},
                         ]}
                         align={val.align as Align}
                         key={String(key)}
                       >
+                        {console.log(countTotalSticky, key)}
                         {val.format ? val.format(row) : row[val.id]}
                       </TableCell>
                     ))}
