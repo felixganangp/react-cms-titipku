@@ -21,7 +21,7 @@ import * as yup from 'yup';
 import FormLabel from 'components/FormLabel';
 import InputImage from 'components/InputImage';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { CreateCustomer } from 'models/Customer';
+import { CreateCustomer } from 'models/kur/Customer';
 
 function a11yProps(index: number) {
   return {

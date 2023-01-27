@@ -3,7 +3,7 @@ import roleUserReducer from './slice/RoleUser';
 import roleAccessReducer from './slice/RoleAccess';
 import skuManagementReducer from './slice/SkuManagement';
 import userDetailsReducer from './slice/UserDetails';
-import customerKurReducer from './slice/Kur/Customer';
+import customerKurReducer from './slice/kur/Customer';
 
 const reducers = {
   ui: uiReducer,

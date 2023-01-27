@@ -30,8 +30,8 @@ import MenuList from 'components/MenuList';
 import { useAppDispatch } from 'store/hooks';
 import { Link, useNavigate } from 'react-router-dom';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { addDays, format } from 'date-fns';
-import { DateRange, DayPicker } from 'react-day-picker';
+import { format } from 'date-fns';
+import { DateRange } from 'react-day-picker';
 import {
   CustomerStatus,
   DateButton,

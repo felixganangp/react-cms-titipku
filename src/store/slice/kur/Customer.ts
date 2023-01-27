@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse } from 'models/fetch';
-import { CreateCustomer, Customer, CustomerParams } from 'models/Customer';
+import { CreateCustomer, Customer, CustomerParams } from 'models/kur/Customer';
 
 interface CustomerInitialProps {
   data: Customer[];
@@ -9,6 +9,8 @@ interface CustomerInitialProps {
   error?: any;
   total: number | undefined;
   params: CustomerParams;
+  loadingKurType: boolean;
+  dataKurType: [];
 }
 const initialState: CustomerInitialProps = {
   data: [],
@@ -21,19 +23,27 @@ const initialState: CustomerInitialProps = {
     count: 10,
     search: '',
   },
+  loadingKurType: false,
+  dataKurType: [],
 };
 
 const CustomerSlice = createSlice({
   name: 'Customer',
   initialState,
   reducers: {
-    fetchData(state, action: PayloadAction<CustomerParams>) {
+    fetchData(
+      state: CustomerInitialProps,
+      action: PayloadAction<CustomerParams>,
+    ) {
       state.loading = true;
     },
-    failedFetch(state) {
+    failedFetch(state: CustomerInitialProps) {
       state.loading = false;
     },
-    fetchDataSuccess(state, action: PayloadAction<ListResponse<Customer>>) {
+    fetchDataSuccess(
+      state: CustomerInitialProps,
+      action: PayloadAction<ListResponse<Customer>>,
+    ) {
       state.loading = false;
       state.data = action.payload.data;
     },
@@ -45,6 +55,19 @@ const CustomerSlice = createSlice({
         ...state.params,
         ...action.payload,
       };
+    },
+    fetchDataKurType(state: CustomerInitialProps) {
+      state.loadingKurType = true;
+    },
+    failedFetchDataKurType(state: CustomerInitialProps) {
+      state.loading = false;
+    },
+    fetchDataKurTypeSuccess(
+      state: CustomerInitialProps,
+      action: PayloadAction<ListResponse<Customer>>,
+    ) {
+      state.loading = false;
+      state.data = action.payload.data;
     },
   },
 });
