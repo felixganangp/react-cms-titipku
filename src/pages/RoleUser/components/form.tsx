@@ -105,8 +105,8 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
         .required('Please input name')
         .test(
           'len',
-          'Maximal character length for name is 100',
-          (val: string | undefined) => val !== undefined && val?.length < 101,
+          'Maximal character length for name is 50',
+          (val: string | undefined) => val !== undefined && val?.length < 51,
         ),
       email: yup
         .string()
@@ -179,7 +179,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
               fullWidth
               disabled={isEdit}
               inputProps={{
-                maxLength: 100,
+                maxLength: 50,
               }}
               sx={{
                 '& .MuiInputBase-input': {
