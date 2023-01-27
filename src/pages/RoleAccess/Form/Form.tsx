@@ -15,6 +15,7 @@ import useToast from 'hooks/useToast';
 import FormLabel from 'components/FormLabel';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { debounce } from 'lodash';
+import { Button } from '@mui/material';
 import {
   CancelButton,
   ChildMenu,
@@ -71,8 +72,8 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
       body.description = '';
       dispatch(roleAccessAction.add(body));
       toast.openToast({
-        headMsg: 'Success add',
-        message: 'Succesfully add new role access',
+        headMsg: 'Role Access Added',
+        message: '',
         severity: 'success',
       });
     } else {
@@ -81,8 +82,8 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
       body.description = '';
       dispatch(roleAccessAction.update(body));
       toast.openToast({
-        headMsg: 'Success update',
-        message: 'Succesfully update role access',
+        headMsg: 'Role Access Edited',
+        message: '',
         severity: 'success',
       });
     }
@@ -125,7 +126,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
       }
     },
     validationSchema: yup.object({
-      name: yup.string().required('Role name is required'),
+      name: yup.string().required('Please input role name'),
     }),
     enableReinitialize: true,
   });
@@ -303,6 +304,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
               name="name"
               fullWidth
               placeholder="Input Role Name"
+              inputProps={{ maxLength: 50 }}
               value={values.name}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setFieldValue('name', e.target.value);
@@ -342,97 +344,96 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
                   />
                 }
               >
-                {parentMenu.sub_menu !== null &&
-                  parentMenu.sub_menu.map((menu: any) =>
-                    menu.sub_menu !== null ? (
-                      <HorizontalContent>
-                        <Menu>{menu.menu}</Menu>
-                        <Control
-                          label=""
-                          key={menu.id}
-                          control={
-                            <Checkbox
-                              checked={accessMenu[menu.id]}
-                              onChange={(e) => {
-                                handleChangeParentChild(
-                                  e,
-                                  parentMenu.id,
-                                  menu.id,
-                                );
-                              }}
-                            />
-                          }
-                        />
-                      </HorizontalContent>
-                    ) : (
-                      <Box style={{ paddingLeft: '18px' }}>
-                        <AccordionOnDetails
-                          title={menu.menu}
-                          key={menu.id}
-                          parent={false}
-                          havingChild={menu.sub_menu}
-                          headerContent={
-                            <Control
-                              label=""
-                              key={menu.id}
-                              control={
-                                <Checkbox
-                                  checked={accessMenu[menu.id]}
-                                  onChange={(e) => {
-                                    handleChangeParentChild(
-                                      e,
-                                      parentMenu.id,
-                                      menu.id,
-                                    );
-                                  }}
-                                />
-                              }
-                            />
-                          }
-                        >
-                          {menu.child.map((childMenu: any) => (
-                            <HorizontalContent key={childMenu.id}>
-                              <ChildMenu>{childMenu.menu}</ChildMenu>
+                <div>
+                  {parentMenu.sub_menu !== null &&
+                    parentMenu.sub_menu.map((menu: any) =>
+                      menu.sub_menu !== null ? (
+                        <HorizontalContent>
+                          <Menu>{menu.menu}</Menu>
+                          <Control
+                            label=""
+                            key={menu.id}
+                            control={
+                              <Checkbox
+                                checked={accessMenu[menu.id]}
+                                onChange={(e) => {
+                                  handleChangeParentChild(
+                                    e,
+                                    parentMenu.id,
+                                    menu.id,
+                                  );
+                                }}
+                              />
+                            }
+                          />
+                        </HorizontalContent>
+                      ) : (
+                        <Box style={{ paddingLeft: '18px' }}>
+                          <AccordionOnDetails
+                            title={menu.menu}
+                            key={menu.id}
+                            parent={false}
+                            havingChild={menu.sub_menu}
+                            headerContent={
                               <Control
                                 label=""
-                                key={childMenu.id}
+                                key={menu.id}
                                 control={
                                   <Checkbox
-                                    checked={accessMenu[childMenu.id]}
-                                    onChange={(e) =>
-                                      handleChangeAccessMenu(e, childMenu.id)
-                                    }
+                                    checked={accessMenu[menu.id]}
+                                    onChange={(e) => {
+                                      handleChangeParentChild(
+                                        e,
+                                        parentMenu.id,
+                                        menu.id,
+                                      );
+                                    }}
                                   />
                                 }
                               />
-                            </HorizontalContent>
-                          ))}
-                        </AccordionOnDetails>
-                      </Box>
-                    ),
-                  )}
+                            }
+                          >
+                            {menu.child.map((childMenu: any) => (
+                              <HorizontalContent key={childMenu.id}>
+                                <ChildMenu>{childMenu.menu}</ChildMenu>
+                                <Control
+                                  label=""
+                                  key={childMenu.id}
+                                  control={
+                                    <Checkbox
+                                      checked={accessMenu[childMenu.id]}
+                                      onChange={(e) =>
+                                        handleChangeAccessMenu(e, childMenu.id)
+                                      }
+                                    />
+                                  }
+                                />
+                              </HorizontalContent>
+                            ))}
+                          </AccordionOnDetails>
+                        </Box>
+                      ),
+                    )}
+                </div>
               </AccordionOnDetails>
             ))}
           </FormGroup>
         </ContentWrapper>
         <ActionWrapper>
-          <CancelButton
+          <Button
+            variant="text"
+            color="error"
             onClick={() => {
               resetForm();
               onClose();
             }}
           >
             Cancel
-          </CancelButton>
-          <SubmitButton
+          </Button>
+          <Button
+            color="primary"
             type="submit"
             disabled={
-              // !(
-              //   isValid &&
-              //   dirty &&
-              //   !errorName &&
-              //   collectItems(accessMenu).length > 0
-              // )
               !(
                 isValid &&
                 dirty &&
@@ -447,8 +448,8 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
                 collectItems(accessMenu).length < 1)
             }
           >
-            {editValue ? 'Update' : 'Add'}
-          </SubmitButton>
+            {editValue ? 'Save' : 'Add'}
+          </Button>
         </ActionWrapper>
       </form>
     </Dialog>

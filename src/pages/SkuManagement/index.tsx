@@ -123,9 +123,7 @@ export default function SkuManagement() {
               selected={[]}
               headCells={headCell}
               page={1}
-              totalPage={10}
               onChangePage={(e) => console.log(e)}
-              // loading
               enableCheckBox
             />
           </Box>

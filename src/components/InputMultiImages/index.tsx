@@ -52,7 +52,7 @@ function InputMultiImages({
     }
   };
 
-  const handleSaveCropedImage = (e: any) => {
+  const handleSaveCropedImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange([...values, e]);
   };
 
@@ -76,7 +76,7 @@ function InputMultiImages({
     onChange([...file]);
   };
 
-  const handleSetImageCrop = (e: any) => {
+  const handleSetImageCrop = (e: React.ChangeEvent<HTMLInputElement>) => {
     setImageCrop(e);
   };
 

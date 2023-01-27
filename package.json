@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc & vite build",
     "preview": "vite preview",
     "lint": "yarn run lint:js && yarn run lint:css",
     "lint:css": "stylelint app/**/*.js",
@@ -36,6 +36,7 @@
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.10.0",
     "@mui/styled-engine": "^5.10.8",
+    "@mui/x-date-pickers": "^5.0.15",
     "@reduxjs/toolkit": "^1.8.4",
     "@testing-library/dom": "^8.19.0",
     "@types/react-avatar-editor": "^13.0.0",

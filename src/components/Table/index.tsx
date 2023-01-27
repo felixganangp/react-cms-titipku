@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable no-plusplus */
+import React, { useRef } from 'react';
 import styled from '@emotion/styled';
 
 import Box from '@mui/material/Box';
@@ -19,7 +20,7 @@ import { EnhancedTableProps, Align } from './types';
 const PaginationStyle = styled(Pagination)`
   button {
     border: 0.8px solid #d5d5d5;
-    color: ${(props: any) => props.theme.palette.primary.main};
+    color: ${(props: any) => props.theme.palette?.primary.main};
     margin: 0;
     margin: 0 2px;
     border-radius: 5px;
@@ -39,10 +40,14 @@ const PaginationStyle = styled(Pagination)`
   }
 `;
 
-function EnhancedTable<T>({
+export interface Data {
+  [key: string]: any;
+}
+
+function EnhancedTable<T extends Data>({
   disableNumber = false,
   enableCheckBox = false,
-  handleRequestSort,
+  onChangeSort,
   selected = [],
   setSelected = () => [],
   orderType = 'asc',
@@ -53,10 +58,11 @@ function EnhancedTable<T>({
   // const [orderBy, setOrderBy] = React.useState('');
   const [page] = React.useState(0);
   const [rowsPerPage] = React.useState(10);
+  const tableRef = useRef<any>();
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelecteds = props.data.map((n) => n.id);
+      const newSelecteds = props.data.map((n: { id: string }) => n.id);
       setSelected(newSelecteds);
       return;
     }
@@ -65,7 +71,7 @@ function EnhancedTable<T>({
 
   const handleClick = (
     event: React.MouseEvent<unknown>,
-    id: string | number,
+    id: string | number | undefined,
   ) => {
     if (!id) return null;
     const selectedIndex = selected.indexOf(id);
@@ -87,7 +93,7 @@ function EnhancedTable<T>({
     setSelected(newSelected);
   };
 
-  const isSelected = (id: string | number) => {
+  const isSelected = (id: string | number | undefined) => {
     if (!id) return false;
 
     return enableCheckBox ? selected.indexOf(id) !== -1 : false;
@@ -122,6 +128,48 @@ function EnhancedTable<T>({
     return 0;
   };
 
+  const numberSumPages = props.page > 1 ? props.page * 10 - 10 : 0;
+
+  const headCell = props.headCells.sort((item1, item2) => {
+    if (item2.isSticky) {
+      return 1;
+    }
+
+    if (item1.isSticky) {
+      return -1;
+    }
+
+    return 0;
+  });
+  const countTotalSticky = props.headCells.filter((val) => val.isSticky).length;
+
+  const currentWidth = (index: number) =>
+    tableRef.current?.children[1]?.childNodes[index]?.scrollWidth;
+
+  const startIndexSticky = () => {
+    let countIndeSticky = 0;
+
+    if (enableCheckBox) {
+      countIndeSticky += 1;
+    }
+
+    if (!disableNumber) {
+      countIndeSticky += 1;
+    }
+
+    return countIndeSticky;
+  };
+
+  const countLeftSticky = (indexTd: number) => {
+    let left = 0;
+
+    for (let index = 0; index < indexTd + startIndexSticky(); index++) {
+      left += currentWidth(index);
+    }
+
+    return left;
+  };
+
   return (
     <Box width="100%">
       <TableContainer>
@@ -139,18 +187,20 @@ function EnhancedTable<T>({
             orderType={orderType}
             orderBy={orderBy}
             onSelectAllClick={handleSelectAllClick}
-            onRequestSort={handleRequestSort}
+            onRequestSort={onChangeSort}
             rowCount={props.data.length}
-            headCells={props.headCells}
+            headCells={headCell}
             bgHeader={props.bgHeader}
             enableCheckBox={enableCheckBox}
             disableNumber={disableNumber}
+            countLeftSticky={countLeftSticky}
+            countTotalSticky={countTotalSticky}
+            startIndexSticky={startIndexSticky}
+            currentWidth={currentWidth}
           />
-          <TableBody>
+          <TableBody ref={tableRef}>
             {!props.loading &&
-              // stableSort(props.data, getComparator(orderType, orderBy))
-              //   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              props.data.map((row, index) => {
+              props.data.map((row: T, index: number) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
                 return (
@@ -165,7 +215,16 @@ function EnhancedTable<T>({
                     {!props.loading && enableCheckBox && (
                       <TableCell
                         padding="checkbox"
-                        sx={{ border: 'none', bgcolor: '#fff' }}
+                        sx={[
+                          { border: 'none', bgcolor: '#fff' },
+                          countTotalSticky !== 0
+                            ? {
+                                position: 'sticky',
+                                left: 0,
+                                zIndex: 10,
+                              }
+                            : {},
+                        ]}
                       >
                         <Checkbox
                           color="primary"
@@ -180,29 +239,56 @@ function EnhancedTable<T>({
                     {!props.loading && !disableNumber && (
                       <TableCell
                         padding="checkbox"
-                        sx={{
-                          border: 'none',
-                          whiteSpace: 'nowrap',
-                          bgcolor: '#fff',
-                        }}
+                        sx={[
+                          {
+                            border: 'none',
+                            whiteSpace: 'nowrap',
+                            bgcolor: '#fff',
+                            minWidth: '50px',
+                          },
+                          countTotalSticky !== 0
+                            ? {
+                                position: 'sticky',
+                                left:
+                                  startIndexSticky() === 2
+                                    ? currentWidth(0)
+                                    : 0,
+                                zIndex: 10,
+                              }
+                            : {},
+                        ]}
                         align="center"
                       >
-                        {index + 1}
+                        {index + 1 + numberSumPages}
                       </TableCell>
                     )}
-                    {props.headCells.map((val, key) => (
+                    {headCell.map((val, key) => (
                       <TableCell
-                        sx={{
-                          padding: '10px',
-                          border: 'none',
-                          whiteSpace: 'wrap',
-                          fontSize: '14px',
-                          color: '#626b79',
-                          bgcolor: '#fff',
-                        }}
+                        sx={[
+                          {
+                            padding: '10px',
+                            border: 'none',
+                            whiteSpace: 'wrap',
+                            fontSize: '14px',
+                            color: '#626b79',
+                            bgcolor: '#fff',
+                          },
+                          val.isSticky
+                            ? {
+                                position: 'sticky',
+                                left: countLeftSticky(key),
+                                zIndex: 10,
+                                borderRight:
+                                  countTotalSticky === key + 1
+                                    ? '1px solid rgba(0.1,0,0,0.2)'
+                                    : 'none',
+                              }
+                            : {},
+                        ]}
                         align={val.align as Align}
                         key={String(key)}
                       >
+                        {console.log(countTotalSticky, key)}
                         {val.format ? val.format(row) : row[val.id]}
                       </TableCell>
                     ))}
@@ -287,7 +373,9 @@ function EnhancedTable<T>({
           color="primary"
           page={props.page}
           onChange={(_, e) => {
-            props.onChangePage(e);
+            if (props.onChangePage) {
+              props.onChangePage(e);
+            }
           }}
         />
       </Box>
@@ -295,4 +383,7 @@ function EnhancedTable<T>({
   );
 }
 
+EnhancedTable.defaultProps = {
+  page: 1,
+};
 export default EnhancedTable;

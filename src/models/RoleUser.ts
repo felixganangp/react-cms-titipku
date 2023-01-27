@@ -14,6 +14,7 @@ export interface RoleUserParams extends ListParams {
   account_type: string;
   search?: string | undefined | null;
   id_status?: 1 | 0;
+  id_role?: string | number;
 }
 
 export interface CreateRoleUser {
@@ -32,4 +33,11 @@ export interface CreateRoleUserPayload {
   id_status: 1;
   account_type: 'cms';
   id?: number;
+}
+
+export interface CheckValidResponse {
+  timestamp: number;
+  status: string;
+  message: string;
+  data: boolean;
 }

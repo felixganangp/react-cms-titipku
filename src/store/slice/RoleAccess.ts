@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import RoleAccessForm, {
   RoleAccess,
   RoleAccessParams,
@@ -7,6 +8,7 @@ import { AccessMenu } from '../../models/Menu';
 import {
   IsExistResponse,
   ListResponse,
+  Response,
   MenuListParam,
 } from '../../models/fetch';
 
@@ -19,6 +21,7 @@ interface RoleAccessProps {
   menuData: [];
   errorName: IsExistResponse;
   menulistParams: MenuListParam;
+  detailsData: RoleAccess | null;
 }
 
 interface MenuProps {
@@ -55,15 +58,36 @@ const initialState: RoleAccessProps = {
     page: 1,
     account_type: 'cms',
   },
+  detailsData: null,
 };
 
 const RoleAccessSlice = createSlice({
   name: 'RoleAccess',
   initialState,
   reducers: {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fetchData(state: RoleAccessProps, action: PayloadAction<RoleAccessParams>) {
       state.loading = true;
+    },
+    fetchDataSuccess(
+      state: RoleAccessProps,
+      action: PayloadAction<ListResponse<RoleAccess>>,
+    ) {
+      state.loading = false;
+      state.data = action.payload.data;
+      state.total = action.payload.total;
+    },
+    fetchDataDetail(
+      state: RoleAccessProps,
+      action: PayloadAction<{ id: string | number }>,
+    ) {
+      state.loading = true;
+    },
+    fetchDataDetailSuccess(
+      state: RoleAccessProps,
+      action: PayloadAction<Response<RoleAccess>>,
+    ) {
+      state.loading = true;
+      state.detailsData = action.payload.data;
     },
     failedFetch(state: RoleAccessProps) {
       state.loading = false;
@@ -74,15 +98,6 @@ const RoleAccessSlice = createSlice({
         ...action.payload,
       };
     },
-    fetchDataSuccess(
-      state: RoleAccessProps,
-      action: PayloadAction<ListResponse<RoleAccess>>,
-    ) {
-      state.loading = false;
-      state.data = action.payload.data;
-      state.total = action.payload.total;
-    },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fetchMenuList(state: MenuProps, action: PayloadAction<MenuListParam>) {
       state.loading = true;
     },
@@ -104,6 +119,12 @@ const RoleAccessSlice = createSlice({
       state.errorName = action.payload;
     },
     add(state: RoleAccessProps, action: PayloadAction<RoleAccessForm>) {
+      state.loadingForm = true;
+    },
+    delete(
+      state: RoleAccessProps,
+      action: PayloadAction<{ id: string | number }>,
+    ) {
       state.loadingForm = true;
     },
     addRoleUser(state: RoleAccessProps) {

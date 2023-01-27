@@ -38,7 +38,7 @@ export default function Login() {
   const parsAuthToken = JSON.parse(authToken || '{}');
   const isAuth = parsAuthToken.token;
   if (isAuth) {
-    return <Navigate to="/role-user" />;
+    return <Navigate to="/" />;
   }
 
   return (
@@ -57,7 +57,7 @@ export default function Login() {
             }}
           >
             <Box color="#FFFF">
-              <Typography fontSize="36px">Me Time Jalan terus</Typography>
+              <Typography fontSize="36px">Me Time Gagal Terus</Typography>
               <Typography fontSize="46px">
                 <span style={{ color: '#F7CC47', fontWeight: 'bold' }}>
                   Titipku

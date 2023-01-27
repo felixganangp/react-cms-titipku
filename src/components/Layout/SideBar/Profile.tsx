@@ -38,8 +38,8 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 
 interface ProfileProps {
   value: {
-    name: string;
-    email: string;
+    name: string | undefined;
+    email: string | undefined;
   };
 }
 

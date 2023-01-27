@@ -1,0 +1,60 @@
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ListResponse } from 'models/fetch';
+import { CreateCustomer, Customer, CustomerParams } from 'models/Customer';
+
+interface CustomerInitialProps {
+  data: Customer[];
+  loading: boolean;
+  loadingForm: boolean;
+  error?: any;
+  total: number | undefined;
+  params: CustomerParams;
+}
+const initialState: CustomerInitialProps = {
+  data: [],
+  loading: false,
+  loadingForm: false,
+  error: null,
+  total: 0,
+  params: {
+    page: 1,
+    count: 10,
+    search: '',
+  },
+};
+
+const CustomerSlice = createSlice({
+  name: 'Customer',
+  initialState,
+  reducers: {
+    fetchData(state, action: PayloadAction<CustomerParams>) {
+      state.loading = true;
+    },
+    failedFetch(state) {
+      state.loading = false;
+    },
+    fetchDataSuccess(state, action: PayloadAction<ListResponse<Customer>>) {
+      state.loading = false;
+      state.data = action.payload.data;
+    },
+    setParams(
+      state: CustomerInitialProps,
+      action: PayloadAction<CustomerParams>,
+    ) {
+      state.params = {
+        ...state.params,
+        ...action.payload,
+      };
+    },
+  },
+});
+
+// Action
+export const customerAction = CustomerSlice.actions;
+
+// Selector
+export const selectDataCustomer = (state: any) => state.data;
+
+// Reducer
+const customerReducer = CustomerSlice.reducer;
+export default customerReducer;

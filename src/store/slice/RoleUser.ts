@@ -11,8 +11,10 @@ interface RoleUserProps {
   loading: boolean;
   loadingForm: boolean;
   error?: any;
-  total: number;
+  total: number | undefined;
   params: RoleUserParams;
+  validMsg?: boolean;
+  loadingValidMsg?: boolean;
 }
 
 const initialState: RoleUserProps = {
@@ -27,6 +29,8 @@ const initialState: RoleUserProps = {
     search: '',
     account_type: 'cms',
   },
+  validMsg: false,
+  loadingValidMsg: false,
 };
 
 const RoleUserSlice = createSlice({
@@ -76,6 +80,13 @@ const RoleUserSlice = createSlice({
     failedError(state: RoleUserProps, action: PayloadAction<any>) {
       state.loadingForm = false;
       state.error = action.payload.error;
+    },
+    checkEmailValid(state: RoleUserProps, action: PayloadAction<any>) {
+      state.loadingValidMsg = true;
+    },
+    checkEmailValidSuccess(state: RoleUserProps, action: PayloadAction<any>) {
+      state.loadingValidMsg = false;
+      state.validMsg = action.payload.data;
     },
   },
 });

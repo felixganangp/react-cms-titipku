@@ -10,7 +10,10 @@ import IconButton from '@mui/material/IconButton';
 
 import Table from 'components/Table';
 import { HeadCells } from 'components/Table/types';
+import MenuList from 'components/MenuList';
 import debounce from 'utils/debounce';
+import useModal from 'hooks/useModal';
+import Modal from 'components/Modal';
 
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
@@ -19,14 +22,18 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { roleAccessAction } from 'store/slice/RoleAccess';
 import { RoleAccess } from 'models/RoleAccess';
+
 import RoleAccessForm from './Form/Form';
-import MenuList from '../../components/MenuList';
+import DeleteConfirm from './components/DeleteConfirm';
 
 export default function RoleAccesPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const roleAccesses = useAppSelector((state) => state.roleAccess);
   const [open, setOpen] = useState<boolean>(false);
+  const [selectedData, setSelectedData] = useState<RoleAccess | null>(null);
+
+  const deleteModal = useModal();
 
   useEffect(() => {
     dispatch(roleAccessAction.fetchMenuList({}));
@@ -56,19 +63,35 @@ export default function RoleAccesPage() {
     );
   };
 
+  const handleChangeSort = (value: {
+    orderBy: string | number;
+    orderType: 'asc' | 'desc';
+  }) => {
+    dispatch(
+      roleAccessAction.setParams({
+        account_type: 'cms',
+        order_by: value.orderBy,
+        page: 1,
+        order_type: value.orderType,
+      }),
+    );
+  };
+
   // form
-  const [editValue, setEditValue] = useState<RoleAccess | null>({
-    account_type: '',
-    id: 0,
-    is_exist: true,
-    name: '',
-  });
+  // const [editValue, setEditValue] = useState<RoleAccess | null>({
+  //   account_type: '',
+  //   id: 0,
+  //   is_exist: true,
+  //   name: '',
+  // });
+  const [editValue, setEditValue] = useState<RoleAccess | null>(null);
 
   const headCell: HeadCells<RoleAccess>[] = [
     {
       id: 'name',
       label: 'Role Name',
       align: 'left',
+      enableSort: true,
     },
     {
       id: 'total_admin',
@@ -102,7 +125,8 @@ export default function RoleAccesPage() {
                 label: 'Delete',
                 color: '#c10000',
                 onClick: () => {
-                  console.log('set active inactive');
+                  setSelectedData(val);
+                  deleteModal.openModal();
                 },
               },
             ]}
@@ -173,16 +197,26 @@ export default function RoleAccesPage() {
               <Table
                 data={roleAccesses.data}
                 headCells={headCell}
-                page={roleAccesses.params.page}
                 totalData={roleAccesses.total}
-                count={roleAccesses.params.count}
                 loading={roleAccesses.loading}
+                count={roleAccesses.params.count}
+                page={roleAccesses.params.page}
+                orderBy={roleAccesses.params.order_by}
+                orderType={roleAccesses.params.order_type}
                 onChangePage={(page) => handleChangePage(page)}
+                onChangeSort={(value) => handleChangeSort(value)}
               />
             </Box>
           </Grid>
         </Grid>
       </Box>
+      <Modal
+        open={deleteModal.open}
+        title="Delete Role"
+        onClose={deleteModal.closeModal}
+      >
+        <DeleteConfirm onClose={deleteModal.closeModal} data={selectedData} />
+      </Modal>
     </div>
   );
 }
