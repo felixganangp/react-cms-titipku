@@ -1,7 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse } from 'models/fetch';
+import { CreateCustomer, Customer, CustomerParams } from 'models/Customer';
 
-const initialState = {
+interface CustomerInitialProps {
+  data: Customer[];
+  loading: boolean;
+  loadingForm: boolean;
+  error?: any;
+  total: number | undefined;
+  params: CustomerParams;
+}
+const initialState: CustomerInitialProps = {
   data: [],
   loading: false,
   loadingForm: false,
@@ -10,6 +19,7 @@ const initialState = {
   params: {
     page: 1,
     count: 10,
+    search: '',
   },
 };
 
@@ -17,14 +27,24 @@ const CustomerSlice = createSlice({
   name: 'Customer',
   initialState,
   reducers: {
-    fetchData(state, action: PayloadAction<any>) {
+    fetchData(state, action: PayloadAction<CustomerParams>) {
       state.loading = true;
     },
     failedFetch(state) {
       state.loading = false;
     },
-    fetchDataSuccess(state, action: PayloadAction<ListResponse<any>>) {
+    fetchDataSuccess(state, action: PayloadAction<ListResponse<Customer>>) {
       state.loading = false;
+      state.data = action.payload.data;
+    },
+    setParams(
+      state: CustomerInitialProps,
+      action: PayloadAction<CustomerParams>,
+    ) {
+      state.params = {
+        ...state.params,
+        ...action.payload,
+      };
     },
   },
 });

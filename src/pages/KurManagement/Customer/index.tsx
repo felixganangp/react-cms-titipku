@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import {
   Card,
@@ -16,13 +16,20 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { skuManagementAction } from 'store/slice/SkuManagement';
+import { customerAction } from 'store/slice/Kur/Customer';
 import useModal from 'hooks/useModal';
 import Table from 'components/Table';
 import Modal from 'components/Modal';
 import FormCustomer from './components/form';
 
 export default function KurCustomer() {
+  const dispatch = useAppDispatch();
+  const customerKur = useAppSelector((state) => state.customerKur);
+
+  useEffect(() => {
+    dispatch(customerAction.fetchData(customerKur.params));
+  }, []);
+
   const [openFilter, setOpenFilter] = useState(false);
 
   const formModal = useModal();
@@ -231,7 +238,7 @@ export default function KurCustomer() {
             data-testid="table-customer"
           >
             <Table
-              data={[]}
+              data={customerKur.data}
               selected={[]}
               headCells={headCell}
               page={1}
