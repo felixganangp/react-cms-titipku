@@ -37,12 +37,12 @@ const sidebarData = [
     path: '',
     icon: <PeopleIcon />,
     child: [
-      // {
-      //   id: 12,
-      //   title: 'Nitiper',
-      //   path: '/nitiper',
-      //   child: [],
-      // },
+      {
+        id: 120,
+        title: 'Nitiper',
+        path: '/nitiper',
+        child: [],
+      },
       {
         id: 15,
         title: 'Jatiper',
@@ -53,17 +53,17 @@ const sidebarData = [
             title: 'Jatiper Management',
             path: '/jatiper-management',
           },
-          // {
-          //   id: 14,
-          //   title: 'Jatiper Registration',
-          //   path: '/jatiper-registration',
-          // },
+          {
+            id: 140,
+            title: 'Jatiper Registration',
+            path: '/jatiper-registration',
+          },
         ],
       },
     ],
   },
   {
-    id: 14,
+    id: 140,
     title: 'Lapak',
     path: '',
     icon: <StoreIcon />,
@@ -74,16 +74,16 @@ const sidebarData = [
         path: '/area',
         child: [],
       },
-      // {
-      //   id: 14,
-      //   title: 'Lapak',
-      //   path: '/lapak',
-      //   child: [],
-      // },
+      {
+        id: 141,
+        title: 'Lapak',
+        path: '/lapak',
+        child: [],
+      },
     ],
   },
   {
-    id: 32,
+    id: 320,
     title: 'Products',
     path: '',
     icon: <StoreIcon />,
@@ -108,28 +108,28 @@ const sidebarData = [
       },
     ],
   },
-  // {
-  //   id: 5,
-  //   title: 'Transaction',
-  //   path: '',
-  //   icon: <StoreIcon />,
-  //   child: [
-  //     {
-  //       id: 16,
-  //       title: 'Transaction',
-  //       path: '/transaction',
-  //       child: [],
-  //     },
-  //     {
-  //       id: 16,
-  //       title: 'Urgent Order',
-  //       path: '/urgent-order',
-  //       child: [],
-  //     },
-  //   ],
-  // },
   {
-    id: 19,
+    id: 500,
+    title: 'Transaction',
+    path: '',
+    icon: <StoreIcon />,
+    child: [
+      {
+        id: 160,
+        title: 'Transaction',
+        path: '/transaction',
+        child: [],
+      },
+      {
+        id: 161,
+        title: 'Urgent Order',
+        path: '/urgent-order',
+        child: [],
+      },
+    ],
+  },
+  {
+    id: 190,
     title: 'Application',
     path: '',
     icon: <PhonelinkSetupIcon />,
@@ -152,16 +152,16 @@ const sidebarData = [
         path: '/event',
         child: [],
       },
-      // {
-      //   id: 17,
-      //   title: 'Giveaway',
-      //   path: '/giveaway',
-      //   child: [],
-      // },
+      {
+        id: 191,
+        title: 'Giveaway',
+        path: '/giveaway',
+        child: [],
+      },
     ],
   },
   {
-    id: 29,
+    id: 21,
     title: 'Promo & Voucher',
     path: '',
     icon: <ConfirmationNumberIcon />,
@@ -172,34 +172,34 @@ const sidebarData = [
         path: '/promo-product',
         child: [],
       },
-      // {
-      //   id: 17,
-      //   title: 'Join Promo',
-      //   path: '/join-promo',
-      //   child: [],
-      // },
-      // {
-      //   id: 17,
-      //   title: 'Voucher',
-      //   path: '/voucher',
-      //   child: [],
-      // },
-      // {
-      //   id: 17,
-      //   title: 'Mass Voucher',
-      //   path: '/mass-voucher',
-      //   child: [],
-      // },
-      // {
-      //   id: 17,
-      //   title: 'Giveaway',
-      //   path: '/giveaway',
-      //   child: [],
-      // },
+      {
+        id: 170,
+        title: 'Join Promo',
+        path: '/join-promo',
+        child: [],
+      },
+      {
+        id: 171,
+        title: 'Voucher',
+        path: '/voucher',
+        child: [],
+      },
+      {
+        id: 172,
+        title: 'Mass Voucher',
+        path: '/mass-voucher',
+        child: [],
+      },
+      {
+        id: 173,
+        title: 'Giveaway',
+        path: '/giveaway',
+        child: [],
+      },
     ],
   },
   {
-    id: 8,
+    id: 800,
     title: 'Service & Request',
     path: '',
     icon: <HeadsetMicIcon />,
@@ -210,30 +210,30 @@ const sidebarData = [
         path: '/withdraw-request',
         child: [],
       },
-      // {
-      //   id: 19,
-      //   title: 'Join Promo Request',
-      //   path: '/join-promo-request',
-      //   child: [],
-      // },
-      // {
-      //   id: 19,
-      //   title: 'New Product Request',
-      //   path: '/new-product-request',
-      //   child: [],
-      // },
-      // {
-      //   id: 19,
-      //   title: 'Master Data Config',
-      //   path: '/master-data-config',
-      //   child: [],
-      // },
-      // {
-      //   id: 19,
-      //   title: 'App Service',
-      //   path: '/app-service',
-      //   child: [],
-      // },
+      {
+        id: 802,
+        title: 'Join Promo Request',
+        path: '/join-promo-request',
+        child: [],
+      },
+      {
+        id: 803,
+        title: 'New Product Request',
+        path: '/new-product-request',
+        child: [],
+      },
+      {
+        id: 804,
+        title: 'Master Data Config',
+        path: '/master-data-config',
+        child: [],
+      },
+      {
+        id: 805,
+        title: 'App Service',
+        path: '/app-service',
+        child: [],
+      },
     ],
   },
   {
@@ -284,23 +284,29 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
 
   useEffect(() => {
     const filtered: FilteredMenu[] = [...sidebarData];
-    filtered.map((menu, i) => {
-      if (
-        menuData.find((item) => item.id === menu.id) === undefined &&
-        menu.id.toString().length !== 3
-      )
-        filtered.splice(i, 1);
-      else {
-        menu.child.map((childMenu, j) => {
-          if (
-            menuData.find((subitem) => subitem.id === childMenu.id) ===
-              undefined &&
-            childMenu.id.toString().length !== 3
-          )
-            filtered[i].child.splice(j, 1);
-        });
-      }
-    });
+    if (menuData && menuData.length > 0) {
+      filtered.map((menu, i) => {
+        if (
+          menuData.find((item) => item.id === menu.id) === undefined &&
+          menu.id.toString().length !== 3
+        )
+          filtered.splice(i, 1);
+        else {
+          menu.child.map((childMenu, j) => {
+            if (
+              menuData.find((subitem) => subitem.id === childMenu.id) ===
+                undefined &&
+              childMenu.id.toString().length !== 3
+            ) {
+              filtered[i].child.splice(j, 1);
+            }
+          });
+        }
+        if (menu.child.length < 1) {
+          filtered.splice(i, 1);
+        }
+      });
+    }
     setFilteredMenu(filtered);
   }, [menuData]);
 
