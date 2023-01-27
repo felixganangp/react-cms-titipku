@@ -4,6 +4,7 @@ import roleAccessReducer from './slice/RoleAccess';
 import skuManagementReducer from './slice/SkuManagement';
 import userDetailsReducer from './slice/UserDetails';
 import customerKurReducer from './slice/kur/Customer';
+import typeKurReducer from './slice/kur/Type';
 
 const reducers = {
   ui: uiReducer,
@@ -12,6 +13,7 @@ const reducers = {
   roleAccess: roleAccessReducer,
   userDetails: userDetailsReducer,
   customerKur: customerKurReducer,
+  typeKur: typeKurReducer,
 };
 
 export default reducers;
