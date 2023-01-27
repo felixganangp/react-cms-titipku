@@ -1,4 +1,4 @@
-import { all, call, put, takeLatest } from 'redux-saga/effects';
+import { all, call, put, takeLatest, select } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { roleUserAction } from 'store/slice/RoleUser';
 import { uiAction } from 'store/slice/ui';
@@ -10,6 +10,8 @@ import {
   RoleUserParams,
   CreateRoleUserPayload,
 } from 'models/RoleUser';
+import { userDetailsAction } from 'store/slice/UserDetails';
+import { MenuParams } from 'models/Menu';
 
 function* fetchData(params: PayloadAction<RoleUserParams>) {
   try {
@@ -71,6 +73,9 @@ function* addRoleUser({ payload }: PayloadAction<CreateRoleUserPayload>) {
 
 function* editRoleUser({ payload }: PayloadAction<CreateRoleUserPayload>) {
   try {
+    const menuParams: MenuParams = yield select(
+      (state) => state.userDetails.menuParams,
+    );
     const response: ListResponse<RoleUser> = yield call(
       AdministratorService.editAdministrator,
       payload,
@@ -82,6 +87,7 @@ function* editRoleUser({ payload }: PayloadAction<CreateRoleUserPayload>) {
         severity: 'success',
       }),
     );
+    yield put(userDetailsAction.fetchMenu(menuParams));
     yield put(roleUserAction.addOrEditRoleUserSuccess({ error: false }));
   } catch (error) {
     yield put(
