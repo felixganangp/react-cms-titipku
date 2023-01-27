@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import styled from '@emotion/styled';
 import {
   Card,
@@ -27,6 +27,8 @@ import Table from 'components/Table';
 import Modal from 'components/Modal';
 import { CreateCustomer, Customer, CustomerParams } from 'models/kur/Customer';
 import { Type } from 'models/kur/Type';
+import debounce from 'utils/debounce';
+
 import FormCustomer from './components/form';
 
 export default function KurCustomer() {
@@ -86,7 +88,7 @@ export default function KurCustomer() {
       id: 'merchant',
       label: 'Merchant',
       align: 'left',
-      format: (val: Customer) => <div>{val.user.name}</div>,
+      // format: (val: Customer) => <div>{val.user.name}</div>,
     },
     {
       id: 'pasar',
@@ -154,6 +156,16 @@ export default function KurCustomer() {
       }),
     );
   };
+
+  const handleSearch = (value: string) => {
+    dispatch(
+      customerAction.setParams({
+        page: 1,
+        search: value,
+      }),
+    );
+  };
+  const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
   return (
     <Box p="20px" bgcolor="#F5F7FA">
       <Grid container spacing={2}>
@@ -185,7 +197,7 @@ export default function KurCustomer() {
                 >
                   <TextField
                     data-testid="search-customer"
-                    placeholder="Search for customer name"
+                    placeholder="Search item"
                     size="small"
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px', width: '60%' }}
                     fullWidth
@@ -195,6 +207,9 @@ export default function KurCustomer() {
                           <SearchIcon />
                         </InputAdornment>
                       ),
+                    }}
+                    onChange={(e) => {
+                      debounceSearch(e.target.value);
                     }}
                   />
                   <Button
