@@ -1,16 +1,16 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
-import { typeAction } from 'store/slice/kur/Type';
+import { areaAction } from 'store/slice/Area';
 import { uiAction } from 'store/slice/ui';
 
-import * as TypeService from 'service/Kur/Type';
+import * as AreaService from 'service/Area';
 import { ListResponse } from 'models/fetch';
-import { Type } from 'models/kur/Type';
+import { Area } from 'models/Area';
 
 function* fetchData() {
   try {
-    const response: ListResponse<Type> = yield call(TypeService.getAllTypes);
+    const response: ListResponse<Area> = yield call(AreaService.getAllAreas);
 
-    yield put(typeAction.fetchDataSuccess(response));
+    yield put(areaAction.fetchDataSuccess(response));
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
@@ -30,10 +30,10 @@ function* fetchData() {
         }),
       );
     }
-    yield put(typeAction.failedFetch());
+    yield put(areaAction.failedFetch());
   }
 }
 
 export default function* customerKurSagas() {
-  yield takeLatest(typeAction.fetchData.type, fetchData);
+  yield takeLatest(areaAction.fetchData.type, fetchData);
 }

@@ -5,6 +5,7 @@ import skuManagementReducer from './slice/SkuManagement';
 import userDetailsReducer from './slice/UserDetails';
 import customerKurReducer from './slice/kur/Customer';
 import typeKurReducer from './slice/kur/Type';
+import areaReducer from './slice/Area';
 
 const reducers = {
   ui: uiReducer,
@@ -14,6 +15,7 @@ const reducers = {
   userDetails: userDetailsReducer,
   customerKur: customerKurReducer,
   typeKur: typeKurReducer,
+  area: areaReducer,
 };
 
 export default reducers;

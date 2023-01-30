@@ -40,8 +40,8 @@ const TypeSlice = createSlice({
 export const typeAction = TypeSlice.actions;
 
 // Selector
-export const selectDataCustomer = (state: any) => state.data;
+export const selectDataType = (state: TypeInitialProps) => state.data;
 
 // Reducer
-const customerReducer = TypeSlice.reducer;
-export default customerReducer;
+const typeReducer = TypeSlice.reducer;
+export default typeReducer;

@@ -4,6 +4,7 @@ import roleAccessSagas from 'store/sagas/RoleAccess';
 import customerKurSagas from 'store/sagas/kur/CustomerAccess';
 import typeKurSagas from 'store/sagas/kur/TypeAccess';
 import userDetailsSaga from './sagas/UserDetails';
+import areaSagas from './sagas/AreaAccess';
 
 export default function* rootSaga() {
   yield all([
@@ -12,5 +13,6 @@ export default function* rootSaga() {
     userDetailsSaga(),
     customerKurSagas(),
     typeKurSagas(),
+    areaSagas(),
   ]);
 }
