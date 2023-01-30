@@ -2,7 +2,6 @@ import { Merchant } from 'models/Merchant';
 import { ListParams } from 'models/fetch';
 
 export interface CreateCustomer {
-  imageCustomer: string | File | Blob;
   idCustomer?: string;
   name: string;
   kurType: object | null;
@@ -20,6 +19,11 @@ export interface CreateCustomer {
   npwp: string;
   imageNpwp: string | File | Blob;
   imageSKUsaha: string;
+  dpdRate: string;
+  creditLimit: string;
+  bankName: object | null;
+  bankNumberPrimary: string;
+  nobuAccountNumber: string;
 }
 
 export interface Customer {
