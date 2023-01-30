@@ -39,7 +39,6 @@ export default function KurCustomer() {
   const customerKur = useAppSelector((state) => state.customerKur);
   const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
-  console.log('🚀 ~ file: index.tsx:40 ~ KurCustomer ~ areaKur', areaKur);
 
   useEffect(() => {
     dispatch(customerAction.fetchData(customerKur.params));
