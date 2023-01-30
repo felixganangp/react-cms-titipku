@@ -73,20 +73,25 @@ export default function KurCustomer() {
   };
   const headCell = [
     {
-      id: 'kur_user_number',
-      label: 'Cust. ID',
+      id: 'id',
+      label: 'ID',
       align: 'left',
+      format: (val: Customer) => <div>{val.kur_user_number}</div>,
+      enableSort: true,
     },
     {
       id: 'name',
       label: 'Name',
       align: 'left',
+      // format: (val: Customer) => <div>{val.name}</div>,
+      enableSort: true,
     },
     {
-      id: 'kur_type',
+      id: 'kur_user_type',
       label: 'KUR Type',
       align: 'left',
       format: (val: Customer) => <div>{val.kur_user_type.name}</div>,
+      enableSort: true,
     },
     {
       id: 'create_date',
@@ -199,6 +204,20 @@ export default function KurCustomer() {
       }),
     );
   };
+
+  const handleChangeSort = (value: {
+    orderBy: string | number;
+    orderType: 'asc' | 'desc';
+  }) => {
+    dispatch(
+      customerAction.setParams({
+        page: 1,
+        order_by: value.orderBy,
+        order_type: value.orderType,
+      }),
+    );
+  };
+
   const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
   return (
     <Box p="20px" bgcolor="#F5F7FA">
@@ -416,7 +435,10 @@ export default function KurCustomer() {
               page={customerKur.params.page}
               totalData={customerKur.total}
               count={customerKur.params.count}
+              orderBy={customerKur.params.order_by}
+              orderType={customerKur.params.order_type}
               onChangePage={(val) => handleChangePage(val)}
+              onChangeSort={(val) => handleChangeSort(val)}
               enableCheckBox
               disableNumber
             />
