@@ -375,7 +375,9 @@ export default function RequestKUR() {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Card>
-              <Typography variant="titlePage">Request KUR</Typography>
+              <Typography variant="titlePage" data-testid="header-page">
+                Request KUR
+              </Typography>
             </Card>
           </Grid>
           <Grid item xs={12}>
@@ -546,6 +548,7 @@ export default function RequestKUR() {
                 totalData={10}
                 onChangePage={(e) => console.log(e)}
                 count={data.length}
+                data-testid="table-request-kur"
               />
             </Box>
           </Grid>
