@@ -10,6 +10,7 @@ import {
   Checkbox,
   FormControlLabel,
   Grid,
+  InputAdornment,
 } from '@mui/material';
 import ErrorIcon from '@mui/icons-material/Error';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -55,11 +56,12 @@ interface Props {
   onClose: () => void;
 }
 const initial: CreateCustomer = {
-  imageCustomer: '',
+  // imageCustomer: '',
   idCustomer: '',
   name: '',
   kurType: null,
   adminFee: '',
+  dpdRate: '',
   birthDate: null,
   phoneNumber: '',
   email: '',
@@ -102,6 +104,11 @@ function Form({ onClose }: Props) {
         .required('Admin fee is required')
         .min(1, 'Please input positive value admin fee')
         .max(99999999, 'Maximal admin fee is 99.999.999'),
+      dpdRate: yup
+        .number()
+        .required('DPD rate is required')
+        .min(1, 'Please input positive value DPD rate')
+        .max(99999999, 'Maximal DPD rate is 99.999.999'),
       birthDate: yup.string().required('Birth Day is required'),
       phoneNumber: yup.string().required('Phone Number is required'),
       addressKtp: yup.string().required('Address (KTP) is required'),
@@ -151,7 +158,7 @@ function Form({ onClose }: Props) {
                 values.email &&
                 values.addressKtp &&
                 values.addressDomisili &&
-                values.imageCustomer
+                +values.adminFee > 1
               )
             }
             sx={{ borderBottom: 1, borderColor: 'divider', color: '#8B95A5' }}
@@ -163,7 +170,8 @@ function Form({ onClose }: Props) {
       <form onSubmit={handleSubmit}>
         <TabPanel value={valueTab} index={0}>
           <Box sx={{ px: 3 }}>
-            <Box sx={{ marginTop: 2 }}>
+            {/** CUSTOMER IMAGE */}
+            {/* <Box sx={{ marginTop: 2 }}>
               <FormLabel
                 // error={values.imageCustomer.length < 1}
                 // helperText={
@@ -179,8 +187,10 @@ function Form({ onClose }: Props) {
                   imageCustomer
                 />
               </FormLabel>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 1, marginBottom: 2 }}>
+            </Box> */}
+            <Box
+              sx={{ display: 'flex', gap: 1, marginBottom: 2, marginTop: 3 }}
+            >
               <Typography>
                 <ErrorIcon sx={{ fontSize: '20px' }} />
               </Typography>
@@ -245,11 +255,39 @@ function Form({ onClose }: Props) {
                 <TextField
                   type="number"
                   name="adminFee"
-                  placeholder="Input admin fee name"
+                  placeholder="Input admin fee"
                   value={values.adminFee}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   fullWidth
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                />
+              </FormLabel>
+              {/** DPD RATE */}
+              <FormLabel
+                text="DPD Rate (%)"
+                error={touched.dpdRate && Boolean(errors.dpdRate)}
+                helperText={
+                  touched.dpdRate && errors.dpdRate && `${errors.dpdRate}`
+                }
+              >
+                <TextField
+                  type="number"
+                  name="dpdRate"
+                  placeholder="Input DPD rate"
+                  value={values.dpdRate}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  fullWidth
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
                 />
               </FormLabel>
               {/** BIRTH DATE */}
@@ -358,7 +396,7 @@ function Form({ onClose }: Props) {
                   <TextField
                     type="text"
                     name="addressDomisili"
-                    placeholder="Input address domicilie"
+                    placeholder="Input address domicile"
                     value={values.addressDomisili}
                     multiline
                     rows={4}
@@ -374,8 +412,8 @@ function Form({ onClose }: Props) {
                       </Typography>
                     }
                     onChange={() => {
+                      setDisabledAddressDom((prev) => !prev);
                       setFieldValue('addressDomisili', values.addressKtp);
-                      setDisabledAddressDom(!disabledAddressDom);
                     }}
                     // label="Address as shown in ID (KTP)"
                     sx={{ fontSize: '14px' }}
@@ -412,7 +450,6 @@ function Form({ onClose }: Props) {
                   values.email &&
                   values.addressKtp &&
                   values.addressDomisili &&
-                  values.imageCustomer &&
                   +values.adminFee > 1
                 )
               }
