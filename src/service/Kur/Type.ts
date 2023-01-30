@@ -1,12 +1,10 @@
 import http from 'utils/request';
-import { CustomerParams } from 'models/kur/Customer';
+import { Type } from 'models/kur/Type';
 
-export const getAllCustomers = (params: CustomerParams) =>
-  new Promise<CustomerParams>(async (resolve, reject) => {
+export const getAllTypes = () =>
+  new Promise(async (resolve, reject) => {
     try {
-      const respon = await http.get(`kur/user`, {
-        params,
-      });
+      const respon = await http.get(`kur/user/type`);
       if (respon.data) {
         resolve(respon.data);
       }
