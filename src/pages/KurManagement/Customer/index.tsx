@@ -53,6 +53,7 @@ export default function KurCustomer() {
 
   const [typeKurFilter, setTypeKurFilter] = useState<Type | null>(null);
   const [areaKurFilter, setAreaKurFilter] = useState<Area[] | undefined>([]);
+  const [searchKur, setSearchKur] = useState<string>('');
 
   const [openFilter, setOpenFilter] = useState(false);
 
@@ -178,10 +179,11 @@ export default function KurCustomer() {
   const handleResetFilter = () => {
     setAreaKurFilter([]);
     setTypeKurFilter(null);
+    setSearchKur('');
     dispatch(
       customerAction.setParams({
         page: 1,
-        count: 1,
+        count: 10,
         search: '',
         kur_user_type_id: undefined,
         area_ids: undefined,
@@ -240,7 +242,9 @@ export default function KurCustomer() {
                         </InputAdornment>
                       ),
                     }}
+                    value={searchKur}
                     onChange={(e) => {
+                      setSearchKur(e.target.value);
                       debounceSearch(e.target.value);
                     }}
                   />
