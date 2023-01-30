@@ -197,10 +197,6 @@
       "code": "qnb_kesawan"
     },
     {
-      "name": "Bank Woori Saudara",
-      "code": "woori"
-    },
-    {
       "name": "BJB Syariah",
       "code": "bjb_syr"
     },
@@ -245,11 +241,11 @@
       "code": "bri_syr"
     },
     {
-      "name": "Bank Rakyat Indonesia",
+      "name": "BRI (Bank Rakyat Indonesia)",
       "code": "bri"
     },
     {
-      "name": "Bank Central Asia",
+      "name": "BCA (Bank Central Asia)",
       "code": "bca"
     },
     {
@@ -653,10 +649,6 @@
       "code": "danamon"
     },
     {
-      "name": "Bank NTB Syariah",
-      "code": "nusa_tenggara_barat"
-    },
-    {
       "name": "BTN/BTN Syariah",
       "code": "btn"
     },
@@ -689,10 +681,6 @@
       "code": "artos"
     },
     {
-      "name": "Bank IBK Indonesia",
-      "code": "agris"
-    },
-    {
       "name": "Bank Aceh Syariah",
       "code": "aceh"
     },
@@ -707,10 +695,6 @@
     {
       "name": "Bank CNB (Centratama Nasional Bank)",
       "code": "cnb"
-    },
-    {
-      "name": "Bank Dinar Indonesia",
-      "code": "dinar"
     },
     {
       "name": "BPR EKA (Bank Eka)",
@@ -757,60 +741,8 @@
       "code": "linkaja"
     },
     {
-      "name": "PT. BPD ISTIMEWA ACEH SYARIAH",
-      "code": "aceh_syar"
-    },
-    {
-      "name": "PT. ARTAJASA PEMBAYARAN ELEKTRONIK",
-      "code": "artajasa"
-    },
-    {
-      "name": "PT. BANK BCA SYARIAH",
-      "code": "bca_syar"
-    },
-    {
-      "name": "PT. BANK JABAR BANTEN SYARIAH",
-      "code": "bjb_syar"
-    },
-    {
-      "name": "PT. BANK SYARIAH INDONESIA TBK. - BNIS",
-      "code": "bni_syar"
-    },
-    {
-      "name": "PT. BANK BNP PARIBAS INDONESIA",
-      "code": "bnp_paribas"
-    },
-    {
       "name": "BANK OF AMERICA NA",
       "code": "boa"
-    },
-    {
-      "name": "PT. BANK SYARIAH INDONESIA TBK. - BRIS",
-      "code": "bri_syar"
-    },
-    {
-      "name": "PT. BANK TABUNGAN NEGARA (PERSERO) UNIT USAHA SYARIAH",
-      "code": "btn_syar"
-    },
-    {
-      "name": "PT. BANK TABUNGAN PENSIUNAN NASIONAL",
-      "code": "btpn"
-    },
-    {
-      "name": "PT. BANK TABUNGAN PENSIUNAN NASIONAL SYARIAH",
-      "code": "btpn_syar"
-    },
-    {
-      "name": "PT. BANK SYARIAH BUKOPIN",
-      "code": "bukopin_syar"
-    },
-    {
-      "name": "PT. BANK BUMI ARTA",
-      "code": "bumi_artha"
-    },
-    {
-      "name": "PT. BANK BUMIPUTERA",
-      "code": "bumiputera"
     },
     {
       "name": "KC JPMORGAN CHASE BANK, N.A.",
@@ -821,272 +753,24 @@
       "code": "china"
     },
     {
-      "name": "PT. BANK CHINA CONSTRUCTION BANK INDONESIA, TBK.",
-      "code": "china_cons"
-    },
-    {
-      "name": "PT. BANK CIMB NIAGA TBK. - REKENING PONSEL",
-      "code": "cimb_rekening_ponsel"
-    },
-    {
-      "name": "PT. BANK CIMB NIAGA TBK. - UNIT USAHA SYARIAH",
-      "code": "cimb_syar"
-    },
-    {
-      "name": "PT. BANK DANAMON INDONESIA UNIT USAHA SYARIAH",
-      "code": "danamon_syar"
-    },
-    {
-      "name": "PT. BANK DIPO INTERNATIONAL",
-      "code": "dipo"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH DIY",
-      "code": "diy"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH DIY UNIT USAHA SYARIAH",
-      "code": "diy_syar"
-    },
-    {
-      "name": "PT. BANK DKI UNIT USAHA SYARIAH",
-      "code": "dki_syar"
-    },
-    {
-      "name": "PT. BANK EKONOMI RAHARJA",
-      "code": "ekonomi"
-    },
-    {
-      "name": "PT. BANK HS 1906",
-      "code": "hs_1906"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH JAWA TENGAH",
-      "code": "jateng"
-    },
-    {
-      "name": "PT. BPD JAWA TENGAH UNIT USAHA SYARIAH",
-      "code": "jateng_syar"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH JATIM",
-      "code": "jatim"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH JATIM - UNIT USAHA SYARIAH",
-      "code": "jatim_syar"
-    },
-    {
-      "name": "PT. BANK JTRUST INDONESIA TBK.",
-      "code": "jtrust"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH KALBAR",
-      "code": "kalbar"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH KALBAR - UNIT USAHA SYARIAH",
-      "code": "kalbar_syar"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH KALSEL",
-      "code": "kalsel"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH KALSEL - UNIT USAHA SYARIAH",
-      "code": "kalsel_syar"
-    },
-    {
-      "name": "PT. BPD KALIMANTAN TENGAH",
-      "code": "kalteng"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH KALTIM",
-      "code": "kaltim"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH KALTIM - UNIT USAHA SYARIAH",
-      "code": "kaltim_syar"
-    },
-    {
-      "name": "PT. BANK KESEJAHTERAAN EKONOMI",
-      "code": "kesejahteraan"
-    },
-    {
-      "name": "PT. BANK SYARIAH INDONESIA TBK. - MANDIRI",
-      "code": "mandiri_syar"
-    },
-    {
-      "name": "PT. BANK MAYBANK SYARIAH INDONESIA",
-      "code": "maybank_syar"
-    },
-    {
-      "name": "PT. BANK MEGA SYARIAH",
-      "code": "mega_syar"
-    },
-    {
-      "name": "PT. BANK MEGA TBK.",
-      "code": "mega_tbk"
-    },
-    {
-      "name": "PT. BANK MESTIKA DHARMA",
-      "code": "mestika"
-    },
-    {
-      "name": "PT. BANK METRO EXPRESS",
-      "code": "metro"
-    },
-    {
-      "name": "PT. BANK MITRANIAGA",
-      "code": "mitraniaga"
-    },
-    {
       "name": "THE BANK OF TOKYO MITSUBISHI UFJ LTD.",
       "code": "mitsubishi"
-    },
-    {
-      "name": "PT. BANK MNC INTERNASIONAL TBK.",
-      "code": "mnc"
-    },
-    {
-      "name": "PT. BANK MULTI ARTA SENTOSA",
-      "code": "multiarta"
-    },
-    {
-      "name": "PT. BANK NAGARI",
-      "code": "nagari"
-    },
-    {
-      "name": "PT. BANK NIAGA TBK. SYARIAH",
-      "code": "niaga_syar"
-    },
-    {
-      "name": "PT. BANK NATIONALNOBU",
-      "code": "nobu"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH NTB",
-      "code": "ntb"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH NTT",
-      "code": "ntt"
-    },
-    {
-      "name": "PT. BANK OCBC NISP TBK. - UNIT USAHA SYARIAH",
-      "code": "ocbc_syar"
-    },
-    {
-      "name": "PT. BANK PANIN SYARIAH",
-      "code": "panin_syar"
-    },
-    {
-      "name": "PT. BANK PERMATA TBK. UNIT USAHA SYARIAH",
-      "code": "permata_syar"
-    },
-    {
-      "name": "PT. BANK PUNDI INDONESIA",
-      "code": "pundi"
-    },
-    {
-      "name": "PT. BANK PURBA DANARTA",
-      "code": "purba"
     },
     {
       "name": "THE ROYAL BANK OF SCOTLAND N.V.",
       "code": "rbos"
     },
     {
-      "name": "PT. BANK PEMBANGUNAN DAERAH RIAU KEPRI",
-      "code": "riau"
-    },
-    {
-      "name": "PT. BANK DIGITAL BCA",
-      "code": "bcad"
-    },
-    {
-      "name": "PT. BANK SAHABAT SAMPOERNA",
-      "code": "sampoerna"
-    },
-    {
-      "name": "PT. BANK SBI INDONESIA",
-      "code": "sbi"
-    },
-    {
-      "name": "PT. BANK SINARMAS UNIT USAHA SYARIAH",
-      "code": "sinarmas_syar"
-    },
-    {
       "name": "STANDARD CHARTERED BANK",
       "code": "stanchard"
-    },
-    {
-      "name": "PT. BPD SULAWESI SELATAN DAN SULAWESI BARAT UNIT USAHA SYARIAH",
-      "code": "sulselbar_syar"
-    },
-    {
-      "name": "PT. BPD SULAWESI TENGAH",
-      "code": "sulteng"
-    },
-    {
-      "name": "PT. BPD SULAWESI TENGGARA",
-      "code": "sultenggara"
-    },
-    {
-      "name": "PT. BPD SUMATERA BARAT",
-      "code": "sumbar"
-    },
-    {
-      "name": "PT. BANK SUMITOMO MITSUI INDONESIA",
-      "code": "sumitomo"
-    },
-    {
-      "name": "PT. BPD SUMSEL DAN BABEL",
-      "code": "sumsel_babel"
-    },
-    {
-      "name": "PT. BPD SUMSEL DAN BABEL UNIT USAHA SYARIAH",
-      "code": "sumsel_babel_syar"
-    },
-    {
-      "name": "PT. BANK PEMBANGUNAN DAERAH SUMUT UUS",
-      "code": "sumut_syar"
-    },
-    {
-      "name": "PT. BANK VICTORIA INTERNATIONAL",
-      "code": "victoria"
-    },
-    {
-      "name": "PT. BANK VICTORIA SYARIAH",
-      "code": "victoria_syar"
     },
     {
       "name": "BANK INDONESIA",
       "code": "bank_indonesia"
     },
     {
-      "name": "PT. BANK PEMBANGUNAN DAERAH RIAU KEPRI SYARIAH",
-      "code": "riau_syar"
-    },
-    {
-      "name": "PT. BANK OKE INDONESIA",
-      "code": "ok"
-    },
-    {
-      "name": "PT. BANK JAGO TBK.",
-      "code": "jago"
-    },
-    {
       "name": "BPR KS",
       "code": "bprks"
-    },
-    {
-      "name": "PT. BANK KESEJAHTERAAN EKONOMI",
-      "code": "seabank"
-    },
-    {
-      "name": "PT. BANK MANDIRI (PERSERO) TBK.",
-      "code": "new_mandiri"
     },
     {
       "name": "Bank NTB Syariah",

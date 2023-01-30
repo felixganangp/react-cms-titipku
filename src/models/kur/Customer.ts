@@ -1,17 +1,19 @@
 import { Merchant } from 'models/Merchant';
 import { ListParams } from 'models/fetch';
+import { Type } from './Type';
+import { Area } from '../Area';
 
 export interface CreateCustomer {
   idCustomer?: string;
   name: string;
-  kurType: object | null;
+  kurType: Type | null;
   adminFee: string;
   birthDate: object | null;
   phoneNumber: string;
   email: string;
   addressKtp: string;
   addressDomisili: string;
-  lapakName: object | null;
+  lapakName: Area | null;
   nikKtp: string;
   imageNik: string | File | Blob;
   kkNumber: string;
@@ -21,7 +23,7 @@ export interface CreateCustomer {
   imageSKUsaha: string;
   dpdRate: string;
   creditLimit: string;
-  bankName: object | null;
+  bankName: BankList | null;
   bankNumberPrimary: string;
   nobuAccountNumber: string;
 }
@@ -103,4 +105,9 @@ export interface CustomerParams extends ListParams {
   area_id?: number;
   // order_type?: string | undefined | null;
   order_by?: string;
+}
+
+export interface BankList {
+  name: string;
+  code: string;
 }

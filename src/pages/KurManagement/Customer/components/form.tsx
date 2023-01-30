@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Box,
   Tabs,
@@ -13,15 +13,20 @@ import {
   InputAdornment,
 } from '@mui/material';
 import ErrorIcon from '@mui/icons-material/Error';
+import SearchIcon from '@mui/icons-material/Search';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { useAppSelector } from 'store/hooks';
 
 import FormLabel from 'components/FormLabel';
 import InputImage from 'components/InputImage';
 import { CreateCustomer } from 'models/kur/Customer';
+import { Type } from 'models/kur/Type';
+import { Area } from 'models/Area';
+import bankData from 'data/list-bank.json';
 
 function a11yProps(index: number) {
   return {
@@ -80,7 +85,10 @@ const initial: CreateCustomer = {
   nobuAccountNumber: '',
 };
 function Form({ onClose }: Props) {
-  const [valueTab, setValueTab] = useState(0);
+  const typeKur = useAppSelector((state) => state.typeKur);
+  const areaKur = useAppSelector((state) => state.area);
+
+  const [valueTab, setValueTab] = useState(1);
   const [openCalendaer, setOpenCalendar] = useState({
     open: false,
     touched: false,
@@ -114,7 +122,7 @@ function Form({ onClose }: Props) {
         .string()
         .email('Please input a valid email address')
         .required('Email is required'),
-      // kurType: yup.mixed().required('KUR Type is required'),
+      kurType: yup.mixed().required('KUR Type is required'),
       adminFee: yup
         .number()
         .required('Admin fee is required')
@@ -137,7 +145,7 @@ function Form({ onClose }: Props) {
         .required('Credit limit is required')
         .min(1, 'Please input positive value credit limit')
         .max(500000000, 'Maximal credit limit is 500.000.000'),
-      // bankName: yup.mixed().required('Bank account is required'),
+      bankName: yup.mixed().required('Bank account is required'),
       bankNumberPrimary: yup
         .string()
         .required('Bank account number (primary) is required'),
@@ -155,6 +163,7 @@ function Form({ onClose }: Props) {
     isValid,
     dirty,
   } = formik;
+  // const [typeKurForm, setTypeKurForm] = useState<Type | null>(null);
   return (
     <Box ref={divRef} data-testid="form-Customer">
       <Box sx={{ mx: 1 }}>
@@ -189,7 +198,8 @@ function Form({ onClose }: Props) {
                 values.addressDomisili &&
                 values.creditLimit &&
                 +values.creditLimit > 1 &&
-                values.bankNumberPrimary
+                values.bankNumberPrimary &&
+                values.kurType
               )
             }
             sx={{ borderBottom: 1, borderColor: 'divider', color: '#8B95A5' }}
@@ -256,14 +266,14 @@ function Form({ onClose }: Props) {
               >
                 <Autocomplete
                   id="kur-type"
-                  options={[]}
+                  options={typeKur.data}
                   onChange={(e, value) => {
                     setFieldValue('kurType', value);
                   }}
-                  isOptionEqualToValue={(option: any) => {
-                    return option.id === values;
+                  isOptionEqualToValue={(option: Type) => {
+                    return option.id === values.kurType?.id;
                   }}
-                  getOptionLabel={(option) => `${option}`}
+                  getOptionLabel={(option) => `${option.name}`}
                   value={values.kurType}
                   renderInput={(params) => (
                     <TextField
@@ -495,14 +505,17 @@ function Form({ onClose }: Props) {
                     >
                       <Autocomplete
                         id="list-bank"
-                        options={[]}
+                        options={bankData.data}
                         onChange={(e, value) => {
                           setFieldValue('bankName', value);
                         }}
-                        isOptionEqualToValue={(option: any) => {
-                          return option.id === values;
+                        isOptionEqualToValue={(option: {
+                          name: string;
+                          code: string;
+                        }) => {
+                          return option.name === values.bankName?.name;
                         }}
-                        getOptionLabel={(option) => `${option}`}
+                        getOptionLabel={(option) => `${option.name}`}
                         value={values.bankName}
                         renderInput={(params) => (
                           <TextField
@@ -593,7 +606,8 @@ function Form({ onClose }: Props) {
                   values.addressDomisili &&
                   values.creditLimit &&
                   +values.creditLimit > 1 &&
-                  values.bankNumberPrimary
+                  values.bankNumberPrimary &&
+                  values.kurType
                 )
               }
               onClick={(e) => handleChangeTab(e, 1)}
@@ -609,7 +623,7 @@ function Form({ onClose }: Props) {
             <Grid container spacing={2}>
               <Grid item xs={7}>
                 <FormLabel
-                  text="Cari Pasar"
+                  text="Lapak Name"
                   error={touched.lapakName && Boolean(errors.lapakName)}
                   helperText={
                     touched.lapakName &&
@@ -619,22 +633,35 @@ function Form({ onClose }: Props) {
                 >
                   <Autocomplete
                     id="lapak-name"
-                    options={[]}
+                    options={areaKur.data}
                     onChange={(e, value) => {
                       setFieldValue('lapakName', value);
                     }}
-                    isOptionEqualToValue={(option: any) => {
-                      return option.id === values;
+                    isOptionEqualToValue={(option: Area) => {
+                      return option.id === values.lapakName?.id;
                     }}
-                    getOptionLabel={(option) => `${option}`}
+                    getOptionLabel={(option) => `${option.title}`}
                     value={values.lapakName}
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         name="lapakName"
                         onBlur={handleBlur}
-                        placeholder="Select KUR Type"
+                        placeholder="Cari Lapak"
+                        InputProps={{
+                          ...params.InputProps,
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchIcon />
+                            </InputAdornment>
+                          ),
+                        }}
                       />
+                    )}
+                    renderOption={(props, option) => (
+                      <Box component="li" {...props} key={`area ${option.id}`}>
+                        {option.title}
+                      </Box>
                     )}
                   />
                 </FormLabel>
@@ -645,15 +672,30 @@ function Form({ onClose }: Props) {
                   // error={touched.name && Boolean(errors.name)}
                   // helperText={touched.name && errors.name && `${errors.name}`}
                 >
-                  <TextField
-                    type="text"
-                    disabled
-                    // name="name"
-                    placeholder="Pasar"
-                    value={values.name}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    fullWidth
+                  <Autocomplete
+                    id="lapak-name"
+                    options={areaKur.data}
+                    onChange={(e, value) => {
+                      setFieldValue('lapakName', value);
+                    }}
+                    isOptionEqualToValue={(option: Area) => {
+                      return option.id === values.lapakName?.id;
+                    }}
+                    getOptionLabel={(option) => `${option.title}`}
+                    value={values.lapakName}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="lapakName"
+                        onBlur={handleBlur}
+                        placeholder="Cari Pasar"
+                      />
+                    )}
+                    renderOption={(props, option) => (
+                      <Box component="li" {...props} key={`area ${option.id}`}>
+                        {option.title}
+                      </Box>
+                    )}
                   />
                 </FormLabel>
               </Grid>
