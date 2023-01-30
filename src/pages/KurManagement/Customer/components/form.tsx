@@ -82,7 +82,10 @@ const initial: CreateCustomer = {
 };
 function Form({ onClose }: Props) {
   const [valueTab, setValueTab] = useState(0);
-  const [openCalendaer, setOpenCalendar] = useState(false);
+  const [openCalendaer, setOpenCalendar] = useState({
+    open: false,
+    touched: false,
+  });
   const [disabledAddressDom, setDisabledAddressDom] = useState(false);
   const divRef: any = useRef(null);
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
@@ -94,12 +97,17 @@ function Form({ onClose }: Props) {
     // });
   };
   const [initialValues, setInitialValues] = useState(initial);
+  const handleCloseForm = () => {
+    setOpenCalendar({ open: false, touched: false });
+    onClose();
+  };
   const formik = useFormik({
     initialValues,
     onSubmit: async (value, { resetForm }) => {
       console.log(value);
       resetForm();
-      onClose();
+      setOpenCalendar({ open: false, touched: false });
+      handleCloseForm();
     },
     validationSchema: yup.object({
       name: yup.string().required('Name is required'),
@@ -118,7 +126,7 @@ function Form({ onClose }: Props) {
         .required('DPD rate is required')
         .min(1, 'Please input positive value DPD rate')
         .max(99999999, 'Maximal DPD rate is 99.999.999'),
-      birthDate: yup.string().required('Birth Day is required'),
+      birthDate: yup.mixed().required('Birth Day is required'),
       phoneNumber: yup.string().required('Phone Number is required'),
       addressKtp: yup.string().required('Address (KTP) is required'),
       addressDomisili: yup.string().required('Address (Domicile) is required'),
@@ -148,9 +156,8 @@ function Form({ onClose }: Props) {
     isValid,
     dirty,
   } = formik;
-
   return (
-    <Box ref={divRef}>
+    <Box ref={divRef} data-testid="form-Customer">
       <Box sx={{ mx: 1 }}>
         <Tabs
           value={valueTab}
@@ -168,6 +175,7 @@ function Form({ onClose }: Props) {
             {...a11yProps(0)}
           />
           <Tab
+            data-testid="kur-ducoment-form-button"
             disabled={
               !(
                 values.name &&
@@ -317,30 +325,31 @@ function Form({ onClose }: Props) {
               {/** BIRTH DATE */}
               <FormLabel
                 text="Birth Date"
-                error={touched.birthDate && Boolean(errors.birthDate)}
-                helperText={
-                  touched.birthDate && errors.birthDate && `${errors.birthDate}`
-                }
+                error={openCalendaer.touched && !values.birthDate}
+                helperText={openCalendaer.touched && 'Birth date is required'}
               >
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                   <DesktopDatePicker
-                    open={openCalendaer}
+                    open={openCalendaer.open}
                     onClose={() => {
-                      setOpenCalendar(false);
+                      setOpenCalendar({ open: false, touched: true });
                     }}
                     onOpen={() => {
-                      setOpenCalendar(true);
+                      setOpenCalendar({ open: true, touched: true });
                     }}
                     inputFormat="DD/MM/YYYY"
                     value={values.birthDate}
                     onChange={(e) => {
-                      setFieldValue('birthDate', e);
+                      setFieldValue('birthDate', e, true);
                     }}
                     renderInput={(params) => (
                       <TextField
                         sx={{ width: '100%' }}
                         {...params}
-                        onClick={() => setOpenCalendar(true)}
+                        onClick={() =>
+                          setOpenCalendar({ open: true, touched: true })
+                        }
+                        onBlur={handleBlur}
                       />
                     )}
                   />
@@ -567,7 +576,7 @@ function Form({ onClose }: Props) {
               boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
             }}
           >
-            <Button variant="text" color="error" onClick={onClose}>
+            <Button variant="text" color="error" onClick={handleCloseForm}>
               Cancel
             </Button>
             <Button
