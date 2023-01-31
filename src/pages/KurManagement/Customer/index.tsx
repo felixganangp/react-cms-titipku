@@ -130,10 +130,10 @@ export default function KurCustomer() {
                   navigate(`/kur/customer/${val.id}`);
                 },
               },
-              {
-                label: `Update`,
-                onClick: () => {},
-              },
+              // {
+              //   label: `Update`,
+              //   onClick: () => {},
+              // },
               // {
               //   label: `Hold`,
               //   color: '#c10000',
