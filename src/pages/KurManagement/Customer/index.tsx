@@ -226,6 +226,17 @@ export default function KurCustomer() {
   };
 
   const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
+
+  const formHandleClose = () => {
+    formModal.closeModal();
+    dispatch(
+      customerAction.setParams({
+        page: 1,
+        count: 1,
+        search: '',
+      }),
+    );
+  };
   return (
     <Box p="20px" bgcolor="#F5F7FA">
       <Grid container spacing={2}>
@@ -457,7 +468,7 @@ export default function KurCustomer() {
         title="Add Customer"
         onClose={formModal.closeModal}
       >
-        <FormCustomer onClose={formModal.closeModal} />
+        <FormCustomer onClose={formHandleClose} />
       </Modal>
     </Box>
   );

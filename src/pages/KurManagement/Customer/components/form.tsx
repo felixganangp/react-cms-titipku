@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Tabs,
@@ -10,18 +10,26 @@ import {
   Checkbox,
   FormControlLabel,
   Grid,
+  InputAdornment,
 } from '@mui/material';
 import ErrorIcon from '@mui/icons-material/Error';
+import SearchIcon from '@mui/icons-material/Search';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { useAppSelector, useAppDispatch } from 'store/hooks';
+import { merchantAction } from 'store/slice/Merchant';
+import { customerAction } from 'store/slice/kur/Customer';
 
 import FormLabel from 'components/FormLabel';
 import InputImage from 'components/InputImage';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { CreateCustomer } from 'models/kur/Customer';
+import { Type } from 'models/kur/Type';
+import { Area } from 'models/Area';
+import { MerchantResp } from 'models/Merchant';
+import bankData from 'data/list-bank.json';
 
 function a11yProps(index: number) {
   return {
@@ -55,17 +63,19 @@ interface Props {
   onClose: () => void;
 }
 const initial: CreateCustomer = {
-  imageCustomer: '',
+  // imageCustomer: '',
   idCustomer: '',
   name: '',
   kurType: null,
   adminFee: '',
+  dpdRate: '',
   birthDate: null,
   phoneNumber: '',
   email: '',
   addressKtp: '',
   addressDomisili: '',
-  lapakName: null,
+  pasarName: null,
+  merchantName: null,
   nikKtp: '',
   imageNik: '',
   kkNumber: '',
@@ -73,22 +83,47 @@ const initial: CreateCustomer = {
   npwp: '',
   imageNpwp: '',
   imageSKUsaha: '',
+  creditLimit: '',
+  bankName: null,
+  bankNumberPrimary: '',
+  nobuAccountNumber: '',
 };
 function Form({ onClose }: Props) {
-  const [valueTab, setValueTab] = useState(0);
-  const [openCalendaer, setOpenCalendar] = useState(false);
-  const [disabledAddressDom, setDisabledAddressDom] = useState(false);
+  const dispatch = useAppDispatch();
 
+  const typeKur = useAppSelector((state) => state.typeKur);
+  const areaKur = useAppSelector((state) => state.area);
+  const merchantKur = useAppSelector((state) => state.merchant);
+  const customerKur = useAppSelector((state) => state.customerKur);
+  const [valueTab, setValueTab] = useState(0);
+  const [openCalendaer, setOpenCalendar] = useState({
+    open: false,
+    touched: false,
+  });
+  useEffect(() => {
+    dispatch(merchantAction.fetchData(merchantKur.params));
+  }, [merchantKur.params]);
+  const [disabledAddressDom, setDisabledAddressDom] = useState(false);
+  const divRef: any = useRef(null);
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setValueTab(newValue);
+    divRef.current.firstElementChild.scrollIntoView();
   };
   const [initialValues, setInitialValues] = useState(initial);
+  const handleCloseForm = () => {
+    setOpenCalendar({ open: false, touched: false });
+    onClose();
+  };
   const formik = useFormik({
     initialValues,
     onSubmit: async (value, { resetForm }) => {
       console.log(value);
-      resetForm();
-      onClose();
+      await dispatch(customerAction.createCustomer(value));
+      if (!customerKur.loadingForm) {
+        resetForm();
+        setOpenCalendar({ open: false, touched: false });
+        handleCloseForm();
+      }
     },
     validationSchema: yup.object({
       name: yup.string().required('Name is required'),
@@ -96,19 +131,35 @@ function Form({ onClose }: Props) {
         .string()
         .email('Please input a valid email address')
         .required('Email is required'),
-      // kurType: yup.mixed().required('KUR Type is required'),
+      kurType: yup.mixed().required('KUR Type is required'),
       adminFee: yup
         .number()
         .required('Admin fee is required')
         .min(1, 'Please input positive value admin fee')
         .max(99999999, 'Maximal admin fee is 99.999.999'),
-      birthDate: yup.string().required('Birth Day is required'),
+      dpdRate: yup
+        .number()
+        .required('DPD rate is required')
+        .min(1, 'Please input positive value DPD rate')
+        .max(99999999, 'Maximal DPD rate is 99.999.999'),
+      birthDate: yup.mixed().required('Birth Day is required'),
       phoneNumber: yup.string().required('Phone Number is required'),
       addressKtp: yup.string().required('Address (KTP) is required'),
-      addressDomisili: yup.string().required('Address (Domicilie) is required'),
+      addressDomisili: yup.string().required('Address (Domicile) is required'),
       nikKtp: yup.string().required('NIK KTP is required'),
       kkNumber: yup.string().required('Kartu Keluarga number is required'),
       npwp: yup.string().required('NPWP number is required'),
+      creditLimit: yup
+        .number()
+        .required('Credit limit is required')
+        .min(1, 'Please input positive value credit limit')
+        .max(500000000, 'Maximal credit limit is 500.000.000'),
+      bankName: yup.mixed().required('Bank account is required'),
+      bankNumberPrimary: yup
+        .string()
+        .required('Bank account number (primary) is required'),
+      pasarName: yup.mixed().required('Pasar is required'),
+      merchantName: yup.mixed().required('Lapak is required'),
     }),
     enableReinitialize: true,
   });
@@ -123,8 +174,17 @@ function Form({ onClose }: Props) {
     isValid,
     dirty,
   } = formik;
+  const handleSelectArea = (val: Area | null) => {
+    dispatch(
+      merchantAction.setParams({
+        page: 1,
+        area_id: val?.id,
+      }),
+    );
+    dispatch(merchantAction.fetchData(merchantKur.params));
+  };
   return (
-    <Box>
+    <Box ref={divRef} data-testid="form-Customer">
       <Box sx={{ mx: 1 }}>
         <Tabs
           value={valueTab}
@@ -142,16 +202,23 @@ function Form({ onClose }: Props) {
             {...a11yProps(0)}
           />
           <Tab
+            data-testid="kur-ducoment-form-button"
             disabled={
               !(
                 values.name &&
                 values.adminFee &&
+                +values.adminFee > 1 &&
+                values.dpdRate &&
+                +values.dpdRate > 1 &&
                 values.birthDate &&
                 values.phoneNumber &&
                 values.email &&
                 values.addressKtp &&
                 values.addressDomisili &&
-                values.imageCustomer
+                values.creditLimit &&
+                +values.creditLimit > 1 &&
+                values.bankNumberPrimary &&
+                values.kurType
               )
             }
             sx={{ borderBottom: 1, borderColor: 'divider', color: '#8B95A5' }}
@@ -163,7 +230,8 @@ function Form({ onClose }: Props) {
       <form onSubmit={handleSubmit}>
         <TabPanel value={valueTab} index={0}>
           <Box sx={{ px: 3 }}>
-            <Box sx={{ marginTop: 2 }}>
+            {/** CUSTOMER IMAGE */}
+            {/* <Box sx={{ marginTop: 2 }}>
               <FormLabel
                 // error={values.imageCustomer.length < 1}
                 // helperText={
@@ -179,8 +247,10 @@ function Form({ onClose }: Props) {
                   imageCustomer
                 />
               </FormLabel>
-            </Box>
-            <Box sx={{ display: 'flex', gap: 1, marginBottom: 2 }}>
+            </Box> */}
+            <Box
+              sx={{ display: 'flex', gap: 1, marginBottom: 2, marginTop: 3 }}
+            >
               <Typography>
                 <ErrorIcon sx={{ fontSize: '20px' }} />
               </Typography>
@@ -215,14 +285,14 @@ function Form({ onClose }: Props) {
               >
                 <Autocomplete
                   id="kur-type"
-                  options={[]}
+                  options={typeKur.data}
                   onChange={(e, value) => {
                     setFieldValue('kurType', value);
                   }}
-                  isOptionEqualToValue={(option: any) => {
-                    return option.id === values;
+                  isOptionEqualToValue={(option: Type) => {
+                    return option.id === values.kurType?.id;
                   }}
-                  getOptionLabel={(option) => `${option}`}
+                  getOptionLabel={(option) => `${option.name}`}
                   value={values.kurType}
                   renderInput={(params) => (
                     <TextField
@@ -245,40 +315,69 @@ function Form({ onClose }: Props) {
                 <TextField
                   type="number"
                   name="adminFee"
-                  placeholder="Input admin fee name"
+                  placeholder="Input admin fee"
                   value={values.adminFee}
                   onChange={handleChange}
                   onBlur={handleBlur}
                   fullWidth
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
+                />
+              </FormLabel>
+              {/** DPD RATE */}
+              <FormLabel
+                text="DPD Rate (%)"
+                error={touched.dpdRate && Boolean(errors.dpdRate)}
+                helperText={
+                  touched.dpdRate && errors.dpdRate && `${errors.dpdRate}`
+                }
+              >
+                <TextField
+                  type="number"
+                  name="dpdRate"
+                  placeholder="Input DPD rate"
+                  value={values.dpdRate}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  fullWidth
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">%</InputAdornment>
+                    ),
+                  }}
                 />
               </FormLabel>
               {/** BIRTH DATE */}
               <FormLabel
                 text="Birth Date"
-                error={touched.birthDate && Boolean(errors.birthDate)}
-                helperText={
-                  touched.birthDate && errors.birthDate && `${errors.birthDate}`
-                }
+                error={openCalendaer.touched && !values.birthDate}
+                helperText={openCalendaer.touched && 'Birth date is required'}
               >
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                   <DesktopDatePicker
-                    open={openCalendaer}
+                    open={openCalendaer.open}
                     onClose={() => {
-                      setOpenCalendar(false);
+                      setOpenCalendar({ open: false, touched: true });
                     }}
                     onOpen={() => {
-                      setOpenCalendar(true);
+                      setOpenCalendar({ open: true, touched: true });
                     }}
                     inputFormat="DD/MM/YYYY"
                     value={values.birthDate}
                     onChange={(e) => {
-                      setFieldValue('birthDate', e);
+                      setFieldValue('birthDate', e, true);
                     }}
                     renderInput={(params) => (
                       <TextField
                         sx={{ width: '100%' }}
                         {...params}
-                        onClick={() => setOpenCalendar(true)}
+                        onClick={() =>
+                          setOpenCalendar({ open: true, touched: true })
+                        }
+                        onBlur={handleBlur}
                       />
                     )}
                   />
@@ -358,7 +457,7 @@ function Form({ onClose }: Props) {
                   <TextField
                     type="text"
                     name="addressDomisili"
-                    placeholder="Input address domicilie"
+                    placeholder="Input address domicile"
                     value={values.addressDomisili}
                     multiline
                     rows={4}
@@ -374,8 +473,8 @@ function Form({ onClose }: Props) {
                       </Typography>
                     }
                     onChange={() => {
+                      setDisabledAddressDom((prev) => !prev);
                       setFieldValue('addressDomisili', values.addressKtp);
-                      setDisabledAddressDom(!disabledAddressDom);
                     }}
                     // label="Address as shown in ID (KTP)"
                     sx={{ fontSize: '14px' }}
@@ -384,6 +483,115 @@ function Form({ onClose }: Props) {
                     }
                   />
                 </>
+              </FormLabel>
+              {/** CREDIT LIMIT */}
+              <FormLabel
+                text="Credit Limit"
+                error={touched.creditLimit && Boolean(errors.creditLimit)}
+                helperText={
+                  touched.creditLimit &&
+                  errors.creditLimit &&
+                  `${errors.creditLimit}`
+                }
+              >
+                <TextField
+                  type="number"
+                  name="creditLimit"
+                  placeholder="Input credit limit"
+                  value={values.creditLimit}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  fullWidth
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">Rp.</InputAdornment>
+                    ),
+                  }}
+                />
+              </FormLabel>
+              {/** ACCOUNT BANK PRIMARY */}
+              <FormLabel text="Acccount Bank (Primary)">
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
+                    <FormLabel
+                      text="List Bank"
+                      error={touched.bankName && Boolean(errors.bankName)}
+                      helperText={
+                        touched.bankName &&
+                        errors.bankName &&
+                        `${errors.bankName}`
+                      }
+                    >
+                      <Autocomplete
+                        id="list-bank"
+                        options={bankData.data}
+                        onChange={(e, value) => {
+                          setFieldValue('bankName', value);
+                        }}
+                        isOptionEqualToValue={(option: {
+                          name: string;
+                          code: string;
+                        }) => {
+                          return option.name === values.bankName?.name;
+                        }}
+                        getOptionLabel={(option) => `${option.name}`}
+                        value={values.bankName}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            name="bankName"
+                            onBlur={handleBlur}
+                            placeholder="Select your bank account"
+                          />
+                        )}
+                      />
+                    </FormLabel>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormLabel
+                      text="Bank account number"
+                      error={
+                        touched.bankNumberPrimary &&
+                        Boolean(errors.bankNumberPrimary)
+                      }
+                      helperText={
+                        touched.bankNumberPrimary &&
+                        errors.bankNumberPrimary &&
+                        `${errors.bankNumberPrimary}`
+                      }
+                    >
+                      <TextField
+                        type="text"
+                        name="bankNumberPrimary"
+                        placeholder="Bank account number"
+                        value={values.bankNumberPrimary}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        fullWidth
+                      />
+                    </FormLabel>
+                  </Grid>
+                </Grid>
+              </FormLabel>
+              {/** ACCOUNT BANK NOBU */}
+              <FormLabel
+                text="Acccount Bank (Nobu)"
+                // error={touched.phoneNumber && Boolean(errors.phoneNumber)}
+                // helperText={
+                //   touched.phoneNumber &&
+                //   errors.phoneNumber &&
+                //   `${errors.phoneNumber}`
+                // }
+              >
+                <TextField
+                  type="text"
+                  name="nobuAccountNumber"
+                  placeholder="Input Phone Number"
+                  value={values.nobuAccountNumber}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  fullWidth
+                />
               </FormLabel>
             </Box>
           </Box>
@@ -399,7 +607,7 @@ function Form({ onClose }: Props) {
               boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
             }}
           >
-            <Button variant="text" color="error" onClick={onClose}>
+            <Button variant="text" color="error" onClick={handleCloseForm}>
               Cancel
             </Button>
             <Button
@@ -407,13 +615,18 @@ function Form({ onClose }: Props) {
                 !(
                   values.name &&
                   values.adminFee &&
+                  +values.adminFee > 1 &&
+                  values.dpdRate &&
+                  +values.dpdRate > 1 &&
                   values.birthDate &&
                   values.phoneNumber &&
                   values.email &&
                   values.addressKtp &&
                   values.addressDomisili &&
-                  values.imageCustomer &&
-                  +values.adminFee > 1
+                  values.creditLimit &&
+                  +values.creditLimit > 1 &&
+                  values.bankNumberPrimary &&
+                  values.kurType
                 )
               }
               onClick={(e) => handleChangeTab(e, 1)}
@@ -429,32 +642,47 @@ function Form({ onClose }: Props) {
             <Grid container spacing={2}>
               <Grid item xs={7}>
                 <FormLabel
-                  text="Cari Pasar"
-                  error={touched.lapakName && Boolean(errors.lapakName)}
+                  text="Lapak Name"
+                  error={touched.merchantName && Boolean(errors.merchantName)}
                   helperText={
-                    touched.lapakName &&
-                    errors.lapakName &&
-                    `${errors.lapakName}`
+                    touched.merchantName &&
+                    errors.merchantName &&
+                    `${errors.merchantName}`
                   }
                 >
                   <Autocomplete
-                    id="lapak-name"
-                    options={[]}
+                    id="merchant-name"
+                    options={merchantKur.data}
                     onChange={(e, value) => {
-                      setFieldValue('lapakName', value);
+                      setFieldValue('merchantName', value);
                     }}
-                    isOptionEqualToValue={(option: any) => {
-                      return option.id === values;
+                    isOptionEqualToValue={(option: MerchantResp) => {
+                      return option.id === values.merchantName?.id;
                     }}
-                    getOptionLabel={(option) => `${option}`}
-                    value={values.lapakName}
+                    getOptionLabel={(option) => `${option.merchant_name}`}
+                    value={values.merchantName}
+                    disabled={!merchantKur.data || !values.pasarName}
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        name="lapakName"
+                        name="merchantName"
                         onBlur={handleBlur}
-                        placeholder="Select KUR Type"
+                        placeholder="Cari Lapak"
+                        disabled={!merchantKur.data || !values.pasarName}
+                        InputProps={{
+                          ...params.InputProps,
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchIcon />
+                            </InputAdornment>
+                          ),
+                        }}
                       />
+                    )}
+                    renderOption={(props, option) => (
+                      <Box component="li" {...props} key={`area ${option.id}`}>
+                        {option.merchant_name}
+                      </Box>
                     )}
                   />
                 </FormLabel>
@@ -462,18 +690,39 @@ function Form({ onClose }: Props) {
               <Grid item xs={5}>
                 <FormLabel
                   text="Pasar"
-                  // error={touched.name && Boolean(errors.name)}
-                  // helperText={touched.name && errors.name && `${errors.name}`}
+                  error={touched.pasarName && Boolean(errors.pasarName)}
+                  helperText={
+                    touched.pasarName &&
+                    errors.pasarName &&
+                    `${errors.pasarName}`
+                  }
                 >
-                  <TextField
-                    type="text"
-                    disabled
-                    // name="name"
-                    placeholder="Pasar"
-                    value={values.name}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    fullWidth
+                  <Autocomplete
+                    id="pasar-name"
+                    options={areaKur.data}
+                    onChange={(e, value) => {
+                      setFieldValue('pasarName', value);
+                      setFieldValue('merchantName', null);
+                      handleSelectArea(value);
+                    }}
+                    isOptionEqualToValue={(option: Area) => {
+                      return option.id === values.pasarName?.id;
+                    }}
+                    getOptionLabel={(option) => `${option.title}`}
+                    value={values.pasarName}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="pasarName"
+                        onBlur={handleBlur}
+                        placeholder="Cari Pasar"
+                      />
+                    )}
+                    renderOption={(props, option) => (
+                      <Box component="li" {...props} key={`area ${option.id}`}>
+                        {option.title}
+                      </Box>
+                    )}
                   />
                 </FormLabel>
               </Grid>
@@ -496,9 +745,9 @@ function Form({ onClose }: Props) {
             </FormLabel>
             {/** IMAGE KTP */}
             <FormLabel
-              text="Nomor Induk Kependudukan (KTP)"
-              error={touched.nikKtp && Boolean(errors.nikKtp)}
-              helperText={touched.nikKtp && errors.nikKtp && `${errors.nikKtp}`}
+              text="Upload KTP"
+              error={!values.imageNik}
+              helperText={!values.imageNik && 'Image KTP is mandatory'}
             >
               <InputImage
                 label="Image KTP"
@@ -526,9 +775,11 @@ function Form({ onClose }: Props) {
             </FormLabel>
             {/** IMAGE KK (C1) */}
             <FormLabel
-              text="Nomor Induk Kependudukan (KTP)"
-              error={touched.nikKtp && Boolean(errors.nikKtp)}
-              helperText={touched.nikKtp && errors.nikKtp && `${errors.nikKtp}`}
+              text="Upload Kartu Keluarga (C1)"
+              error={!values.imageKk}
+              helperText={
+                !values.imageKk && 'Image Kartu Keluarga is mandatory'
+              }
             >
               <InputImage
                 label="Image KK"
@@ -554,9 +805,9 @@ function Form({ onClose }: Props) {
             </FormLabel>
             {/** NPWP IMAGE */}
             <FormLabel
-              text="Nomor Induk Kependudukan (KTP)"
-              error={touched.nikKtp && Boolean(errors.nikKtp)}
-              helperText={touched.nikKtp && errors.nikKtp && `${errors.nikKtp}`}
+              text="Upload NPWP"
+              error={!values.imageNpwp}
+              helperText={!values.imageNpwp && 'Image NPWP is mandatory'}
             >
               <InputImage
                 label="Image NPWP"
@@ -566,9 +817,12 @@ function Form({ onClose }: Props) {
             </FormLabel>
             {/** SURAT KETERANGAN USAHA IMAGE */}
             <FormLabel
-              text="Nomor Induk Kependudukan (KTP)"
-              error={touched.nikKtp && Boolean(errors.nikKtp)}
-              helperText={touched.nikKtp && errors.nikKtp && `${errors.nikKtp}`}
+              text="Upload Surat Keterangan Usaha"
+              error={!values.imageSKUsaha}
+              helperText={
+                !values.imageSKUsaha &&
+                'Image surat keterangan usaha is mandatory'
+              }
             >
               <InputImage
                 label="Image Surat Keterangan Usaha"
