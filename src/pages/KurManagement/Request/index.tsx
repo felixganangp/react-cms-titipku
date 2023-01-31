@@ -367,15 +367,13 @@ export default function RequestKUR() {
     }
   }
 
-  console.log('date', range);
-
   return (
     <>
       <Box p="20px" bgcolor="#F5F7FA">
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Card>
-              <Typography variant="titlePage" data-testid="header-page">
+              <Typography variant="titlePage" data-testid="request-kur-title">
                 Request KUR
               </Typography>
             </Card>
@@ -394,6 +392,7 @@ export default function RequestKUR() {
                     size="small"
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
                     fullWidth
+                    data-testid="search-request-kur"
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -404,6 +403,7 @@ export default function RequestKUR() {
                   />
                   <FilterButton
                     endIcon={<ArrowDown />}
+                    data-testid="request-kur-show-filter"
                     onClick={() => setOpenFilter(!openFilter)}
                   >
                     Filter
@@ -416,6 +416,7 @@ export default function RequestKUR() {
                   width="100%"
                   justifyContent="space-between"
                   gap="28px"
+                  data-testid="request-kur-filter-box"
                 >
                   <FormLabel text="Pasar">
                     <FormControl
@@ -490,6 +491,7 @@ export default function RequestKUR() {
                   <FormLabel text="Submit Date">
                     <div>
                       <TextField
+                        data-testid="request-kur-filter-date"
                         value={
                           range?.from && range?.to && range?.from !== range?.to
                             ? `${format(range.from, 'dd MMM yyyy')} - ${format(
@@ -540,6 +542,7 @@ export default function RequestKUR() {
               p="7px"
               borderRadius="5px"
               boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
+              data-testid="request-kur-table"
             >
               <Table
                 data={data}
@@ -548,7 +551,6 @@ export default function RequestKUR() {
                 totalData={10}
                 onChangePage={(e) => console.log(e)}
                 count={data.length}
-                data-testid="table-request-kur"
               />
             </Box>
           </Grid>
@@ -557,6 +559,7 @@ export default function RequestKUR() {
       <Dialog open={openDatePicker} onClose={() => closeDatePicker()}>
         <DialogContent>
           <RangeDatePicker
+            data-testid="datepicker-range"
             mode="range"
             defaultMonth={today}
             selected={range}

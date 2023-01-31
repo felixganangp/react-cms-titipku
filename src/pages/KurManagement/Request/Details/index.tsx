@@ -67,6 +67,12 @@ export default function RequestKURDetails(props: RequestKURProps) {
   const formModal = useModal();
   const customerStatus = 3;
 
+  // action
+  const submitRefusal = (reason: string) => {
+    console.log('the reason is....', reason);
+  };
+
+  // table
   const headCell = [
     {
       id: 'image',
@@ -371,7 +377,7 @@ export default function RequestKURDetails(props: RequestKURProps) {
         title="Refusal Reason"
         onClose={formModal.closeModal}
       >
-        <RefusalReason />
+        <RefusalReason onSubmit={submitRefusal} />
       </Modal>
     </div>
   );

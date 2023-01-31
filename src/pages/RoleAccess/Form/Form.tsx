@@ -254,6 +254,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
 
   return (
     <Dialog
+      data-testid="role-access-modal"
       open={open}
       onClose={() => {
         onClose();

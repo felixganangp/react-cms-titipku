@@ -2,7 +2,11 @@ import FormLabel from 'components/FormLabel';
 import { TextField, Box, Button } from '@mui/material';
 import { useState } from 'react';
 
-const RefusalReason = () => {
+interface RefusalReasonProps {
+  onSubmit: (reason: string) => void;
+}
+
+const RefusalReason = ({ onSubmit }: RefusalReasonProps) => {
   const [desc, setDesc] = useState<string>('');
   return (
     <div>
@@ -32,7 +36,7 @@ const RefusalReason = () => {
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <Button type="submit" disabled={!desc}>
+        <Button disabled={!desc} onClick={() => onSubmit(desc)}>
           Submit
         </Button>
       </Box>

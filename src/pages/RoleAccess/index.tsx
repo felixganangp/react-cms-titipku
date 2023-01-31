@@ -165,6 +165,7 @@ export default function RoleAccesPage() {
                     setOpen(!open);
                     setEditValue(null);
                   }}
+                  data-testid="role-access-add-btn"
                 >
                   Add New
                 </Button>
