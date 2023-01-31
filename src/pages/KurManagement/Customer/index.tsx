@@ -211,10 +211,12 @@ export default function KurCustomer() {
     setAreaKurFilter([]);
     setTypeKurFilter(null);
     setSearchKur('');
-    const params = {
+    const params: CustomerParams = {
       page: 1,
       count: 10,
       search: '',
+      order_by: 'id',
+      order_type: 'desc',
       kur_user_type_id: undefined,
       area_ids: undefined,
     };
