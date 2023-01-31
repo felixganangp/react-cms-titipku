@@ -1,4 +1,4 @@
-import { Merchant } from 'models/Merchant';
+import { Merchant, MerchantResp } from 'models/Merchant';
 import { ListParams } from 'models/fetch';
 import { Type } from './Type';
 import { Area } from '../Area';
@@ -14,6 +14,7 @@ export interface CreateCustomer {
   addressKtp: string;
   addressDomisili: string;
   lapakName: Area | null;
+  merchantName: MerchantResp | null;
   nikKtp: string;
   imageNik: string | File | Blob;
   kkNumber: string;

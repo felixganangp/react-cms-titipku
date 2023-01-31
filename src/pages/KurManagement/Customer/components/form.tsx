@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Tabs,
@@ -19,13 +19,15 @@ import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useAppSelector } from 'store/hooks';
+import { useAppSelector, useAppDispatch } from 'store/hooks';
+import { merchantAction } from 'store/slice/Merchant';
 
 import FormLabel from 'components/FormLabel';
 import InputImage from 'components/InputImage';
 import { CreateCustomer } from 'models/kur/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
+import { MerchantResp } from 'models/Merchant';
 import bankData from 'data/list-bank.json';
 
 function a11yProps(index: number) {
@@ -72,6 +74,7 @@ const initial: CreateCustomer = {
   addressKtp: '',
   addressDomisili: '',
   lapakName: null,
+  merchantName: null,
   nikKtp: '',
   imageNik: '',
   kkNumber: '',
@@ -85,14 +88,21 @@ const initial: CreateCustomer = {
   nobuAccountNumber: '',
 };
 function Form({ onClose }: Props) {
+  const dispatch = useAppDispatch();
+
   const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
+  const merchantKur = useAppSelector((state) => state.merchant);
+  console.log('🚀 ~ file: form.tsx:94 ~ Form ~ merchantKur', merchantKur);
 
   const [valueTab, setValueTab] = useState(1);
   const [openCalendaer, setOpenCalendar] = useState({
     open: false,
     touched: false,
   });
+  useEffect(() => {
+    dispatch(merchantAction.fetchData(merchantKur.params));
+  }, [merchantKur.params]);
   const [disabledAddressDom, setDisabledAddressDom] = useState(false);
   const divRef: any = useRef(null);
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
@@ -163,7 +173,16 @@ function Form({ onClose }: Props) {
     isValid,
     dirty,
   } = formik;
-  // const [typeKurForm, setTypeKurForm] = useState<Type | null>(null);
+  const handleSelectArea = (val: Area | null) => {
+    console.log('🚀 ~ file: form.tsx:175 ~ handleSelectArea ~ val', val);
+    dispatch(
+      merchantAction.setParams({
+        page: 1,
+        area_id: val?.id,
+      }),
+    );
+    dispatch(merchantAction.fetchData(merchantKur.params));
+  };
   return (
     <Box ref={divRef} data-testid="form-Customer">
       <Box sx={{ mx: 1 }}>
@@ -632,22 +651,24 @@ function Form({ onClose }: Props) {
                   }
                 >
                   <Autocomplete
-                    id="lapak-name"
-                    options={areaKur.data}
+                    id="merchant-name"
+                    options={merchantKur.data}
                     onChange={(e, value) => {
-                      setFieldValue('lapakName', value);
+                      setFieldValue('merchantName', value);
                     }}
-                    isOptionEqualToValue={(option: Area) => {
-                      return option.id === values.lapakName?.id;
+                    isOptionEqualToValue={(option: MerchantResp) => {
+                      return option.id === values.merchantName?.id;
                     }}
-                    getOptionLabel={(option) => `${option.title}`}
-                    value={values.lapakName}
+                    getOptionLabel={(option) => `${option.merchant_name}`}
+                    value={values.merchantName}
+                    disabled={!merchantKur.data || !values.lapakName}
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        name="lapakName"
+                        name="merchantName"
                         onBlur={handleBlur}
                         placeholder="Cari Lapak"
+                        disabled={!merchantKur.data || !values.lapakName}
                         InputProps={{
                           ...params.InputProps,
                           startAdornment: (
@@ -660,7 +681,7 @@ function Form({ onClose }: Props) {
                     )}
                     renderOption={(props, option) => (
                       <Box component="li" {...props} key={`area ${option.id}`}>
-                        {option.title}
+                        {option.merchant_name}
                       </Box>
                     )}
                   />
@@ -677,6 +698,8 @@ function Form({ onClose }: Props) {
                     options={areaKur.data}
                     onChange={(e, value) => {
                       setFieldValue('lapakName', value);
+                      setFieldValue('merchantName', null);
+                      handleSelectArea(value);
                     }}
                     isOptionEqualToValue={(option: Area) => {
                       return option.id === values.lapakName?.id;
