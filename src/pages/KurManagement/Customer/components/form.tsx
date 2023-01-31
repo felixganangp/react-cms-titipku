@@ -21,6 +21,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useAppSelector, useAppDispatch } from 'store/hooks';
 import { merchantAction } from 'store/slice/Merchant';
+import { customerAction } from 'store/slice/kur/Customer';
 
 import FormLabel from 'components/FormLabel';
 import InputImage from 'components/InputImage';
@@ -73,7 +74,7 @@ const initial: CreateCustomer = {
   email: '',
   addressKtp: '',
   addressDomisili: '',
-  lapakName: null,
+  pasarName: null,
   merchantName: null,
   nikKtp: '',
   imageNik: '',
@@ -93,9 +94,8 @@ function Form({ onClose }: Props) {
   const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
   const merchantKur = useAppSelector((state) => state.merchant);
-  console.log('🚀 ~ file: form.tsx:94 ~ Form ~ merchantKur', merchantKur);
-
-  const [valueTab, setValueTab] = useState(1);
+  const customerKur = useAppSelector((state) => state.customerKur);
+  const [valueTab, setValueTab] = useState(0);
   const [openCalendaer, setOpenCalendar] = useState({
     open: false,
     touched: false,
@@ -108,10 +108,6 @@ function Form({ onClose }: Props) {
   const handleChangeTab = (event: React.SyntheticEvent, newValue: number) => {
     setValueTab(newValue);
     divRef.current.firstElementChild.scrollIntoView();
-    // divRef.current.scroll({
-    //   top: 0,
-    //   behavior: 'smooth',
-    // });
   };
   const [initialValues, setInitialValues] = useState(initial);
   const handleCloseForm = () => {
@@ -122,9 +118,12 @@ function Form({ onClose }: Props) {
     initialValues,
     onSubmit: async (value, { resetForm }) => {
       console.log(value);
-      resetForm();
-      setOpenCalendar({ open: false, touched: false });
-      handleCloseForm();
+      await dispatch(customerAction.createCustomer(value));
+      if (!customerKur.loadingForm) {
+        resetForm();
+        setOpenCalendar({ open: false, touched: false });
+        handleCloseForm();
+      }
     },
     validationSchema: yup.object({
       name: yup.string().required('Name is required'),
@@ -159,6 +158,8 @@ function Form({ onClose }: Props) {
       bankNumberPrimary: yup
         .string()
         .required('Bank account number (primary) is required'),
+      pasarName: yup.mixed().required('Pasar is required'),
+      merchantName: yup.mixed().required('Lapak is required'),
     }),
     enableReinitialize: true,
   });
@@ -174,7 +175,6 @@ function Form({ onClose }: Props) {
     dirty,
   } = formik;
   const handleSelectArea = (val: Area | null) => {
-    console.log('🚀 ~ file: form.tsx:175 ~ handleSelectArea ~ val', val);
     dispatch(
       merchantAction.setParams({
         page: 1,
@@ -643,11 +643,11 @@ function Form({ onClose }: Props) {
               <Grid item xs={7}>
                 <FormLabel
                   text="Lapak Name"
-                  error={touched.lapakName && Boolean(errors.lapakName)}
+                  error={touched.merchantName && Boolean(errors.merchantName)}
                   helperText={
-                    touched.lapakName &&
-                    errors.lapakName &&
-                    `${errors.lapakName}`
+                    touched.merchantName &&
+                    errors.merchantName &&
+                    `${errors.merchantName}`
                   }
                 >
                   <Autocomplete
@@ -661,14 +661,14 @@ function Form({ onClose }: Props) {
                     }}
                     getOptionLabel={(option) => `${option.merchant_name}`}
                     value={values.merchantName}
-                    disabled={!merchantKur.data || !values.lapakName}
+                    disabled={!merchantKur.data || !values.pasarName}
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         name="merchantName"
                         onBlur={handleBlur}
                         placeholder="Cari Lapak"
-                        disabled={!merchantKur.data || !values.lapakName}
+                        disabled={!merchantKur.data || !values.pasarName}
                         InputProps={{
                           ...params.InputProps,
                           startAdornment: (
@@ -690,26 +690,30 @@ function Form({ onClose }: Props) {
               <Grid item xs={5}>
                 <FormLabel
                   text="Pasar"
-                  // error={touched.name && Boolean(errors.name)}
-                  // helperText={touched.name && errors.name && `${errors.name}`}
+                  error={touched.pasarName && Boolean(errors.pasarName)}
+                  helperText={
+                    touched.pasarName &&
+                    errors.pasarName &&
+                    `${errors.pasarName}`
+                  }
                 >
                   <Autocomplete
-                    id="lapak-name"
+                    id="pasar-name"
                     options={areaKur.data}
                     onChange={(e, value) => {
-                      setFieldValue('lapakName', value);
+                      setFieldValue('pasarName', value);
                       setFieldValue('merchantName', null);
                       handleSelectArea(value);
                     }}
                     isOptionEqualToValue={(option: Area) => {
-                      return option.id === values.lapakName?.id;
+                      return option.id === values.pasarName?.id;
                     }}
                     getOptionLabel={(option) => `${option.title}`}
-                    value={values.lapakName}
+                    value={values.pasarName}
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        name="lapakName"
+                        name="pasarName"
                         onBlur={handleBlur}
                         placeholder="Cari Pasar"
                       />
@@ -741,9 +745,9 @@ function Form({ onClose }: Props) {
             </FormLabel>
             {/** IMAGE KTP */}
             <FormLabel
-              text="Nomor Induk Kependudukan (KTP)"
-              error={touched.nikKtp && Boolean(errors.nikKtp)}
-              helperText={touched.nikKtp && errors.nikKtp && `${errors.nikKtp}`}
+              text="Upload KTP"
+              error={!values.imageNik}
+              helperText={!values.imageNik && 'Image KTP is mandatory'}
             >
               <InputImage
                 label="Image KTP"
@@ -771,9 +775,11 @@ function Form({ onClose }: Props) {
             </FormLabel>
             {/** IMAGE KK (C1) */}
             <FormLabel
-              text="Nomor Induk Kependudukan (KTP)"
-              error={touched.nikKtp && Boolean(errors.nikKtp)}
-              helperText={touched.nikKtp && errors.nikKtp && `${errors.nikKtp}`}
+              text="Upload Kartu Keluarga (C1)"
+              error={!values.imageKk}
+              helperText={
+                !values.imageKk && 'Image Kartu Keluarga is mandatory'
+              }
             >
               <InputImage
                 label="Image KK"
@@ -799,9 +805,9 @@ function Form({ onClose }: Props) {
             </FormLabel>
             {/** NPWP IMAGE */}
             <FormLabel
-              text="Nomor Induk Kependudukan (KTP)"
-              error={touched.nikKtp && Boolean(errors.nikKtp)}
-              helperText={touched.nikKtp && errors.nikKtp && `${errors.nikKtp}`}
+              text="Upload NPWP"
+              error={!values.imageNpwp}
+              helperText={!values.imageNpwp && 'Image NPWP is mandatory'}
             >
               <InputImage
                 label="Image NPWP"
@@ -811,9 +817,12 @@ function Form({ onClose }: Props) {
             </FormLabel>
             {/** SURAT KETERANGAN USAHA IMAGE */}
             <FormLabel
-              text="Nomor Induk Kependudukan (KTP)"
-              error={touched.nikKtp && Boolean(errors.nikKtp)}
-              helperText={touched.nikKtp && errors.nikKtp && `${errors.nikKtp}`}
+              text="Upload Surat Keterangan Usaha"
+              error={!values.imageSKUsaha}
+              helperText={
+                !values.imageSKUsaha &&
+                'Image surat keterangan usaha is mandatory'
+              }
             >
               <InputImage
                 label="Image Surat Keterangan Usaha"

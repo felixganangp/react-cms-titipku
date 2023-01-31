@@ -8,12 +8,12 @@ export interface CreateCustomer {
   name: string;
   kurType: Type | null;
   adminFee: string;
-  birthDate: object | null;
+  birthDate: { _d?: Date } | null;
   phoneNumber: string;
   email: string;
   addressKtp: string;
   addressDomisili: string;
-  lapakName: Area | null;
+  pasarName: Area | null;
   merchantName: MerchantResp | null;
   nikKtp: string;
   imageNik: string | File | Blob;
@@ -111,4 +111,32 @@ export interface CustomerParams extends ListParams {
 export interface BankList {
   name: string;
   code: string;
+}
+
+export interface CreateCustomerPayload {
+  user_id: number | undefined;
+  user_type: string; // as of now only merchant
+  name: string;
+  nik: string;
+  birth_date: number | undefined;
+  email: string;
+  phone_number: string;
+  registered_address: string;
+  living_address: string;
+  credit_limit: number;
+  admin_fee: number;
+  dpd_rate: number;
+  user_account_number: string;
+  user_bank: string | undefined;
+  nobu_account_number: string;
+  join_date: number | undefined;
+  kur_user_status_id: number;
+  kur_user_type_id: number | undefined;
+  kur_user_document: KurUserDocumentPayload[];
+}
+
+export interface KurUserDocumentPayload {
+  document_type: 'ktp' | 'kk' | 'npwp' | 'sku'; // available options : ktp, kk, npwp, sku
+  document_filepath: string;
+  document_number?: string;
 }
