@@ -2,31 +2,51 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { CreateRoleUser } from 'models/RoleUser';
+import { CreateRoleUserPayload } from 'models/RoleUser';
 
-import { roleAccessAction } from 'store/slice/RoleAccess';
+import { roleUserAction } from 'store/slice/RoleUser';
 import { useAppDispatch } from 'store/hooks';
 
 interface DeleteConfirmTypes {
   onClose: () => void;
-  data: CreateRoleUser | null;
+  data: CreateRoleUserPayload | null;
 }
 
+const typeChangeStatus = (id: number | undefined) => {
+  let nameChange = 'status_name';
+  let colorChange = '#cecece';
+
+  if (id === 1) {
+    nameChange = 'Inactive';
+    colorChange = '#c10000';
+  }
+
+  if (id === 2) {
+    nameChange = 'Active';
+    colorChange = '#008e58';
+  }
+
+  return { nameChange, colorChange };
+};
 export default function DeleteConfirm(props: DeleteConfirmTypes) {
   const dispatch = useAppDispatch();
   // const roleAccesses = useAppSelector((state) => state.roleAccess);
 
   const onChangeStatus = () => {
     if (props.data?.id) {
-      dispatch(roleAccessAction.delete({ id: props.data.id }));
+      props.data.id_status = props.data.id_status === 1 ? 2 : 1;
+      dispatch(roleUserAction.editStatusRoleUser(props.data));
       props.onClose();
     }
   };
-  console.log(props.data);
+
   return (
     <Box>
       <Box p={3}>
-        <Typography>Are you sure to set to {data} this user?</Typography>
+        <Typography>
+          Are you sure to set{' '}
+          {typeChangeStatus(props.data?.id_status).nameChange} this user?
+        </Typography>
       </Box>
       <Box
         width="100%"
@@ -42,8 +62,11 @@ export default function DeleteConfirm(props: DeleteConfirmTypes) {
         <Button variant="text" onClick={props.onClose}>
           Cancel
         </Button>
-        <Button color="error" onClick={onChangeStatus}>
-          Set to Inactive
+        <Button
+          color={props.data?.id_status === 2 ? 'success' : 'error'}
+          onClick={onChangeStatus}
+        >
+          Set to {typeChangeStatus(props.data?.id_status).nameChange}
         </Button>
       </Box>
     </Box>

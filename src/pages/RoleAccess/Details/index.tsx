@@ -112,13 +112,11 @@ export default function RoleUserDetails() {
       label: 'Name',
       align: 'left',
       enableSort: true,
-      isSticky: true,
     },
     {
       id: 'email',
       label: 'Email',
       align: 'left',
-      isSticky: true,
     },
     {
       id: 'role',

@@ -44,3 +44,9 @@ export interface MenuListParam {
   role_id?: number | string;
   account_type?: string;
 }
+
+export interface Status {
+  id: number;
+  name: string;
+  description: string;
+}

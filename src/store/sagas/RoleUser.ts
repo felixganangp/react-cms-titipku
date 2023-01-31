@@ -106,8 +106,8 @@ function* editStatusRoleUser({
   payload,
 }: PayloadAction<CreateRoleUserPayload>) {
   try {
-    const menuParams: MenuParams = yield select(
-      (state) => state.userDetails.menuParams,
+    const menuParams: RoleUserParams = yield select(
+      (state) => state.roleUser.params,
     );
     const response: ListResponse<RoleUser> = yield call(
       AdministratorService.editAdministrator,
@@ -115,17 +115,19 @@ function* editStatusRoleUser({
     );
     yield put(
       uiAction.openToast({
-        headMsg: 'Role User Inactivated',
+        headMsg: `Role User ${
+          payload.id_status === 1 ? 'Actived' : 'Inactivated'
+        }`,
         // message: 'Succes Fetch data',
         severity: 'success',
       }),
     );
-    yield put(userDetailsAction.fetchMenu(menuParams));
-    yield put(roleUserAction.addOrEditRoleUserSuccess({ error: false }));
+    // console.log(menuParams)
+    yield put(roleUserAction.fetchData(menuParams));
   } catch (error) {
     yield put(
       uiAction.openToast({
-        headMsg: 'Failed to edit role user',
+        headMsg: 'Failed to change status user',
         message: error as string,
         severity: 'error',
       }),

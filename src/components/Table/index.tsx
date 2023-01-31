@@ -242,7 +242,7 @@ function EnhancedTable<T extends Data>({
                         sx={[
                           {
                             border: 'none',
-                            whiteSpace: 'nowrap',
+                            whiteSpace: 'pre-line',
                             bgcolor: '#fff',
                             minWidth: '50px',
                           },
@@ -268,7 +268,7 @@ function EnhancedTable<T extends Data>({
                           {
                             padding: '10px',
                             border: 'none',
-                            whiteSpace: 'wrap',
+                            whiteSpace: 'pre-line',
                             fontSize: '14px',
                             color: '#626b79',
                             bgcolor: '#fff',

@@ -73,7 +73,7 @@ const RoleAccessSlice = createSlice({
       action: PayloadAction<ListResponse<RoleAccess>>,
     ) {
       state.loading = false;
-      state.data = action.payload.data;
+      state.data = action.payload.data || [];
       state.total = action.payload.total;
     },
     fetchDataDetail(

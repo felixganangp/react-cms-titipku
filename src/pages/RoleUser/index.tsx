@@ -35,6 +35,23 @@ interface FormDataType {
   isEdit: boolean;
   data: CreateRoleUser;
 }
+
+const statusColor = (id: number, name: string) => {
+  let nameCurrent = name;
+  let colorCurrent = 'rgba(0,0,0,0.3)';
+
+  if (id === 1) {
+    nameCurrent = 'Active';
+    colorCurrent = '#008e58';
+  }
+
+  if (id === 2) {
+    nameCurrent = 'Inactive';
+    colorCurrent = '#c10000';
+  }
+
+  return { nameCurrent, colorCurrent };
+};
 export default function RoleUser() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -153,12 +170,12 @@ export default function RoleUser() {
       label: 'Status',
       align: 'left',
       enableSort: true,
-      format: (val: any) => {
+      format: (val) => {
         const status = val.administrator_detail[0].administrator_status;
 
         return (
-          <Status color={status.id === 1 ? '#008E58' : 'rgba(0,0,0,0.3)'}>
-            {status.id === 1 ? 'Actived' : status.nam}
+          <Status color={statusColor(status.id, status.name).colorCurrent}>
+            {statusColor(status.id, status.name).nameCurrent}
           </Status>
         );
       },
@@ -167,14 +184,13 @@ export default function RoleUser() {
       id: 'menu',
       label: '',
       align: 'left',
-      format: (val: any) => (
+      format: (val) => (
         <>
           <MenuList
             menu={[
               {
                 label: 'Edit',
                 onClick: () => {
-                  setFormData(val);
                   const data: FormDataType = {
                     isEdit: true,
                     data: {
@@ -183,7 +199,8 @@ export default function RoleUser() {
                       roleAccess:
                         val.administrator_detail[0].administrator_role,
                       id: val.id,
-                      id_status: 1,
+                      id_status:
+                        val.administrator_detail[0].administrator_status.id,
                       account_type: 'cms',
                     },
                   };
@@ -192,10 +209,16 @@ export default function RoleUser() {
                 },
               },
               {
-                label: `Set to Inactive`,
-                color: '#c10000',
+                label: `Set to ${
+                  val.administrator_detail[0].administrator_status.id === 1
+                    ? 'Inactive'
+                    : 'Active'
+                }`,
+                color:
+                  val.administrator_detail[0].administrator_status.id === 1
+                    ? '#c10000'
+                    : '#008e58',
                 onClick: () => {
-                  setFormData(val);
                   const data: FormDataType = {
                     isEdit: true,
                     data: {
@@ -204,7 +227,8 @@ export default function RoleUser() {
                       roleAccess:
                         val.administrator_detail[0].administrator_role,
                       id: val.id,
-                      id_status: 1,
+                      id_status:
+                        val.administrator_detail[0].administrator_status.id,
                       account_type: 'cms',
                     },
                   };
@@ -243,6 +267,7 @@ export default function RoleUser() {
                   size="small"
                   sx={{ bgcolor: '#ebeff3', maxWidth: '560px' }}
                   fullWidth
+                  defaultValue={roleUser.params.search}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
