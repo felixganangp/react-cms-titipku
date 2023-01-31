@@ -2,14 +2,14 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { CreateRoleUserPayload } from 'models/RoleUser';
+import { CreateRoleUser, CreateRoleUserPayload } from 'models/RoleUser';
 
 import { roleUserAction } from 'store/slice/RoleUser';
 import { useAppDispatch } from 'store/hooks';
 
 interface DeleteConfirmTypes {
   onClose: () => void;
-  data: CreateRoleUserPayload | null;
+  data: CreateRoleUser | null;
 }
 
 const typeChangeStatus = (id: number | undefined) => {
@@ -34,8 +34,15 @@ export default function DeleteConfirm(props: DeleteConfirmTypes) {
 
   const onChangeStatus = () => {
     if (props.data?.id) {
-      props.data.id_status = props.data.id_status === 1 ? 2 : 1;
-      dispatch(roleUserAction.editStatusRoleUser(props.data));
+      const { roleAccess, name, ...newData } = props.data;
+
+      const payload: CreateRoleUserPayload = {
+        ...newData,
+        id_status: props.data.id_status === 1 ? 2 : 1,
+        full_name: name,
+        id_role: roleAccess?.id,
+      };
+      dispatch(roleUserAction.editStatusRoleUser(payload));
       props.onClose();
     }
   };

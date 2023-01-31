@@ -102,7 +102,7 @@ export default function RoleUserDetails() {
           <Grid item xs={12}>
             <Card>
               <Menu>Role Access Management</Menu>
-              <Link style={{ textDecoration: 'none' }} to="/role-access">
+              <Link style={{ textDecoration: 'none' }} to="/kur/customer">
                 <BackButton
                   sx={{ '&:hover': { backgroundColor: '#ffff' } }}
                   startIcon={<ArrowBackIosIcon />}
