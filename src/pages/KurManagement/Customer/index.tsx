@@ -76,7 +76,7 @@ export default function KurCustomer() {
       id: 'id',
       label: 'ID',
       align: 'left',
-      format: (val: Customer) => <div>{val.kur_user_number}</div>,
+      // format: (val: Customer) => <div>{val.kur_user_number}</div>,
       enableSort: true,
     },
     {
