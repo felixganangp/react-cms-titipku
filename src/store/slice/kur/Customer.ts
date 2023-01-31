@@ -19,8 +19,10 @@ const initialState: CustomerInitialProps = {
   total: 0,
   params: {
     page: 1,
-    count: 1,
+    count: 10,
     search: '',
+    order_by: 'id',
+    order_type: 'desc',
   },
   details: null,
 };
