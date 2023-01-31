@@ -44,7 +44,7 @@ export default function KurCustomer() {
 
   useEffect(() => {
     dispatch(customerAction.fetchData(customerKur.params));
-  }, [customerKur.params]);
+  }, [customerKur.params.search]);
 
   useEffect(() => {
     dispatch(typeAction.fetchData());
@@ -181,21 +181,6 @@ export default function KurCustomer() {
     dispatch(customerAction.setParams(payload));
   };
 
-  const handleResetFilter = () => {
-    setAreaKurFilter([]);
-    setTypeKurFilter(null);
-    setSearchKur('');
-    dispatch(
-      customerAction.setParams({
-        page: 1,
-        count: 10,
-        search: '',
-        kur_user_type_id: undefined,
-        area_ids: undefined,
-      }),
-    );
-  };
-
   const handleSearch = (value: string) => {
     dispatch(
       customerAction.setParams({
@@ -216,6 +201,26 @@ export default function KurCustomer() {
         order_type: value.orderType,
       }),
     );
+  };
+
+  const handleApplyFilter = () => {
+    dispatch(customerAction.fetchData(customerKur.params));
+  };
+
+  const handleResetFilter = async () => {
+    setAreaKurFilter([]);
+    setTypeKurFilter(null);
+    setSearchKur('');
+    const params = {
+      page: 1,
+      count: 10,
+      search: '',
+      kur_user_type_id: undefined,
+      area_ids: undefined,
+    };
+    await dispatch(customerAction.setParams(params));
+    await dispatch(customerAction.fetchData(params));
+    // await handleApplyFilter();
   };
 
   const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
@@ -413,7 +418,7 @@ export default function KurCustomer() {
                     >
                       Reset
                     </Button>
-                    <Button>Apply</Button>
+                    <Button onClick={handleApplyFilter}>Apply</Button>
                   </Box>
                 </Grid>
               </Grid>
