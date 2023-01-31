@@ -24,7 +24,7 @@ const DescriptionDetail = (props: DescriptionDetailTypes) => {
         >
           {props.title}
         </Typography>
-        <Box>{props.content}</Box>
+        <Box>{props.content || '-'}</Box>
       </Grid>
     </Grid>
   );
