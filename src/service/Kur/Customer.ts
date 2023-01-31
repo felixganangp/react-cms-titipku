@@ -49,8 +49,6 @@ export const uploadImage = ({
 export const createCustomer = (payload: CreateCustomerPayload) =>
   new Promise<CreateCustomerPayload>(async (resolve, reject) => {
     try {
-      console.log('🚀 ~ file: Customer.ts:50 ~ payload', payload);
-
       const respon = await http.post(`kur/user`, payload);
       if (respon.data) {
         resolve(respon.data);
@@ -62,7 +60,7 @@ export const createCustomer = (payload: CreateCustomerPayload) =>
       reject(message);
     }
   });
-  
+
 export const getCustomersDetails = (id: number | string) =>
   new Promise<CustomerParams>(async (resolve, reject) => {
     try {

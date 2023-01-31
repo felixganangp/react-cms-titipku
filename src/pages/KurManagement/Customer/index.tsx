@@ -44,7 +44,12 @@ export default function KurCustomer() {
 
   useEffect(() => {
     dispatch(customerAction.fetchData(customerKur.params));
-  }, [customerKur.params.search]);
+  }, [
+    customerKur.params.search,
+    customerKur.params.order_by,
+    customerKur.params.order_type,
+    customerKur.params.page,
+  ]);
 
   useEffect(() => {
     dispatch(typeAction.fetchData());
@@ -227,15 +232,17 @@ export default function KurCustomer() {
 
   const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
 
-  const formHandleClose = () => {
-    formModal.closeModal();
-    dispatch(
-      customerAction.setParams({
-        page: 1,
-        count: 1,
-        search: '',
-      }),
-    );
+  const formHandleClose = async () => {
+    // await dispatch(
+    //   customerAction.setParams({
+    //     page: 1,
+    //     count: 10,
+    //     search: '',
+    //     order_by: 'id',
+    //     order_type: 'desc',
+    //   }),
+    // );
+    await formModal.closeModal();
   };
   return (
     <Box p="20px" bgcolor="#F5F7FA">

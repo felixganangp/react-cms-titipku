@@ -69,10 +69,6 @@ function* createCustomer(payload: PayloadAction<CreateCustomer>) {
     const today = new Date();
     const convertJoindate = Math.floor(today.getTime() / 1000);
 
-    console.log(
-      '🚀 ~ file: CustomerAccess.ts:71 ~ function*createCustomer ~ convertBirthDate',
-      convertJoindate,
-    );
     const createCustomerPayload: CreateCustomerPayload = {
       user_id: payload.payload.merchantName?.id,
       user_type: 'merchant',
@@ -118,11 +114,18 @@ function* createCustomer(payload: PayloadAction<CreateCustomer>) {
       CustomerService.createCustomer as any,
       createCustomerPayload,
     );
-    console.log(
-      '🚀 ~ file: CustomerAccess.ts:122 ~ function*createCustomer ~ response',
-      response,
-    );
+
     yield put(customerAction.createCustomerSuccess());
+    yield call(fetchData, {
+      type: customerAction.fetchData.type,
+      payload: {
+        page: 1,
+        count: 10,
+        search: '',
+        order_by: 'id',
+        order_type: 'desc',
+      },
+    });
     yield put(
       uiAction.openToast({
         headMsg: 'Success create customer kur',
