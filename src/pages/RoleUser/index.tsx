@@ -27,6 +27,7 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { roleUserAction } from 'store/slice/RoleUser';
 import { CreateRoleUser, RoleUser as RoleUserTypes } from 'models/RoleUser';
 import FormRoleUser from './components/form';
+import SetStatusUser from './components/SetStatusUser';
 
 import { Bullet } from './roleuser.styled';
 
@@ -40,6 +41,7 @@ export default function RoleUser() {
   const roleUser = useAppSelector((state) => state.roleUser);
 
   const formModal = useModal();
+  const setStatusUserModal = useModal();
   const [formData, setFormData] = useState<FormDataType>({
     isEdit: false,
     data: {
@@ -151,11 +153,15 @@ export default function RoleUser() {
       label: 'Status',
       align: 'left',
       enableSort: true,
-      format: (val: any) => (
-        <Status color="rgba(0,0,0,0.3)">
-          {val.administrator_detail[0].administrator_status.name}
-        </Status>
-      ),
+      format: (val: any) => {
+        const status = val.administrator_detail[0].administrator_status;
+
+        return (
+          <Status color={status.id === 1 ? '#008E58' : 'rgba(0,0,0,0.3)'}>
+            {status.id === 1 ? 'Actived' : status.nam}
+          </Status>
+        );
+      },
     },
     {
       id: 'menu',
@@ -188,7 +194,23 @@ export default function RoleUser() {
               {
                 label: `Set to Inactive`,
                 color: '#c10000',
-                onClick: () => {},
+                onClick: () => {
+                  setFormData(val);
+                  const data: FormDataType = {
+                    isEdit: true,
+                    data: {
+                      name: val.full_name,
+                      email: val.email,
+                      roleAccess:
+                        val.administrator_detail[0].administrator_role,
+                      id: val.id,
+                      id_status: 1,
+                      account_type: 'cms',
+                    },
+                  };
+                  setFormData(data);
+                  setStatusUserModal.openModal();
+                },
               },
             ]}
           >
@@ -277,6 +299,16 @@ export default function RoleUser() {
           onClose={onCloseForm}
           data={formData.data}
           isEdit={formData.isEdit}
+        />
+      </Modal>
+      <Modal
+        open={setStatusUserModal.open}
+        title="Delete Role"
+        onClose={setStatusUserModal.closeModal}
+      >
+        <SetStatusUser
+          onClose={setStatusUserModal.closeModal}
+          data={formData.data}
         />
       </Modal>
     </div>

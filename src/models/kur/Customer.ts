@@ -54,7 +54,6 @@ export interface Customer {
   kur_user_type: KurUserType;
   kur_user_document: KurUserDocument[];
 }
-
 export interface KurUserStatus {
   id?: number;
   created_at: number;
