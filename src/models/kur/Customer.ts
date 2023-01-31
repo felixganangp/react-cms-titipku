@@ -1,4 +1,5 @@
-import { ListParams } from '../fetch';
+import { Merchant } from 'models/Merchant';
+import { ListParams } from 'models/fetch';
 
 export interface CreateCustomer {
   imageCustomer: string | File | Blob;
@@ -33,6 +34,7 @@ export interface Customer {
   updated_by: object;
   user_id: number;
   user_type: string;
+  user: Merchant;
   kur_user_number: string;
   name: string;
   nik: string;
@@ -48,20 +50,9 @@ export interface Customer {
   user_bank: string;
   nobu_account_number: string;
   join_date?: number;
-  user: UserCust;
   kur_user_status: KurUserStatus;
   kur_user_type: KurUserType;
   kur_user_document: KurUserDocument[];
-}
-
-export interface Area {
-  id: number;
-  name: string;
-}
-export interface UserCust {
-  name: string;
-  id: number;
-  area: Area;
 }
 export interface KurUserStatus {
   id?: number;

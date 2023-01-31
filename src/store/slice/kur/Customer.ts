@@ -9,8 +9,6 @@ interface CustomerInitialProps {
   error?: any;
   total: number | undefined;
   params: CustomerParams;
-  loadingKurType: boolean;
-  dataKurType: [];
   details: Customer | null;
 }
 const initialState: CustomerInitialProps = {
@@ -21,11 +19,9 @@ const initialState: CustomerInitialProps = {
   total: 0,
   params: {
     page: 1,
-    count: 10,
+    count: 1,
     search: '',
   },
-  loadingKurType: false,
-  dataKurType: [],
   details: null,
 };
 
@@ -47,7 +43,8 @@ const CustomerSlice = createSlice({
       action: PayloadAction<ListResponse<Customer>>,
     ) {
       state.loading = false;
-      state.data = action.payload.data;
+      state.data = action.payload.data || [];
+      state.total = action.payload.total;
     },
     fetchDataDetail(
       state: CustomerInitialProps,
@@ -70,19 +67,6 @@ const CustomerSlice = createSlice({
         ...state.params,
         ...action.payload,
       };
-    },
-    fetchDataKurType(state: CustomerInitialProps) {
-      state.loadingKurType = true;
-    },
-    failedFetchDataKurType(state: CustomerInitialProps) {
-      state.loading = false;
-    },
-    fetchDataKurTypeSuccess(
-      state: CustomerInitialProps,
-      action: PayloadAction<ListResponse<Customer>>,
-    ) {
-      state.loading = false;
-      state.data = action.payload.data;
     },
   },
 });

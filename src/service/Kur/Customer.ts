@@ -1,5 +1,5 @@
 import http from 'utils/request';
-import { Customer, CustomerParams } from 'models/kur/Customer';
+import { CustomerParams } from 'models/kur/Customer';
 
 export const getAllCustomers = (params: CustomerParams) =>
   new Promise<CustomerParams>(async (resolve, reject) => {
