@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ListResponse } from 'models/fetch';
+import { ListResponse, Response } from 'models/fetch';
 import { CreateCustomer, Customer, CustomerParams } from 'models/kur/Customer';
 
 interface CustomerInitialProps {
@@ -11,6 +11,7 @@ interface CustomerInitialProps {
   params: CustomerParams;
   loadingKurType: boolean;
   dataKurType: [];
+  details: Customer | null;
 }
 const initialState: CustomerInitialProps = {
   data: [],
@@ -25,6 +26,7 @@ const initialState: CustomerInitialProps = {
   },
   loadingKurType: false,
   dataKurType: [],
+  details: null,
 };
 
 const CustomerSlice = createSlice({
@@ -46,6 +48,19 @@ const CustomerSlice = createSlice({
     ) {
       state.loading = false;
       state.data = action.payload.data;
+    },
+    fetchDataDetail(
+      state: CustomerInitialProps,
+      action: PayloadAction<{ id: string | number }>,
+    ) {
+      state.loading = true;
+    },
+    fetchDataDetailSuccess(
+      state: CustomerInitialProps,
+      action: PayloadAction<Response<Customer>>,
+    ) {
+      state.loading = false;
+      state.details = action.payload.data;
     },
     setParams(
       state: CustomerInitialProps,

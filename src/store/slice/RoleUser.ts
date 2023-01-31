@@ -70,6 +70,12 @@ const RoleUserSlice = createSlice({
     ) {
       state.loadingForm = true;
     },
+    editStatusRoleUser(
+      state: RoleUserProps,
+      action: PayloadAction<CreateRoleUserPayload>,
+    ) {
+      state.loadingForm = true;
+    },
     addOrEditRoleUserSuccess(
       state: RoleUserProps,
       action: PayloadAction<{ error: boolean }>,

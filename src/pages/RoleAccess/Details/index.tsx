@@ -48,7 +48,6 @@ export default function RoleUserDetails() {
   useEffect(() => {
     if (id) {
       dispatch(roleAccessAction.fetchDataDetail({ id }));
-      // eslint-disable-next-line radix
     }
   }, []);
 

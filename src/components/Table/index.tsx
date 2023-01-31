@@ -288,7 +288,6 @@ function EnhancedTable<T extends Data>({
                         align={val.align as Align}
                         key={String(key)}
                       >
-                        {console.log(countTotalSticky, key)}
                         {val.format ? val.format(row) : row[val.id]}
                       </TableCell>
                     ))}

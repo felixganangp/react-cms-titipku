@@ -18,6 +18,8 @@ export const StatusStyle = styled.div<Pick<StatusStyleTypes, 'color'>>`
   background-color: ${(props) => props.color};
   border-radius: 8px;
   text-align: center;
+  white-space: nowrap;
+  word-wrap: break-word;
 `;
 export default function Status(props: StatusTypes) {
   return <StatusStyle color={props.color}>{props.children}</StatusStyle>;
