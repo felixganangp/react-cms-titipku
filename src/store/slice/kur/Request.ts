@@ -28,8 +28,6 @@ const initialState: RequestKURProps = {
   displayFilter: {
     areas: [],
     types: null,
-    startDate: null,
-    endDate: null,
   },
 };
 
