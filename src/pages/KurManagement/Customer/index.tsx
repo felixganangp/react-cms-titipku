@@ -82,6 +82,13 @@ export default function KurCustomer() {
     bankName: null,
     bankNumberPrimary: '',
     nobuAccountNumber: '',
+    oldNikKtp: '',
+    oldKkNumber: '',
+    oldNpwp: '',
+    idImageNik: null,
+    idImageKk: null,
+    idImageNpwp: null,
+    idImageSKUsaha: null,
   };
   const [openFilter, setOpenFilter] = useState(false);
   const [formData, setFormData] = useState<FormDataType>({
@@ -125,6 +132,7 @@ export default function KurCustomer() {
     setFormHead('Edit Customer');
     const birthDate = new Date(0);
     birthDate.setUTCSeconds(val.birth_date);
+    const convertBirthDate = { _d: birthDate };
     const findBank = bankData.data.filter((el) => el.name === val.user_bank);
     const findKtp = val.kur_user_document.filter(
       (el) => el.document_type === 'ktp',
@@ -156,7 +164,7 @@ export default function KurCustomer() {
         kurType: val.kur_user_type,
         adminFee: val.admin_fee.toString(),
         dpdRate: val.dpd_rate.toString(),
-        birthDate,
+        birthDate: convertBirthDate,
         phoneNumber: val.phone_number,
         email: val.email,
         addressKtp: val.registered_address,
@@ -164,16 +172,23 @@ export default function KurCustomer() {
         pasarName,
         merchantName,
         nikKtp: findKtp[0].document_number,
+        oldNikKtp: findKtp[0].document_number,
         imageNik: findKtp[0].document_filepath,
         kkNumber: findKk[0].document_number,
+        oldKkNumber: findKk[0].document_number,
         imageKk: findKk[0].document_filepath,
         npwp: findNpwp[0].document_number,
+        oldNpwp: findNpwp[0].document_number,
         imageNpwp: findNpwp[0].document_filepath,
         imageSKUsaha: findSKU[0].document_filepath,
         creditLimit: val.credit_limit.toString(),
         bankName: findBank[0],
         bankNumberPrimary: val.user_account_number,
         nobuAccountNumber: val.nobu_account_number,
+        idImageNik: findKtp[0].id,
+        idImageKk: findKk[0].id,
+        idImageNpwp: findNpwp[0].id,
+        idImageSKUsaha: findSKU[0].id,
       },
     });
     formModal.openModal();

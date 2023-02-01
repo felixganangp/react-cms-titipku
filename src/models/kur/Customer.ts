@@ -8,7 +8,7 @@ export interface CreateCustomer {
   name: string;
   kurType: Type | null;
   adminFee: string;
-  birthDate: { _d?: Date } | Date | null;
+  birthDate: { _d?: Date } | null;
   phoneNumber: string;
   email: string;
   addressKtp: string;
@@ -16,12 +16,19 @@ export interface CreateCustomer {
   pasarName: Area | null;
   merchantName: MerchantResp | null;
   nikKtp: string;
+  oldNikKtp?: string;
   imageNik: string | File | Blob;
+  idImageNik?: number | null;
   kkNumber: string;
+  oldKkNumber?: string;
   imageKk: string | File | Blob;
+  idImageKk?: number | null;
   npwp: string;
+  oldNpwp?: string;
   imageNpwp: string | File | Blob;
+  idImageNpwp?: number | null;
   imageSKUsaha: string;
+  idImageSKUsaha?: number | null;
   dpdRate: string;
   creditLimit: string;
   bankName: BankList | null;
@@ -111,6 +118,7 @@ export interface BankList {
 }
 
 export interface CreateCustomerPayload {
+  idCustomer?: number;
   user_id: number | undefined;
   user_type: string; // as of now only merchant
   name: string;
@@ -133,6 +141,8 @@ export interface CreateCustomerPayload {
 }
 
 export interface KurUserDocumentPayload {
+  id?: number;
+  is_update?: boolean;
   document_type: 'ktp' | 'kk' | 'npwp' | 'sku'; // available options : ktp, kk, npwp, sku
   document_filepath: string;
   document_number?: string;

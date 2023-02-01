@@ -110,6 +110,24 @@ const CustomerSlice = createSlice({
         ...action.payload,
       };
     },
+    editCustomer(
+      state: CustomerInitialProps,
+      action: PayloadAction<CreateCustomer>,
+    ) {
+      state.loadingForm = true;
+    },
+    editCustomerSuccess(
+      state: CustomerInitialProps,
+      // action: PayloadAction<CreateCustomer>,
+    ) {
+      state.loadingForm = false;
+    },
+    editCustomerFailed(
+      state: CustomerInitialProps,
+      // action: PayloadAction<CreateCustomer>,
+    ) {
+      state.loadingForm = false;
+    },
   },
 });
 

@@ -124,7 +124,11 @@ function Form({ onClose, formData }: Props) {
     initialValues,
     onSubmit: async (value, { resetForm }) => {
       await setLoadingForm(true);
-      await dispatch(customerAction.createCustomer(value));
+      if (formData.isEdit) {
+        await dispatch(customerAction.editCustomer(value));
+      } else {
+        await dispatch(customerAction.createCustomer(value));
+      }
       await setLoadingForm(false);
       await resetForm();
       await setOpenCalendar({ open: false, touched: false });
