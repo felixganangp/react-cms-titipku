@@ -1,6 +1,7 @@
 import http from 'utils/request';
+import { RequestKURParams } from 'models/kur/Request';
 
-export const getAllRequestKUR = (params: any) =>
+export const getAllRequestKUR = (params: RequestKURParams) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await http.get('/kur/request', { params });
@@ -16,7 +17,7 @@ export const getAllRequestKUR = (params: any) =>
 export const getAllArea = (params: any) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await http.get(`/b2b/area`, { params });
+      const response = await http.get(`/kur/area`, { params });
       if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response
