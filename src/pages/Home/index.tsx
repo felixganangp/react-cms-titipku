@@ -94,7 +94,7 @@ export default function Home() {
             {greating(date).greeting} {userDetails?.full_name}
           </Typography>
           <Typography color="#fff" my="20px" fontSize="15px">
-            “{quote?.content}x”
+            “{quote?.content}”
           </Typography>
           <Typography
             textAlign="end"
