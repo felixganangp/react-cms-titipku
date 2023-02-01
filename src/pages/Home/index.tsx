@@ -66,6 +66,7 @@ export default function Home() {
         justifyContent: 'center',
         height: 'calc(100vh - 54px)',
         backgroundImage: `url(${image[greating(date).day]})`,
+        backgroundSize: 'fill',
       }}
     >
       <Box

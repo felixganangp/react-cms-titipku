@@ -19,6 +19,8 @@ const KurCustomerDetailsManagement = lazy(
   () => import('pages/KurManagement/Customer/Details'),
 );
 
+const KurInvoiceManagement = lazy(() => import('pages/KurManagement/Invoice'));
+
 interface RouteProps {
   path: string;
   index: boolean;
@@ -90,6 +92,12 @@ const ListRoute: RouteProps[] = [
   {
     comp: KurRequestDetails,
     path: '/kur/request/:id',
+    index: true,
+    auth: 'Private',
+  },
+  {
+    comp: KurInvoiceManagement,
+    path: '/kur/invoice',
     index: true,
     auth: 'Private',
   },
