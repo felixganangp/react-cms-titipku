@@ -1,6 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Card,
@@ -10,191 +9,197 @@ import {
   TextField,
   InputAdornment,
   IconButton,
-  Select,
-  SelectChangeEvent,
-  OutlinedInput,
-  MenuItem,
-  Checkbox,
-  ListItemText,
-  FormControl,
-  DialogContent,
-  Dialog,
+  Autocomplete,
+  Chip,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import Table from 'components/Table';
 import useModal from 'hooks/useModal';
 import ArrowDown from '@mui/icons-material/KeyboardArrowDown';
-import CalendarIcon from '@mui/icons-material/CalendarToday';
 import FormLabel from 'components/FormLabel';
 import MenuList from 'components/MenuList';
-import { useAppDispatch } from 'store/hooks';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { Link, useNavigate } from 'react-router-dom';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { format } from 'date-fns';
-import { DateRange } from 'react-day-picker';
+import { RequestKUR } from 'models/kur/Request';
+import debounce from 'utils/debounce';
+import { HeadCells } from 'components/Table/types';
+import moment from 'moment';
+import { areaAction } from 'store/slice/Area';
+import { typeAction } from 'store/slice/kur/Type';
+import { Area } from 'models/Area';
+import { Type } from 'models/kur/Type';
+import { requestKURAction } from 'store/slice/kur/Request';
+import 'react-day-picker/dist/style.css';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import {
-  CustomerStatus,
-  DateButton,
   FilterButton,
   FilterDataBox,
-  FooterDatePicker,
   InvoiceLabel,
   InvoiceStatus,
-  RangeDatePicker,
-  RowBox,
-  SelectedDate,
 } from './request.styled';
-import 'react-day-picker/dist/style.css';
 
-const data = [
-  {
-    id: 1,
-    customer_id: 1,
-    no_request: 'REQ/019221121',
-    name: 'Lastri',
-    kur_status: 1,
-    kur: {
-      id: 1,
-      kur_type: 'B2B',
-    },
-    request_amount: 20000000,
-    merchant: 'Lapak L12',
-    pasar: 'Pasar Serpong',
-    submit_date: 1674198628,
-    status: 1,
-  },
-  {
-    id: 2,
-    customer_id: 2,
-    no_request: 'REQ/019221122',
-    name: 'Har',
-    kur_status: 4,
-    kur: {
-      id: 2,
-      kur_type: 'B2BWC',
-    },
-    request_amount: 50000000,
-    merchant: 'Lapak Sayur Har',
-    pasar: 'Pasar Cinere',
-    submit_date: 1674198628,
-    status: 2,
-  },
-  {
-    id: 3,
-    customer_id: 3,
-    no_request: 'REQ/019221123',
-    name: 'Yayok',
-    kur_status: 2,
-    kur: {
-      id: 2,
-      kur_type: 'B2BWC',
-    },
-    request_amount: 50000000,
-    merchant: 'Lapak Soto Yayok',
-    pasar: 'Pasar Modern Karawaci',
-    submit_date: 1674198628,
-    status: 3,
-  },
-  {
-    id: 4,
-    customer_id: 4,
-    no_request: 'REQ/019221124',
-    name: 'Bowo',
-    kur_status: 3,
-    kur: {
-      id: 2,
-      kur_type: 'B2BWC',
-    },
-    request_amount: 50000000,
-    merchant: 'Lapak Sayur Bowo',
-    pasar: 'Pasar Cinere',
-    submit_date: 1674198628,
-    status: 2,
-  },
-  {
-    id: 5,
-    customer_id: 5,
-    no_request: 'REQ/019221125',
-    name: 'Tejo',
-    kur_status: 2,
-    kur: {
-      id: 1,
-      kur_type: 'B2B',
-    },
-    request_amount: 100000000,
-    merchant: 'Lapak Daging Beku',
-    pasar: 'Pasar Bintaro',
-    submit_date: 1674198628,
-    status: 1,
-  },
-];
-
-const areas = [
-  {
-    id: 15,
-    name: 'Pasar Paramount',
-    address: '',
-  },
-  {
-    id: 16,
-    name: 'Pasar Modern Bintaro',
-    address: '',
-  },
-  {
-    id: 17,
-    name: 'Pasar Segar Graha',
-    address: '',
-  },
-  {
-    id: 18,
-    name: 'Pasar Modern Town Market',
-    address: '',
-  },
-  {
-    id: 19,
-    name: 'Pasar Sinpasa GS',
-    address: '',
-  },
-  {
-    id: 20,
-    name: 'Pasar Laris Kosambi',
-    address: '',
-  },
-  {
-    id: 21,
-    name: 'Pasar Laris Palm Paradise',
-    address: '',
-  },
-];
-
-const kurType = [
-  {
-    id: 1,
-    type: 'B2B',
-  },
-  {
-    id: 2,
-    type: 'B2BWC',
-  },
-];
-
-const today = new Date();
-
-export default function RequestKUR() {
-  const formModal = useModal();
-  const [openDatePicker, setOpenDatePicker] = useState<boolean>(false);
+export default function RequestKURPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const request = useAppSelector((state) => state.request);
+
+  // define filter
+  const [openFilter, setOpenFilter] = useState<boolean>(false);
+  const areas = useAppSelector((state) => state.area.data);
+  const types = useAppSelector((state) => state.typeKur.data);
+  const [inputValueArea, setInputValueArea] = useState('');
+
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [openStartDate, setOpenStartDate] = useState<boolean>(false);
+  const [openEndDate, setOpenEndDate] = useState<boolean>(false);
+
+  useEffect(() => {
+    dispatch(typeAction.fetchData());
+    dispatch(areaAction.fetchData());
+    if (request.params.submit_date_start)
+      setStartDate(new Date(request.params.submit_date_start * 1000));
+    if (request.params.submit_date_end)
+      setEndDate(new Date(request.params.submit_date_end * 1000));
+  }, []);
 
   // table
-  const headCell = [
+  useEffect(() => {
+    dispatch(requestKURAction.fetchData(request.params));
+  }, [
+    request.params.search,
+    request.params.order_by,
+    request.params.order_type,
+  ]);
+
+  const handleSearch = (value: string) => {
+    dispatch(
+      requestKURAction.setParams({
+        page: 1,
+        search: value,
+      }),
+    );
+  };
+
+  const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
+
+  const handleChangePage = (value: number) => {
+    dispatch(
+      requestKURAction.setParams({
+        page: value,
+      }),
+    );
+  };
+
+  const handleChangeSort = (value: {
+    orderBy: string | number;
+    orderType: 'asc' | 'desc';
+  }) => {
+    dispatch(
+      requestKURAction.setParams({
+        page: 1,
+        order_by: value.orderBy,
+        order_type: value.orderType,
+      }),
+    );
+  };
+
+  const handleChangeType = (value: any) => {
+    dispatch(
+      requestKURAction.setParams({
+        page: 1,
+        kur_user_type_id: value ? value?.id : null,
+      }),
+    );
+    dispatch(
+      requestKURAction.setDisplayFilter({
+        types: value,
+      }),
+    );
+  };
+
+  const handleChangePasar = (value: any) => {
+    const areasId: (number | undefined)[] = [];
+    if (value.length > 0) value.map((item: Area) => areasId.push(item.id));
+    dispatch(
+      requestKURAction.setParams({
+        page: 1,
+        area_ids: areasId.length > 0 ? areasId.join(',') : undefined,
+      }),
+    );
+    dispatch(
+      requestKURAction.setDisplayFilter({
+        areas: value,
+      }),
+    );
+  };
+
+  const handleChangeStartDate = (value: any) => {
+    dispatch(
+      requestKURAction.setParams({
+        page: 1,
+        submit_date_start: Math.floor(new Date(value).getTime() / 1000),
+      }),
+    );
+  };
+
+  const handleChangeEndDate = (value: any) => {
+    dispatch(
+      requestKURAction.setParams({
+        page: 1,
+        submit_date_end: Math.floor(
+          new Date(value).setHours(23, 59, 59, 59) / 1000,
+        ),
+      }),
+    );
+  };
+
+  const handleApplyFilter = () => {
+    dispatch(requestKURAction.fetchData(request.params));
+  };
+
+  const handleResetFilter = async () => {
+    setStartDate(null);
+    setEndDate(null);
+    await dispatch(
+      requestKURAction.setParams({
+        page: 1,
+        area_ids: undefined,
+        kur_user_type_id: undefined,
+        submit_date_start: undefined,
+        submit_date_end: undefined,
+      }),
+    );
+    await dispatch(
+      requestKURAction.setDisplayFilter({
+        areas: [],
+        types: null,
+      }),
+    );
+    await dispatch(
+      requestKURAction.fetchData({
+        page: 1,
+        search: request.params.search,
+        area_ids: undefined,
+        kur_user_type_id: undefined,
+        submit_date_start: undefined,
+        submit_date_end: undefined,
+      }),
+    );
+  };
+
+  const headCell: HeadCells<RequestKUR>[] = [
     {
-      id: 'no_request',
+      id: 'kur_request_number',
       label: 'No Request',
       align: 'left',
+      enableSort: true,
       format: (val: any) => (
         <Link to={`/kur/request/${val.id}`} style={{ textDecoration: 'none' }}>
-          <InvoiceLabel>{val.no_request}</InvoiceLabel>
+          <InvoiceLabel>{val.kur_request_number}</InvoiceLabel>
         </Link>
       ),
     },
@@ -202,56 +207,57 @@ export default function RequestKUR() {
       id: 'name',
       label: 'Name',
       align: 'left',
-      format: (val: any) => (
-        <RowBox>
-          <CustomerStatus status={val.kur_status}>&nbsp;</CustomerStatus>
-          <Typography>{val.name}</Typography>
-        </RowBox>
-      ),
+      enableSort: true,
+      format: (val: any) => <Typography>{val.kur_user.name}</Typography>,
     },
     {
       id: 'kur_type',
       label: 'KUR Type',
       align: 'left',
-      format: (val: any) => <Typography>{val.kur.kur_type}</Typography>,
+      format: (val: any) => (
+        <Typography>{val.kur_user.kur_user_type.name}</Typography>
+      ),
     },
     {
       id: 'request_amount',
       label: 'Request Amount',
       align: 'left',
       format: (val: any) => (
-        <Typography>
-          Rp {new Intl.NumberFormat().format(val.request_amount)}
-        </Typography>
+        <Typography>Rp {new Intl.NumberFormat().format(val.amount)}</Typography>
       ),
     },
     {
-      id: 'merchant',
+      id: 'merchant_name',
       label: 'Merchant',
       align: 'left',
+      enableSort: true,
+      format: (val: any) => <Typography>{val.kur_user.user.name}</Typography>,
     },
     {
-      id: 'pasar',
+      id: 'area_name',
       label: 'Pasar',
       align: 'left',
+      format: (val: any) => (
+        <Typography>{val.kur_user.user.area.name}</Typography>
+      ),
     },
     {
-      id: 'submit_date',
+      id: 'created_at',
       label: 'Submit Date',
       align: 'left',
+      format: (val: any) => (
+        <Typography>
+          {moment.unix(val.created_at).format('DD/MM/YYYY')}
+        </Typography>
+      ),
     },
     {
       id: 'status',
       label: 'Status',
       align: 'left',
+      enableSort: true,
       format: (val: any) => (
-        <InvoiceStatus status={val.status}>
-          {val.status === 1
-            ? 'Pending'
-            : val.status === 2
-            ? 'Approved'
-            : 'Rejected'}
-        </InvoiceStatus>
+        <InvoiceStatus status={val.status}>{val.status}</InvoiceStatus>
       ),
     },
     {
@@ -292,83 +298,6 @@ export default function RequestKUR() {
     },
   ];
 
-  // filter
-  const ITEM_HEIGHT = 48;
-  const ITEM_PADDING_TOP = 8;
-  const MenuProps = {
-    PaperProps: {
-      style: {
-        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-        width: 250,
-      },
-    },
-  };
-  const [openFilter, setOpenFilter] = useState<boolean>(false);
-  const [selectedArea, setSelectedArea] = useState<string[]>([]);
-  const [selectedKurType, setSelectedKurType] = useState<string[]>([]);
-
-  const handleChangeFilterPasar = (
-    event: SelectChangeEvent<typeof selectedArea>,
-  ) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedArea(typeof value === 'string' ? value.split(',') : value);
-  };
-
-  const handleChangeFilterKurType = (
-    event: SelectChangeEvent<typeof selectedKurType>,
-  ) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedKurType(typeof value === 'string' ? value.split(',') : value);
-  };
-
-  const defaultSelected: DateRange = {
-    from: today,
-    to: today,
-  };
-  const [range, setRange] = useState<DateRange | undefined>(defaultSelected);
-
-  const closeDatePicker = () => {
-    if (!range?.to) {
-      setRange((prevState: DateRange | undefined) => {
-        const next = {
-          from: prevState?.from,
-          to: prevState?.from,
-        };
-        return next;
-      });
-    }
-    setOpenDatePicker(!openDatePicker);
-  };
-
-  let footer = <p>Please pick start date</p>;
-  if (range?.from) {
-    if (!range.to) {
-      footer = (
-        <FooterDatePicker>
-          <SelectedDate>
-            {format(range.from, 'PPP')} - pick end date
-          </SelectedDate>
-          <DateButton onClick={() => closeDatePicker()}>OK</DateButton>
-        </FooterDatePicker>
-      );
-    } else if (range.to) {
-      footer = (
-        <FooterDatePicker>
-          <SelectedDate>
-            {format(range.from, 'PPP')} - {format(range.to, 'PPP')}
-          </SelectedDate>
-          <DateButton onClick={() => closeDatePicker()}>OK</DateButton>
-        </FooterDatePicker>
-      );
-    }
-  }
-
-  console.log('date', range);
-
   return (
     <>
       <Box p="20px" bgcolor="#F5F7FA">
@@ -392,12 +321,16 @@ export default function RequestKUR() {
                     size="small"
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
                     fullWidth
+                    defaultValue={request.params.search}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
                           <SearchIcon />
                         </InputAdornment>
                       ),
+                    }}
+                    onChange={(event) => {
+                      debounceSearch(event.target.value);
                     }}
                   />
                   <FilterButton
@@ -407,7 +340,6 @@ export default function RequestKUR() {
                     Filter
                   </FilterButton>
                 </Box>
-
                 <Box
                   display={openFilter ? 'flex' : 'none'}
                   flexDirection="row"
@@ -416,107 +348,151 @@ export default function RequestKUR() {
                   gap="28px"
                 >
                   <FormLabel text="Pasar">
-                    <FormControl
-                      sx={{ width: 'inherit', maxWidth: 'inherit', height: 20 }}
-                    >
-                      <Select
-                        multiple
-                        displayEmpty
-                        value={selectedArea}
-                        onChange={handleChangeFilterPasar}
-                        input={
-                          <OutlinedInput
+                    <Autocomplete
+                      multiple
+                      id="filterPasar"
+                      options={areas}
+                      onChange={(e, value) => {
+                        handleChangePasar(value);
+                      }}
+                      getOptionLabel={(option) => `${option.title}`}
+                      renderInput={(params) => {
+                        return (
+                          <TextField
+                            {...params}
+                            name="type"
                             placeholder="Select Pasar"
-                            size="small"
-                            fullWidth
+                            variant="outlined"
                           />
-                        }
-                        renderValue={(selected) => selected.join(', ')}
-                        MenuProps={MenuProps}
-                        inputProps={{ 'aria-label': 'Without label' }}
-                        fullWidth
-                      >
-                        <MenuItem disabled value="">
-                          <em>Select Pasar</em>
-                        </MenuItem>
-                        {areas.map((pasar) => (
-                          <MenuItem key={pasar.name} value={pasar.name}>
-                            <Checkbox
-                              checked={selectedArea.indexOf(pasar.name) > -1}
-                            />
-                            <ListItemText primary={pasar.name} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+                        );
+                      }}
+                      renderTags={(value: Area[], getTagProps) =>
+                        value.map((item: Area, index: number) => (
+                          <Chip
+                            label={item.title}
+                            {...getTagProps({ index })}
+                            key={`area-${item.id}`}
+                          />
+                        ))
+                      }
+                      isOptionEqualToValue={(item: Area) => {
+                        const filtered = request?.displayFilter?.areas?.filter(
+                          (el) => el.id === item.id,
+                        );
+                        if (filtered) return item.id === filtered[0]?.id;
+                        return false;
+                      }}
+                      renderOption={(props, item) => (
+                        <Box component="li" {...props} key={`area${item.id}`}>
+                          {item.title}
+                        </Box>
+                      )}
+                      value={request?.displayFilter?.areas}
+                      inputValue={inputValueArea}
+                      onInputChange={(_, newInput) => {
+                        setInputValueArea(newInput);
+                      }}
+                    />
                   </FormLabel>
                   <FormLabel text="Type">
-                    <FormControl
-                      sx={{ width: 'inherit', maxWidth: 'inherit', height: 20 }}
-                    >
-                      <Select
-                        multiple
-                        displayEmpty
-                        value={selectedKurType}
-                        onChange={handleChangeFilterKurType}
-                        input={
-                          <OutlinedInput
-                            placeholder="Select Type of KUR"
-                            size="small"
-                            fullWidth
-                          />
-                        }
-                        renderValue={(selected) => selected.join(', ')}
-                        MenuProps={MenuProps}
-                        inputProps={{ 'aria-label': 'Without label' }}
-                        fullWidth
-                      >
-                        <MenuItem disabled value="">
-                          <em>Select Type of KUR</em>
-                        </MenuItem>
-                        {kurType.map((type) => (
-                          <MenuItem key={type.type} value={type.type}>
-                            <Checkbox
-                              checked={selectedKurType.indexOf(type.type) > -1}
-                            />
-                            <ListItemText primary={type.type} />
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
+                    <Autocomplete
+                      id="filterType"
+                      options={types}
+                      onChange={(e, value) => {
+                        handleChangeType(value);
+                      }}
+                      isOptionEqualToValue={(item: Type) => {
+                        return item.id === request.displayFilter?.types?.id;
+                      }}
+                      getOptionLabel={(item) => item.name}
+                      value={request?.displayFilter?.types}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          name="type"
+                          placeholder="Select Type of KUR"
+                        />
+                      )}
+                    />
                   </FormLabel>
-                  <FormLabel text="Submit Date">
-                    <div>
-                      <TextField
-                        value={
-                          range?.from && range?.to && range?.from !== range?.to
-                            ? `${format(range.from, 'dd MMM yyyy')} - ${format(
-                                range.to,
-                                'dd MMM yyyy',
-                              )}`
-                            : range?.from &&
-                              `${format(range?.from, 'dd MMM yyyy')}`
-                        }
-                        placeholder={
-                          range?.from && range?.to
-                            ? `${format(range.from, 'dd/mm/yyyy')} - ${format(
-                                range.to,
-                                'dd/mm/yyyy',
-                              )}`
-                            : 'Select Date'
-                        }
-                        size="small"
-                        fullWidth
-                        onClick={() => setOpenDatePicker(!openDatePicker)}
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <CalendarIcon />
-                            </InputAdornment>
-                          ),
+                </Box>
+                <Box
+                  display={openFilter ? 'flex' : 'none'}
+                  flexDirection="row"
+                  width="100%"
+                  justifyContent="space-between"
+                  gap="28px"
+                >
+                  <FormLabel
+                    text="Start Submit Date"
+                    error={startDate === null && endDate !== null}
+                    helperText={
+                      startDate === null &&
+                      endDate !== null &&
+                      'Start Date is required when End Date is filled'
+                    }
+                  >
+                    <LocalizationProvider dateAdapter={AdapterMoment}>
+                      <DesktopDatePicker
+                        open={openStartDate}
+                        onClose={() => {
+                          setOpenStartDate(false);
                         }}
+                        onOpen={() => {
+                          setOpenStartDate(true);
+                        }}
+                        value={startDate}
+                        inputFormat="DD/MM/YYYY"
+                        onChange={(value) => {
+                          setStartDate(value);
+                          handleChangeStartDate(value);
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            sx={{ width: '100%' }}
+                            {...params}
+                            onClick={() => setOpenStartDate(true)}
+                          />
+                        )}
+                        maxDate={endDate}
                       />
-                    </div>
+                    </LocalizationProvider>
+                  </FormLabel>
+
+                  <FormLabel
+                    text="End Submit Date"
+                    error={startDate !== null && endDate === null}
+                    helperText={
+                      startDate !== null &&
+                      endDate === null &&
+                      'End Date is required when Start Date is filled'
+                    }
+                  >
+                    <LocalizationProvider dateAdapter={AdapterMoment}>
+                      <DesktopDatePicker
+                        open={openEndDate}
+                        onClose={() => {
+                          setOpenEndDate(false);
+                        }}
+                        onOpen={() => {
+                          setOpenEndDate(true);
+                        }}
+                        value={endDate}
+                        inputFormat="DD/MM/YYYY"
+                        onChange={(value) => {
+                          setEndDate(value);
+                          handleChangeEndDate(value);
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            sx={{ width: '100%' }}
+                            {...params}
+                            onClick={() => setOpenEndDate(true)}
+                          />
+                        )}
+                        minDate={startDate}
+                      />
+                    </LocalizationProvider>
                   </FormLabel>
                 </Box>
                 <Box
@@ -526,8 +502,18 @@ export default function RequestKUR() {
                   width="100%"
                   gap="20px"
                 >
-                  <Button variant="text">Reset</Button>
-                  <FilterButton>Apply</FilterButton>
+                  <Button variant="text" onClick={() => handleResetFilter()}>
+                    Reset
+                  </Button>
+                  <FilterButton
+                    onClick={() => handleApplyFilter()}
+                    disabled={
+                      (startDate === null && endDate !== null) ||
+                      (startDate !== null && endDate === null)
+                    }
+                  >
+                    Apply
+                  </FilterButton>
                 </Box>
               </FilterDataBox>
             </Card>
@@ -540,28 +526,21 @@ export default function RequestKUR() {
               boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
             >
               <Table
-                data={data}
+                data={request.data || []}
                 headCells={headCell}
-                page={1}
-                totalData={10}
-                onChangePage={(e) => console.log(e)}
-                count={data.length}
+                totalData={request.total}
+                loading={request.loading}
+                count={request.params.count}
+                page={request.params.page}
+                orderBy={request.params.order_by}
+                orderType={request.params.order_type}
+                onChangePage={(page) => handleChangePage(page)}
+                onChangeSort={(value) => handleChangeSort(value)}
               />
             </Box>
           </Grid>
         </Grid>
       </Box>
-      <Dialog open={openDatePicker} onClose={() => closeDatePicker()}>
-        <DialogContent>
-          <RangeDatePicker
-            mode="range"
-            defaultMonth={today}
-            selected={range}
-            footer={footer}
-            onSelect={setRange}
-          />
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

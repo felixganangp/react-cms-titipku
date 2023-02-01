@@ -59,7 +59,7 @@ export interface Customer {
   join_date?: number;
   kur_user_status: KurUserStatus;
   kur_user_type: KurUserType;
-  kur_user_document: KurUserDocument[];
+  kur_user_document: KurUserDocument[] | null;
 }
 export interface KurUserStatus {
   id?: number;
