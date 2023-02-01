@@ -57,35 +57,36 @@ export default function KurCustomer() {
     customerKur.params.page,
   ]);
 
+  const initialData = {
+    // imageCustomer: '',
+    idCustomer: '',
+    name: '',
+    kurType: null,
+    adminFee: '',
+    dpdRate: '',
+    birthDate: null,
+    phoneNumber: '',
+    email: '',
+    addressKtp: '',
+    addressDomisili: '',
+    pasarName: null,
+    merchantName: null,
+    nikKtp: '',
+    imageNik: '',
+    kkNumber: '',
+    imageKk: '',
+    npwp: '',
+    imageNpwp: '',
+    imageSKUsaha: '',
+    creditLimit: '',
+    bankName: null,
+    bankNumberPrimary: '',
+    nobuAccountNumber: '',
+  };
   const [openFilter, setOpenFilter] = useState(false);
   const [formData, setFormData] = useState<FormDataType>({
     isEdit: false,
-    initialData: {
-      // imageCustomer: '',
-      idCustomer: '',
-      name: '',
-      kurType: null,
-      adminFee: '',
-      dpdRate: '',
-      birthDate: null,
-      phoneNumber: '',
-      email: '',
-      addressKtp: '',
-      addressDomisili: '',
-      pasarName: null,
-      merchantName: null,
-      nikKtp: '',
-      imageNik: '',
-      kkNumber: '',
-      imageKk: '',
-      npwp: '',
-      imageNpwp: '',
-      imageSKUsaha: '',
-      creditLimit: '',
-      bankName: null,
-      bankNumberPrimary: '',
-      nobuAccountNumber: '',
-    },
+    initialData,
   });
   useEffect(() => {
     if (
@@ -117,8 +118,11 @@ export default function KurCustomer() {
     const result = `${day}/${month + 1}/${year}`;
     return result;
   };
+
+  const [formHead, setFormHead] = useState('');
   const handleOpenEdit = (val: Customer) => {
     console.log('🚀 ~ file:  val', val);
+    setFormHead('Edit Customer');
     const birthDate = new Date(0);
     birthDate.setUTCSeconds(val.birth_date);
     const findBank = bankData.data.filter((el) => el.name === val.user_bank);
@@ -130,6 +134,9 @@ export default function KurCustomer() {
     );
     const findNpwp = val.kur_user_document.filter(
       (el) => el.document_type === 'npwp',
+    );
+    const findSKU = val.kur_user_document.filter(
+      (el) => el.document_type === 'sku',
     );
     const merchantName: MerchantResp = {
       merchant_name: val.user.name,
@@ -157,18 +164,22 @@ export default function KurCustomer() {
         pasarName,
         merchantName,
         nikKtp: findKtp[0].document_number,
-        imageNik: '',
+        imageNik: findKtp[0].document_filepath,
         kkNumber: findKk[0].document_number,
-        imageKk: '',
+        imageKk: findKk[0].document_filepath,
         npwp: findNpwp[0].document_number,
-        imageNpwp: '',
-        imageSKUsaha: '',
+        imageNpwp: findNpwp[0].document_filepath,
+        imageSKUsaha: findSKU[0].document_filepath,
         creditLimit: val.credit_limit.toString(),
         bankName: findBank[0],
         bankNumberPrimary: val.user_account_number,
         nobuAccountNumber: val.nobu_account_number,
       },
     });
+    formModal.openModal();
+  };
+  const handleOpenAdd = () => {
+    setFormHead('Add Customer');
     formModal.openModal();
   };
   const headCell = [
@@ -361,6 +372,7 @@ export default function KurCustomer() {
     //     order_type: 'desc',
     //   }),
     // );
+    setFormData({ isEdit: false, initialData });
     await formModal.closeModal();
   };
   return (
@@ -384,7 +396,9 @@ export default function KurCustomer() {
                   data-testid="button-add-customer"
                   sx={{ width: '12%' }}
                   startIcon={<AddIcon />}
-                  onClick={formModal.openModal}
+                  onClick={() => {
+                    handleOpenAdd();
+                  }}
                 >
                   Add Customer
                 </Button>
@@ -602,11 +616,7 @@ export default function KurCustomer() {
           </Box>
         </Grid>
       </Grid>
-      <Modal
-        open={formModal.open}
-        title="Add Customer"
-        onClose={formModal.closeModal}
-      >
+      <Modal open={formModal.open} title={formHead} onClose={formHandleClose}>
         <FormCustomer onClose={formHandleClose} formData={formData} />
       </Modal>
     </Box>
