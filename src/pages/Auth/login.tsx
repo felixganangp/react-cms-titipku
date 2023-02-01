@@ -73,6 +73,7 @@ export default function Login() {
             display="flex"
             alignItems="center"
             justifyContent="center"
+            sx={{ backgroundColor: '#cce8de' }}
           >
             <Box
               boxShadow="0px 4px 25px rgba(0, 0, 0, 0.25);"
@@ -84,6 +85,7 @@ export default function Login() {
               alignItems="center"
               gap="20px"
               minWidth="80%"
+              sx={{ backgroundColor: '#fff' }}
             >
               <img src="/images/logo_titipku.png" height="75px" alt="icon" />
               <Typography>To continue, Sign in to Titipku account.</Typography>
