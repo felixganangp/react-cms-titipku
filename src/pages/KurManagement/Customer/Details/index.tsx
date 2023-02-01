@@ -101,13 +101,13 @@ export default function RoleUserDetails() {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Card>
-              <Menu>Role Access Management</Menu>
+              <Menu>Kredit Usaha Rakyat</Menu>
               <Link style={{ textDecoration: 'none' }} to="/kur/customer">
                 <BackButton
                   sx={{ '&:hover': { backgroundColor: '#ffff' } }}
                   startIcon={<ArrowBackIosIcon />}
                 >
-                  <TitlePage>Details</TitlePage>
+                  <TitlePage>Customer Detail</TitlePage>
                 </BackButton>
               </Link>
             </Card>
