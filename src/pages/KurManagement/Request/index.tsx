@@ -67,70 +67,14 @@ export default function RequestKURPage() {
     dispatch(areaAction.fetchData());
   }, []);
 
-  // const [range, setRange] = useState<DateRange | undefined>(undefined);
-
-  // const handleChangeDate = () => {
-  //   console.log('range', range);
-  //   if (range && range.from) {
-  //     console.log('range from', new Date(format(range.from, 'dd-MM-yyyy')));
-  //     const startDate: number = new Date(
-  //       format(range.from, 'dd/MM/yyyy'),
-  //     ).setHours(0, 0, 0, 0);
-  //     const endDate: number = range.to
-  //       ? new Date(format(range.to, 'dd/MM/yyyy')).setHours(23, 59, 59, 59)
-  //       : new Date(format(range.from, 'dd/MM/yyyy')).setHours(23, 59, 59, 59);
-  //     if (!range?.to) {
-  //       setRange((prevState: DateRange | undefined) => {
-  //         const next = {
-  //           from: prevState?.from,
-  //           to: prevState?.from,
-  //         };
-  //         return next;
-  //       });
-  //     }
-  //     setOpenDatePicker(!openDatePicker);
-  //     console.log('start date', startDate, 'end date', endDate);
-  //     dispatch(
-  //       requestKURAction.setParams({
-  //         page: 1,
-  //         submit_date_start: Math.floor(startDate.getTime() / 1000);
-  //       })
-  //     )
-  //   }
-  //   const startDateUnix: number =
-  //     startDate && Math.floor(startDate.getTime() / 1000);
-  // };
-
-  // const renderFooter = () => {
-  //   let footer = <p>Please pick start date</p>;
-  //   if (range?.from) {
-  //     if (!range.to) {
-  //       footer = (
-  //         <FooterDatePicker>
-  //           <SelectedDate>
-  //             {format(range.from, 'PPP')} - pick end date
-  //           </SelectedDate>
-  //           <DateButton onClick={() => handleChangeDate()}>OK</DateButton>
-  //         </FooterDatePicker>
-  //       );
-  //     } else if (range.to) {
-  //       footer = (
-  //         <FooterDatePicker>
-  //           <SelectedDate>
-  //             {format(range.from, 'PPP')} - {format(range.to, 'PPP')}
-  //           </SelectedDate>
-  //           <DateButton onClick={() => handleChangeDate()}>OK</DateButton>
-  //         </FooterDatePicker>
-  //       );
-  //     }
-  //   }
-  //   return footer;
-  // };
-
   // table
   useEffect(() => {
     dispatch(requestKURAction.fetchData(request.params));
-  }, [request.params.search]);
+  }, [
+    request.params.search,
+    request.params.order_by,
+    request.params.order_type,
+  ]);
 
   const handleSearch = (value: string) => {
     dispatch(
@@ -236,9 +180,10 @@ export default function RequestKURPage() {
 
   const headCell: HeadCells<RequestKUR>[] = [
     {
-      id: 'no_request',
+      id: 'kur_request_number',
       label: 'No Request',
       align: 'left',
+      enableSort: true,
       format: (val: any) => (
         <Link to={`/kur/request/${val.id}`} style={{ textDecoration: 'none' }}>
           <InvoiceLabel>{val.kur_request_number}</InvoiceLabel>
@@ -249,6 +194,7 @@ export default function RequestKURPage() {
       id: 'name',
       label: 'Name',
       align: 'left',
+      enableSort: true,
       format: (val: any) => <Typography>{val.kur_user.name}</Typography>,
     },
     {
@@ -268,13 +214,14 @@ export default function RequestKURPage() {
       ),
     },
     {
-      id: 'merchant',
+      id: 'merchant_name',
       label: 'Merchant',
       align: 'left',
+      enableSort: true,
       format: (val: any) => <Typography>{val.kur_user.user.name}</Typography>,
     },
     {
-      id: 'pasar',
+      id: 'area_name',
       label: 'Pasar',
       align: 'left',
       format: (val: any) => (
@@ -282,7 +229,7 @@ export default function RequestKURPage() {
       ),
     },
     {
-      id: 'submit_date',
+      id: 'created_at',
       label: 'Submit Date',
       align: 'left',
       format: (val: any) => (
@@ -295,6 +242,7 @@ export default function RequestKURPage() {
       id: 'status',
       label: 'Status',
       align: 'left',
+      enableSort: true,
       format: (val: any) => (
         <InvoiceStatus status={val.status}>{val.status}</InvoiceStatus>
       ),
@@ -444,39 +392,6 @@ export default function RequestKURPage() {
                       )}
                     />
                   </FormLabel>
-                  {/* <FormLabel text="Submit Date">
-                    <div>
-                      <TextField
-                        value={
-                          range?.from && range?.to && range?.from !== range?.to
-                            ? `${format(range.from, 'dd MMM yyyy')} - ${format(
-                                range.to,
-                                'dd MMM yyyy',
-                              )}`
-                            : range?.from &&
-                              `${format(range?.from, 'dd MMM yyyy')}`
-                        }
-                        placeholder={
-                          range?.from && range?.to
-                            ? `${format(range.from, 'dd/mm/yyyy')} - ${format(
-                                range.to,
-                                'dd/mm/yyyy',
-                              )}`
-                            : 'Select Date'
-                        }
-                        size="small"
-                        fullWidth
-                        onClick={() => setOpenDatePicker(!openDatePicker)}
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <CalendarIcon />
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                    </div>
-                  </FormLabel> */}
                 </Box>
                 <Box
                   display={openFilter ? 'flex' : 'none'}
@@ -485,7 +400,15 @@ export default function RequestKURPage() {
                   justifyContent="space-between"
                   gap="28px"
                 >
-                  <FormLabel text="Start Submit Date">
+                  <FormLabel
+                    text="Start Submit Date"
+                    error={startDate === null && endDate !== null}
+                    helperText={
+                      startDate === null &&
+                      endDate !== null &&
+                      'Start Date is required when End Date is filled'
+                    }
+                  >
                     <LocalizationProvider dateAdapter={AdapterMoment}>
                       <DesktopDatePicker
                         open={openStartDate}
@@ -513,7 +436,15 @@ export default function RequestKURPage() {
                     </LocalizationProvider>
                   </FormLabel>
 
-                  <FormLabel text="End Submit Date">
+                  <FormLabel
+                    text="End Submit Date"
+                    error={startDate !== null && endDate === null}
+                    helperText={
+                      startDate !== null &&
+                      endDate === null &&
+                      'End Date is required when Start Date is filled'
+                    }
+                  >
                     <LocalizationProvider dateAdapter={AdapterMoment}>
                       <DesktopDatePicker
                         open={openEndDate}
@@ -551,7 +482,13 @@ export default function RequestKURPage() {
                   <Button variant="text" onClick={() => handleResetFilter()}>
                     Reset
                   </Button>
-                  <FilterButton onClick={() => handleApplyFilter()}>
+                  <FilterButton
+                    onClick={() => handleApplyFilter()}
+                    disabled={
+                      (startDate === null && endDate !== null) ||
+                      (startDate !== null && endDate === null)
+                    }
+                  >
                     Apply
                   </FilterButton>
                 </Box>
@@ -581,17 +518,6 @@ export default function RequestKURPage() {
           </Grid>
         </Grid>
       </Box>
-      {/* <Dialog open={openDatePicker} onClose={() => handleChangeDate()}>
-        <DialogContent>
-          <RangeDatePicker
-            mode="range"
-            defaultMonth={undefined}
-            selected={range}
-            footer={renderFooter()}
-            onSelect={setRange}
-          />
-        </DialogContent>
-      </Dialog> */}
     </>
   );
 }
