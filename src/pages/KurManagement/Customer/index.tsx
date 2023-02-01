@@ -148,7 +148,7 @@ export default function KurCustomer() {
       title: val.user.area.name,
     };
     setFormData({
-      isEdit: false,
+      isEdit: true,
       initialData: {
         // imageCustomer: '',
         idCustomer: '',

@@ -870,7 +870,7 @@ function Form({ onClose, formData }: Props) {
             </Button>
             <Button
               disabled={
-                !(isValid && dirty) ||
+                !(isValid && (dirty || formData.isEdit)) ||
                 !(
                   values.imageKk &&
                   values.imageNik &&
