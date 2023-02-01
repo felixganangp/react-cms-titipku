@@ -55,7 +55,7 @@ export default function ChildMenu({
               textDecoration: 'none',
             }}
             to={item.path}
-            key={item.path}
+            key={item.path + item.id}
             onClick={() => onSetCurrentMenu(item.id)}
           >
             <ListItemButton
@@ -83,12 +83,12 @@ export default function ChildMenu({
                   whiteSpace: 'nowrap',
                   minWidth: '126px',
                 }}
-                key={item.id}
+                key={item.id + item.title}
               />
             </ListItemButton>
           </Link>
         ) : (
-          <div key={item.path}>
+          <div key={item.path + item.id}>
             <ListItemButton
               sx={{
                 margin: '6px 14px',
@@ -104,7 +104,7 @@ export default function ChildMenu({
                   toggleOpenList(item)
                 )
               }
-              key={item.id}
+              key={item.id + item.title}
             >
               <ListItemIcon sx={{ minWidth: '46px', fontSize: '20px' }} />
               <ListItemText
@@ -143,7 +143,7 @@ export default function ChildMenu({
                 <List dense>
                   {item.child.map((superchild) => (
                     <Link
-                      key={superchild.id}
+                      key={superchild.id + superchild.title}
                       style={{
                         textDecoration: 'none',
                       }}
