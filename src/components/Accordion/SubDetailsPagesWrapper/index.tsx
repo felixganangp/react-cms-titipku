@@ -67,3 +67,27 @@ export default function AccordionOnDetails(props: AccordionOnDetailsProps) {
 AccordionOnDetails.defaultProps = {
   defaultOpen: false,
 };
+
+export function SubDetail(props: AccordionOnDetailsProps) {
+  const { title, children, headerContent, defaultOpen } = props;
+  return (
+    <Wrapper>
+      <HeaderBox>
+        <ButtonAccordion>
+          <Icon rotate={1}>
+            <KeyboardArrowRightIcon sx={{ color: '#ffff', mt: '3px' }} />
+          </Icon>
+          <Title>{title}</Title>
+        </ButtonAccordion>
+        {headerContent}
+      </HeaderBox>
+      <WrapperContent
+        sx={{
+          maxHeight: defaultOpen ? 'unset !important' : 'unset !important',
+        }}
+      >
+        {children}
+      </WrapperContent>
+    </Wrapper>
+  );
+}

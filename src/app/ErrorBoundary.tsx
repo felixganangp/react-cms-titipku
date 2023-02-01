@@ -1,5 +1,6 @@
-import { Container, Typography } from '@mui/material';
-import * as React from 'react';
+import React from 'react';
+import { Container, Typography, Box, Button } from '@mui/material';
+import errorImg from 'assets/error.svg';
 
 /**
  * An error screen that will be used as a fallback UI.
@@ -27,22 +28,68 @@ export default class ErrorBoundary extends React.Component<Props> {
     }
 
     return (
-      <Container sx={{ marginTop: '43vh' }}>
-        <Container maxWidth="sm">
-          <Typography
-            variant="h1"
-            align="center"
-            sx={{
-              fontSize: '2em',
-              fontWeight: 300,
-              '& strong': {
-                fontWeight: 400,
-              },
-            }}
+      <Container>
+        <Box
+          position="absolute"
+          top="50%"
+          left="50%"
+          sx={{
+            transform: 'translate(-50%, -50%)',
+          }}
+          display="flex"
+        >
+          <Box
+            bgcolor="#FF8F00"
+            padding="20px"
+            width="400px"
+            borderRadius="8px"
+            position="relative"
+            mr={4}
           >
-            <strong>Error {error.status || 500}</strong>: {error.message}
-          </Typography>
-        </Container>
+            <Typography
+              sx={{
+                color: 'rgba(0,0,0,0.5)',
+                pb: '20px',
+                fontSize: '1.5em',
+              }}
+            >
+              <strong>Error {error.status || 500}</strong>
+            </Typography>
+            <Typography
+              variant="h1"
+              sx={{
+                color: 'rgba(0,0,0,0.5)',
+                fontSize: '1.5em',
+                fontWeight: 400,
+                '& strong': {},
+              }}
+            >
+              {error.message}
+            </Typography>
+            <Button
+              sx={{ mt: '20px' }}
+              onClick={() => {
+                window.location.reload();
+              }}
+            >
+              Refresh page
+            </Button>
+            <Box
+              sx={{
+                position: 'absolute',
+                top: '20px',
+                right: '-20px',
+                width: 0,
+                height: 0,
+                borderTop: '21px solid transparent',
+                borderBottom: '21px solid transparent',
+                borderLeft: '21px solid #FF8F00',
+              }}
+            />
+          </Box>
+
+          <Box component="img" src={errorImg} alt="you'r online" height={200} />
+        </Box>
       </Container>
     );
   }

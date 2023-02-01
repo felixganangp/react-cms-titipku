@@ -101,13 +101,13 @@ export default function RoleUserDetails() {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Card>
-              <Menu>Role Access Management</Menu>
+              <Menu>Kredit Usaha Rakyat</Menu>
               <Link style={{ textDecoration: 'none' }} to="/kur/customer">
                 <BackButton
                   sx={{ '&:hover': { backgroundColor: '#ffff' } }}
                   startIcon={<ArrowBackIosIcon />}
                 >
-                  <TitlePage>Details</TitlePage>
+                  <TitlePage>Customer Detail</TitlePage>
                 </BackButton>
               </Link>
             </Card>
@@ -420,15 +420,3 @@ export default function RoleUserDetails() {
     </div>
   );
 }
-
-const styleModal = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
