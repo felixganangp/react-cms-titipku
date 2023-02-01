@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse, Response } from 'models/fetch';
 import { CreateCustomer, Customer, CustomerParams } from 'models/kur/Customer';
+import { Type } from 'models/kur/Type';
+import { Area } from 'models/Area';
 
 interface CustomerInitialProps {
   data: Customer[];
@@ -10,6 +12,10 @@ interface CustomerInitialProps {
   total: number | undefined;
   params: CustomerParams;
   details: Customer | null;
+  stateFilter?: {
+    typeKur?: Type | null;
+    areaKur?: Area[] | undefined;
+  };
 }
 const initialState: CustomerInitialProps = {
   data: [],
@@ -23,6 +29,10 @@ const initialState: CustomerInitialProps = {
     search: '',
     order_by: 'id',
     order_type: 'desc',
+  },
+  stateFilter: {
+    typeKur: null,
+    areaKur: undefined,
   },
   details: null,
 };
@@ -87,6 +97,18 @@ const CustomerSlice = createSlice({
       // action: PayloadAction<CreateCustomer>,
     ) {
       state.loadingForm = false;
+    },
+    setFilter(
+      state: CustomerInitialProps,
+      action: PayloadAction<{
+        typeKur: Type | null;
+        areaKur: Area[] | undefined;
+      }>,
+    ) {
+      state.stateFilter = {
+        ...state.stateFilter,
+        ...action.payload,
+      };
     },
   },
 });
