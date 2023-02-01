@@ -51,7 +51,15 @@ export default function KurCustomer() {
     customerKur.params.page,
   ]);
 
+  const [openFilter, setOpenFilter] = useState(false);
+
   useEffect(() => {
+    if (
+      customerKur.stateFilter?.areaKur &&
+      customerKur.stateFilter?.areaKur.length > 0
+    ) {
+      setOpenFilter(true);
+    }
     dispatch(typeAction.fetchData());
     dispatch(areaAction.fetchData());
   }, []);
@@ -60,8 +68,6 @@ export default function KurCustomer() {
   // const [areaKurFilter, setAreaKurFilter] = useState<Area[] | undefined>([]);
   // const [searchKur, setSearchKur] = useState<string>('');
   const [inputValueArea, setInputValueArea] = useState('');
-
-  const [openFilter, setOpenFilter] = useState(false);
 
   const formModal = useModal();
 
@@ -180,8 +186,6 @@ export default function KurCustomer() {
   };
 
   const handleChangeArea = (value: Area[]) => {
-    console.log('🚀 ~ file: index.tsx:182 ~ handleChangeArea ~ value', value);
-
     const payload: CustomerParams = {
       page: 1,
     };
@@ -266,10 +270,6 @@ export default function KurCustomer() {
     // );
     await formModal.closeModal();
   };
-  const test = customerKur?.stateFilter?.areaKur?.map((el) => {
-    return el;
-  });
-  console.log('🚀 ~ file: index.tsx:261 ~ test ~ test', test);
   return (
     <Box p="20px" bgcolor="#F5F7FA">
       <Grid container spacing={2}>
@@ -378,11 +378,6 @@ export default function KurCustomer() {
                     id="pasar-kur"
                     options={areaKur.data}
                     onChange={(e, value) => {
-                      console.log(
-                        '🚀 ~ file: index.tsx:496 ~ KurCustomer ~ value',
-                        value,
-                      );
-
                       handleChangeArea(value);
                     }}
                     isOptionEqualToValue={(option: Area) => {

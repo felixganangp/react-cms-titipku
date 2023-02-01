@@ -279,6 +279,9 @@ function Form({ onClose }: Props) {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   fullWidth
+                  inputProps={{
+                    maxLength: 100,
+                  }}
                 />
               </FormLabel>
               {/** KUR TYPE */}
@@ -364,6 +367,7 @@ function Form({ onClose }: Props) {
               >
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                   <DesktopDatePicker
+                    maxDate={new Date()}
                     open={openCalendaer.open}
                     onClose={() => {
                       setOpenCalendar({ open: false, touched: true });

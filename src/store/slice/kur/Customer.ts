@@ -14,7 +14,7 @@ interface CustomerInitialProps {
   details: Customer | null;
   stateFilter?: {
     typeKur?: Type | null;
-    areaKur?: Area[] | undefined;
+    areaKur?: Area[] | [];
   };
 }
 const initialState: CustomerInitialProps = {
@@ -32,7 +32,7 @@ const initialState: CustomerInitialProps = {
   },
   stateFilter: {
     typeKur: null,
-    areaKur: undefined,
+    areaKur: [],
   },
   details: null,
 };
