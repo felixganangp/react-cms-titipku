@@ -10,28 +10,45 @@ export default function Home() {
   return (
     <Box
       sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
+        padding: 20,
         height: 'calc(100vh - 54px)',
       }}
     >
-      <Box display="flex" gap="100px" alignItems="center">
-        <img src={notfound} alt="you'r online" height={300} />
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        height="100%"
+      >
         <Box>
-          <Typography variant="h1" fontSize="40px" fontWeight="400">
-            Oops,
+          <Typography variant="h1" fontSize="40px" fontWeight="500">
+            Ooopss...
             <br />
-            Page not founds!
+            Something went wrong
           </Typography>
-          <Button
-            variant="outlined"
-            sx={{ mt: 2 }}
-            onClick={() => navigate('/')}
+          <Typography
+            variant="h1"
+            fontSize="20px"
+            fontWeight="500"
+            lineHeight="70px"
           >
-            Return Home
+            page not found
+          </Typography>
+          <Button sx={{ mt: 2 }} onClick={() => navigate('/')}>
+            Back to Homepage
           </Button>
         </Box>
+        <Box
+          component="img"
+          src={notfound}
+          alt="you'r online"
+          height={450}
+          sx={{
+            position: 'fixed',
+            bottom: 0,
+            right: 100,
+          }}
+        />
       </Box>
     </Box>
   );
