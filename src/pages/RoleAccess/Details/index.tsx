@@ -48,7 +48,6 @@ export default function RoleUserDetails() {
   useEffect(() => {
     if (id) {
       dispatch(roleAccessAction.fetchDataDetail({ id }));
-      // eslint-disable-next-line radix
     }
   }, []);
 
@@ -113,13 +112,11 @@ export default function RoleUserDetails() {
       label: 'Name',
       align: 'left',
       enableSort: true,
-      isSticky: true,
     },
     {
       id: 'email',
       label: 'Email',
       align: 'left',
-      isSticky: true,
     },
     {
       id: 'role',

@@ -8,8 +8,10 @@ import {
   fireEvent,
 } from '@testing-library/react';
 import { CssBaseline, ThemeProvider } from '@mui/material';
-import CustomerView from '../index';
+import Modal from 'components/Modal';
 import theme from '../../../../theme/index';
+import CustomerView from '../index';
+import FormCustomer from '../components/form';
 
 // let documentBody: RenderResult;
 function MockTheme({ children }: any) {
@@ -23,6 +25,11 @@ function MockTheme({ children }: any) {
 
 const showFilter = () => {
   const buttonElement = screen.getByRole('button', { name: 'Filter' });
+  fireEvent.click(buttonElement);
+};
+
+const addForm = () => {
+  const buttonElement = screen.getByTestId('button-add-customer');
   fireEvent.click(buttonElement);
 };
 

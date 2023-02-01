@@ -7,6 +7,7 @@ import customerKurReducer from './slice/kur/Customer';
 import typeKurReducer from './slice/kur/Type';
 import areaReducer from './slice/Area';
 import requestKURReducer from './slice/kur/Request';
+import merchantReducer from './slice/Merchant';
 
 const reducers = {
   ui: uiReducer,
@@ -18,6 +19,7 @@ const reducers = {
   typeKur: typeKurReducer,
   area: areaReducer,
   request: requestKURReducer,
+  merchant: merchantReducer,
 };
 
 export default reducers;

@@ -88,7 +88,7 @@ function* deleteRoleAccess(body: PayloadAction<{ id: string | number }>) {
     yield put(roleAccessAction.fetchData(params));
     yield put(
       uiAction.openToast({
-        headMsg: 'Success Delete Data',
+        headMsg: 'Role Access Deleted',
         severity: 'success',
       }),
     );

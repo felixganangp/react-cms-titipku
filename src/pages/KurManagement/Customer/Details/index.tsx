@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Card from '@mui/material/Card';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import { Link } from 'react-router-dom';
+import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
+import moment from 'moment';
 
 import DescDetails from 'components/DescDetails';
 import Tabs from 'components/Tabs';
@@ -25,16 +26,41 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import HideImageOutlinedIcon from '@mui/icons-material/HideImageOutlined';
 
+import { Link, useParams } from 'react-router-dom';
+import { customerAction } from 'store/slice/kur/Customer';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+
 import { TitlePage, BackButton, Menu } from './details.styled';
 
+interface ModalImageTypes {
+  open: boolean;
+  filePath: string | null;
+}
 export default function RoleUserDetails() {
-  const [kurHistoryTab, setKurHistoryTab] = React.useState(0);
+  const { id } = useParams();
+  const dispatch = useAppDispatch();
+  const customerKur = useAppSelector((state) => state.customerKur);
+  const [kurHistoryTab, setKurHistoryTab] = useState(0);
+  const [modalImage, setModalImage] = useState<ModalImageTypes>({
+    open: false,
+    filePath: null,
+  });
+
+  useEffect(() => {
+    if (id) {
+      dispatch(customerAction.fetchDataDetail({ id }));
+    }
+  }, []);
 
   const handleChangeKurHistoryTab = (
     event: React.SyntheticEvent,
     newValue: number,
   ) => {
     setKurHistoryTab(newValue);
+  };
+
+  const handleViewDetailImage = (open: boolean, filePath: string | null) => {
+    setModalImage({ open, filePath });
   };
 
   const headCell = [
@@ -68,6 +94,7 @@ export default function RoleUserDetails() {
       format: (val: any) => <Status color="#c10000">dskeke</Status>,
     },
   ];
+
   return (
     <div>
       <Box p="20px" bgcolor="#F5F7FA">
@@ -75,7 +102,7 @@ export default function RoleUserDetails() {
           <Grid item xs={12}>
             <Card>
               <Menu>Role Access Management</Menu>
-              <Link style={{ textDecoration: 'none' }} to="/role-access">
+              <Link style={{ textDecoration: 'none' }} to="/kur/customer">
                 <BackButton
                   sx={{ '&:hover': { backgroundColor: '#ffff' } }}
                   startIcon={<ArrowBackIosIcon />}
@@ -91,7 +118,7 @@ export default function RoleUserDetails() {
           <Box p="20px">
             <Box display="flex" mb="30px" gap="10px">
               <Typography variant="h1" fontWeight="700">
-                Dea Delavena
+                {customerKur.details?.name}
               </Typography>
               <Status color="#c10000">Rejected</Status>
             </Box>
@@ -100,76 +127,92 @@ export default function RoleUserDetails() {
                 <DescDetails
                   title="Customer ID"
                   icon={<Person2OutlinedIcon sx={{ color: '#008e58' }} />}
-                  content="1289"
+                  content={customerKur.details?.id}
                 />
               </Grid>
               <Grid item xs={6} md={3}>
                 <DescDetails
                   title="Phone Number"
                   icon={<PhoneIcon sx={{ color: '#008e58' }} />}
-                  content="+628991241235"
+                  content={customerKur.details?.phone_number}
                 />
               </Grid>
               <Grid item xs={6} md={3}>
                 <DescDetails
                   title="Credit Limit"
                   icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
-                  content="+628991241235"
+                  content={customerKur.details?.credit_limit}
                 />
               </Grid>
               <Grid item xs={6} md={3}>
-                <DescDetails title="Credit Limit" content="+628991241235" />
+                <DescDetails
+                  title="Primary Account Number "
+                  content={`${customerKur.details?.user_bank} - ${customerKur.details?.user_account_number} `}
+                />
               </Grid>
               <Grid item xs={6} md={3}>
                 <DescDetails
                   title="NIK"
                   icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
-                  content="UJANG888"
+                  content={customerKur.details?.nik}
                 />
               </Grid>
               <Grid item xs={6} md={3}>
                 <DescDetails
                   title="Address (KTP)"
                   icon={<LocationOnOutlinedIcon sx={{ color: '#008e58' }} />}
-                  content="Jalan H Bahri no 12 RT 12 RW 4 Kebayoran, Jakarta Serlatan"
+                  content={customerKur.details?.registered_address}
                 />
               </Grid>
               <Grid item xs={6} md={3}>
-                <DescDetails title="Admin Fee" content="4,5%" />
+                <DescDetails
+                  title="Admin Fee"
+                  content={customerKur.details?.admin_fee}
+                />
               </Grid>
               <Grid item xs={6} md={3}>
                 <DescDetails
                   title="Nobu Account Number "
-                  content="NOBU - 293958292"
+                  content={`NOBU - ${customerKur.details?.nobu_account_number}`}
                 />
               </Grid>
               <Grid item xs={6} md={3}>
                 <DescDetails
                   title="Birth Date"
                   icon={<DateRangeRoundedIcon sx={{ color: '#008e58' }} />}
-                  content="19 August 1994"
+                  content={customerKur.details?.birth_date}
                 />
               </Grid>
               <Grid item xs={6} md={3}>
                 <DescDetails
                   title="Address (Domicile)"
-                  content="Jalan H Bahri no 12 RT 12 RW 4 Kebayoran, Jakarta Serlatan"
+                  content={customerKur.details?.living_address}
                 />
               </Grid>
               <Grid item xs={6} md={3}>
-                <DescDetails title="DPD rate" content="2%" />
+                <DescDetails
+                  title="DPD rate"
+                  content={`${customerKur.details?.dpd_rate || '-'} %`}
+                />
               </Grid>
               <Grid item xs={6} md={3}>
                 <DescDetails
                   title="Join Date"
-                  content="Jan 25, 2022 08:00 AM"
+                  // content="Jan 25, 2022 08:00 AM"
+                  content={
+                    customerKur.details?.join_date
+                      ? moment
+                          .unix(customerKur.details?.join_date)
+                          .format('MMM DD, YYYY hh:mm A')
+                      : '-'
+                  }
                 />
               </Grid>
               <Grid item xs={6} md={3}>
                 <DescDetails
                   icon={<MailOutlineRoundedIcon sx={{ color: '#008e58' }} />}
-                  title="Join Date"
-                  content="Jan 25, 2022 08:00 AM"
+                  title="Email"
+                  content={customerKur.details?.email}
                 />
               </Grid>
             </Grid>
@@ -185,48 +228,76 @@ export default function RoleUserDetails() {
                   icon={
                     <TypesIcon sx={{ color: '#008e58', fontSize: '40px' }} />
                   }
-                  content="1289"
+                  content={customerKur.details?.kur_user_type.name}
                 />
               </Grid>
               <Grid item xs={6} md={3}>
                 <DescDetails
                   title="Lapak Name"
                   icon={<StorefrontOutlinedIcon sx={{ color: '#008e58' }} />}
-                  content="Lapak B-12"
+                  content={customerKur.details?.user.name}
                 />
               </Grid>
               <Grid item xs={6} md={3}>
                 <DescDetails
                   title="Lapak Area"
-                  content="Pasar Modern Sinpasa"
+                  content={customerKur.details?.user.area.name}
                 />
               </Grid>
             </Grid>
             {/* PHOTOS OR IMAGE  */}
             <Grid container spacing={5} mt="10px">
-              <Grid item xs={6} md={4}>
-                <DescDetails
-                  title="KTP Image"
-                  icon={
-                    <AddPhotoAlternateOutlinedIcon sx={{ color: '#008e58' }} />
-                  }
-                  content="730823505910001"
-                />
-                <Box
-                  width="100%"
-                  height="242px"
-                  bgcolor="#cecece"
-                  borderRadius="3px"
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <HideImageOutlinedIcon
-                    sx={{ fontSize: '60px', color: '#ffff' }}
+              {customerKur.details?.kur_user_document?.map((val, i) => (
+                <Grid item xs={6} md={4} key={val.id}>
+                  <DescDetails
+                    title={val.document_type
+                      .toLocaleUpperCase()
+                      .replaceAll('_', ' ')}
+                    icon={
+                      <AddPhotoAlternateOutlinedIcon
+                        sx={{ color: '#008e58' }}
+                      />
+                    }
+                    content={val.document_number}
                   />
-                </Box>
-              </Grid>
-              <Grid item xs={6} md={4}>
+                  {val.document_filepath ? (
+                    <Box
+                      component="img"
+                      width="100%"
+                      height="242px"
+                      bgcolor="#cecece"
+                      borderRadius="3px"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      sx={{
+                        objectFit: 'contain',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => {
+                        handleViewDetailImage(true, val.document_filepath);
+                      }}
+                      src={val.document_filepath}
+                    />
+                  ) : (
+                    <Box
+                      width="100%"
+                      height="242px"
+                      bgcolor="#cecece"
+                      borderRadius="3px"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <HideImageOutlinedIcon
+                        sx={{ fontSize: '60px', color: '#ffff' }}
+                      />
+                    </Box>
+                  )}
+                </Grid>
+              ))}
+
+              {/* <Grid item xs={6} md={4}>
                 <DescDetails
                   title="Kartu Keluarga C1"
                   icon={
@@ -291,7 +362,7 @@ export default function RoleUserDetails() {
                     sx={{ fontSize: '60px', color: '#ffff' }}
                   />
                 </Box>
-              </Grid>
+              </Grid> */}
             </Grid>
           </Box>
         </SubDetailsPagesWrapper>
@@ -326,7 +397,38 @@ export default function RoleUserDetails() {
             />
           </Box>
         </SubDetailsPagesWrapper>
+        <Modal
+          open={modalImage.open}
+          onClose={() => setModalImage({ open: false, filePath: null })}
+        >
+          <Box
+            position="absolute"
+            maxHeight="70vh"
+            maxWidth="90vw"
+            component="img"
+            bgcolor="#cecece"
+            top="50%"
+            left="50%"
+            sx={{
+              objectFit: 'contain',
+              transform: 'translate(-50%, -50%)',
+            }}
+            src={modalImage.filePath || undefined}
+          />
+        </Modal>
       </Box>
     </div>
   );
 }
+
+const styleModal = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '2px solid #000',
+  boxShadow: 24,
+  p: 4,
+};

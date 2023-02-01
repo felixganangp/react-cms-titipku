@@ -27,6 +27,7 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { roleUserAction } from 'store/slice/RoleUser';
 import { CreateRoleUser, RoleUser as RoleUserTypes } from 'models/RoleUser';
 import FormRoleUser from './components/form';
+import SetStatusUser from './components/SetStatusUser';
 
 import { Bullet } from './roleuser.styled';
 
@@ -34,12 +35,30 @@ interface FormDataType {
   isEdit: boolean;
   data: CreateRoleUser;
 }
+
+const statusColor = (id: number, name: string) => {
+  let nameCurrent = name;
+  let colorCurrent = 'rgba(0,0,0,0.3)';
+
+  if (id === 1) {
+    nameCurrent = 'Active';
+    colorCurrent = '#008e58';
+  }
+
+  if (id === 2) {
+    nameCurrent = 'Inactive';
+    colorCurrent = '#c10000';
+  }
+
+  return { nameCurrent, colorCurrent };
+};
 export default function RoleUser() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const roleUser = useAppSelector((state) => state.roleUser);
 
   const formModal = useModal();
+  const setStatusUserModal = useModal();
   const [formData, setFormData] = useState<FormDataType>({
     isEdit: false,
     data: {
@@ -151,24 +170,27 @@ export default function RoleUser() {
       label: 'Status',
       align: 'left',
       enableSort: true,
-      format: (val: any) => (
-        <Status color="rgba(0,0,0,0.3)">
-          {val.administrator_detail[0].administrator_status.name}
-        </Status>
-      ),
+      format: (val) => {
+        const status = val.administrator_detail[0].administrator_status;
+
+        return (
+          <Status color={statusColor(status.id, status.name).colorCurrent}>
+            {statusColor(status.id, status.name).nameCurrent}
+          </Status>
+        );
+      },
     },
     {
       id: 'menu',
       label: '',
       align: 'left',
-      format: (val: any) => (
+      format: (val) => (
         <>
           <MenuList
             menu={[
               {
                 label: 'Edit',
                 onClick: () => {
-                  setFormData(val);
                   const data: FormDataType = {
                     isEdit: true,
                     data: {
@@ -177,7 +199,8 @@ export default function RoleUser() {
                       roleAccess:
                         val.administrator_detail[0].administrator_role,
                       id: val.id,
-                      id_status: 1,
+                      id_status:
+                        val.administrator_detail[0].administrator_status.id,
                       account_type: 'cms',
                     },
                   };
@@ -186,9 +209,32 @@ export default function RoleUser() {
                 },
               },
               {
-                label: `Set to Inactive`,
-                color: '#c10000',
-                onClick: () => {},
+                label: `Set to ${
+                  val.administrator_detail[0].administrator_status.id === 1
+                    ? 'Inactive'
+                    : 'Active'
+                }`,
+                color:
+                  val.administrator_detail[0].administrator_status.id === 1
+                    ? '#c10000'
+                    : '#008e58',
+                onClick: () => {
+                  const data: FormDataType = {
+                    isEdit: true,
+                    data: {
+                      name: val.full_name,
+                      email: val.email,
+                      roleAccess:
+                        val.administrator_detail[0].administrator_role,
+                      id: val.id,
+                      id_status:
+                        val.administrator_detail[0].administrator_status.id,
+                      account_type: 'cms',
+                    },
+                  };
+                  setFormData(data);
+                  setStatusUserModal.openModal();
+                },
               },
             ]}
           >
@@ -221,6 +267,7 @@ export default function RoleUser() {
                   size="small"
                   sx={{ bgcolor: '#ebeff3', maxWidth: '560px' }}
                   fullWidth
+                  defaultValue={roleUser.params.search}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -277,6 +324,16 @@ export default function RoleUser() {
           onClose={onCloseForm}
           data={formData.data}
           isEdit={formData.isEdit}
+        />
+      </Modal>
+      <Modal
+        open={setStatusUserModal.open}
+        title="Delete Role"
+        onClose={setStatusUserModal.closeModal}
+      >
+        <SetStatusUser
+          onClose={setStatusUserModal.closeModal}
+          data={formData.data}
         />
       </Modal>
     </div>

@@ -55,7 +55,7 @@ const RoleUserSlice = createSlice({
       action: PayloadAction<ListResponse<RoleUser>>,
     ) {
       state.loading = false;
-      state.data = action.payload.data;
+      state.data = action.payload.data || [];
       state.total = action.payload.total;
     },
     addRoleUser(
@@ -65,6 +65,12 @@ const RoleUserSlice = createSlice({
       state.loadingForm = true;
     },
     editRoleUser(
+      state: RoleUserProps,
+      action: PayloadAction<CreateRoleUserPayload>,
+    ) {
+      state.loadingForm = true;
+    },
+    editStatusRoleUser(
       state: RoleUserProps,
       action: PayloadAction<CreateRoleUserPayload>,
     ) {

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 // import styled from '@emotion/styled';
 import {
   Card,
@@ -27,7 +28,7 @@ import { areaAction } from 'store/slice/Area';
 import useModal from 'hooks/useModal';
 import Table from 'components/Table';
 import Modal from 'components/Modal';
-import { Customer } from 'models/kur/Customer';
+import { Customer, CustomerParams } from 'models/kur/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
 import debounce from 'utils/debounce';
@@ -36,24 +37,37 @@ import FormCustomer from './components/form';
 
 export default function KurCustomer() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const customerKur = useAppSelector((state) => state.customerKur);
   const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
 
   useEffect(() => {
     dispatch(customerAction.fetchData(customerKur.params));
-  }, [customerKur.params]);
+  }, [
+    customerKur.params.search,
+    customerKur.params.order_by,
+    customerKur.params.order_type,
+    customerKur.params.page,
+  ]);
+
+  const [openFilter, setOpenFilter] = useState(false);
 
   useEffect(() => {
+    if (
+      customerKur.stateFilter?.areaKur &&
+      customerKur.stateFilter?.areaKur.length > 0
+    ) {
+      setOpenFilter(true);
+    }
     dispatch(typeAction.fetchData());
     dispatch(areaAction.fetchData());
   }, []);
 
-  const [typeKurFilter, setTypeKurFilter] = useState<Type | null>(null);
-  const [areaKurFilter, setAreaKurFilter] = useState<Area[] | undefined>(
-    undefined,
-  );
-  const [openFilter, setOpenFilter] = useState(true);
+  // const [typeKurFilter, setTypeKurFilter] = useState<Type | null>(null);
+  // const [areaKurFilter, setAreaKurFilter] = useState<Area[] | undefined>([]);
+  // const [searchKur, setSearchKur] = useState<string>('');
+  const [inputValueArea, setInputValueArea] = useState('');
 
   const formModal = useModal();
 
@@ -71,31 +85,39 @@ export default function KurCustomer() {
   };
   const headCell = [
     {
-      id: 'kur_user_number',
-      label: 'Cust. ID',
+      id: 'id',
+      label: 'ID',
       align: 'left',
+      // format: (val: Customer) => <div>{val.kur_user_number}</div>,
+      enableSort: true,
     },
     {
       id: 'name',
       label: 'Name',
       align: 'left',
+      width: '200px',
+      // format: (val: Customer) => <div>{val.name}</div>,
+      enableSort: true,
     },
     {
-      id: 'kur_type',
+      id: 'kur_user_type',
       label: 'KUR Type',
       align: 'left',
+      width: '95px',
       format: (val: Customer) => <div>{val.kur_user_type.name}</div>,
+      enableSort: true,
     },
-    {
-      id: 'create_date',
-      label: 'Create Date',
-      align: 'left',
-      format: (val: Customer) => <div>{convertDate(val.created_at)}</div>,
-    },
+    // {
+    //   id: 'create_date',
+    //   label: 'Create Date',
+    //   align: 'left',
+    //   format: (val: Customer) => <div>{convertDate(val.created_at)}</div>,
+    // },
     {
       id: 'merchant',
       label: 'Merchant',
       align: 'left',
+      width: '439px',
       format: (val: Customer) => <div>{val.user.name}</div>,
     },
     {
@@ -113,23 +135,25 @@ export default function KurCustomer() {
       id: 'action',
       label: 'Action',
       align: 'left',
-      format: (val: any) => (
+      format: (val: Customer) => (
         <>
           <MenuList
             menu={[
               {
                 label: 'Details',
-                onClick: () => {},
+                onClick: () => {
+                  navigate(`/kur/customer/${val.id}`);
+                },
               },
-              {
-                label: `Update`,
-                onClick: () => {},
-              },
-              {
-                label: `Hold`,
-                color: '#c10000',
-                onClick: () => {},
-              },
+              // {
+              //   label: `Update`,
+              //   onClick: () => {},
+              // },
+              // {
+              //   label: `Hold`,
+              //   color: '#c10000',
+              //   onClick: () => {},
+              // },
             ]}
           >
             <IconButton>
@@ -149,7 +173,13 @@ export default function KurCustomer() {
     );
   };
 
-  const handleChangeType = (value: any) => {
+  const handleChangeType = (value: Type | null) => {
+    dispatch(
+      customerAction.setFilter({
+        typeKur: value,
+        areaKur: customerKur.stateFilter?.areaKur,
+      }),
+    );
     dispatch(
       customerAction.setParams({
         page: 1,
@@ -158,16 +188,24 @@ export default function KurCustomer() {
     );
   };
 
-  const handleResetFilter = () => {
-    setTypeKurFilter(null);
+  const handleChangeArea = (value: Area[]) => {
+    const payload: CustomerParams = {
+      page: 1,
+    };
+    if (value.length > 0) {
+      const ids = value.map((el) => el.id);
+      const areas = ids.toString();
+      payload.area_ids = areas;
+    } else {
+      payload.area_ids = undefined;
+    }
     dispatch(
-      customerAction.setParams({
-        page: 1,
-        count: 1,
-        search: '',
-        kur_user_type_id: undefined,
+      customerAction.setFilter({
+        typeKur: customerKur.stateFilter?.typeKur || null,
+        areaKur: value,
       }),
     );
+    dispatch(customerAction.setParams(payload));
   };
 
   const handleSearch = (value: string) => {
@@ -178,7 +216,63 @@ export default function KurCustomer() {
       }),
     );
   };
+
+  const handleChangeSort = (value: {
+    orderBy: string | number;
+    orderType: 'asc' | 'desc';
+  }) => {
+    dispatch(
+      customerAction.setParams({
+        page: 1,
+        order_by: value.orderBy,
+        order_type: value.orderType,
+      }),
+    );
+  };
+
+  const handleApplyFilter = () => {
+    dispatch(customerAction.fetchData(customerKur.params));
+  };
+
+  const handleResetFilter = async () => {
+    // setAreaKurFilter([]);
+    // setTypeKurFilter(null);
+    // setSearchKur('');
+
+    const params: CustomerParams = {
+      page: 1,
+      count: 10,
+      search: '',
+      order_by: 'id',
+      order_type: 'desc',
+      kur_user_type_id: undefined,
+      area_ids: undefined,
+    };
+    await dispatch(
+      customerAction.setFilter({
+        areaKur: [],
+        typeKur: null,
+      }),
+    );
+    await dispatch(customerAction.setParams(params));
+    await dispatch(customerAction.fetchData(params));
+    // await handleApplyFilter();
+  };
+
   const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
+
+  const formHandleClose = async () => {
+    // await dispatch(
+    //   customerAction.setParams({
+    //     page: 1,
+    //     count: 10,
+    //     search: '',
+    //     order_by: 'id',
+    //     order_type: 'desc',
+    //   }),
+    // );
+    await formModal.closeModal();
+  };
   return (
     <Box p="20px" bgcolor="#F5F7FA">
       <Grid container spacing={2}>
@@ -221,7 +315,9 @@ export default function KurCustomer() {
                         </InputAdornment>
                       ),
                     }}
+                    defaultValue={customerKur.params.search}
                     onChange={(e) => {
+                      // setSearchKur(e.target.value);
                       debounceSearch(e.target.value);
                     }}
                   />
@@ -252,14 +348,14 @@ export default function KurCustomer() {
                     id="type"
                     options={typeKur.data}
                     onChange={(e, value) => {
-                      setTypeKurFilter(value);
+                      // setTypeKurFilter(value);
                       handleChangeType(value);
                     }}
                     isOptionEqualToValue={(option: Type) => {
-                      return option.id === typeKurFilter?.id;
+                      return option.id === customerKur.stateFilter?.typeKur?.id;
                     }}
                     getOptionLabel={(option) => `${option.name}`}
-                    value={typeKurFilter}
+                    value={customerKur?.stateFilter?.typeKur}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -285,14 +381,27 @@ export default function KurCustomer() {
                     id="pasar-kur"
                     options={areaKur.data}
                     onChange={(e, value) => {
-                      setAreaKurFilter(value);
-                      // handleChangeType(value);
+                      handleChangeArea(value);
                     }}
-                    // isOptionEqualToValue={(option: Area) => {
-                    //   return option.id === areaKurFilter?.id;
-                    // }}
-                    getOptionLabel={(option) => `${option.title}`}
-                    // value={areaKurFilter || null}
+                    isOptionEqualToValue={(option: Area) => {
+                      const filtered =
+                        customerKur?.stateFilter?.areaKur?.filter(
+                          (el) => el.id === option.id,
+                        );
+                      if (filtered) {
+                        return option.id === filtered[0]?.id;
+                      }
+                      return false;
+                    }}
+                    getOptionLabel={(option) => {
+                      return `${option.title}`;
+                    }}
+                    inputValue={inputValueArea}
+                    onInputChange={(_, newInputValue) => {
+                      setInputValueArea(newInputValue);
+                    }}
+                    value={customerKur?.stateFilter?.areaKur}
+                    limitTags={3}
                     renderInput={(params) => {
                       return (
                         <>
@@ -371,7 +480,7 @@ export default function KurCustomer() {
                     >
                       Reset
                     </Button>
-                    <Button>Apply</Button>
+                    <Button onClick={handleApplyFilter}>Apply</Button>
                   </Box>
                 </Grid>
               </Grid>
@@ -393,7 +502,10 @@ export default function KurCustomer() {
               page={customerKur.params.page}
               totalData={customerKur.total}
               count={customerKur.params.count}
+              orderBy={customerKur.params.order_by}
+              orderType={customerKur.params.order_type}
               onChangePage={(val) => handleChangePage(val)}
+              onChangeSort={(val) => handleChangeSort(val)}
               enableCheckBox
               disableNumber
             />
@@ -405,7 +517,7 @@ export default function KurCustomer() {
         title="Add Customer"
         onClose={formModal.closeModal}
       >
-        <FormCustomer onClose={formModal.closeModal} />
+        <FormCustomer onClose={formHandleClose} />
       </Modal>
     </Box>
   );
