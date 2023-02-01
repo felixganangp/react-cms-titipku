@@ -8,7 +8,7 @@ export interface CreateCustomer {
   name: string;
   kurType: Type | null;
   adminFee: string;
-  birthDate: { _d?: Date } | null;
+  birthDate: { _d?: Date } | Date | null;
   phoneNumber: string;
   email: string;
   addressKtp: string;

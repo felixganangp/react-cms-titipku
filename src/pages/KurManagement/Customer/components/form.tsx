@@ -62,6 +62,10 @@ function TabPanel(props: TabPanelProps) {
 
 interface Props {
   onClose: () => void;
+  formData: {
+    isEdit: boolean;
+    initialData: CreateCustomer;
+  };
 }
 const initial: CreateCustomer = {
   // imageCustomer: '',
@@ -89,7 +93,7 @@ const initial: CreateCustomer = {
   bankNumberPrimary: '',
   nobuAccountNumber: '',
 };
-function Form({ onClose }: Props) {
+function Form({ onClose, formData }: Props) {
   const dispatch = useAppDispatch();
   const [loadingForm, setLoadingForm] = useState(false);
 
@@ -111,7 +115,7 @@ function Form({ onClose }: Props) {
     setValueTab(newValue);
     divRef.current.firstElementChild.scrollIntoView();
   };
-  const [initialValues, setInitialValues] = useState(initial);
+  const [initialValues, setInitialValues] = useState(formData.initialData);
   const handleCloseForm = () => {
     setOpenCalendar({ open: false, touched: false });
     onClose();

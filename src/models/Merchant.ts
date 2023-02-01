@@ -10,13 +10,13 @@ export interface Merchant {
 export interface MerchantResp {
   id?: number;
   merchant_name: string;
-  area: Area;
-  created_at: number;
-  updated_at: number;
-  merchant_description: string;
-  is_exist: boolean;
-  is_owner: boolean;
-  area_id: number;
+  area?: Area;
+  created_at?: number;
+  updated_at?: number;
+  merchant_description?: string;
+  is_exist?: boolean;
+  is_owner?: boolean;
+  area_id?: number;
 }
 
 export interface MerchantParams extends ListParams {
