@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import ErrorIcon from '@mui/icons-material/Error';
 import SearchIcon from '@mui/icons-material/Search';
+import CircularProgress from '@mui/material/CircularProgress';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -90,6 +91,7 @@ const initial: CreateCustomer = {
 };
 function Form({ onClose }: Props) {
   const dispatch = useAppDispatch();
+  const [loadingForm, setLoadingForm] = useState(false);
 
   const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
@@ -117,13 +119,12 @@ function Form({ onClose }: Props) {
   const formik = useFormik({
     initialValues,
     onSubmit: async (value, { resetForm }) => {
-      console.log(value);
+      await setLoadingForm(true);
       await dispatch(customerAction.createCustomer(value));
-      if (!customerKur.loadingForm) {
-        resetForm();
-        setOpenCalendar({ open: false, touched: false });
-        handleCloseForm();
-      }
+      await setLoadingForm(false);
+      await resetForm();
+      await setOpenCalendar({ open: false, touched: false });
+      await handleCloseForm();
     },
     validationSchema: yup.object({
       name: yup.string().required('Name is required'),
@@ -160,6 +161,9 @@ function Form({ onClose }: Props) {
         .required('Bank account number (primary) is required'),
       pasarName: yup.mixed().required('Pasar is required'),
       merchantName: yup.mixed().required('Lapak is required'),
+      nobuAccountNumber: yup
+        .string()
+        .required('Nobu account number is required'),
     }),
     enableReinitialize: true,
   });
@@ -218,7 +222,9 @@ function Form({ onClose }: Props) {
                 values.creditLimit &&
                 +values.creditLimit > 1 &&
                 values.bankNumberPrimary &&
-                values.kurType
+                values.kurType &&
+                values.bankName &&
+                values.nobuAccountNumber
               )
             }
             sx={{ borderBottom: 1, borderColor: 'divider', color: '#8B95A5' }}
@@ -273,6 +279,9 @@ function Form({ onClose }: Props) {
                   onChange={handleChange}
                   onBlur={handleBlur}
                   fullWidth
+                  inputProps={{
+                    maxLength: 100,
+                  }}
                 />
               </FormLabel>
               {/** KUR TYPE */}
@@ -358,6 +367,7 @@ function Form({ onClose }: Props) {
               >
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                   <DesktopDatePicker
+                    maxDate={new Date()}
                     open={openCalendaer.open}
                     onClose={() => {
                       setOpenCalendar({ open: false, touched: true });
@@ -576,12 +586,14 @@ function Form({ onClose }: Props) {
               {/** ACCOUNT BANK NOBU */}
               <FormLabel
                 text="Acccount Bank (Nobu)"
-                // error={touched.phoneNumber && Boolean(errors.phoneNumber)}
-                // helperText={
-                //   touched.phoneNumber &&
-                //   errors.phoneNumber &&
-                //   `${errors.phoneNumber}`
-                // }
+                error={
+                  touched.nobuAccountNumber && Boolean(errors.nobuAccountNumber)
+                }
+                helperText={
+                  touched.nobuAccountNumber &&
+                  errors.nobuAccountNumber &&
+                  `${errors.nobuAccountNumber}`
+                }
               >
                 <TextField
                   type="text"
@@ -626,7 +638,9 @@ function Form({ onClose }: Props) {
                   values.creditLimit &&
                   +values.creditLimit > 1 &&
                   values.bankNumberPrimary &&
-                  values.kurType
+                  values.kurType &&
+                  values.bankName &&
+                  values.nobuAccountNumber
                 )
               }
               onClick={(e) => handleChangeTab(e, 1)}
@@ -851,11 +865,20 @@ function Form({ onClose }: Props) {
               Previous
             </Button>
             <Button
-              disabled={!(isValid && dirty)}
+              disabled={
+                !(isValid && dirty) ||
+                !(
+                  values.imageKk &&
+                  values.imageNik &&
+                  values.imageNpwp &&
+                  values.imageSKUsaha
+                ) ||
+                loadingForm
+              }
               // onClick={(e) => handleChangeTab(e, 1)}
               type="submit"
             >
-              Save
+              {loadingForm ? <CircularProgress size="1rem" /> : 'Save'}
             </Button>
           </Box>
         </TabPanel>

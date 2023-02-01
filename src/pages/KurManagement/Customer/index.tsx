@@ -44,18 +44,30 @@ export default function KurCustomer() {
 
   useEffect(() => {
     dispatch(customerAction.fetchData(customerKur.params));
-  }, [customerKur.params.search]);
+  }, [
+    customerKur.params.search,
+    customerKur.params.order_by,
+    customerKur.params.order_type,
+    customerKur.params.page,
+  ]);
+
+  const [openFilter, setOpenFilter] = useState(false);
 
   useEffect(() => {
+    if (
+      customerKur.stateFilter?.areaKur &&
+      customerKur.stateFilter?.areaKur.length > 0
+    ) {
+      setOpenFilter(true);
+    }
     dispatch(typeAction.fetchData());
     dispatch(areaAction.fetchData());
   }, []);
 
-  const [typeKurFilter, setTypeKurFilter] = useState<Type | null>(null);
-  const [areaKurFilter, setAreaKurFilter] = useState<Area[] | undefined>([]);
-  const [searchKur, setSearchKur] = useState<string>('');
-
-  const [openFilter, setOpenFilter] = useState(false);
+  // const [typeKurFilter, setTypeKurFilter] = useState<Type | null>(null);
+  // const [areaKurFilter, setAreaKurFilter] = useState<Area[] | undefined>([]);
+  // const [searchKur, setSearchKur] = useState<string>('');
+  const [inputValueArea, setInputValueArea] = useState('');
 
   const formModal = useModal();
 
@@ -160,6 +172,12 @@ export default function KurCustomer() {
 
   const handleChangeType = (value: Type | null) => {
     dispatch(
+      customerAction.setFilter({
+        typeKur: value,
+        areaKur: customerKur.stateFilter?.areaKur,
+      }),
+    );
+    dispatch(
       customerAction.setParams({
         page: 1,
         kur_user_type_id: value?.id,
@@ -178,6 +196,12 @@ export default function KurCustomer() {
     } else {
       payload.area_ids = undefined;
     }
+    dispatch(
+      customerAction.setFilter({
+        typeKur: customerKur.stateFilter?.typeKur || null,
+        areaKur: value,
+      }),
+    );
     dispatch(customerAction.setParams(payload));
   };
 
@@ -208,9 +232,10 @@ export default function KurCustomer() {
   };
 
   const handleResetFilter = async () => {
-    setAreaKurFilter([]);
-    setTypeKurFilter(null);
-    setSearchKur('');
+    // setAreaKurFilter([]);
+    // setTypeKurFilter(null);
+    // setSearchKur('');
+
     const params: CustomerParams = {
       page: 1,
       count: 10,
@@ -220,6 +245,12 @@ export default function KurCustomer() {
       kur_user_type_id: undefined,
       area_ids: undefined,
     };
+    await dispatch(
+      customerAction.setFilter({
+        areaKur: [],
+        typeKur: null,
+      }),
+    );
     await dispatch(customerAction.setParams(params));
     await dispatch(customerAction.fetchData(params));
     // await handleApplyFilter();
@@ -227,15 +258,17 @@ export default function KurCustomer() {
 
   const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
 
-  const formHandleClose = () => {
-    formModal.closeModal();
-    dispatch(
-      customerAction.setParams({
-        page: 1,
-        count: 1,
-        search: '',
-      }),
-    );
+  const formHandleClose = async () => {
+    // await dispatch(
+    //   customerAction.setParams({
+    //     page: 1,
+    //     count: 10,
+    //     search: '',
+    //     order_by: 'id',
+    //     order_type: 'desc',
+    //   }),
+    // );
+    await formModal.closeModal();
   };
   return (
     <Box p="20px" bgcolor="#F5F7FA">
@@ -279,9 +312,9 @@ export default function KurCustomer() {
                         </InputAdornment>
                       ),
                     }}
-                    value={searchKur}
+                    defaultValue={customerKur.params.search}
                     onChange={(e) => {
-                      setSearchKur(e.target.value);
+                      // setSearchKur(e.target.value);
                       debounceSearch(e.target.value);
                     }}
                   />
@@ -312,14 +345,14 @@ export default function KurCustomer() {
                     id="type"
                     options={typeKur.data}
                     onChange={(e, value) => {
-                      setTypeKurFilter(value);
+                      // setTypeKurFilter(value);
                       handleChangeType(value);
                     }}
                     isOptionEqualToValue={(option: Type) => {
-                      return option.id === typeKurFilter?.id;
+                      return option.id === customerKur.stateFilter?.typeKur?.id;
                     }}
                     getOptionLabel={(option) => `${option.name}`}
-                    value={typeKurFilter}
+                    value={customerKur?.stateFilter?.typeKur}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -345,14 +378,27 @@ export default function KurCustomer() {
                     id="pasar-kur"
                     options={areaKur.data}
                     onChange={(e, value) => {
-                      setAreaKurFilter(value);
                       handleChangeArea(value);
                     }}
-                    // isOptionEqualToValue={(option: Area) => {
-                    //   return option.id === areaKurFilter?.id;
-                    // }}
-                    getOptionLabel={(option) => `${option.title}`}
-                    value={areaKurFilter}
+                    isOptionEqualToValue={(option: Area) => {
+                      const filtered =
+                        customerKur?.stateFilter?.areaKur?.filter(
+                          (el) => el.id === option.id,
+                        );
+                      if (filtered) {
+                        return option.id === filtered[0]?.id;
+                      }
+                      return false;
+                    }}
+                    getOptionLabel={(option) => {
+                      return `${option.title}`;
+                    }}
+                    inputValue={inputValueArea}
+                    onInputChange={(_, newInputValue) => {
+                      setInputValueArea(newInputValue);
+                    }}
+                    value={customerKur?.stateFilter?.areaKur}
+                    limitTags={3}
                     renderInput={(params) => {
                       return (
                         <>
