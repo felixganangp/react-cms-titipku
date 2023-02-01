@@ -1,4 +1,8 @@
-import { RequestKUR, RequestKURParams } from 'models/kur/Request';
+import {
+  RequestKUR,
+  RequestKURDisplayFilter,
+  RequestKURParams,
+} from 'models/kur/Request';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse } from 'models/fetch';
 
@@ -8,6 +12,7 @@ interface RequestKURProps {
   loadingForm: boolean;
   total: number | undefined;
   params: RequestKURParams;
+  displayFilter: RequestKURDisplayFilter;
 }
 
 const initialState: RequestKURProps = {
@@ -19,6 +24,12 @@ const initialState: RequestKURProps = {
     page: 1,
     count: 10,
     search: '',
+  },
+  displayFilter: {
+    areas: [],
+    types: null,
+    startDate: null,
+    endDate: null,
   },
 };
 
@@ -36,6 +47,15 @@ const RequestKURSlice = createSlice({
     setParams(state: RequestKURProps, action: PayloadAction<RequestKURParams>) {
       state.params = {
         ...state.params,
+        ...action.payload,
+      };
+    },
+    setDisplayFilter(
+      state: RequestKURProps,
+      action: PayloadAction<RequestKURDisplayFilter>,
+    ) {
+      state.displayFilter = {
+        ...state.displayFilter,
         ...action.payload,
       };
     },

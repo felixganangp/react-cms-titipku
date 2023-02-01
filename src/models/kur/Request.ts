@@ -1,4 +1,6 @@
 import { Customer } from 'models/kur/Customer';
+import { Area } from 'models/Area';
+import { Type } from 'models/kur/Type';
 import { ListParams } from '../fetch';
 
 export interface RequestKURParams extends ListParams {
@@ -8,6 +10,11 @@ export interface RequestKURParams extends ListParams {
   status?: string;
   submit_date_start?: number;
   submit_date_end?: number;
+}
+
+export interface RequestKURDisplayFilter {
+  areas?: Area[];
+  types?: Type | null;
 }
 
 export interface RequestKUR {

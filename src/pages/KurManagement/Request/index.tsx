@@ -42,20 +42,15 @@ import {
 } from './request.styled';
 
 export default function RequestKURPage() {
-  // const formModal = useModal();
-  // const [openDatePicker, setOpenDatePicker] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const request = useAppSelector((state) => state.request);
 
   // define filter
+  const [openFilter, setOpenFilter] = useState<boolean>(false);
   const areas = useAppSelector((state) => state.area.data);
   const types = useAppSelector((state) => state.typeKur.data);
-  const [openFilter, setOpenFilter] = useState<boolean>(false);
-  const [selectedArea, setSelectedArea] = useState<Area[] | undefined>(
-    undefined,
-  );
-  const [selectedType, setSelectedType] = useState<Type | null>(null);
+  const [inputValueArea, setInputValueArea] = useState('');
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
@@ -65,6 +60,10 @@ export default function RequestKURPage() {
   useEffect(() => {
     dispatch(typeAction.fetchData());
     dispatch(areaAction.fetchData());
+    if (request.params.submit_date_start)
+      setStartDate(new Date(request.params.submit_date_start * 1000));
+    if (request.params.submit_date_end)
+      setEndDate(new Date(request.params.submit_date_end * 1000));
   }, []);
 
   // table
@@ -115,6 +114,11 @@ export default function RequestKURPage() {
         kur_user_type_id: value ? value?.id : null,
       }),
     );
+    dispatch(
+      requestKURAction.setDisplayFilter({
+        types: value,
+      }),
+    );
   };
 
   const handleChangePasar = (value: any) => {
@@ -124,6 +128,11 @@ export default function RequestKURPage() {
       requestKURAction.setParams({
         page: 1,
         area_ids: areasId.length > 0 ? areasId.join(',') : undefined,
+      }),
+    );
+    dispatch(
+      requestKURAction.setDisplayFilter({
+        areas: value,
       }),
     );
   };
@@ -153,8 +162,6 @@ export default function RequestKURPage() {
   };
 
   const handleResetFilter = async () => {
-    setSelectedArea(undefined);
-    setSelectedType(null);
     setStartDate(null);
     setEndDate(null);
     await dispatch(
@@ -164,6 +171,12 @@ export default function RequestKURPage() {
         kur_user_type_id: undefined,
         submit_date_start: undefined,
         submit_date_end: undefined,
+      }),
+    );
+    await dispatch(
+      requestKURAction.setDisplayFilter({
+        areas: [],
+        types: null,
       }),
     );
     await dispatch(
@@ -308,6 +321,7 @@ export default function RequestKURPage() {
                     size="small"
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
                     fullWidth
+                    defaultValue={request.params.search}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -339,7 +353,6 @@ export default function RequestKURPage() {
                       id="filterPasar"
                       options={areas}
                       onChange={(e, value) => {
-                        setSelectedArea(value);
                         handleChangePasar(value);
                       }}
                       getOptionLabel={(option) => `${option.title}`}
@@ -362,12 +375,23 @@ export default function RequestKURPage() {
                           />
                         ))
                       }
+                      isOptionEqualToValue={(item: Area) => {
+                        const filtered = request?.displayFilter?.areas?.filter(
+                          (el) => el.id === item.id,
+                        );
+                        if (filtered) return item.id === filtered[0]?.id;
+                        return false;
+                      }}
                       renderOption={(props, item) => (
                         <Box component="li" {...props} key={`area${item.id}`}>
                           {item.title}
                         </Box>
                       )}
-                      value={selectedArea}
+                      value={request?.displayFilter?.areas}
+                      inputValue={inputValueArea}
+                      onInputChange={(_, newInput) => {
+                        setInputValueArea(newInput);
+                      }}
                     />
                   </FormLabel>
                   <FormLabel text="Type">
@@ -375,14 +399,13 @@ export default function RequestKURPage() {
                       id="filterType"
                       options={types}
                       onChange={(e, value) => {
-                        setSelectedType(value);
                         handleChangeType(value);
                       }}
                       isOptionEqualToValue={(item: Type) => {
-                        return item.id === selectedType?.id;
+                        return item.id === request.displayFilter?.types?.id;
                       }}
                       getOptionLabel={(item) => item.name}
-                      value={selectedType}
+                      value={request?.displayFilter?.types}
                       renderInput={(params) => (
                         <TextField
                           {...params}
