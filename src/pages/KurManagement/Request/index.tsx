@@ -34,6 +34,8 @@ import 'react-day-picker/dist/style.css';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import Modal from 'components/Modal';
+import RefusalReason from './components/InputMessage';
 import {
   FilterButton,
   FilterDataBox,
@@ -191,6 +193,17 @@ export default function RequestKURPage() {
     );
   };
 
+  // action
+  const rejectModal = useModal();
+  const [selected, setSelected] = useState<RequestKUR | null>(null);
+  const handleApproveRequest = (id: number | string) => {
+    dispatch(requestKURAction.approveRequest({ id }));
+  };
+  const handleRejectRequest = (id: number | undefined, remarks: string) => {
+    dispatch(requestKURAction.rejectRequest({ id, remarks }));
+    rejectModal.closeModal();
+  };
+
   const headCell: HeadCells<RequestKUR>[] = [
     {
       id: 'kur_request_number',
@@ -268,26 +281,38 @@ export default function RequestKURPage() {
       format: (val: any) => (
         <div>
           <MenuList
-            menu={[
-              {
-                label: 'Details',
-                onClick: () => {
-                  navigate(`/kur/request/${val.id}`);
-                },
-              },
-              {
-                label: 'Approve',
-                onClick: () => {
-                  console.log('approve request');
-                },
-              },
-              {
-                label: 'Reject',
-                onClick: () => {
-                  console.log('reject request');
-                },
-              },
-            ]}
+            menu={
+              val.status === 'pending'
+                ? [
+                    {
+                      label: 'Details',
+                      onClick: () => {
+                        navigate(`/kur/request/${val.id}`);
+                      },
+                    },
+                    {
+                      label: 'Approve',
+                      onClick: () => {
+                        handleApproveRequest(val.id);
+                      },
+                    },
+                    {
+                      label: 'Reject',
+                      onClick: () => {
+                        setSelected(val);
+                        rejectModal.openModal();
+                      },
+                    },
+                  ]
+                : [
+                    {
+                      label: 'Details',
+                      onClick: () => {
+                        navigate(`/kur/request/${val.id}`);
+                      },
+                    },
+                  ]
+            }
           >
             <IconButton>
               <MoreVertIcon />
@@ -541,6 +566,16 @@ export default function RequestKURPage() {
           </Grid>
         </Grid>
       </Box>
+      <Modal
+        open={rejectModal.open}
+        title="Refusal Reason"
+        onClose={rejectModal.closeModal}
+      >
+        <RefusalReason
+          onSubmitRefusal={handleRejectRequest}
+          id={selected?.id}
+        />
+      </Modal>
     </>
   );
 }
