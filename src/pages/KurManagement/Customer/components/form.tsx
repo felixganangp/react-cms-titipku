@@ -62,6 +62,10 @@ function TabPanel(props: TabPanelProps) {
 
 interface Props {
   onClose: () => void;
+  formData: {
+    isEdit: boolean;
+    initialData: CreateCustomer;
+  };
 }
 const initial: CreateCustomer = {
   // imageCustomer: '',
@@ -89,7 +93,7 @@ const initial: CreateCustomer = {
   bankNumberPrimary: '',
   nobuAccountNumber: '',
 };
-function Form({ onClose }: Props) {
+function Form({ onClose, formData }: Props) {
   const dispatch = useAppDispatch();
   const [loadingForm, setLoadingForm] = useState(false);
 
@@ -111,7 +115,7 @@ function Form({ onClose }: Props) {
     setValueTab(newValue);
     divRef.current.firstElementChild.scrollIntoView();
   };
-  const [initialValues, setInitialValues] = useState(initial);
+  const [initialValues, setInitialValues] = useState(formData.initialData);
   const handleCloseForm = () => {
     setOpenCalendar({ open: false, touched: false });
     onClose();
@@ -120,7 +124,11 @@ function Form({ onClose }: Props) {
     initialValues,
     onSubmit: async (value, { resetForm }) => {
       await setLoadingForm(true);
-      await dispatch(customerAction.createCustomer(value));
+      if (formData.isEdit) {
+        await dispatch(customerAction.editCustomer(value));
+      } else {
+        await dispatch(customerAction.createCustomer(value));
+      }
       await setLoadingForm(false);
       await resetForm();
       await setOpenCalendar({ open: false, touched: false });
@@ -866,7 +874,7 @@ function Form({ onClose }: Props) {
             </Button>
             <Button
               disabled={
-                !(isValid && dirty) ||
+                !(isValid && (dirty || formData.isEdit)) ||
                 !(
                   values.imageKk &&
                   values.imageNik &&
