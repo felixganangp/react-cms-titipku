@@ -19,6 +19,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MenuList from 'components/MenuList';
+import moment from 'moment';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { customerAction } from 'store/slice/kur/Customer';
@@ -132,8 +133,9 @@ export default function KurCustomer() {
     setFormHead('Edit Customer');
     const birthDate = new Date(0);
     birthDate.setUTCSeconds(val.birth_date);
-    const convertBirthDate = { _d: birthDate };
+    const convertBirthDate = moment(birthDate).format('MM/DD/YYYY');
     const findBank = bankData.data.filter((el) => el.name === val.user_bank);
+
     const findKtp = val.kur_user_document.filter(
       (el) => el.document_type === 'ktp',
     );

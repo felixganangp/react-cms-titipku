@@ -69,8 +69,13 @@ function* createCustomer(payload: PayloadAction<CreateCustomer>) {
       CustomerService.uploadImage as any,
       { file: payload.payload.imageSKUsaha, type: 'sku' },
     );
-    // eslint-disable-next-line no-underscore-dangle
-    const jsDate = payload.payload.birthDate?._d;
+    let jsDate;
+    if (typeof payload.payload.birthDate !== 'string') {
+      // eslint-disable-next-line no-underscore-dangle
+      jsDate = payload.payload.birthDate?._d;
+    } else {
+      jsDate = new Date(payload.payload.birthDate);
+    }
     // eslint-disable-next-line no-unsafe-optional-chaining
     const convertBirthDate = jsDate && jsDate?.getTime() / 1000;
     const today = new Date();
@@ -303,8 +308,13 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       };
     }
 
-    // eslint-disable-next-line no-underscore-dangle
-    const jsDate = payload.payload.birthDate?._d;
+    let jsDate;
+    if (typeof payload.payload.birthDate !== 'string') {
+      // eslint-disable-next-line no-underscore-dangle
+      jsDate = payload.payload.birthDate?._d;
+    } else {
+      jsDate = new Date(payload.payload.birthDate);
+    }
     // eslint-disable-next-line no-unsafe-optional-chaining
     const convertBirthDate = jsDate && jsDate?.getTime() / 1000;
     const today = new Date();
