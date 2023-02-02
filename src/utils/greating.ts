@@ -1,6 +1,5 @@
 export const greating = (timeDate: Date) => {
-  // const time = timeDate.getHours();
-  const time = 20;
+  const time = timeDate.getHours();
   let day;
   let greeting;
 
