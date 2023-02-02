@@ -2,7 +2,7 @@ import { call, put, select, takeLatest } from 'redux-saga/effects';
 import { uiAction } from 'store/slice/ui';
 import * as service from 'service/Kur/Request';
 import { PayloadAction } from '@reduxjs/toolkit';
-import { ListResponse } from 'models/fetch';
+import { ListResponse, Response } from 'models/fetch';
 import { RequestKUR, RequestKURParams } from 'models/kur/Request';
 import { requestKURAction } from 'store/slice/kur/Request';
 
@@ -66,6 +66,36 @@ function* approveRequest(params: PayloadAction<{ id: string | number }>) {
   }
 }
 
+function* fetchDetails(params: PayloadAction<{ id: string | number }>) {
+  try {
+    const response: Response<RequestKUR> = yield call(
+      service.getRequestDetails,
+      params.payload.id,
+    );
+
+    yield put(requestKURAction.fetchDetailsSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
 function* rejectRequest(
   params: PayloadAction<{ id: number | undefined; remarks: string }>,
 ) {
@@ -102,4 +132,5 @@ export default function* requestKurSagas() {
   yield takeLatest(requestKURAction.fetchData.type, fetchData);
   yield takeLatest(requestKURAction.approveRequest.type, approveRequest);
   yield takeLatest(requestKURAction.rejectRequest.type, rejectRequest);
+  yield takeLatest(requestKURAction.fetchDetails.type, fetchDetails);
 }
