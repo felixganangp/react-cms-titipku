@@ -158,17 +158,9 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
     const paramsState: CustomerParams = yield select((state) => {
       return state.customerKur.params;
     });
-    console.log(
-      '🚀 ~ file: CustomerAccess.ts:150 ~ function*editCustomer ~ payload',
-      payload,
-    );
-    console.log('🚀 ~ file: payload', typeof payload.payload.imageKk);
 
-    // if
-    const test =
-      'kur_user_documents/ktp/1-02-2023-1675233622722456380_Screen%20Shot%202023-01-31%20at%2010.45.43.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAXSNW2ORESX4WA3MQ%2F20230201%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230201T093213Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&x-id=GetObject&X-Amz-Signature=0acfac854d07547e115cfa8f8f34ad55e052e0237a5db9da947bda3126ff1287';
-
-    let payloadKtp: undefined | ImageUpdatePayload = {
+    //* KTP */
+    let payloadKtp: KurUserDocumentPayload = {
       id: payload.payload.idImageNik,
       is_update: false,
       document_type: 'ktp',
@@ -194,6 +186,7 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       payloadKtp = {
         ...payloadKtp,
         document_filepath: responseImageNik.data,
+        is_update: true,
       };
     } else {
       let imageNik: string | string[] = payload.payload.imageNik.toString();
@@ -204,29 +197,112 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
         document_filepath: `/${payloadImageNik[0]}`,
       };
     }
-    console.log(
-      '🚀 ~ file: CustomerAccess.ts:176 ~ function*editCustomer ~ payloadKtp',
-      payloadKtp,
-    );
 
-    // if (typeof payload.payload.imageKk === 'object') {
-    //   const responseImageKk: Response<string> = yield call(
-    //     CustomerService.uploadImage as any,
-    //     { file: payload.payload.imageKk, type: 'kk' },
-    //   );
-    // }
-    // if (typeof payload.payload.imageNpwp === 'object') {
-    //   const responseImageNpwp: Response<string> = yield call(
-    //     CustomerService.uploadImage as any,
-    //     { file: payload.payload.imageNpwp, type: 'npwp' },
-    //   );
-    // }
-    // if (typeof payload.payload.imageSKUsaha === 'object') {
-    //   const responseImageSKUsaha: Response<string> = yield call(
-    //     CustomerService.uploadImage as any,
-    //     { file: payload.payload.imageSKUsaha, type: 'sku' },
-    //   );
-    // }
+    //* KK */
+    let payloadKK: KurUserDocumentPayload = {
+      id: payload.payload.idImageKk,
+      is_update: false,
+      document_type: 'kk',
+    };
+    if (payload.payload.oldKkNumber !== payload.payload.kkNumber) {
+      payloadKK = {
+        ...payloadKK,
+        document_number: payload.payload.kkNumber,
+        is_update: true,
+      };
+    } else {
+      payloadKK = {
+        ...payloadKK,
+        document_number: payload.payload.kkNumber,
+        is_update: false,
+      };
+    }
+    if (typeof payload.payload.imageKk === 'object') {
+      const responseImageKk: Response<string> = yield call(
+        CustomerService.uploadImage as any,
+        { file: payload.payload.imageKk, type: 'kk' },
+      );
+      payloadKK = {
+        ...payloadKK,
+        document_filepath: responseImageKk.data,
+        is_update: true,
+      };
+    } else {
+      let imageKk: string | string[] = payload.payload.imageKk.toString();
+      imageKk = imageKk.split('//');
+      const payloadImageKk = imageKk[2].split('?');
+      payloadKK = {
+        ...payloadKK,
+        document_filepath: `/${payloadImageKk[0]}`,
+      };
+    }
+
+    //* NPWP */
+    let payloadNpwp: KurUserDocumentPayload = {
+      id: payload.payload.idImageNpwp,
+      is_update: false,
+      document_type: 'npwp',
+    };
+    if (payload.payload.oldNpwp !== payload.payload.npwp) {
+      payloadNpwp = {
+        ...payloadNpwp,
+        document_number: payload.payload.npwp,
+        is_update: true,
+      };
+    } else {
+      payloadNpwp = {
+        ...payloadNpwp,
+        document_number: payload.payload.npwp,
+        is_update: false,
+      };
+    }
+    if (typeof payload.payload.imageNpwp === 'object') {
+      const responseImageNpwp: Response<string> = yield call(
+        CustomerService.uploadImage as any,
+        { file: payload.payload.imageNpwp, type: 'npwp' },
+      );
+      payloadNpwp = {
+        ...payloadNpwp,
+        document_filepath: responseImageNpwp.data,
+        is_update: true,
+      };
+    } else {
+      let imageNpwp: string | string[] = payload.payload.imageNpwp.toString();
+      imageNpwp = imageNpwp.split('//');
+      const payloadImageNpwp = imageNpwp[2].split('?');
+      payloadNpwp = {
+        ...payloadNpwp,
+        document_filepath: `/${payloadImageNpwp[0]}`,
+      };
+    }
+
+    //* SKU */
+    let payloadSKU: KurUserDocumentPayload = {
+      id: payload.payload.idImageSKUsaha,
+      is_update: false,
+      document_type: 'sku',
+      document_number: '',
+    };
+    if (typeof payload.payload.imageSKUsaha === 'object') {
+      const responseImageSKUsaha: Response<string> = yield call(
+        CustomerService.uploadImage as any,
+        { file: payload.payload.imageSKUsaha, type: 'sku' },
+      );
+      payloadSKU = {
+        ...payloadSKU,
+        document_filepath: responseImageSKUsaha.data,
+        is_update: true,
+      };
+    } else {
+      let imageSku: string | string[] = payload.payload.imageSKUsaha.toString();
+      imageSku = imageSku.split('//');
+      const payloadImageSku = imageSku[2].split('?');
+      payloadSKU = {
+        ...payloadSKU,
+        document_filepath: `/${payloadImageSku[0]}`,
+      };
+    }
+
     // eslint-disable-next-line no-underscore-dangle
     const jsDate = payload.payload.birthDate?._d;
     // eslint-disable-next-line no-unsafe-optional-chaining
@@ -234,60 +310,46 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
     const today = new Date();
     const convertJoindate = Math.floor(today.getTime() / 1000);
 
-    // const createCustomerPayload: CreateCustomerPayload = {
-    //   user_id: payload.payload.merchantName?.id,
-    //   user_type: 'merchant',
-    //   name: payload.payload.name,
-    //   nik: payload.payload.nikKtp,
-    //   birth_date: convertBirthDate,
-    //   join_date: convertJoindate,
-    //   email: payload.payload.email,
-    //   phone_number: payload.payload.phoneNumber,
-    //   registered_address: payload.payload.addressKtp,
-    //   living_address: payload.payload.addressDomisili,
-    //   credit_limit: +payload.payload.creditLimit,
-    //   admin_fee: +payload.payload.adminFee,
-    //   dpd_rate: +payload.payload.dpdRate,
-    //   user_account_number: payload.payload.bankNumberPrimary,
-    //   user_bank: payload.payload.bankName?.name,
-    //   nobu_account_number: payload.payload.nobuAccountNumber,
-    //   kur_user_status_id: 1,
-    //   kur_user_type_id: payload.payload.kurType?.id,
-    //   kur_user_document: [
-    //     {
-    //       document_filepath: responseImageNik.data,
-    //       document_number: payload.payload.nikKtp,
-    //       document_type: 'ktp',
-    //     },
-    //     {
-    //       document_filepath: responseImageKk.data,
-    //       document_number: payload.payload.kkNumber,
-    //       document_type: 'kk',
-    //     },
-    //     {
-    //       document_filepath: responseImageNpwp.data,
-    //       document_number: payload.payload.npwp,
-    //       document_type: 'npwp',
-    //     },
-    //     {
-    //       document_filepath: responseImageSKUsaha.data,
-    //       document_type: 'sku',
-    //     },
-    //   ],
-    // };
-    // const response: Response<string> = yield call(
-    //   CustomerService.updateCustomer as any,
-    //   createCustomerPayload,
-    // );
+    let idCust: string | undefined;
+    if (payload?.payload?.idCustomer) {
+      idCust = payload?.payload?.idCustomer;
+    }
+    const createCustomerPayload: CreateCustomerPayload = {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      idCustomer: +idCust!,
+      user_id: payload.payload.merchantName?.id,
+      user_type: 'merchant',
+      name: payload.payload.name,
+      nik: payload.payload.nikKtp,
+      birth_date: convertBirthDate,
+      join_date: convertJoindate,
+      email: payload.payload.email,
+      phone_number: payload.payload.phoneNumber,
+      registered_address: payload.payload.addressKtp,
+      living_address: payload.payload.addressDomisili,
+      credit_limit: +payload.payload.creditLimit,
+      admin_fee: +payload.payload.adminFee,
+      dpd_rate: +payload.payload.dpdRate,
+      user_account_number: payload.payload.bankNumberPrimary,
+      user_bank: payload.payload.bankName?.name,
+      nobu_account_number: payload.payload.nobuAccountNumber,
+      kur_user_status_id: 1,
+      kur_user_type_id: payload.payload.kurType?.id,
+      kur_user_document: [payloadKtp, payloadKK, payloadNpwp, payloadSKU],
+    };
+    const response: Response<string> = yield call(
+      CustomerService.updateCustomer as any,
+      createCustomerPayload,
+    );
 
-    // yield put(customerAction.editCustomerSuccess());
+    yield put(customerAction.editCustomerSuccess());
     yield call(fetchData, {
       type: customerAction.fetchData.type,
       payload: paramsState,
     });
     yield put(
       uiAction.openToast({
-        headMsg: 'Success create customer kur',
+        headMsg: 'Success update customer kur',
         // message: 'Succes Fetch data',
         severity: 'success',
       }),
@@ -295,13 +357,13 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
   } catch (error) {
     yield put(
       uiAction.openToast({
-        headMsg: 'Failed to create customer kur',
+        headMsg: 'Failed to update customer kur',
         message: error as string,
         severity: 'error',
       }),
     );
     yield put(customerAction.createCustomerFailed());
-    console.log(`Failed to create user: `, error);
+    console.log(`Failed to update user: `, error);
   }
 }
 

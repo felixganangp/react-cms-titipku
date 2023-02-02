@@ -159,7 +159,7 @@ export default function KurCustomer() {
       isEdit: true,
       initialData: {
         // imageCustomer: '',
-        idCustomer: '',
+        idCustomer: val.id?.toString(),
         name: val.name,
         kurType: val.kur_user_type,
         adminFee: val.admin_fee.toString(),

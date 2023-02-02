@@ -141,9 +141,9 @@ export interface CreateCustomerPayload {
 }
 
 export interface KurUserDocumentPayload {
-  id?: number;
+  id?: number | null;
   is_update?: boolean;
   document_type: 'ktp' | 'kk' | 'npwp' | 'sku'; // available options : ktp, kk, npwp, sku
-  document_filepath: string;
+  document_filepath?: string;
   document_number?: string;
 }

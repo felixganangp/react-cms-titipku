@@ -64,6 +64,8 @@ export const createCustomer = (payload: CreateCustomerPayload) =>
 export const updateCustomer = (payload: CreateCustomerPayload) =>
   new Promise<CreateCustomerPayload>(async (resolve, reject) => {
     try {
+      console.log('🚀 ~ file: Customer.ts:65 ~ payload', payload);
+
       const respon = await http.put(`kur/user/${payload.idCustomer}`, payload);
       if (respon.data) {
         resolve(respon.data);
