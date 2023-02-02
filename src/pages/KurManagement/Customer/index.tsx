@@ -129,7 +129,6 @@ export default function KurCustomer() {
 
   const [formHead, setFormHead] = useState('');
   const handleOpenEdit = (val: Customer) => {
-    console.log('🚀 ~ file:  val', val);
     setFormHead('Edit Customer');
     const birthDate = new Date(0);
     birthDate.setUTCSeconds(val.birth_date);
