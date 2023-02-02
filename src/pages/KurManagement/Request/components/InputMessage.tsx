@@ -2,7 +2,12 @@ import FormLabel from 'components/FormLabel';
 import { TextField, Box, Button } from '@mui/material';
 import { useState } from 'react';
 
-const RefusalReason = () => {
+interface RefusalReasonProps {
+  onSubmitRefusal: (id: number | undefined, reason: string) => void;
+  id: number | undefined;
+}
+
+const RefusalReason = ({ onSubmitRefusal, id }: RefusalReasonProps) => {
   const [desc, setDesc] = useState<string>('');
   return (
     <div>
@@ -18,6 +23,7 @@ const RefusalReason = () => {
             onBlur={(e) => setDesc(e.target.value)}
             multiline
             rows={3}
+            inputProps={{ maxLength: 100 }}
           />
         </FormLabel>
       </Box>
@@ -32,7 +38,7 @@ const RefusalReason = () => {
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <Button type="submit" disabled={!desc}>
+        <Button onClick={() => onSubmitRefusal(id, desc)} disabled={!desc}>
           Submit
         </Button>
       </Box>

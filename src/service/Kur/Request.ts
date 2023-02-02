@@ -26,3 +26,34 @@ export const getAllArea = (params: any) =>
       reject(message);
     }
   });
+
+export const approveRequest = (id: number | string) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.post(`/kur/request/${id}/approve`, {
+        remarks: '',
+      });
+      if (response) resolve(response);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.reponse.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const rejectRequest = (body: any) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const { id, remarks } = body;
+      const response = await http.post(`/kur/request/${id}/reject`, {
+        remarks,
+      });
+      if (response) resolve(response);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });

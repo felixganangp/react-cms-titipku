@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   RequestKUR,
   RequestKURDisplayFilter,
   RequestKURParams,
 } from 'models/kur/Request';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ListResponse } from 'models/fetch';
+import { ListResponse, Response } from 'models/fetch';
 
 interface RequestKURProps {
   data: RequestKUR[];
@@ -13,6 +14,7 @@ interface RequestKURProps {
   total: number | undefined;
   params: RequestKURParams;
   displayFilter: RequestKURDisplayFilter;
+  detailsData: RequestKUR | null;
 }
 
 const initialState: RequestKURProps = {
@@ -29,6 +31,7 @@ const initialState: RequestKURProps = {
     areas: [],
     types: null,
   },
+  detailsData: null,
 };
 
 const RequestKURSlice = createSlice({
@@ -64,6 +67,31 @@ const RequestKURSlice = createSlice({
       state.loading = false;
       state.data = action.payload.data;
       state.total = action.payload.total;
+    },
+    fetchDetails(
+      state: RequestKURProps,
+      action: PayloadAction<{ id: string | number }>,
+    ) {
+      state.loading = true;
+    },
+    fetchDetailsSuccess(
+      state: RequestKURProps,
+      action: PayloadAction<Response<RequestKUR>>,
+    ) {
+      state.loading = true;
+      state.detailsData = action.payload.data;
+    },
+    approveRequest(
+      state: RequestKURProps,
+      action: PayloadAction<{ id: string | number }>,
+    ) {
+      state.loading = true;
+    },
+    rejectRequest(
+      state: RequestKURProps,
+      action: PayloadAction<{ id: number | undefined; remarks: string }>,
+    ) {
+      state.loading = true;
     },
   },
 });

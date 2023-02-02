@@ -33,8 +33,8 @@ import {
   RequestStatus,
   Amount,
 } from '../request.styled';
-import RefusalReason from './components/InputMessage';
-import CustomerData from './components/CustomerData';
+import RefusalReason from '../components/InputMessage';
+import CustomerData from '../components/CustomerData';
 
 interface RequestKURProps {
   id: number;

@@ -5,7 +5,7 @@ import {
   Field,
   FieldContent,
   FieldName,
-} from '../../request.styled';
+} from '../request.styled';
 
 interface CustomerDataProps {
   icon: ReactElement<any, any>;
