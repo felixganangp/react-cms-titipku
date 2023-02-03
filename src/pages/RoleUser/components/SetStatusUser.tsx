@@ -66,7 +66,11 @@ export default function DeleteConfirm(props: DeleteConfirmTypes) {
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <Button variant="text" onClick={props.onClose}>
+        <Button
+          variant="text"
+          onClick={props.onClose}
+          color={props.data?.id_status === 2 ? 'error' : 'success'}
+        >
           Cancel
         </Button>
         <Button
