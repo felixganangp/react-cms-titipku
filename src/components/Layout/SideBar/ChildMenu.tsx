@@ -8,29 +8,16 @@ import ListItemText from '@mui/material/ListItemText';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import Box from '@mui/material/Box';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { CurrentActiveMenu } from 'models/Menu';
-import { userDetailsAction } from 'store/slice/UserDetails';
+import { Child } from 'models/Menu';
 
 interface ChildMenuProps {
-  child: {
-    id: number;
-    path: string;
-    title: string;
-    child:
-      | {
-          id: number;
-          path: string;
-          title: string;
-        }[]
-      | [];
-  }[];
+  child: Child[];
   open: boolean;
   onSetCurrentMenu: (id: number) => void;
   currentActiveMenu: number;
 }
 
-export default function ChildMenu({
+export default function ChildrenMenu({
   child,
   open,
   onSetCurrentMenu,
@@ -49,7 +36,7 @@ export default function ChildMenu({
   return (
     <List dense>
       {child.map((item) =>
-        item.child.length === 0 ? (
+        item.child?.length === 0 ? (
           <Link
             style={{
               textDecoration: 'none',
@@ -98,7 +85,7 @@ export default function ChildMenu({
                   currentActiveMenu === item.id ? '#ebeff3' : 'transparent',
               }}
               onClick={() =>
-                item.child.length === 0 ? (
+                item.child?.length === 0 ? (
                   <Link to={item.path} />
                 ) : (
                   toggleOpenList(item)
@@ -126,9 +113,11 @@ export default function ChildMenu({
               <Box position="absolute" top="25%" right="5px">
                 {
                   // eslint-disable-next-line no-nested-ternary
-                  item.child.length > 0 && openList !== item.id
+                  item.child && item.child?.length > 0 && openList !== item.id
                     ? iconOpened
-                    : item.child.length > 0 && openList === item.id
+                    : item.child &&
+                      item.child?.length > 0 &&
+                      openList === item.id
                     ? iconClosed
                     : null
                 }
@@ -141,7 +130,7 @@ export default function ChildMenu({
                 }}
               >
                 <List dense>
-                  {item.child.map((superchild) => (
+                  {item.child?.map((superchild) => (
                     <Link
                       key={superchild.id + superchild.title}
                       style={{
