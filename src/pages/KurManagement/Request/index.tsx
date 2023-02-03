@@ -197,10 +197,12 @@ export default function RequestKURPage() {
   const rejectModal = useModal();
   const [selected, setSelected] = useState<RequestKUR | null>(null);
   const handleApproveRequest = (id: number | string) => {
-    dispatch(requestKURAction.approveRequest({ id }));
+    dispatch(requestKURAction.approveRequest({ id, detailsPage: false }));
   };
-  const handleRejectRequest = (id: number | undefined, remarks: string) => {
-    dispatch(requestKURAction.rejectRequest({ id, remarks }));
+  const handleRejectRequest = (id: number | string, remarks: string) => {
+    dispatch(
+      requestKURAction.rejectRequest({ id, detailsPage: false, remarks }),
+    );
     rejectModal.closeModal();
   };
 
@@ -210,7 +212,7 @@ export default function RequestKURPage() {
       label: 'No Request',
       align: 'left',
       enableSort: true,
-      format: (val: any) => (
+      format: (val) => (
         <Link to={`/kur/request/${val.id}`} style={{ textDecoration: 'none' }}>
           <InvoiceLabel>{val.kur_request_number}</InvoiceLabel>
         </Link>
@@ -221,13 +223,13 @@ export default function RequestKURPage() {
       label: 'Name',
       align: 'left',
       enableSort: true,
-      format: (val: any) => <Typography>{val.kur_user.name}</Typography>,
+      format: (val) => <Typography>{val.kur_user.name}</Typography>,
     },
     {
       id: 'kur_type',
       label: 'KUR Type',
       align: 'left',
-      format: (val: any) => (
+      format: (val) => (
         <Typography>{val.kur_user.kur_user_type.name}</Typography>
       ),
     },
@@ -235,7 +237,7 @@ export default function RequestKURPage() {
       id: 'request_amount',
       label: 'Request Amount',
       align: 'left',
-      format: (val: any) => (
+      format: (val) => (
         <Typography>Rp {new Intl.NumberFormat().format(val.amount)}</Typography>
       ),
     },
@@ -244,21 +246,19 @@ export default function RequestKURPage() {
       label: 'Merchant',
       align: 'left',
       enableSort: true,
-      format: (val: any) => <Typography>{val.kur_user.user.name}</Typography>,
+      format: (val) => <Typography>{val.kur_user.user.name}</Typography>,
     },
     {
       id: 'area_name',
       label: 'Pasar',
       align: 'left',
-      format: (val: any) => (
-        <Typography>{val.kur_user.user.area.name}</Typography>
-      ),
+      format: (val) => <Typography>{val.kur_user.user.area.name}</Typography>,
     },
     {
       id: 'created_at',
       label: 'Submit Date',
       align: 'left',
-      format: (val: any) => (
+      format: (val) => (
         <Typography>
           {moment.unix(val.created_at).format('DD/MM/YYYY')}
         </Typography>
@@ -269,7 +269,7 @@ export default function RequestKURPage() {
       label: 'Status',
       align: 'left',
       enableSort: true,
-      format: (val: any) => (
+      format: (val) => (
         <InvoiceStatus status={val.status}>{val.status}</InvoiceStatus>
       ),
     },
@@ -278,7 +278,7 @@ export default function RequestKURPage() {
       label: 'Action',
       align: 'left',
       width: '20px',
-      format: (val: any) => (
+      format: (val) => (
         <div>
           <MenuList
             menu={
@@ -573,7 +573,7 @@ export default function RequestKURPage() {
       >
         <RefusalReason
           onSubmitRefusal={handleRejectRequest}
-          id={selected?.id}
+          id={selected?.id || 0}
         />
       </Modal>
     </>

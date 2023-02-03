@@ -3,8 +3,8 @@ import { TextField, Box, Button } from '@mui/material';
 import { useState } from 'react';
 
 interface RefusalReasonProps {
-  onSubmitRefusal: (id: number | undefined, reason: string) => void;
-  id: number | undefined;
+  onSubmitRefusal: (id: number | string, reason: string) => void;
+  id: number | string;
 }
 
 const RefusalReason = ({ onSubmitRefusal, id }: RefusalReasonProps) => {

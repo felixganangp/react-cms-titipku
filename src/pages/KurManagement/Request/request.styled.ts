@@ -8,7 +8,7 @@ interface CustomerStatusProps {
 }
 
 interface InvoiceStatusProps {
-  status: string;
+  status: string | undefined;
 }
 
 export const InvoiceLabel = styled(Typography)`
