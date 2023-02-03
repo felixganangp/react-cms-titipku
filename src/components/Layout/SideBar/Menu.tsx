@@ -11,6 +11,7 @@ import Collapse from '@mui/material/Collapse';
 import Box from '@mui/material/Box';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { userDetailsAction } from 'store/slice/UserDetails';
+import { FilteredMenu } from 'models/Menu';
 import ChildMenu from './ChildMenu';
 
 const IconButton = styled.nav`
@@ -20,24 +21,7 @@ const IconButton = styled.nav`
 `;
 
 interface MenuProps {
-  listOfMenu: {
-    id: number;
-    title: string;
-    path: string;
-    icon: any;
-    child: {
-      id: number;
-      path: string;
-      title: string;
-      child:
-        | {
-            id: number;
-            path: string;
-            title: string;
-          }[]
-        | [];
-    }[];
-  }[];
+  listOfMenu: FilteredMenu[];
   open: boolean;
 }
 

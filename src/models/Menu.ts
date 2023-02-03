@@ -33,17 +33,21 @@ export interface FilteredMenu {
   id: number;
   title: string;
   path: string;
-  icon: JSX.Element;
-  child: {
-    id: number;
-    title: string;
-    path: string;
-    child: {
-      id: number;
-      title: string;
-      path: string;
-    }[];
-  }[];
+  icon?: JSX.Element;
+  child: Child[] | [];
+}
+
+export interface Child {
+  id: number;
+  title: string;
+  path: string;
+  child?:
+    | {
+        id: number;
+        title: string;
+        path: string;
+      }[]
+    | [];
 }
 
 export interface CurrentActiveMenu {
