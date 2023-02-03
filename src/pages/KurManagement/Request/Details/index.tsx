@@ -1,10 +1,9 @@
 import { Box, Card, Grid, Button, Typography } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import ArrowBack from '@mui/icons-material/ArrowBackIos';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
-import Face2Icon from '@mui/icons-material/Face2';
 import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
@@ -19,7 +18,6 @@ import Modal from 'components/Modal';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { requestKURAction } from 'store/slice/kur/Request';
 import moment from 'moment';
-import PageNotFound from '../../../../assets/page-not-found.svg';
 import {
   DetailsHeader,
   BackButton,
@@ -39,8 +37,8 @@ import CustomerData from '../components/CustomerData';
 export default function RequestKURDetails() {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const { id } = useParams();
-  const customerStatus = 3;
   const dispatch = useAppDispatch();
+  const [totalAmount, setTotalAmount] = useState<number>(0);
   const requestDetails = useAppSelector((state) => state.request.detailsData);
 
   const headCell = [
@@ -79,18 +77,37 @@ export default function RequestKURDetails() {
     if (id) dispatch(requestKURAction.fetchDetails({ id }));
   }, []);
 
+  useEffect(() => {
+    if (requestDetails) {
+      let total = 0;
+      // eslint-disable-next-line array-callback-return
+      requestDetails.kur_request_detail.some((item) => {
+        total += item.amount;
+      });
+      setTotalAmount(total);
+    }
+  }, [requestDetails]);
+
   // action
   const formModal = useModal();
 
-  const handleApproveRequest = (approvedId: number | string) => {
-    dispatch(requestKURAction.approveRequest({ id: approvedId }));
+  const handleApproveRequest = async (approvedId: number | string) => {
+    dispatch(
+      requestKURAction.approveRequest({ id: approvedId, detailsPage: true }),
+    );
   };
 
   const handleRejectRequest = (
-    rejectedId: number | undefined,
+    rejectedId: number | string,
     remarks: string,
   ) => {
-    dispatch(requestKURAction.rejectRequest({ id: rejectedId, remarks }));
+    dispatch(
+      requestKURAction.rejectRequest({
+        id: rejectedId,
+        detailsPage: true,
+        remarks,
+      }),
+    );
     formModal.closeModal();
   };
 
@@ -116,12 +133,14 @@ export default function RequestKURDetails() {
                       }}
                       startIcon={<ArrowBack />}
                     >
-                      REQ/10029312
+                      {requestDetails?.kur_request_number}
                     </BackButton>
                   </Link>
                 </Box>
                 <Box
-                  display="flex"
+                  display={
+                    requestDetails?.status === 'pending' ? 'flex' : 'none'
+                  }
                   flexDirection="row"
                   gap="13px"
                   justifyContent="center"
@@ -159,7 +178,9 @@ export default function RequestKURDetails() {
                         }}
                       />
                     }
-                    onClick={() => console.log('Approve Request')}
+                    onClick={() => {
+                      if (id) handleApproveRequest(id);
+                    }}
                   >
                     Approve
                   </Button>
@@ -369,7 +390,7 @@ export default function RequestKURDetails() {
         </Header>
         <Content>
           <Typography>Total Amount</Typography>
-          <Amount>11,280,200.00</Amount>
+          <Amount>{new Intl.NumberFormat().format(totalAmount || 0)}</Amount>
           <Table
             data={requestDetails?.kur_request_detail || []}
             selected={[]}
@@ -385,10 +406,7 @@ export default function RequestKURDetails() {
         title="Refusal Reason"
         onClose={formModal.closeModal}
       >
-        <RefusalReason
-          onSubmitRefusal={handleRejectRequest}
-          id={requestDetails?.id}
-        />
+        <RefusalReason onSubmitRefusal={handleRejectRequest} id={id || 0} />
       </Modal>
     </div>
   );

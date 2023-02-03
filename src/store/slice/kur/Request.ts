@@ -3,6 +3,7 @@ import {
   RequestKUR,
   RequestKURDisplayFilter,
   RequestKURParams,
+  ActionParams,
 } from 'models/kur/Request';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse, Response } from 'models/fetch';
@@ -83,14 +84,11 @@ const RequestKURSlice = createSlice({
     },
     approveRequest(
       state: RequestKURProps,
-      action: PayloadAction<{ id: string | number }>,
+      action: PayloadAction<ActionParams>,
     ) {
       state.loading = true;
     },
-    rejectRequest(
-      state: RequestKURProps,
-      action: PayloadAction<{ id: number | undefined; remarks: string }>,
-    ) {
+    rejectRequest(state: RequestKURProps, action: PayloadAction<ActionParams>) {
       state.loading = true;
     },
   },

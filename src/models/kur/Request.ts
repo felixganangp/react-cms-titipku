@@ -64,3 +64,9 @@ export interface KURRequestDetail {
   description: string;
   image_filepath: string;
 }
+
+export interface ActionParams {
+  id: string | number;
+  detailsPage: boolean;
+  remarks?: string;
+}
