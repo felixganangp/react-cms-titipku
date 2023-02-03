@@ -2,13 +2,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
-import PersonIcon from '@mui/icons-material/Person';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
+import ManageAccountIcon from '@mui/icons-material/ManageAccountsOutlined';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import { UserDetails } from 'models/UserDetails';
 import { useAppSelector } from 'store/hooks';
-import { FilteredMenu } from 'models/Menu';
+import { Child, FilteredMenu } from 'models/Menu';
 import SideBarProfile from './Profile';
 import Menu from './Menu';
 
@@ -25,19 +25,13 @@ const iconFontSize = 20;
 const drawerWidthClose =
   (paddingIconButton + marginIconButton) * 2 + iconFontSize;
 
-const sidebarData = [
+const sidebarData: FilteredMenu[] = [
   {
     id: 48,
     title: 'KUR',
     path: '',
     icon: <LocalAtmIcon />,
     child: [
-      {
-        id: 51,
-        title: 'Customer',
-        path: '/kur/customer',
-        child: [],
-      },
       {
         id: 52,
         title: 'Request',
@@ -56,13 +50,19 @@ const sidebarData = [
         path: '',
         child: [],
       },
+      {
+        id: 51,
+        title: 'Customer',
+        path: '/kur/customer',
+        child: [],
+      },
     ],
   },
   {
     id: 47,
     title: 'Admin Panel',
     path: '',
-    icon: <PersonIcon />,
+    icon: <ManageAccountIcon />,
     child: [
       {
         id: 49,
@@ -93,25 +93,15 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
   useEffect(() => {
     const filtered: FilteredMenu[] = [...sidebarData];
     if (menuData && menuData.length > 0) {
-      filtered.map((menu, i) => {
-        if (
-          menuData.find((item) => item.id === menu.id) === undefined &&
-          menu.id.toString().length !== 3
-        )
+      sidebarData.map((menu, i) => {
+        if (menuData.find((item) => item.id === menu.id) === undefined) {
           filtered.splice(i, 1);
-        else {
-          menu.child.map((childMenu, j) => {
-            if (
-              menuData.find((subitem) => subitem.id === childMenu.id) ===
-                undefined &&
-              childMenu.id.toString().length !== 3
-            ) {
-              filtered[i].child.splice(j, 1);
-            }
-          });
-        }
-        if (menu.child.length < 1) {
-          filtered.splice(i, 1);
+        } else {
+          const filteredChild: Child[] = sidebarData[i].child.filter(
+            (a) =>
+              menuData.find((subitem) => subitem.id === a.id) !== undefined,
+          );
+          filtered[i].child = [...filteredChild];
         }
       });
     }

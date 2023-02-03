@@ -36,7 +36,7 @@ export default function Home() {
 
   const getData = async () => {
     const respon = await fetch(
-      'https://api.quotable.io/random?tags=famous-quotes,future',
+      'https://api.quotable.io/random?tags=famous-quotes',
       {
         method: 'GET',
         redirect: 'follow',
@@ -57,6 +57,11 @@ export default function Home() {
 
     return () => clearInterval(interval);
   }, []);
+
+  const clock = moment(date)
+    .format('hh:mm a')
+    .replace('am', 'a.m')
+    .replace('pm', 'p.m');
 
   return (
     <Box
@@ -86,15 +91,20 @@ export default function Home() {
         >
           <Typography
             sx={{
-              fontSize: '1.5rem',
+              fontSize: '30px',
               fontWeight: 700,
               color: '#fff',
               fontFamily: 'Montserrat',
             }}
           >
-            {greating(date).greeting} {userDetails?.full_name}
+            {greating(date).greeting} {userDetails?.full_name}!
           </Typography>
-          <Typography color="#fff" my="20px" fontSize="15px">
+          <Typography
+            color="#fff"
+            my="20px"
+            fontSize="14px"
+            fontFamily="Montserrat"
+          >
             “{quote?.content}”
           </Typography>
           <Typography
@@ -125,7 +135,7 @@ export default function Home() {
             fontWeight: 700,
           }}
         >
-          {moment(date).format('hh:mm A')}
+          {clock}
         </Typography>
       </Box>
     </Box>

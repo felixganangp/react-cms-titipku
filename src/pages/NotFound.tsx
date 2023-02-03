@@ -21,20 +21,24 @@ export default function Home() {
         height="100%"
       >
         <Box>
-          <Typography variant="h1" fontSize="40px" fontWeight="500">
+          <Typography variant="h1" fontSize="36px" fontWeight="500">
             Ooopss...
             <br />
             Something went wrong
           </Typography>
           <Typography
             variant="h1"
-            fontSize="20px"
+            fontSize="14px"
             fontWeight="500"
-            lineHeight="70px"
+            lineHeight="40px"
           >
             page not found
           </Typography>
-          <Button sx={{ mt: 2 }} onClick={() => navigate('/')}>
+          <Button
+            sx={{ mt: 2, fontSize: '16px' }}
+            size="medium"
+            onClick={() => navigate('/')}
+          >
             Back to Homepage
           </Button>
         </Box>

@@ -73,14 +73,23 @@ export default function RoleUserDetails() {
 
   const roleUser = useAppSelector((state) => state.roleUser);
   const [accessMenu, setAccessMenu] = useState<{ [id: number]: boolean }>({});
+  const [isEdited, setIsEdited] = useState(0);
   const deleteModal = useModal();
   const editModal = useModal();
 
   useEffect(() => {
     if (id) {
       dispatch(roleAccessAction.fetchDataDetail({ id }));
+      dispatch(
+        roleUserAction.setParams({
+          account_type: 'cms',
+          count: 5,
+          id_role: id,
+        }),
+      );
+      // eslint-disable-next-line radix
     }
-  }, []);
+  }, [isEdited]);
 
   useEffect(() => {
     dispatch(
@@ -103,7 +112,7 @@ export default function RoleUserDetails() {
       }
     }
     setAccessMenu({ ...access });
-  }, [listOfMenu]);
+  }, [isEdited, listOfMenu]);
 
   const handleSearch = (value: string) => {
     dispatch(
@@ -121,6 +130,7 @@ export default function RoleUserDetails() {
       roleUserAction.setParams({
         account_type: 'cms',
         page: value,
+        count: 5,
       }),
     );
   };
@@ -148,17 +158,8 @@ export default function RoleUserDetails() {
     },
     {
       id: 'email',
-      label: 'Email',
+      label: 'Email Address',
       align: 'left',
-    },
-    {
-      id: 'role',
-      label: 'Role',
-      align: 'left',
-      enableSort: true,
-      format: (val: any) => (
-        <Bullet>{`\u2022  ${val.administrator_detail[0].administrator_role.name}`}</Bullet>
-      ),
     },
     {
       id: 'updated_at',
@@ -276,7 +277,6 @@ export default function RoleUserDetails() {
                     style={{ marginRight: '0px' }}
                     label=""
                     key={parentMenu.id}
-                    disabled
                     control={
                       <Checkbox
                         checked={accessMenu[parentMenu.id] || false}
@@ -301,7 +301,6 @@ export default function RoleUserDetails() {
                             key={menu.id}
                             control={
                               <Checkbox
-                                disabled
                                 checked={accessMenu[menu.id] || false}
                                 // onChange={(e) => {
                                 // handleChangeParentChild(
@@ -325,7 +324,6 @@ export default function RoleUserDetails() {
                               <Control
                                 label=""
                                 key={menu.id}
-                                disabled
                                 control={
                                   <Checkbox
                                     checked={accessMenu[menu.id] || false}
@@ -414,12 +412,19 @@ export default function RoleUserDetails() {
             deleteModal.closeModal();
             navigate('/role-access');
           }}
+          onCancel={() => {
+            deleteModal.closeModal();
+          }}
           data={roleAccesses.detailsData}
         />
       </Modal>
       <RoleAccessForm
         open={editModal.open}
-        onClose={() => editModal.closeModal()}
+        onClose={() => {
+          editModal.closeModal();
+          const triggerEdit = isEdited + 1;
+          setIsEdited(triggerEdit);
+        }}
         editValue={roleAccesses.detailsData || null}
         // isEdit={isEdit}
       />

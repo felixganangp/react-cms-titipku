@@ -22,7 +22,7 @@ function Modal({ onClose, open, title, children, width, padding }: ModalProps) {
       <DialogTitle
         fontSize="20px"
         fontWeight="500"
-        textTransform="capitalize"
+        // textTransform="capitalize"
         sx={{ boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.1)' }}
       >
         {title}

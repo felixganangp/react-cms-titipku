@@ -51,7 +51,7 @@ export default function DeleteConfirm(props: DeleteConfirmTypes) {
     <Box>
       <Box p={3}>
         <Typography>
-          Are you sure to set{' '}
+          Are you sure to set to{' '}
           {typeChangeStatus(props.data?.id_status).nameChange} this user?
         </Typography>
       </Box>
