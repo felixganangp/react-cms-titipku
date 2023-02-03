@@ -218,7 +218,11 @@ export default function RoleAccesPage() {
         title="Delete Role"
         onClose={deleteModal.closeModal}
       >
-        <DeleteConfirm onClose={deleteModal.closeModal} data={selectedData} />
+        <DeleteConfirm
+          onClose={deleteModal.closeModal}
+          onCancel={deleteModal.closeModal}
+          data={selectedData}
+        />
       </Modal>
     </div>
   );

@@ -1,16 +1,19 @@
 import React, { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import TextField from '@mui/material/TextField';
+import Collapse from '@mui/material/Collapse';
+import Autocomplete from '@mui/material/Autocomplete';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import Table from 'components/Table';
 import MenuList from 'components/MenuList';
+import Status from 'components/Status';
 import useModal from 'hooks/useModal';
 
 import SearchIcon from '@mui/icons-material/Search';
@@ -20,6 +23,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 export default function Ivoice() {
   const formModal = useModal();
+  const [collapseFilter, setCollapseFilter] = useState(false);
 
   const headCell = [
     {
@@ -27,12 +31,96 @@ export default function Ivoice() {
       label: 'ID',
       align: 'left',
       enableSort: true,
+      format: () => {
+        return (
+          <Link
+            to="INV/192323934"
+            style={{ textDecoration: 'none', color: '#0774d1' }}
+          >
+            INV/192323934
+          </Link>
+        );
+      },
+    },
+    {
+      id: 'condition',
+      label: 'Condition',
+      align: 'left',
+      enableSort: true,
+      width: '60px',
+      format: () => {
+        return <Status color="#cecece">Late</Status>;
+      },
+    },
+    {
+      id: 'status',
+      label: 'Status',
+      align: 'left',
+      enableSort: true,
+      width: '60px',
+      format: () => {
+        return <Status color="#cecece">Debt</Status>;
+      },
+    },
+    {
+      id: 'cust',
+      label: 'Name',
+      align: 'left',
+      enableSort: true,
+      format: () => {
+        return (
+          <Box display="flex" alignItems="center" gap="10px">
+            <Box
+              bgcolor="#cecece"
+              width="8px"
+              height="8px"
+              borderRadius="100%"
+            />
+            <Typography>Neneng Murdiyati</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      id: 'kurType',
+      label: 'KUR Type',
+      align: 'left',
+    },
+    {
+      id: 'req_amount',
+      label: 'Request Amount',
+      align: 'left',
+    },
+    {
+      id: 'delivy',
+      label: 'Delivery Date',
+      align: 'left',
+    },
+    {
+      id: 'invoice',
+      label: 'Invoice Date',
+      align: 'left',
+    },
+    {
+      id: 'due',
+      label: 'Due Date',
+      align: 'left',
+    },
+    {
+      id: 'due',
+      label: 'Last Paid',
+      align: 'left',
+    },
+    {
+      id: 'paid_amount',
+      label: 'Paid amount',
+      align: 'left',
     },
     {
       id: 'action',
       label: 'Action',
       align: 'left',
-      format: (val) => (
+      format: () => (
         <>
           <MenuList
             menu={[
@@ -88,11 +176,147 @@ export default function Ivoice() {
                   </Box>
                   <Button
                     endIcon={<KeyboardArrowDownIcon />}
-                    onClick={formModal.openModal}
+                    onClick={() => setCollapseFilter(!collapseFilter)}
                   >
                     Filter
                   </Button>
                 </Box>
+                <Collapse in={collapseFilter}>
+                  <Grid container spacing={2} sx={{ marginTop: '2rem' }}>
+                    <Grid item xs={3}>
+                      <Typography
+                        sx={{
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          marginBottom: 1,
+                        }}
+                      >
+                        Type
+                      </Typography>
+                      <Autocomplete
+                        data-testid="filter-type-customer"
+                        id="type"
+                        options={[]}
+                        onChange={(e, value) => {
+                          // setTypeKurFilter(value);
+                        }}
+                        // isOptionEqualToValue={(option: Type) => {
+                        //   return (
+                        //     option.id === customerKur.stateFilter?.typeKur?.id
+                        //   );
+                        // }}
+                        getOptionLabel={(option) => `${option.name}`}
+                        // value={customerKur?.stateFilter?.typeKur}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            name="type"
+                            placeholder="Select Type of KUR"
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Typography
+                        sx={{
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          marginBottom: 1,
+                        }}
+                      >
+                        Pasar
+                      </Typography>
+                      <Autocomplete
+                        data-testid="filter-type-customer"
+                        id="type"
+                        options={[]}
+                        onChange={(e, value) => {
+                          // setTypeKurFilter(value);
+                        }}
+                        // isOptionEqualToValue={(option: Type) => {
+                        //   return (
+                        //     option.id === customerKur.stateFilter?.typeKur?.id
+                        //   );
+                        // }}
+                        getOptionLabel={(option) => `${option.name}`}
+                        // value={customerKur?.stateFilter?.typeKur}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            name="type"
+                            placeholder="Select Type of KUR"
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Typography
+                        sx={{
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          marginBottom: 1,
+                        }}
+                      >
+                        Status
+                      </Typography>
+                      <Autocomplete
+                        data-testid="filter-type-customer"
+                        id="type"
+                        options={[]}
+                        onChange={(e, value) => {
+                          // setTypeKurFilter(value);
+                        }}
+                        // isOptionEqualToValue={(option: Type) => {
+                        //   return (
+                        //     option.id === customerKur.stateFilter?.typeKur?.id
+                        //   );
+                        // }}
+                        getOptionLabel={(option) => `${option.name}`}
+                        // value={customerKur?.stateFilter?.typeKur}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            name="type"
+                            placeholder="Select Type of KUR"
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={3}>
+                      <Typography
+                        sx={{
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          marginBottom: 1,
+                        }}
+                      >
+                        Condition
+                      </Typography>
+                      <Autocomplete
+                        data-testid="filter-type-customer"
+                        id="type"
+                        options={[]}
+                        onChange={(e, value) => {
+                          // setTypeKurFilter(value);
+                        }}
+                        // isOptionEqualToValue={(option: Type) => {
+                        //   return (
+                        //     option.id === customerKur.stateFilter?.typeKur?.id
+                        //   );
+                        // }}
+                        getOptionLabel={(option) => `${option.name}`}
+                        // value={customerKur?.stateFilter?.typeKur}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            name="type"
+                            placeholder="Select Type of KUR"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  </Grid>
+                </Collapse>
               </Card>
             </Grid>
             <Grid item xs={12}>
@@ -104,8 +328,9 @@ export default function Ivoice() {
                 data-testid="table-customer"
               >
                 <Table
-                  data={[{ data: '1' }]}
+                  data={[]}
                   headCells={headCell}
+                  selected={[]}
                   // page={customerKur.params.page}
                   // totalData={customerKur.total}
                   // count={customerKur.params.count}
@@ -113,8 +338,8 @@ export default function Ivoice() {
                   // orderType={customerKur.params.order_type}
                   // onChangePage={(val) => handleChangePage(val)}
                   // onChangeSort={(val) => handleChangeSort(val)}
-                  // enableCheckBox
-                  // disableNumber
+                  enableCheckBox
+                  disableNumber
                 />
               </Box>
             </Grid>
@@ -124,3 +349,10 @@ export default function Ivoice() {
     </div>
   );
 }
+
+const data = [
+  {
+    kurType: 'B2B',
+    amount: 'Rp.100',
+  },
+];
