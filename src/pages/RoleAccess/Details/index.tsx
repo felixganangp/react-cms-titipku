@@ -5,19 +5,26 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Checkbox from '@mui/material/Checkbox';
+import Button from '@mui/material/Button';
 
+import MenuList from 'components/MenuList';
 import Table from 'components/Table';
 import { HeadCells } from 'components/Table/types';
-import SubDetailsPagesWrapper from 'components/Accordion/SubDetailsPagesWrapper';
+import SubDetailsPagesWrapper, {
+  SubDetail,
+} from 'components/Accordion/SubDetailsPagesWrapper';
 import DescDetails from 'components/DescDetails';
 import Status from 'components/Status';
 import AccordionOnDetails from 'components/Accordion/Details';
 import debounce from 'utils/debounce';
+import useModal from 'hooks/useModal';
+import Modal from 'components/Modal';
 import moment from 'moment';
 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
 import SearchIcon from '@mui/icons-material/Search';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { roleAccessAction } from 'store/slice/RoleAccess';
@@ -25,7 +32,7 @@ import { roleUserAction } from 'store/slice/RoleUser';
 import { RoleUser as RoleUserTypes } from 'models/RoleUser';
 
 import { Bullet } from 'pages/RoleUser/roleuser.styled';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Typography } from '@mui/material';
 import {
   TitlePage,
@@ -36,24 +43,58 @@ import {
   ChildMenu,
 } from './details.styled';
 
+import DeleteConfirm from '../components/DeleteConfirm';
+import RoleAccessForm from '../Form/Form';
+
+const statusColor = (id: number, name: string) => {
+  let nameCurrent = name;
+  let colorCurrent = 'rgba(0,0,0,0.3)';
+
+  if (id === 1) {
+    nameCurrent = 'Active';
+    colorCurrent = '#008e58';
+  }
+
+  if (id === 2) {
+    nameCurrent = 'Inactive';
+    colorCurrent = '#c10000';
+  }
+
+  return { nameCurrent, colorCurrent };
+};
+
 export default function RoleUserDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const dispatch = useAppDispatch();
   const roleAccesses = useAppSelector((state) => state.roleAccess);
   const listOfMenu = useAppSelector((state: any) => state.roleAccess.menuData);
 
   const roleUser = useAppSelector((state) => state.roleUser);
   const [accessMenu, setAccessMenu] = useState<{ [id: number]: boolean }>({});
+  const [isEdited, setIsEdited] = useState(0);
+  const deleteModal = useModal();
+  const editModal = useModal();
 
   useEffect(() => {
     if (id) {
       dispatch(roleAccessAction.fetchDataDetail({ id }));
+      dispatch(
+        roleUserAction.setParams({
+          account_type: 'cms',
+          count: 5,
+          id_role: id,
+        }),
+      );
       // eslint-disable-next-line radix
     }
-  }, []);
+  }, [isEdited]);
 
   useEffect(() => {
-    dispatch(roleUserAction.fetchData({ ...roleUser.params, id_role: id }));
+    dispatch(
+      roleUserAction.fetchData({ ...roleUser.params, count: 5, id_role: id }),
+    );
   }, [roleUser.params]);
 
   useEffect(() => {
@@ -71,7 +112,7 @@ export default function RoleUserDetails() {
       }
     }
     setAccessMenu({ ...access });
-  }, [listOfMenu]);
+  }, [isEdited, listOfMenu]);
 
   const handleSearch = (value: string) => {
     dispatch(
@@ -89,6 +130,7 @@ export default function RoleUserDetails() {
       roleUserAction.setParams({
         account_type: 'cms',
         page: value,
+        count: 5,
       }),
     );
   };
@@ -113,22 +155,11 @@ export default function RoleUserDetails() {
       label: 'Name',
       align: 'left',
       enableSort: true,
-      isSticky: true,
     },
     {
       id: 'email',
-      label: 'Email',
+      label: 'Email Address',
       align: 'left',
-      isSticky: true,
-    },
-    {
-      id: 'role',
-      label: 'Role',
-      align: 'left',
-      enableSort: true,
-      format: (val: any) => (
-        <Bullet>{`\u2022  ${val.administrator_detail[0].administrator_role.name}`}</Bullet>
-      ),
     },
     {
       id: 'updated_at',
@@ -146,11 +177,15 @@ export default function RoleUserDetails() {
       label: 'Status',
       align: 'left',
       enableSort: true,
-      format: (val: any) => (
-        <Status color="rgba(0,0,0,0.3)">
-          {val.administrator_detail[0].administrator_status.name}
-        </Status>
-      ),
+      format: (val) => {
+        const status = val.administrator_detail[0].administrator_status;
+
+        return (
+          <Status color={statusColor(status.id, status.name).colorCurrent}>
+            {statusColor(status.id, status.name).nameCurrent}
+          </Status>
+        );
+      },
     },
   ];
 
@@ -160,15 +195,45 @@ export default function RoleUserDetails() {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Card>
-              <Menu>Role Access Management</Menu>
-              <Link style={{ textDecoration: 'none' }} to="/role-access">
-                <BackButton
-                  sx={{ '&:hover': { backgroundColor: '#ffff' } }}
-                  startIcon={<ArrowBackIosIcon />}
-                >
-                  <TitlePage>Details</TitlePage>
-                </BackButton>
-              </Link>
+              <Box display="flex" justifyContent="space-between">
+                <Box>
+                  <Menu>Role Access Management</Menu>
+                  <Link style={{ textDecoration: 'none' }} to="/role-access">
+                    <BackButton
+                      sx={{ '&:hover': { backgroundColor: '#ffff' } }}
+                      startIcon={<ArrowBackIosIcon />}
+                    >
+                      <TitlePage>Details</TitlePage>
+                    </BackButton>
+                  </Link>
+                </Box>
+                <div>
+                  <MenuList
+                    menu={[
+                      {
+                        label: 'Edit',
+                        onClick: () => {
+                          editModal.openModal();
+                        },
+                      },
+                      {
+                        label: 'Delete',
+                        color: '#c10000',
+                        onClick: () => {
+                          deleteModal.openModal();
+                        },
+                      },
+                    ]}
+                  >
+                    <Button
+                      startIcon={<KeyboardArrowDownIcon />}
+                      // onClick={() => setOpenFilter((prev) => !prev)}
+                    >
+                      Action
+                    </Button>
+                  </MenuList>
+                </div>
+              </Box>
             </Card>
           </Grid>
         </Grid>
@@ -199,7 +264,7 @@ export default function RoleUserDetails() {
             </Grid>
           </Box>
         </SubDetailsPagesWrapper>
-        <SubDetailsPagesWrapper title="Menu Access" defaultOpen>
+        <SubDetail title="Menu Access" defaultOpen>
           <Box p="20px">
             {listOfMenu.map((parentMenu: any) => (
               <AccordionOnDetails
@@ -212,7 +277,6 @@ export default function RoleUserDetails() {
                     style={{ marginRight: '0px' }}
                     label=""
                     key={parentMenu.id}
-                    disabled
                     control={
                       <Checkbox
                         checked={accessMenu[parentMenu.id] || false}
@@ -237,7 +301,6 @@ export default function RoleUserDetails() {
                             key={menu.id}
                             control={
                               <Checkbox
-                                disabled
                                 checked={accessMenu[menu.id] || false}
                                 // onChange={(e) => {
                                 // handleChangeParentChild(
@@ -261,7 +324,6 @@ export default function RoleUserDetails() {
                               <Control
                                 label=""
                                 key={menu.id}
-                                disabled
                                 control={
                                   <Checkbox
                                     checked={accessMenu[menu.id] || false}
@@ -304,7 +366,7 @@ export default function RoleUserDetails() {
               </AccordionOnDetails>
             ))}
           </Box>
-        </SubDetailsPagesWrapper>
+        </SubDetail>
         <SubDetailsPagesWrapper title="Role User List" defaultOpen>
           <Box p="20px">
             <Box display="flex" gap="20px" flexWrap="wrap" mb="20px">
@@ -340,6 +402,32 @@ export default function RoleUserDetails() {
           </Box>
         </SubDetailsPagesWrapper>
       </Box>
+      <Modal
+        open={deleteModal.open}
+        title="Delete Role"
+        onClose={deleteModal.closeModal}
+      >
+        <DeleteConfirm
+          onClose={() => {
+            deleteModal.closeModal();
+            navigate('/role-access');
+          }}
+          onCancel={() => {
+            deleteModal.closeModal();
+          }}
+          data={roleAccesses.detailsData}
+        />
+      </Modal>
+      <RoleAccessForm
+        open={editModal.open}
+        onClose={() => {
+          editModal.closeModal();
+          const triggerEdit = isEdited + 1;
+          setIsEdited(triggerEdit);
+        }}
+        editValue={roleAccesses.detailsData || null}
+        // isEdit={isEdit}
+      />
     </div>
   );
 }

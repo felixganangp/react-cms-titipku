@@ -88,7 +88,7 @@ function* deleteRoleAccess(body: PayloadAction<{ id: string | number }>) {
     yield put(roleAccessAction.fetchData(params));
     yield put(
       uiAction.openToast({
-        headMsg: 'Success Delete Data',
+        headMsg: 'Role Access Deleted',
         severity: 'success',
       }),
     );
@@ -155,7 +155,15 @@ function* fetchDataDetail(params: PayloadAction<{ id: string | number }>) {
     );
 
     yield put(roleAccessAction.fetchDataDetailSuccess(response));
-    yield put(roleAccessAction.fetchMenuList({ role_id: params.payload.id }));
+    // eslint-disable-next-line radix
+    const idInt = parseInt(params.payload.id.toString());
+    if (params.payload.id) {
+      yield put(
+        roleAccessAction.fetchMenuList({
+          role_id: idInt,
+        }),
+      );
+    }
   } catch (err) {
     const headMessage = 'Failed Get Role Access Detail';
     if (typeof err === 'string') {

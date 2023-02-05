@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ListResponse } from 'models/fetch';
+import { ListResponse, Response } from 'models/fetch';
 import { CreateCustomer, Customer, CustomerParams } from 'models/kur/Customer';
+import { Type } from 'models/kur/Type';
+import { Area } from 'models/Area';
 
 interface CustomerInitialProps {
   data: Customer[];
@@ -9,8 +11,11 @@ interface CustomerInitialProps {
   error?: any;
   total: number | undefined;
   params: CustomerParams;
-  loadingKurType: boolean;
-  dataKurType: [];
+  details: Customer | null;
+  stateFilter?: {
+    typeKur?: Type | null;
+    areaKur?: Area[] | [];
+  };
 }
 const initialState: CustomerInitialProps = {
   data: [],
@@ -22,9 +27,14 @@ const initialState: CustomerInitialProps = {
     page: 1,
     count: 10,
     search: '',
+    order_by: 'id',
+    order_type: 'desc',
   },
-  loadingKurType: false,
-  dataKurType: [],
+  stateFilter: {
+    typeKur: null,
+    areaKur: [],
+  },
+  details: null,
 };
 
 const CustomerSlice = createSlice({
@@ -45,7 +55,21 @@ const CustomerSlice = createSlice({
       action: PayloadAction<ListResponse<Customer>>,
     ) {
       state.loading = false;
-      state.data = action.payload.data;
+      state.data = action.payload.data || [];
+      state.total = action.payload.total;
+    },
+    fetchDataDetail(
+      state: CustomerInitialProps,
+      action: PayloadAction<{ id: string | number }>,
+    ) {
+      state.loading = true;
+    },
+    fetchDataDetailSuccess(
+      state: CustomerInitialProps,
+      action: PayloadAction<Response<Customer>>,
+    ) {
+      state.loading = false;
+      state.details = action.payload.data;
     },
     setParams(
       state: CustomerInitialProps,
@@ -56,18 +80,53 @@ const CustomerSlice = createSlice({
         ...action.payload,
       };
     },
-    fetchDataKurType(state: CustomerInitialProps) {
-      state.loadingKurType = true;
-    },
-    failedFetchDataKurType(state: CustomerInitialProps) {
-      state.loading = false;
-    },
-    fetchDataKurTypeSuccess(
+    createCustomer(
       state: CustomerInitialProps,
-      action: PayloadAction<ListResponse<Customer>>,
+      action: PayloadAction<CreateCustomer>,
     ) {
-      state.loading = false;
-      state.data = action.payload.data;
+      state.loadingForm = true;
+    },
+    createCustomerSuccess(
+      state: CustomerInitialProps,
+      // action: PayloadAction<CreateCustomer>,
+    ) {
+      state.loadingForm = false;
+    },
+    createCustomerFailed(
+      state: CustomerInitialProps,
+      // action: PayloadAction<CreateCustomer>,
+    ) {
+      state.loadingForm = false;
+    },
+    setFilter(
+      state: CustomerInitialProps,
+      action: PayloadAction<{
+        typeKur: Type | null;
+        areaKur: Area[] | undefined;
+      }>,
+    ) {
+      state.stateFilter = {
+        ...state.stateFilter,
+        ...action.payload,
+      };
+    },
+    editCustomer(
+      state: CustomerInitialProps,
+      action: PayloadAction<CreateCustomer>,
+    ) {
+      state.loadingForm = true;
+    },
+    editCustomerSuccess(
+      state: CustomerInitialProps,
+      // action: PayloadAction<CreateCustomer>,
+    ) {
+      state.loadingForm = false;
+    },
+    editCustomerFailed(
+      state: CustomerInitialProps,
+      // action: PayloadAction<CreateCustomer>,
+    ) {
+      state.loadingForm = false;
     },
   },
 });

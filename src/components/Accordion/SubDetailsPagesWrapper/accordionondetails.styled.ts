@@ -52,7 +52,7 @@ export const ButtonAccordion = styled.button<
 
 export const Title = styled(Typography)``;
 
-export const WrapperContent = styled.div`
+export const WrapperContent = styled(Box)`
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.2s ease-out;

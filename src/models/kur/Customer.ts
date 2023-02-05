@@ -1,24 +1,39 @@
-import { ListParams } from '../fetch';
+import { Merchant, MerchantResp } from 'models/Merchant';
+import { ListParams } from 'models/fetch';
+import { Type } from './Type';
+import { Area } from '../Area';
 
 export interface CreateCustomer {
-  imageCustomer: string | File | Blob;
   idCustomer?: string;
   name: string;
-  kurType: object | null;
+  kurType: Type | null;
   adminFee: string;
-  birthDate: object | null;
+  birthDate: { _d?: Date } | null | string;
   phoneNumber: string;
   email: string;
   addressKtp: string;
   addressDomisili: string;
-  lapakName: object | null;
+  pasarName: Area | null;
+  merchantName: MerchantResp | null;
   nikKtp: string;
+  oldNikKtp?: string;
   imageNik: string | File | Blob;
+  idImageNik?: number | null;
   kkNumber: string;
+  oldKkNumber?: string;
   imageKk: string | File | Blob;
+  idImageKk?: number | null;
   npwp: string;
+  oldNpwp?: string;
   imageNpwp: string | File | Blob;
+  idImageNpwp?: number | null;
   imageSKUsaha: string;
+  idImageSKUsaha?: number | null;
+  dpdRate: string;
+  creditLimit: string;
+  bankName: BankList | null;
+  bankNumberPrimary: string;
+  nobuAccountNumber: string;
 }
 
 export interface Customer {
@@ -33,7 +48,7 @@ export interface Customer {
   updated_by: object;
   user_id: number;
   user_type: string;
-  user: object;
+  user: Merchant;
   kur_user_number: string;
   name: string;
   nik: string;
@@ -53,7 +68,6 @@ export interface Customer {
   kur_user_type: KurUserType;
   kur_user_document: KurUserDocument[];
 }
-
 export interface KurUserStatus {
   id?: number;
   created_at: number;
@@ -95,7 +109,41 @@ export interface KurUserDocument {
 
 export interface CustomerParams extends ListParams {
   kur_user_type_id?: number;
-  area_id?: number;
-  // order_type?: string | undefined | null;
-  order_by?: string;
+  area_ids?: string;
+}
+
+export interface BankList {
+  name: string;
+  code: string;
+}
+
+export interface CreateCustomerPayload {
+  idCustomer?: number;
+  user_id: number | undefined;
+  user_type: string; // as of now only merchant
+  name: string;
+  nik: string;
+  birth_date: number | undefined;
+  email: string;
+  phone_number: string;
+  registered_address: string;
+  living_address: string;
+  credit_limit: number;
+  admin_fee: number;
+  dpd_rate: number;
+  user_account_number: string;
+  user_bank: string | undefined;
+  nobu_account_number: string;
+  join_date: number | undefined;
+  kur_user_status_id: number;
+  kur_user_type_id: number | undefined;
+  kur_user_document: KurUserDocumentPayload[];
+}
+
+export interface KurUserDocumentPayload {
+  id?: number | null;
+  is_update?: boolean;
+  document_type: 'ktp' | 'kk' | 'npwp' | 'sku'; // available options : ktp, kk, npwp, sku
+  document_filepath?: string;
+  document_number?: string;
 }

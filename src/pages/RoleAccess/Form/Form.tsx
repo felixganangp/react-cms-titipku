@@ -17,12 +17,10 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { debounce } from 'lodash';
 import { Button } from '@mui/material';
 import {
-  CancelButton,
   ChildMenu,
   Control,
   HorizontalContent,
   Menu,
-  SubmitButton,
   Title,
   TitleWrapper,
   ActionWrapper,
@@ -157,6 +155,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
 
   useEffect(() => {
     // for checked attribute on checkbox
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     const access: { [x: number]: boolean } = {};
     if (listOfMenu !== undefined) {
       for (let i = 0; i < listOfMenu.length; i += 1) {
@@ -218,11 +217,27 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
   const handleChangeParentChild = (
     // checking another child from same parent
     // + checking parent when one of its child checked
+    // + uncheck parent when no one child checked
     e: React.ChangeEvent<HTMLInputElement>,
     parentId: number,
     childId: number,
   ) => {
+    let totalTrue = 0;
+    const childIds = accordionMenu.filter(
+      (group: { parent: number }) => group.parent === parentId,
+    )[0].child;
+    // eslint-disable-next-line array-callback-return
+    childIds.some((id: number) => {
+      if (accessMenu[id] === true && id !== childId) totalTrue += 1;
+    });
+
     if (accessMenu[parentId] === false) {
+      setAccessMenu({
+        ...accessMenu,
+        [parentId]: !!e.target.checked,
+        [childId]: !!e.target.checked,
+      });
+    } else if (totalTrue < 1 && accessMenu[childId] === true) {
       setAccessMenu({
         ...accessMenu,
         [parentId]: !!e.target.checked,

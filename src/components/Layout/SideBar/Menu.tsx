@@ -11,6 +11,7 @@ import Collapse from '@mui/material/Collapse';
 import Box from '@mui/material/Box';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { userDetailsAction } from 'store/slice/UserDetails';
+import { FilteredMenu } from 'models/Menu';
 import ChildMenu from './ChildMenu';
 
 const IconButton = styled.nav`
@@ -20,24 +21,7 @@ const IconButton = styled.nav`
 `;
 
 interface MenuProps {
-  listOfMenu: {
-    id: number;
-    title: string;
-    path: string;
-    icon: any;
-    child: {
-      id: number;
-      path: string;
-      title: string;
-      child:
-        | {
-            id: number;
-            path: string;
-            title: string;
-          }[]
-        | [];
-    }[];
-  }[];
+  listOfMenu: FilteredMenu[];
   open: boolean;
 }
 
@@ -66,7 +50,7 @@ function Menu(props: MenuProps) {
       {listOfMenu?.map((menu) =>
         menu?.child?.length === 0 ? (
           <Link
-            key={menu.id}
+            key={menu.id + menu.title}
             style={{
               textDecoration: 'none',
             }}
@@ -81,7 +65,7 @@ function Menu(props: MenuProps) {
                 backgroundColor:
                   currentActiveMenu === menu.id ? '#ebeff3' : 'transparent',
               }}
-              key={menu.id}
+              key={menu.id + menu.title}
             >
               <ListItemIcon sx={{ minWidth: '46px', fontSize: '20px' }}>
                 <IconButton>{menu.icon}</IconButton>
@@ -119,7 +103,7 @@ function Menu(props: MenuProps) {
             </ListItemButton>
           </Link>
         ) : (
-          <div key={menu.id}>
+          <div key={menu.id + menu.title}>
             <ListItemButton
               sx={{
                 margin: '6px 14px',
@@ -133,7 +117,7 @@ function Menu(props: MenuProps) {
                   toggleOpenList(menu)
                 )
               }
-              key={menu.id}
+              key={menu.id + menu.title}
             >
               <ListItemIcon sx={{ minWidth: '46px', fontSize: '20px' }}>
                 <IconButton>{menu.icon}</IconButton>
@@ -172,7 +156,7 @@ function Menu(props: MenuProps) {
                 }}
               >
                 <ChildMenu
-                  key={menu.id}
+                  key={menu.id + menu.title}
                   child={menu.child}
                   open={open}
                   onSetCurrentMenu={handleChangeActiveMenu}

@@ -3,10 +3,11 @@ import { TextField, Box, Button } from '@mui/material';
 import { useState } from 'react';
 
 interface RefusalReasonProps {
-  onSubmit: (reason: string) => void;
+  onSubmitRefusal: (id: number | string, reason: string) => void;
+  id: number | string;
 }
 
-const RefusalReason = ({ onSubmit }: RefusalReasonProps) => {
+const RefusalReason = ({ onSubmitRefusal, id }: RefusalReasonProps) => {
   const [desc, setDesc] = useState<string>('');
   return (
     <div>
@@ -22,6 +23,7 @@ const RefusalReason = ({ onSubmit }: RefusalReasonProps) => {
             onBlur={(e) => setDesc(e.target.value)}
             multiline
             rows={3}
+            inputProps={{ maxLength: 100 }}
           />
         </FormLabel>
       </Box>
@@ -36,7 +38,7 @@ const RefusalReason = ({ onSubmit }: RefusalReasonProps) => {
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <Button disabled={!desc} onClick={() => onSubmit(desc)}>
+        <Button onClick={() => onSubmitRefusal(id, desc)} disabled={!desc}>
           Submit
         </Button>
       </Box>

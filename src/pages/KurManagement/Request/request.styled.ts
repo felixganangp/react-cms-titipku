@@ -8,7 +8,7 @@ interface CustomerStatusProps {
 }
 
 interface InvoiceStatusProps {
-  status: number;
+  status: string | undefined;
 }
 
 export const InvoiceLabel = styled(Typography)`
@@ -46,7 +46,11 @@ export const InvoiceStatus = styled(Box)<Pick<InvoiceStatusProps, 'status'>>`
   padding: 6px 10px;
   color: #fff;
   background-color: ${(p) =>
-    p.status === 1 ? '#FF8F00' : p.status === 2 ? '#008E58' : '#C10000'};
+    p.status === 'pending'
+      ? '#FF8F00'
+      : p.status === 'approved'
+      ? '#008E58'
+      : '#C10000'};
   border-radius: 10px;
   width: 80px;
   font-size: 12px;

@@ -152,7 +152,9 @@ export default function RoleAccesPage() {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Card>
-              <Typography variant="titlePage">Role Access</Typography>
+              <Typography variant="titlePage">
+                Role Access Management
+              </Typography>
             </Card>
           </Grid>
           <Grid item xs={12}>
@@ -174,6 +176,7 @@ export default function RoleAccesPage() {
                   size="small"
                   sx={{ bgcolor: '#ebeff3', maxWidth: '560px' }}
                   fullWidth
+                  defaultValue={roleAccesses.params.search}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
@@ -216,7 +219,11 @@ export default function RoleAccesPage() {
         title="Delete Role"
         onClose={deleteModal.closeModal}
       >
-        <DeleteConfirm onClose={deleteModal.closeModal} data={selectedData} />
+        <DeleteConfirm
+          onClose={deleteModal.closeModal}
+          onCancel={deleteModal.closeModal}
+          data={selectedData}
+        />
       </Modal>
     </div>
   );

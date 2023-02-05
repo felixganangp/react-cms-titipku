@@ -102,6 +102,41 @@ function* editRoleUser({ payload }: PayloadAction<CreateRoleUserPayload>) {
   }
 }
 
+function* editStatusRoleUser({
+  payload,
+}: PayloadAction<CreateRoleUserPayload>) {
+  try {
+    const menuParams: RoleUserParams = yield select(
+      (state) => state.roleUser.params,
+    );
+    const response: ListResponse<RoleUser> = yield call(
+      AdministratorService.editAdministrator,
+      payload,
+    );
+    yield put(
+      uiAction.openToast({
+        headMsg: `Role User ${
+          payload.id_status === 1 ? 'Activated' : 'Inactivated'
+        }`,
+        // message: 'Succes Fetch data',
+        severity: 'success',
+      }),
+    );
+    // console.log(menuParams)
+    yield put(roleUserAction.fetchData(menuParams));
+  } catch (error) {
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Failed to change status user',
+        message: error as string,
+        severity: 'error',
+      }),
+    );
+    yield put(roleUserAction.addOrEditRoleUserSuccess({ error: true }));
+    console.log(`Failed to create user: `, error);
+  }
+}
+
 function* checkEmailValid(params: any) {
   try {
     const response: ListResponse<any> = yield call(
@@ -126,5 +161,6 @@ export default function* roleUserSagas() {
   yield takeLatest(roleUserAction.fetchData.type, fetchData);
   yield takeLatest(roleUserAction.addRoleUser.type, addRoleUser);
   yield takeLatest(roleUserAction.editRoleUser.type, editRoleUser);
+  yield takeLatest(roleUserAction.editStatusRoleUser.type, editStatusRoleUser);
   yield takeLatest(roleUserAction.checkEmailValid.type, checkEmailValid);
 }
