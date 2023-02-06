@@ -222,12 +222,13 @@ export default function KurCustomer() {
       format: (val: Customer) => <div>{val.kur_user_type.name}</div>,
       enableSort: true,
     },
-    // {
-    //   id: 'create_date',
-    //   label: 'Create Date',
-    //   align: 'left',
-    //   format: (val: Customer) => <div>{convertDate(val.created_at)}</div>,
-    // },
+    {
+      id: 'create_date',
+      label: 'Create Date',
+      align: 'left',
+      width: '100px',
+      format: (val: Customer) => <div>{convertDate(val.created_at)}</div>,
+    },
     {
       id: 'merchant',
       label: 'Merchant',
@@ -283,10 +284,32 @@ export default function KurCustomer() {
   ];
 
   const handleChangePage = (value: number) => {
+    if (!customerKur.params.kur_user_type_id) {
+      dispatch(
+        customerAction.setFilter({
+          areaKur: customerKur.stateFilter?.areaKur,
+          typeKur: null,
+        }),
+      );
+    }
+    if (!customerKur.params.area_ids) {
+      dispatch(
+        customerAction.setFilter({
+          areaKur: [],
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          typeKur: customerKur.stateFilter!.typeKur!,
+        }),
+      );
+    }
     dispatch(
       customerAction.setParams({
+        ...customerKur.params,
         page: value,
       }),
+    );
+    console.log(
+      '🚀 ~ file: index.tsx:292 ~ handleChangePage ~ customerKur.params',
+      customerKur.params,
     );
   };
 
@@ -297,12 +320,12 @@ export default function KurCustomer() {
         areaKur: customerKur.stateFilter?.areaKur,
       }),
     );
-    dispatch(
-      customerAction.setParams({
-        page: 1,
-        kur_user_type_id: value?.id,
-      }),
-    );
+    // dispatch(
+    //   customerAction.setParams({
+    //     page: 1,
+    //     kur_user_type_id: value?.id,
+    //   }),
+    // );
   };
 
   const handleChangeArea = (value: Area[]) => {
@@ -322,7 +345,7 @@ export default function KurCustomer() {
         areaKur: value,
       }),
     );
-    dispatch(customerAction.setParams(payload));
+    // dispatch(customerAction.setParams(payload));
   };
 
   const handleSearch = (value: string) => {
@@ -348,7 +371,28 @@ export default function KurCustomer() {
   };
 
   const handleApplyFilter = () => {
-    dispatch(customerAction.fetchData(customerKur.params));
+    console.log(
+      '🚀 ~ file: index.tsx:363 ~ handleApplyFilter ~ customerKur.stateFilter',
+      customerKur.stateFilter?.areaKur,
+    );
+
+    const payloadParams = {
+      ...customerKur.params,
+      page: 1,
+      kur_user_type_id: customerKur.stateFilter?.typeKur?.id,
+    };
+    if (
+      customerKur.stateFilter?.areaKur &&
+      customerKur.stateFilter?.areaKur.length > 0
+    ) {
+      const ids = customerKur.stateFilter?.areaKur.map((el) => el.id);
+      const areas = ids.toString();
+      payloadParams.area_ids = areas;
+    } else {
+      payloadParams.area_ids = undefined;
+    }
+    dispatch(customerAction.setParams(payloadParams));
+    dispatch(customerAction.fetchData(payloadParams));
   };
 
   const handleResetFilter = async () => {
@@ -357,9 +401,9 @@ export default function KurCustomer() {
     // setSearchKur('');
 
     const params: CustomerParams = {
+      ...customerKur.params,
       page: 1,
       count: 10,
-      search: '',
       order_by: 'id',
       order_type: 'desc',
       kur_user_type_id: undefined,
@@ -617,7 +661,6 @@ export default function KurCustomer() {
           >
             <Table
               data={customerKur.data}
-              selected={[]}
               headCells={headCell}
               page={customerKur.params.page}
               totalData={customerKur.total}
@@ -626,7 +669,6 @@ export default function KurCustomer() {
               orderType={customerKur.params.order_type}
               onChangePage={(val) => handleChangePage(val)}
               onChangeSort={(val) => handleChangeSort(val)}
-              enableCheckBox
               disableNumber
             />
           </Box>

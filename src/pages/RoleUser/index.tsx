@@ -104,6 +104,7 @@ export default function RoleUser() {
       roleUserAction.setParams({
         account_type: 'cms',
         page: 1,
+        // defaultSearch: value,
         search: value,
       }),
     );

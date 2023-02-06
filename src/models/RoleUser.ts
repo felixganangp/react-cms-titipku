@@ -13,6 +13,7 @@ export interface RoleUser {
 export interface RoleUserParams extends ListParams {
   account_type: string;
   search?: string | undefined | null;
+  defaultSearch?: string;
   id_status?: number;
   id_role?: string | number;
 }

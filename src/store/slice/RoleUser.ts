@@ -50,6 +50,14 @@ const RoleUserSlice = createSlice({
         ...action.payload,
       };
     },
+    setResetParams(state: RoleUserProps) {
+      state.params = {
+        page: 1,
+        count: 10,
+        search: null,
+        account_type: 'cms',
+      };
+    },
     fetchDataSuccess(
       state: RoleUserProps,
       action: PayloadAction<ListResponse<RoleUser>>,

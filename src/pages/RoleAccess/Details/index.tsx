@@ -89,7 +89,11 @@ export default function RoleUserDetails() {
       );
       // eslint-disable-next-line radix
     }
-  }, [isEdited]);
+
+    return () => {
+      dispatch(roleUserAction.setResetParams());
+    };
+  }, []);
 
   useEffect(() => {
     dispatch(
