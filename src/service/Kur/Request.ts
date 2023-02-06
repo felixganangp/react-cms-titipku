@@ -1,5 +1,6 @@
 import http from 'utils/request';
 import { RequestKURParams } from 'models/kur/Request';
+import { ListParams } from 'models/fetch';
 
 export const getAllRequestKUR = (params: RequestKURParams) =>
   new Promise(async (resolve, reject) => {
@@ -66,6 +67,19 @@ export const getRequestDetails = (id: number | string) =>
     } catch (err: any) {
       const message: string = err.response
         ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const getDetailsTable = (id: number | string, params: ListParams) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.get(`/kur/request/${id}/detail`, { params });
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.message}`
         : 'Oops, something wrong with our server, please try again later.';
       reject(message);
     }

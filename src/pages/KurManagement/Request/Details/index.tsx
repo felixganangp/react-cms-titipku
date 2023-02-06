@@ -15,6 +15,7 @@ import { ExpandMore } from '@mui/icons-material';
 import Table from 'components/Table';
 import useModal from 'hooks/useModal';
 import Modal from 'components/Modal';
+import digitFormatter from 'utils/digitFormatter';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { requestKURAction } from 'store/slice/kur/Request';
 import moment from 'moment';
@@ -40,6 +41,7 @@ export default function RequestKURDetails() {
   const dispatch = useAppDispatch();
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const requestDetails = useAppSelector((state) => state.request.detailsData);
+  const details = useAppSelector((state) => state.request);
 
   const headCell = [
     {
@@ -59,10 +61,7 @@ export default function RequestKURDetails() {
       label: 'Amount',
       align: 'left',
       format: (val: any) => (
-        <Typography>
-          {' '}
-          Rp {new Intl.NumberFormat().format(val.amount)}
-        </Typography>
+        <Typography> Rp {digitFormatter.format(val.amount)}</Typography>
       ),
     },
     {
@@ -76,6 +75,16 @@ export default function RequestKURDetails() {
   useEffect(() => {
     if (id) dispatch(requestKURAction.fetchDetails({ id }));
   }, []);
+
+  useEffect(() => {
+    if (id)
+      dispatch(
+        requestKURAction.fetchDetailsTable({
+          id,
+          params: details.detailParams,
+        }),
+      );
+  }, [details.detailParams]);
 
   useEffect(() => {
     if (requestDetails) {
@@ -294,7 +303,7 @@ export default function RequestKURDetails() {
                     <FieldName>Credit Limit</FieldName>
                     <FieldContent>
                       Rp{' '}
-                      {new Intl.NumberFormat().format(
+                      {digitFormatter.format(
                         requestDetails?.kur_user.credit_limit || 0,
                       )}
                     </FieldContent>
@@ -390,14 +399,14 @@ export default function RequestKURDetails() {
         </Header>
         <Content>
           <Typography>Total Amount</Typography>
-          <Amount>{new Intl.NumberFormat().format(totalAmount || 0)}</Amount>
+          <Amount>{digitFormatter.format(totalAmount || 0)}</Amount>
           <Table
-            data={requestDetails?.kur_request_detail || []}
+            data={details.detailsTableData || []}
             selected={[]}
-            count={requestDetails?.kur_request_detail.length}
+            count={details.detailParams.count}
             headCells={headCell}
-            page={1}
-            totalData={requestDetails?.kur_request_detail.length}
+            page={details.detailParams.page}
+            totalData={details.totalDetailsTable}
           />
         </Content>
       </Box>
