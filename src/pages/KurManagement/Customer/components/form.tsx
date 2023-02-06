@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
@@ -158,12 +159,12 @@ function Form({ onClose, formData }: Props) {
         .test(
           'len',
           'Maximal digit for phone number is 14',
-          (val) => val !== undefined && val.toString().length < 14,
+          (val) => val !== undefined && val.toString().length < 15,
         )
         .test(
           'len',
           'Minimal digit for phone number is 10',
-          (val) => val !== undefined && val.toString().length > 8,
+          (val) => val !== undefined && val.toString().length > 9,
         )
         .typeError('Phone number should be a number'),
       addressKtp: yup.string().required('Address (KTP) is required'),
@@ -253,10 +254,8 @@ function Form({ onClose, formData }: Props) {
             disabled={
               !(
                 values.name &&
-                values.adminFee &&
-                +values.adminFee >= 0 &&
-                values.dpdRate &&
-                +values.dpdRate >= 0 &&
+                (values.adminFee || +values.adminFee === 0) &&
+                (values.dpdRate || +values.dpdRate === 0) &&
                 values.birthDate &&
                 values.phoneNumber &&
                 values.email &&
@@ -268,7 +267,9 @@ function Form({ onClose, formData }: Props) {
                 values.kurType &&
                 values.bankName &&
                 values.nobuAccountNumber
-              )
+              ) ||
+              +values.adminFee < 0 ||
+              +values.dpdRate < 0
             }
             sx={{ borderBottom: 1, borderColor: 'divider', color: '#8B95A5' }}
             label="2. KUR Document"
@@ -441,7 +442,13 @@ function Form({ onClose, formData }: Props) {
                         onClick={() =>
                           setOpenCalendar({ open: true, touched: true })
                         }
-                        onBlur={handleBlur}
+                        onBlur={(e) => {
+                          handleBlur(e);
+                          setOpenCalendar({ open: true, touched: true });
+                        }}
+                        onFocus={() => {
+                          setOpenCalendar({ open: false, touched: true });
+                        }}
                       />
                     )}
                   />
@@ -532,6 +539,12 @@ function Form({ onClose, formData }: Props) {
                     onBlur={handleBlur}
                     fullWidth
                     disabled={disabledAddressDom}
+                    sx={{
+                      // backgroundColor: 'red',
+                      '& .MuiInputBase-root.Mui-disabled': {
+                        backgroundColor: '#ebeff3',
+                      },
+                    }}
                   />
                   <FormControlLabel
                     label={
@@ -686,13 +699,15 @@ function Form({ onClose, formData }: Props) {
               disabled={
                 !(
                   values.name &&
-                  ((values.adminFee && +values.adminFee > -1) ||
-                    +values.adminFee === 0) &&
-                  ((values.dpdRate && +values.dpdRate > -1) ||
-                    +values.dpdRate === 0) &&
+                  (values.adminFee || +values.adminFee === 0) &&
+                  (values.dpdRate || +values.dpdRate === 0) &&
                   values.birthDate &&
                   values.phoneNumber &&
+                  values.phoneNumber.length > 9 &&
+                  values.phoneNumber.length < 15 &&
                   values.email &&
+                  // eslint-disable-next-line no-useless-escape
+                  values.email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g) &&
                   values.addressKtp &&
                   values.addressDomisili &&
                   values.creditLimit &&
@@ -701,7 +716,13 @@ function Form({ onClose, formData }: Props) {
                   values.kurType &&
                   values.bankName &&
                   values.nobuAccountNumber
-                )
+                ) ||
+                +values.adminFee < 0 ||
+                +values.dpdRate < 0 ||
+                isNaN(+values.phoneNumber) ||
+                isNaN(+values.nobuAccountNumber) ||
+                isNaN(+values.bankNumberPrimary) ||
+                +values.creditLimit > 500000000
               }
               onClick={(e) => handleChangeTab(e, 1)}
               // type="submit"
