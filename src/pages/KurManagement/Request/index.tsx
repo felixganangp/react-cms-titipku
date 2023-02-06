@@ -30,7 +30,7 @@ import { typeAction } from 'store/slice/kur/Type';
 import { Area } from 'models/Area';
 import { Type } from 'models/kur/Type';
 import { requestKURAction } from 'store/slice/kur/Request';
-import 'react-day-picker/dist/style.css';
+import digitFormatter from 'utils/digitFormatter';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
@@ -239,7 +239,7 @@ export default function RequestKURPage() {
       label: 'Request Amount',
       align: 'left',
       format: (val) => (
-        <Typography>Rp {new Intl.NumberFormat().format(val.amount)}</Typography>
+        <Typography>Rp {digitFormatter.format(val.amount)}</Typography>
       ),
     },
     {

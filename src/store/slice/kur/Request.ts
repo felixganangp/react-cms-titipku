@@ -4,9 +4,10 @@ import {
   RequestKURDisplayFilter,
   RequestKURParams,
   ActionParams,
+  KURRequestDetail,
 } from 'models/kur/Request';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ListResponse, Response } from 'models/fetch';
+import { ListParams, ListResponse, Response } from 'models/fetch';
 
 interface RequestKURProps {
   data: RequestKUR[];
@@ -16,6 +17,9 @@ interface RequestKURProps {
   params: RequestKURParams;
   displayFilter: RequestKURDisplayFilter;
   detailsData: RequestKUR | null;
+  detailsTableData: KURRequestDetail[];
+  totalDetailsTable: number | undefined;
+  detailParams: ListParams;
 }
 
 const initialState: RequestKURProps = {
@@ -33,6 +37,12 @@ const initialState: RequestKURProps = {
     types: null,
   },
   detailsData: null,
+  detailsTableData: [],
+  totalDetailsTable: 0,
+  detailParams: {
+    page: 1,
+    count: 5,
+  },
 };
 
 const RequestKURSlice = createSlice({
@@ -81,6 +91,29 @@ const RequestKURSlice = createSlice({
     ) {
       state.loading = true;
       state.detailsData = action.payload.data;
+    },
+    setDetailsTableParams(
+      state: RequestKURProps,
+      action: PayloadAction<ListParams>,
+    ) {
+      state.detailParams = {
+        ...state.detailParams,
+        ...action.payload,
+      };
+    },
+    fetchDetailsTable(
+      state: RequestKURProps,
+      ction: PayloadAction<{ id: string | number; params: ListParams }>,
+    ) {
+      state.loading = true;
+    },
+    fetchDetailsTableSuccess(
+      state: RequestKURProps,
+      action: PayloadAction<ListResponse<KURRequestDetail>>,
+    ) {
+      state.loading = false;
+      state.detailsTableData = action.payload.data;
+      state.totalDetailsTable = action.payload.total;
     },
     approveRequest(
       state: RequestKURProps,
