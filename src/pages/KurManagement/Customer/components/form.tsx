@@ -442,11 +442,11 @@ function Form({ onClose, formData }: Props) {
                         onClick={() =>
                           setOpenCalendar({ open: true, touched: true })
                         }
-                        onBlur={(e) => {
-                          handleBlur(e);
-                          setOpenCalendar({ open: true, touched: true });
-                        }}
+                        onBlur={handleBlur}
                         onFocus={() => {
+                          setOpenCalendar({ open: false, touched: true });
+                        }}
+                        onKeyDown={() => {
                           setOpenCalendar({ open: false, touched: true });
                         }}
                       />
