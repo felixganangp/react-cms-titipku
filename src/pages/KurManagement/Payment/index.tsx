@@ -1,0 +1,665 @@
+/* eslint-disable no-nested-ternary */
+import { useState, useEffect, useCallback } from 'react';
+import {
+  Box,
+  Card,
+  Grid,
+  Typography,
+  Button,
+  TextField,
+  InputAdornment,
+  IconButton,
+  Autocomplete,
+  Chip,
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import Table from 'components/Table';
+import useModal from 'hooks/useModal';
+import ArrowDown from '@mui/icons-material/KeyboardArrowDown';
+import FormLabel from 'components/FormLabel';
+import MenuList from 'components/MenuList';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { Link, useNavigate } from 'react-router-dom';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import debounce from 'utils/debounce';
+import { HeadCells } from 'components/Table/types';
+import moment from 'moment';
+import { areaAction } from 'store/slice/Area';
+import { typeAction } from 'store/slice/kur/Type';
+// import { requestKURAction } from 'store/slice/kur/Request';
+import { paymentKURAction } from 'store/slice/kur/Payment';
+import { Area } from 'models/Area';
+import { Type } from 'models/kur/Type';
+// import { RequestKUR } from 'models/kur/Request';
+import { PaymentKUR } from 'models/kur/Payment';
+import digitFormatter from 'utils/digitFormatter';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import bankData from 'data/list-bank.json';
+// import Modal from 'components/Modal';
+// import RefusalReason from './components/InputMessage';
+import {
+  FilterButton,
+  FilterDataBox,
+  InvoiceLabel,
+  InvoiceStatus,
+  LabelText,
+} from './payment.styled';
+
+export default function paymentKURPage() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const request = useAppSelector((state) => state.payment);
+
+  // define filter
+  const [openFilter, setOpenFilter] = useState<boolean>(false);
+  const areas = useAppSelector((state) => state.area.data);
+  const types = useAppSelector((state) => state.typeKur.data);
+  const [inputValueArea, setInputValueArea] = useState('');
+
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [openStartDate, setOpenStartDate] = useState<boolean>(false);
+  const [openEndDate, setOpenEndDate] = useState<boolean>(false);
+
+  useEffect(() => {
+    dispatch(typeAction.fetchData());
+    dispatch(areaAction.fetchData());
+    if (request.params.submit_date_start)
+      setStartDate(new Date(request.params.submit_date_start * 1000));
+    if (request.params.submit_date_end)
+      setEndDate(new Date(request.params.submit_date_end * 1000));
+  }, []);
+
+  // table
+  useEffect(() => {
+    dispatch(paymentKURAction.fetchData(request.params));
+  }, [
+    request.params.search,
+    request.params.order_by,
+    request.params.order_type,
+    request.params.page,
+  ]);
+
+  const handleSearch = (value: string) => {
+    dispatch(
+      paymentKURAction.setParams({
+        page: 1,
+        search: value,
+      }),
+    );
+  };
+
+  const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
+
+  const handleChangePage = (value: number) => {
+    dispatch(
+      paymentKURAction.setParams({
+        page: value,
+      }),
+    );
+  };
+
+  const handleChangeSort = (value: {
+    orderBy: string | number;
+    orderType: 'asc' | 'desc';
+  }) => {
+    dispatch(
+      paymentKURAction.setParams({
+        page: 1,
+        order_by: value.orderBy,
+        order_type: value.orderType,
+      }),
+    );
+  };
+
+  const handleChangeType = (value: any) => {
+    dispatch(
+      paymentKURAction.setParams({
+        page: 1,
+        kur_user_type_id: value ? value?.id : null,
+      }),
+    );
+    dispatch(
+      paymentKURAction.setDisplayFilter({
+        types: value,
+      }),
+    );
+  };
+
+  const handleChangeBank = (value: any) => {
+    dispatch(
+      paymentKURAction.setParams({
+        page: 1,
+        kur_user_type_id: value ? value?.id : null,
+      }),
+    );
+    dispatch(
+      paymentKURAction.setDisplayFilter({
+        types: value,
+      }),
+    );
+  };
+
+  const handleChangePasar = (value: any) => {
+    const areasId: (number | undefined)[] = [];
+    if (value.length > 0) value.map((item: Area) => areasId.push(item.id));
+    dispatch(
+      paymentKURAction.setParams({
+        page: 1,
+        area_ids: areasId.length > 0 ? areasId.join(',') : undefined,
+      }),
+    );
+    dispatch(
+      paymentKURAction.setDisplayFilter({
+        areas: value,
+      }),
+    );
+  };
+
+  const handleChangeStartDate = (value: any) => {
+    dispatch(
+      paymentKURAction.setParams({
+        page: 1,
+        submit_date_start: Math.floor(new Date(value).getTime() / 1000),
+      }),
+    );
+  };
+
+  const handleChangeEndDate = (value: any) => {
+    dispatch(
+      paymentKURAction.setParams({
+        page: 1,
+        submit_date_end: Math.floor(
+          new Date(value).setHours(23, 59, 59, 59) / 1000,
+        ),
+      }),
+    );
+  };
+
+  const handleApplyFilter = () => {
+    dispatch(paymentKURAction.fetchData(request.params));
+  };
+
+  const handleResetFilter = async () => {
+    setStartDate(null);
+    setEndDate(null);
+    await dispatch(
+      paymentKURAction.setParams({
+        page: 1,
+        area_ids: undefined,
+        kur_user_type_id: undefined,
+        submit_date_start: undefined,
+        submit_date_end: undefined,
+      }),
+    );
+    await dispatch(
+      paymentKURAction.setDisplayFilter({
+        areas: [],
+        types: null,
+      }),
+    );
+    await dispatch(
+      paymentKURAction.fetchData({
+        page: 1,
+        search: request.params.search,
+        area_ids: undefined,
+        kur_user_type_id: undefined,
+        submit_date_start: undefined,
+        submit_date_end: undefined,
+      }),
+    );
+  };
+
+  // action
+  const rejectModal = useModal();
+  const [selected, setSelected] = useState<PaymentKUR | null>(null);
+  // const handleApproveRequest = (id: number | string) => {
+  //   dispatch(paymentKURAction.approveRequest({ id, detailsPage: false }));
+  // };
+  // const handleRejectRequest = (id: number | string, remarks: string) => {
+  //   dispatch(
+  //     paymentKURAction.rejectRequest({ id, detailsPage: false, remarks }),
+  //   );
+  //   rejectModal.closeModal();
+  // };
+
+  const headCell: HeadCells<PaymentKUR>[] = [
+    {
+      id: 'kur_payment_number',
+      label: 'No. Payment',
+      align: 'left',
+      enableSort: true,
+      isSticky: true,
+      format: (val) => (
+        <Link to={`/kur/payment/${val.id}`} style={{ textDecoration: 'none' }}>
+          <InvoiceLabel>{val.kur_payment_number}</InvoiceLabel>
+        </Link>
+      ),
+    },
+    {
+      id: 'name',
+      label: 'Name',
+      align: 'left',
+      enableSort: true,
+      isSticky: true,
+      format: (val) => <Typography>{val.kur_user.name}</Typography>,
+    },
+    {
+      id: 'kur_type',
+      label: 'KUR Type',
+      align: 'left',
+      isSticky: true,
+      format: (val) => (
+        <Typography>{val.kur_user.kur_user_type.name}</Typography>
+      ),
+    },
+    {
+      id: 'transfer_to',
+      label: 'Transfer to',
+      align: 'left',
+      width: '200px',
+      format: (val) => <Typography>{val.paid_to_bank}</Typography>,
+    },
+    {
+      id: 'payment_amount',
+      label: 'Payment Amount',
+      align: 'left',
+      format: (val) => (
+        <Typography>Rp {digitFormatter.format(val.amount)}</Typography>
+      ),
+    },
+    {
+      id: 'outstanding_credit',
+      label: 'Outstanding Credit',
+      align: 'left',
+      format: (val) => (
+        <Typography>Rp {digitFormatter.format(val.amount)}</Typography>
+      ),
+    },
+    {
+      id: 'merchant_name',
+      label: 'Merchant',
+      align: 'left',
+      enableSort: true,
+      format: (val) => <Typography>{val.kur_user.user.name}</Typography>,
+    },
+    {
+      id: 'area_name',
+      label: 'Pasar',
+      align: 'left',
+      width: '450px',
+      format: (val) => <Typography>{val.kur_user.user.area.name}</Typography>,
+    },
+    {
+      id: 'created_at',
+      label: 'Submit Date',
+      align: 'left',
+      format: (val) => (
+        <Typography>
+          {moment.unix(val.created_at).format('DD/MM/YYYY')}
+        </Typography>
+      ),
+    },
+    {
+      id: 'status',
+      label: 'Status',
+      align: 'left',
+      enableSort: true,
+      format: (val) => (
+        <InvoiceStatus status={val.status}>{val.status}</InvoiceStatus>
+      ),
+    },
+    {
+      id: 'menu',
+      label: 'Action',
+      align: 'left',
+      width: '20px',
+      format: (val) => (
+        <div>
+          <MenuList
+            menu={
+              val.status === 'pending'
+                ? [
+                    {
+                      label: 'Details',
+                      onClick: () => {
+                        navigate(`/kur/request/${val.id}`);
+                      },
+                    },
+                    // {
+                    //   label: 'Approve',
+                    //   onClick: () => {
+                    //     handleApproveRequest(val.id);
+                    //   },
+                    // },
+                    // {
+                    //   label: 'Reject',
+                    //   onClick: () => {
+                    //     setSelected(val);
+                    //     rejectModal.openModal();
+                    //   },
+                    // },
+                  ]
+                : [
+                    {
+                      label: 'Details',
+                      onClick: () => {
+                        navigate(`/kur/request/${val.id}`);
+                      },
+                    },
+                  ]
+            }
+          >
+            <IconButton>
+              <MoreVertIcon />
+            </IconButton>
+          </MenuList>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <>
+      <Box p="20px" bgcolor="#F5F7FA">
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Card>
+              <Typography variant="titlePage">KUR Payment</Typography>
+            </Card>
+          </Grid>
+          <Grid item xs={12}>
+            <Card>
+              <FilterDataBox>
+                <Box
+                  display="flex"
+                  flexDirection="row"
+                  width="100%"
+                  justifyContent="space-between"
+                >
+                  <TextField
+                    placeholder="Search item"
+                    size="small"
+                    sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
+                    fullWidth
+                    defaultValue={request.params.search}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon />
+                        </InputAdornment>
+                      ),
+                    }}
+                    onChange={(event) => {
+                      debounceSearch(event.target.value);
+                    }}
+                  />
+                  <FilterButton
+                    endIcon={<ArrowDown />}
+                    onClick={() => setOpenFilter(!openFilter)}
+                  >
+                    Filter
+                  </FilterButton>
+                </Box>
+                <Box
+                  display={openFilter ? 'flex' : 'none'}
+                  flexDirection="row"
+                  width="100%"
+                  justifyContent="space-between"
+                  gap="28px"
+                >
+                  <FormLabel text="Pasar">
+                    <Autocomplete
+                      multiple
+                      id="filterPasar"
+                      options={areas}
+                      onChange={(e, value) => {
+                        handleChangePasar(value);
+                      }}
+                      getOptionLabel={(option) => `${option.title}`}
+                      renderInput={(params) => {
+                        return (
+                          <TextField
+                            {...params}
+                            name="type"
+                            placeholder="Select Pasar"
+                            variant="outlined"
+                          />
+                        );
+                      }}
+                      renderTags={(value: Area[], getTagProps) =>
+                        value.map((item: Area, index: number) => (
+                          <Chip
+                            label={item.title}
+                            {...getTagProps({ index })}
+                            key={`area-${item.id}`}
+                          />
+                        ))
+                      }
+                      isOptionEqualToValue={(item: Area) => {
+                        const filtered = request?.displayFilter?.areas?.filter(
+                          (el: any) => el.id === item.id,
+                        );
+                        if (filtered) return item.id === filtered[0]?.id;
+                        return false;
+                      }}
+                      renderOption={(props, item) => (
+                        <Box component="li" {...props} key={`area${item.id}`}>
+                          {item.title}
+                        </Box>
+                      )}
+                      value={request?.displayFilter?.areas}
+                      inputValue={inputValueArea}
+                      onInputChange={(_, newInput) => {
+                        setInputValueArea(newInput);
+                      }}
+                    />
+                  </FormLabel>
+                  <FormLabel text="Type">
+                    <Autocomplete
+                      id="filterType"
+                      options={types}
+                      onChange={(e, value) => {
+                        handleChangeType(value);
+                      }}
+                      isOptionEqualToValue={(item: Type) => {
+                        return item.id === request.displayFilter?.types?.id;
+                      }}
+                      getOptionLabel={(item) => item.name}
+                      value={request?.displayFilter?.types}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          name="type"
+                          placeholder="Select Type of KUR"
+                        />
+                      )}
+                    />
+                  </FormLabel>
+                  <FormLabel text="Transfer To">
+                    <Autocomplete
+                      id="filterBank"
+                      options={bankData.data}
+                      // onChange={(e, value) => {
+                      //   handleChangeType(value);
+                      // }}
+                      // isOptionEqualToValue={(item: Type) => {
+                      //   return item.id === request.displayFilter?.types?.id;
+                      // }}
+                      getOptionLabel={(item) => item.name}
+                      // value={request?.displayFilter?.types}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          name="type"
+                          placeholder="Select Bank"
+                        />
+                      )}
+                    />
+                  </FormLabel>
+                </Box>
+                <Box
+                  display={openFilter ? 'flex' : 'none'}
+                  flexDirection="column"
+                  width="32%"
+                  justifyContent="space-between"
+                >
+                  <LabelText>Range Date</LabelText>
+                  <Box
+                    display={openFilter ? 'flex' : 'none'}
+                    flexDirection="row"
+                    width="100%"
+                    justifyContent="space-between"
+                  >
+                    <FormLabel
+                      text=""
+                      error={startDate === null && endDate !== null}
+                      helperText={
+                        startDate === null &&
+                        endDate !== null &&
+                        'Start Date is required when End Date is filled'
+                      }
+                    >
+                      <LocalizationProvider dateAdapter={AdapterMoment}>
+                        <DesktopDatePicker
+                          open={openStartDate}
+                          onClose={() => {
+                            setOpenStartDate(false);
+                          }}
+                          onOpen={() => {
+                            setOpenStartDate(true);
+                          }}
+                          value={startDate}
+                          inputFormat="DD/MM/YYYY"
+                          onChange={(value) => {
+                            setStartDate(value);
+                            handleChangeStartDate(value);
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              sx={{ width: '100%' }}
+                              {...params}
+                              inputProps={{
+                                ...params.inputProps,
+                                placeholder: 'Start Date',
+                              }}
+                              onClick={() => setOpenStartDate(true)}
+                            />
+                          )}
+                          toolbarPlaceholder="End Date"
+                          maxDate={endDate}
+                        />
+                      </LocalizationProvider>
+                    </FormLabel>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '40px',
+                      }}
+                    >
+                      -
+                    </Box>
+                    <FormLabel
+                      text=""
+                      error={startDate !== null && endDate === null}
+                      helperText={
+                        startDate !== null &&
+                        endDate === null &&
+                        'End Date is required when Start Date is filled'
+                      }
+                    >
+                      <LocalizationProvider dateAdapter={AdapterMoment}>
+                        <DesktopDatePicker
+                          open={openEndDate}
+                          onClose={() => {
+                            setOpenEndDate(false);
+                          }}
+                          onOpen={() => {
+                            setOpenEndDate(true);
+                          }}
+                          value={endDate}
+                          inputFormat="DD/MM/YYYY"
+                          onChange={(value) => {
+                            setEndDate(value);
+                            handleChangeEndDate(value);
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              sx={{ width: '100%' }}
+                              {...params}
+                              inputProps={{
+                                ...params.inputProps,
+                                placeholder: 'End Date',
+                              }}
+                              onClick={() => setOpenEndDate(true)}
+                            />
+                          )}
+                          minDate={startDate}
+                        />
+                      </LocalizationProvider>
+                    </FormLabel>
+                  </Box>
+                </Box>
+                <Box
+                  display={openFilter ? 'flex' : 'none'}
+                  flexDirection="row"
+                  justifyContent="flex-end"
+                  width="100%"
+                  gap="20px"
+                >
+                  <Button variant="text" onClick={() => handleResetFilter()}>
+                    Reset
+                  </Button>
+                  <FilterButton
+                    onClick={() => handleApplyFilter()}
+                    disabled={
+                      (startDate === null && endDate !== null) ||
+                      (startDate !== null && endDate === null)
+                    }
+                  >
+                    Apply
+                  </FilterButton>
+                </Box>
+              </FilterDataBox>
+            </Card>
+          </Grid>
+          <Grid item xs={12}>
+            <Box
+              bgcolor="#fff"
+              p="7px"
+              borderRadius="5px"
+              boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
+            >
+              <Table
+                data={request.data || []}
+                headCells={headCell}
+                totalData={request.total}
+                loading={request.loading}
+                count={request.params.count}
+                page={request.params.page}
+                orderBy={request.params.order_by}
+                orderType={request.params.order_type}
+                onChangePage={(page) => handleChangePage(page)}
+                onChangeSort={(value) => handleChangeSort(value)}
+              />
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
+      {/* <Modal
+        open={rejectModal.open}
+        title="Refusal Reason"
+        onClose={rejectModal.closeModal}
+      >
+        <RefusalReason
+          onSubmitRefusal={handleRejectRequest}
+          id={selected?.id || 0}
+        />
+      </Modal> */}
+    </>
+  );
+}
