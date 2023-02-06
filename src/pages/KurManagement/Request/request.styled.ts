@@ -179,6 +179,7 @@ export const Amount = styled(Typography)`
   font-weight: 500;
   font-size: 24px;
   color: #17231d;
+  margin-bottom: 16px;
 `;
 
 export const RangeDatePicker = styled(DayPicker)`
