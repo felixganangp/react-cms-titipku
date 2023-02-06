@@ -19,6 +19,7 @@ import digitFormatter from 'utils/digitFormatter';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { requestKURAction } from 'store/slice/kur/Request';
 import moment from 'moment';
+import noImage from 'assets/no-image.svg';
 import {
   DetailsHeader,
   BackButton,
@@ -51,6 +52,10 @@ export default function RequestKURDetails() {
       format: (val: any) => (
         <img
           src={val.image_filepath}
+          onError={({ currentTarget }) => {
+            currentTarget.onerror = null;
+            currentTarget.src = noImage;
+          }}
           alt="statement img"
           style={{ height: '80px', width: '80px' }}
         />
@@ -68,6 +73,7 @@ export default function RequestKURDetails() {
       id: 'description',
       label: 'Description',
       align: 'left',
+      format: (val: any) => <Typography>{val.description || '-'}</Typography>,
     },
   ];
 
@@ -76,6 +82,7 @@ export default function RequestKURDetails() {
     if (id) dispatch(requestKURAction.fetchDetails({ id }));
   }, []);
 
+  // table's
   useEffect(() => {
     if (id)
       dispatch(
@@ -85,6 +92,10 @@ export default function RequestKURDetails() {
         }),
       );
   }, [details.detailParams]);
+
+  const handleChangePage = (value: number) => {
+    dispatch(requestKURAction.setDetailsTableParams({ page: value }));
+  };
 
   useEffect(() => {
     if (requestDetails) {
@@ -407,6 +418,7 @@ export default function RequestKURDetails() {
             headCells={headCell}
             page={details.detailParams.page}
             totalData={details.totalDetailsTable}
+            onChangePage={(page) => handleChangePage(page)}
           />
         </Content>
       </Box>

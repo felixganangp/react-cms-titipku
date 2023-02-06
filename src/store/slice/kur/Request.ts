@@ -92,6 +92,15 @@ const RequestKURSlice = createSlice({
       state.loading = true;
       state.detailsData = action.payload.data;
     },
+    setDetailsTableParams(
+      state: RequestKURProps,
+      action: PayloadAction<ListParams>,
+    ) {
+      state.detailParams = {
+        ...state.detailParams,
+        ...action.payload,
+      };
+    },
     fetchDetailsTable(
       state: RequestKURProps,
       ction: PayloadAction<{ id: string | number; params: ListParams }>,
