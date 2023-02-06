@@ -1,0 +1,74 @@
+import { Customer } from 'models/kur/Customer';
+import { Area } from 'models/Area';
+import { Type } from 'models/kur/Type';
+import { ListParams } from '../fetch';
+
+export interface PaymentKURParams extends ListParams {
+  kur_user_type_id?: number;
+  kur_user_id?: number;
+  area_ids?: string;
+  status?: string;
+  submit_date_start?: number;
+  submit_date_end?: number;
+  bank?: string;
+}
+
+export interface PaymentKURDisplayFilter {
+  areas?: Area[];
+  types?: Type | null;
+}
+
+export interface PaymentKUR {
+  id: number;
+  created_at: number;
+  updated_at: number;
+  created_by_id: number;
+  created_by_type: string;
+  created_by: ModifierUser;
+  updated_by_id: number;
+  updated_by_type: string;
+  updated_by: ModifierUser;
+  kur_payment_number: string;
+  kur_user_id: number;
+  kur_user: Customer;
+  status: string;
+  amount: number;
+  paid_to_account_number: string;
+  paid_to_bank: string;
+  proof_of_payment: string;
+  decision_date: number;
+  decision_by_admin_id: null;
+  decision_by_admin: null;
+  remarks: string;
+}
+
+export interface ModifierUser {
+  id: number;
+  name: string;
+  area?: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface KURPaymentDetail {
+  id: number;
+  created_date: number;
+  updated_date: number;
+  created_by_id: number;
+  created_by_type: string;
+  created_by: null | ModifierUser;
+  updated_by_id: number;
+  updated_by_type: string;
+  updated_by: null | ModifierUser;
+  kur_request_id: number;
+  amount: number;
+  description: string;
+  image_filepath: string;
+}
+
+export interface ActionParams {
+  id: string | number;
+  detailsPage: boolean;
+  remarks?: string;
+}

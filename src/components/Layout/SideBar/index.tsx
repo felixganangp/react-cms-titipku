@@ -40,7 +40,7 @@ const sidebarData: FilteredMenu[] = [
       },
       {
         id: 53,
-        title: 'Settlement',
+        title: 'Payment',
         path: '/kur/payment',
         child: [],
       },

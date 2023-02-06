@@ -7,6 +7,7 @@ import customerKurReducer from './slice/kur/Customer';
 import typeKurReducer from './slice/kur/Type';
 import areaReducer from './slice/Area';
 import requestKURReducer from './slice/kur/Request';
+import paymentKURReducer from './slice/kur/Payment';
 import merchantReducer from './slice/Merchant';
 
 const reducers = {
@@ -19,6 +20,7 @@ const reducers = {
   typeKur: typeKurReducer,
   area: areaReducer,
   request: requestKURReducer,
+  payment: paymentKURReducer,
   merchant: merchantReducer,
 };
 

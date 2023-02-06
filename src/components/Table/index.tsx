@@ -179,7 +179,7 @@ function EnhancedTable<T extends Data>({
           aria-labelledby="tableTitle"
           size="medium"
           sx={{
-            wordBreak: 'break-all',
+            // wordBreak: 'break-all',
             // tableLayout: 'fixed',
           }}
         >
