@@ -72,6 +72,7 @@ function Menu(props: MenuProps) {
                 <IconButton>{menu.icon}</IconButton>
               </ListItemIcon>
               <ListItemText
+                data-testid="side-bar-parentmenu"
                 primary={menu.title}
                 primaryTypographyProps={{
                   variant: 'body2',

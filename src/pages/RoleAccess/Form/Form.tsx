@@ -341,16 +341,16 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
             {listOfMenu.map((parentMenu: any) => (
               <AccordionOnDetails
                 title={parentMenu.menu}
-                key={parentMenu.id}
+                key={parentMenu.id + parentMenu.menu}
                 parent
                 havingChild={parentMenu.sub_menu}
                 headerContent={
                   <Control
                     style={{ marginRight: '0px' }}
                     label=""
-                    key={parentMenu.id}
                     control={
                       <Checkbox
+                        key={parentMenu.id + parentMenu.menu}
                         checked={accessMenu[parentMenu.id]}
                         onChange={(e) => {
                           handleChangeChild(e, parentMenu.id);
@@ -368,9 +368,9 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
                           <Menu>{menu.menu}</Menu>
                           <Control
                             label=""
-                            key={menu.id}
                             control={
                               <Checkbox
+                                key={menu.id + menu.menu}
                                 checked={accessMenu[menu.id]}
                                 onChange={(e) => {
                                   handleChangeParentChild(
@@ -387,15 +387,15 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
                         <Box style={{ paddingLeft: '18px' }}>
                           <AccordionOnDetails
                             title={menu.menu}
-                            key={menu.id}
+                            key={menu.id + menu.menu}
                             parent={false}
                             havingChild={menu.sub_menu}
                             headerContent={
                               <Control
                                 label=""
-                                key={menu.id}
                                 control={
                                   <Checkbox
+                                    key={menu.id + menu.menu}
                                     checked={accessMenu[menu.id]}
                                     onChange={(e) => {
                                       handleChangeParentChild(
@@ -414,10 +414,10 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
                                 <ChildMenu>{childMenu.menu}</ChildMenu>
                                 <Control
                                   label=""
-                                  key={childMenu.id}
                                   control={
                                     <Checkbox
                                       checked={accessMenu[childMenu.id]}
+                                      key={childMenu.id + childMenu.menu}
                                       onChange={(e) =>
                                         handleChangeAccessMenu(e, childMenu.id)
                                       }

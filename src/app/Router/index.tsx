@@ -1,13 +1,19 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useAppSelector } from 'store/hooks';
+import { useAppSelector, useAppDispatch } from 'store/hooks';
+import { userDetailsAction } from 'store/slice/UserDetails';
 import ListRoute from './ListRoute';
 import PrivateRoute from './PrivateRoute';
 
 export default function IndexRoute() {
+  const dispatch = useAppDispatch();
   const menuRoleUserCurrent = useAppSelector(
     (state) => state.userDetails.menuData,
   );
+
+  // useEffect(() => {
+  //   dispatch(userDetailsAction.fetchUserDetails());
+  // }, []);
 
   const listIdMenu = menuRoleUserCurrent.map((val) => val.id);
 
