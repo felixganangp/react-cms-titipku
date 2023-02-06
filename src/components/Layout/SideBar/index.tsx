@@ -134,6 +134,7 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
         '& .MuiPaper-root': { position: 'relative' },
         backgroundColor: '#fafafa',
       }}
+      data-testid="sidebar"
     >
       <Box
         width={drawerWidthClose}

@@ -4,7 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from 'store';
 import { Person2Outlined } from '@mui/icons-material';
-import CustomerData from '../Details/components/CustomerData';
+import CustomerData from '../components/CustomerData';
 
 // details
 test('displays customer data', async () => {

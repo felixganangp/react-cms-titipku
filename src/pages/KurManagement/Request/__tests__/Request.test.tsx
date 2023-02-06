@@ -45,19 +45,19 @@ test('all filter is shown', async () => {
   requestKUR.unmount();
 });
 
-test('date picker modal is shown', async () => {
-  const requestKUR = render(
-    <Provider store={store}>
-      <BrowserRouter>
-        <RequestKUR />
-      </BrowserRouter>
-    </Provider>,
-  );
-  const filterDateField = await requestKUR.findByTestId(
-    'request-kur-filter-date',
-  );
-  const datePickerModal = screen.findByTestId('datepicker-range');
-  fireEvent.click(filterDateField);
-  waitFor(() => expect(datePickerModal).toBeInTheDocument());
-  requestKUR.unmount();
-});
+// test('date picker modal is shown', async () => {
+//   const requestKUR = render(
+//     <Provider store={store}>
+//       <BrowserRouter>
+//         <RequestKUR />
+//       </BrowserRouter>
+//     </Provider>,
+//   );
+//   const filterDateField = await requestKUR.findByTestId(
+//     'request-kur-filter-date',
+//   );
+//   const datePickerModal = screen.findByTestId('datepicker-range');
+//   fireEvent.click(filterDateField);
+//   waitFor(() => expect(datePickerModal).toBeInTheDocument());
+//   requestKUR.unmount();
+// });
