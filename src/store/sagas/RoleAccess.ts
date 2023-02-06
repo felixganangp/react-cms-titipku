@@ -56,6 +56,7 @@ function* updateRoleAccess(payload: PayloadAction<RoleAccessForm>) {
     yield call(service.updateRoleAccess, payload.payload);
     yield put(userDetailsAction.fetchMenu(menuParams));
     yield put(roleAccessAction.fetchData(params));
+    yield put(roleAccessAction.fetchDataDetail({ id: payload.payload.id }));
   } catch (err) {
     const headMessage = 'Failed Update Role Access';
     if (typeof err === 'string') {
