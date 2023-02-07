@@ -116,7 +116,7 @@ function* editStatusRoleUser({
     yield put(
       uiAction.openToast({
         headMsg: `Role User ${
-          payload.id_status === 1 ? 'Actived' : 'Inactivated'
+          payload.id_status === 1 ? 'Activated' : 'Inactivated'
         }`,
         // message: 'Succes Fetch data',
         severity: 'success',

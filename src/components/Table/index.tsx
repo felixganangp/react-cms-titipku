@@ -51,6 +51,7 @@ function EnhancedTable<T extends Data>({
   selected = [],
   setSelected = () => [],
   orderType = 'asc',
+  count = 0,
   orderBy,
   ...props
 }: EnhancedTableProps<T>) {
@@ -121,14 +122,14 @@ function EnhancedTable<T extends Data>({
 
   // eslint-disable-next-line consistent-return
   const totalPage = () => {
-    if (props?.totalData && props?.count) {
-      return Math.ceil(props.totalData / props.count);
+    if (props?.totalData && count) {
+      return Math.ceil(props.totalData / count);
     }
 
     return 0;
   };
 
-  const numberSumPages = props.page > 1 ? props.page * 10 - 10 : 0;
+  const numberSumPages = props.page > 1 ? props.page * count - count : 0;
 
   const headCell = props.headCells.sort((item1, item2) => {
     if (item2.isSticky) {
@@ -178,7 +179,7 @@ function EnhancedTable<T extends Data>({
           aria-labelledby="tableTitle"
           size="medium"
           sx={{
-            wordBreak: 'break-all',
+            // wordBreak: 'break-all',
             // tableLayout: 'fixed',
           }}
         >

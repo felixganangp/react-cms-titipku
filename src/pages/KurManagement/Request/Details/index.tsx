@@ -1,11 +1,9 @@
 import { Box, Card, Grid, Button, Typography } from '@mui/material';
-import * as React from 'react';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import ArrowBack from '@mui/icons-material/ArrowBackIos';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
-import Face2Icon from '@mui/icons-material/Face2';
 import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
@@ -17,55 +15,34 @@ import { ExpandMore } from '@mui/icons-material';
 import Table from 'components/Table';
 import useModal from 'hooks/useModal';
 import Modal from 'components/Modal';
-import PageNotFound from '../../../../assets/page-not-found.svg';
+import digitFormatter from 'utils/digitFormatter';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { requestKURAction } from 'store/slice/kur/Request';
+import moment from 'moment';
+import noImage from 'assets/no-image.svg';
 import {
   DetailsHeader,
   BackButton,
   Header,
   Content,
   ContentGrid,
-  ProfileContainer,
-  CustomerStatusDetail,
   Field,
   DescriptionBox,
   FieldName,
   FieldContent,
-  RequestStatus,
   Amount,
+  InvoiceStatus,
 } from '../request.styled';
 import RefusalReason from '../components/InputMessage';
 import CustomerData from '../components/CustomerData';
 
-interface RequestKURProps {
-  id: number;
-}
-
-const data = [
-  {
-    id: 1,
-    image: PageNotFound,
-    amount: 2000000,
-    desc: 'Description here',
-  },
-  {
-    id: 2,
-    image: PageNotFound,
-    amount: 5400000,
-    desc: 'Description here',
-  },
-  {
-    id: 3,
-    image: PageNotFound,
-    amount: 7800000,
-    desc: 'Description here',
-  },
-];
-
-export default function RequestKURDetails(props: RequestKURProps) {
+export default function RequestKURDetails() {
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const { id } = props;
-  const formModal = useModal();
-  const customerStatus = 3;
+  const { id } = useParams();
+  const dispatch = useAppDispatch();
+  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const requestDetails = useAppSelector((state) => state.request.detailsData);
+  const details = useAppSelector((state) => state.request);
 
   const headCell = [
     {
@@ -74,7 +51,11 @@ export default function RequestKURDetails(props: RequestKURProps) {
       align: 'left',
       format: (val: any) => (
         <img
-          src={val.img}
+          src={val.image_filepath}
+          onError={({ currentTarget }) => {
+            currentTarget.onerror = null;
+            currentTarget.src = noImage;
+          }}
           alt="statement img"
           style={{ height: '80px', width: '80px' }}
         />
@@ -85,18 +66,70 @@ export default function RequestKURDetails(props: RequestKURProps) {
       label: 'Amount',
       align: 'left',
       format: (val: any) => (
-        <Typography>
-          {' '}
-          Rp {new Intl.NumberFormat().format(val.amount)}
-        </Typography>
+        <Typography> Rp {digitFormatter.format(val.amount)}</Typography>
       ),
     },
     {
-      id: 'desc',
+      id: 'description',
       label: 'Description',
       align: 'left',
+      format: (val: any) => <Typography>{val.description || '-'}</Typography>,
     },
   ];
+
+  // get details
+  useEffect(() => {
+    if (id) dispatch(requestKURAction.fetchDetails({ id }));
+  }, []);
+
+  // table's
+  useEffect(() => {
+    if (id)
+      dispatch(
+        requestKURAction.fetchDetailsTable({
+          id,
+          params: details.detailParams,
+        }),
+      );
+  }, [details.detailParams]);
+
+  const handleChangePage = (value: number) => {
+    dispatch(requestKURAction.setDetailsTableParams({ page: value }));
+  };
+
+  useEffect(() => {
+    if (requestDetails) {
+      let total = 0;
+      // eslint-disable-next-line array-callback-return
+      requestDetails.kur_request_detail.some((item) => {
+        total += item.amount;
+      });
+      setTotalAmount(total);
+    }
+  }, [requestDetails]);
+
+  // action
+  const formModal = useModal();
+
+  const handleApproveRequest = async (approvedId: number | string) => {
+    dispatch(
+      requestKURAction.approveRequest({ id: approvedId, detailsPage: true }),
+    );
+  };
+
+  const handleRejectRequest = (
+    rejectedId: number | string,
+    remarks: string,
+  ) => {
+    dispatch(
+      requestKURAction.rejectRequest({
+        id: rejectedId,
+        detailsPage: true,
+        remarks,
+      }),
+    );
+    formModal.closeModal();
+  };
 
   return (
     <div>
@@ -120,12 +153,14 @@ export default function RequestKURDetails(props: RequestKURProps) {
                       }}
                       startIcon={<ArrowBack />}
                     >
-                      REQ/10029312
+                      {requestDetails?.kur_request_number}
                     </BackButton>
                   </Link>
                 </Box>
                 <Box
-                  display="flex"
+                  display={
+                    requestDetails?.status === 'pending' ? 'flex' : 'none'
+                  }
                   flexDirection="row"
                   gap="13px"
                   justifyContent="center"
@@ -163,7 +198,9 @@ export default function RequestKURDetails(props: RequestKURProps) {
                         }}
                       />
                     }
-                    onClick={() => console.log('Approve Request')}
+                    onClick={() => {
+                      if (id) handleApproveRequest(id);
+                    }}
                   >
                     Approve
                   </Button>
@@ -178,174 +215,192 @@ export default function RequestKURDetails(props: RequestKURProps) {
           <span>Basic Info</span>
         </Header>
         <Content>
-          <Box
-            display="flex"
-            flexDirection="row"
-            justifyContent="space-between"
-            alignItems="flex-start"
-            height="100%"
-          >
-            {/* <img
-              src={<Face2Icon />}
-              style={{ width: '120px', height: '120px' }}
-              alt="Profile Pict"
-            /> */}
-            <ProfileContainer>
-              <Face2Icon
-                sx={{
-                  backgroundColor: '#fafafa',
-                  borderRadius: '50%',
-                  width: '120px',
-                  height: '120px',
-                  border: '1px solid #626b79',
-                }}
-              />
-              <Typography style={{ fontSize: '16px', fontWeight: 500 }}>
-                Customer Name
+          <Box display="flex" flexDirection="column" gap="40px">
+            <Box display="flex" flexDirection="row" justifyContent="flex-start">
+              <Typography fontWeight={700} variant="h1">
+                {requestDetails?.kur_user?.name}
               </Typography>
-              <CustomerStatusDetail status={customerStatus}>
+              {/* <CustomerStatusDetail status={customerStatus}>
                 Customer Status
-              </CustomerStatusDetail>
-            </ProfileContainer>
-            <ContentGrid>
-              <CustomerData
-                icon={
-                  <Person2OutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />
-                }
-                fieldName="Customer ID"
-                fieldContent="1892"
-              />
-
-              <CustomerData
-                icon={
-                  <ErrorOutlineOutlinedIcon
-                    sx={{ color: '#008e58', mr: '4px' }}
-                  />
-                }
-                fieldName="NIK"
-                fieldContent="7351823736857485956"
-              />
-
-              <CustomerData
-                icon={
-                  <CalendarTodayOutlinedIcon
-                    sx={{ color: '#008e58', mr: '4px' }}
-                  />
-                }
-                fieldName="Birth Date"
-                fieldContent="19 August 1992"
-              />
-
-              <CustomerData
-                icon={
-                  <EmailOutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />
-                }
-                fieldName="Email"
-                fieldContent="customer.email@gmail.com"
-              />
-            </ContentGrid>
-
-            <ContentGrid>
-              <CustomerData
-                icon={<CallOutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />}
-                fieldName="Phone Number"
-                fieldContent="+62836349393"
-              />
-
-              <CustomerData
-                icon={
-                  <LocationOnOutlinedIcon
-                    sx={{ color: '#008e58', mr: '4px' }}
-                  />
-                }
-                fieldName="Address (KTP)"
-                fieldContent="Foresta Business Loft 2 unit 29, Jl. BSD Raya Utama,
-                Tangerang, Banten"
-              />
-
-              <CustomerData
-                icon={
-                  <LocationOnOutlinedIcon
-                    sx={{ color: '#008e58', mr: '4px' }}
-                  />
-                }
-                fieldName="Address (Domicile)"
-                fieldContent="Foresta Business Loft 2 unit 29, Jl. BSD Raya Utama,
-                Tangerang, Banten"
-              />
-            </ContentGrid>
-
-            <ContentGrid>
-              <Field>
-                <AttachMoneyOutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />
-                <DescriptionBox>
-                  <FieldName>Credit Limit</FieldName>
-                  <FieldContent>Rp 50,000,000.00</FieldContent>
-                </DescriptionBox>
-              </Field>
-
-              <Field>
-                <AttachMoneyOutlinedIcon
-                  sx={{ color: 'transparent', mr: '4px' }}
+              </CustomerStatusDetail> */}
+            </Box>
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="space-between"
+              alignItems="flex-start"
+              height="100%"
+            >
+              <ContentGrid>
+                <CustomerData
+                  icon={
+                    <Person2OutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />
+                  }
+                  fieldName="Customer ID"
+                  fieldContent={requestDetails?.kur_user?.user_id}
                 />
-                <DescriptionBox>
-                  <FieldName>Credit Balance</FieldName>
-                  <FieldContent>Rp 45,000,000.00</FieldContent>
-                </DescriptionBox>
-              </Field>
 
-              <Field>
-                <AttachMoneyOutlinedIcon
-                  sx={{ color: 'transparent', mr: '4px' }}
+                <CustomerData
+                  icon={
+                    <ErrorOutlineOutlinedIcon
+                      sx={{ color: '#008e58', mr: '4px' }}
+                    />
+                  }
+                  fieldName="NIK"
+                  fieldContent={requestDetails?.kur_user?.nik}
                 />
-                <DescriptionBox>
-                  <FieldName>Admin Fee</FieldName>
-                  <FieldContent>4,5%</FieldContent>
-                </DescriptionBox>
-              </Field>
 
-              <Field>
-                <AttachMoneyOutlinedIcon
-                  sx={{ color: 'transparent', mr: '4px' }}
+                <CustomerData
+                  icon={
+                    <CalendarTodayOutlinedIcon
+                      sx={{ color: '#008e58', mr: '4px' }}
+                    />
+                  }
+                  fieldName="Birth Date"
+                  fieldContent={
+                    requestDetails
+                      ? moment
+                          .unix(requestDetails.kur_user.birth_date || 0)
+                          .format('DD MMMM YYYY')
+                      : '-'
+                  }
                 />
-                <DescriptionBox>
-                  <FieldName>DPD Rate</FieldName>
-                  <FieldContent>2%</FieldContent>
-                </DescriptionBox>
-              </Field>
-            </ContentGrid>
 
-            <ContentGrid>
-              <Field>
-                <DescriptionBox>
-                  <FieldName>Primary Account Number</FieldName>
-                  <FieldContent>BCA - 293958292</FieldContent>
-                </DescriptionBox>
-              </Field>
+                <CustomerData
+                  icon={
+                    <EmailOutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />
+                  }
+                  fieldName="Email"
+                  fieldContent={requestDetails?.kur_user?.email}
+                />
+              </ContentGrid>
 
-              <Field>
-                <DescriptionBox>
-                  <FieldName>Nobu Account Number</FieldName>
-                  <FieldContent>NOBU - 293847834442</FieldContent>
-                </DescriptionBox>
-              </Field>
+              <ContentGrid>
+                <CustomerData
+                  icon={
+                    <CallOutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />
+                  }
+                  fieldName="Phone Number"
+                  fieldContent={requestDetails?.kur_user.phone_number}
+                />
 
-              <Field>
-                <DescriptionBox>
-                  <FieldName>Join Date</FieldName>
-                  <FieldContent>Jan, 25, 2022 08:00 AM</FieldContent>
-                </DescriptionBox>
-              </Field>
+                <CustomerData
+                  icon={
+                    <LocationOnOutlinedIcon
+                      sx={{ color: '#008e58', mr: '4px' }}
+                    />
+                  }
+                  fieldName="Address (KTP)"
+                  fieldContent={requestDetails?.kur_user.registered_address}
+                />
 
-              <Field>
-                <DescriptionBox>
-                  <FieldName>Request Status</FieldName>
-                  <FieldContent>
-                    <RequestStatus>Pending</RequestStatus>
-                  </FieldContent>
-                </DescriptionBox>
-              </Field>
-            </ContentGrid>
+                <CustomerData
+                  icon={
+                    <LocationOnOutlinedIcon
+                      sx={{ color: '#008e58', mr: '4px' }}
+                    />
+                  }
+                  fieldName="Address (Domicile)"
+                  fieldContent={requestDetails?.kur_user.living_address}
+                />
+              </ContentGrid>
+
+              <ContentGrid>
+                <Field>
+                  <AttachMoneyOutlinedIcon
+                    sx={{ color: '#008e58', mr: '4px' }}
+                  />
+                  <DescriptionBox>
+                    <FieldName>Credit Limit</FieldName>
+                    <FieldContent>
+                      Rp{' '}
+                      {digitFormatter.format(
+                        requestDetails?.kur_user.credit_limit || 0,
+                      )}
+                    </FieldContent>
+                  </DescriptionBox>
+                </Field>
+
+                {/* <Field>
+                  <AttachMoneyOutlinedIcon
+                    sx={{ color: 'transparent', mr: '4px' }}
+                  />
+                  <DescriptionBox>
+                    <FieldName>Credit Balance</FieldName>
+                    <FieldContent>{requestDetails?.kur_user.}</FieldContent>
+                  </DescriptionBox>
+                </Field> */}
+
+                <Field>
+                  <AttachMoneyOutlinedIcon
+                    sx={{ color: 'transparent', mr: '4px' }}
+                  />
+                  <DescriptionBox>
+                    <FieldName>Admin Fee</FieldName>
+                    <FieldContent>
+                      {requestDetails?.kur_user.admin_fee}%
+                    </FieldContent>
+                  </DescriptionBox>
+                </Field>
+
+                <Field>
+                  <AttachMoneyOutlinedIcon
+                    sx={{ color: 'transparent', mr: '4px' }}
+                  />
+                  <DescriptionBox>
+                    <FieldName>DPD Rate</FieldName>
+                    <FieldContent>
+                      {requestDetails?.kur_user.dpd_rate}%
+                    </FieldContent>
+                  </DescriptionBox>
+                </Field>
+              </ContentGrid>
+
+              <ContentGrid>
+                <Field>
+                  <DescriptionBox>
+                    <FieldName>Primary Account Number</FieldName>
+                    <FieldContent>
+                      {requestDetails?.kur_user.user_bank} -{' '}
+                      {requestDetails?.kur_user.user_account_number}
+                    </FieldContent>
+                  </DescriptionBox>
+                </Field>
+
+                <Field>
+                  <DescriptionBox>
+                    <FieldName>Nobu Account Number</FieldName>
+                    <FieldContent>
+                      NOBU - {requestDetails?.kur_user.nobu_account_number}
+                    </FieldContent>
+                  </DescriptionBox>
+                </Field>
+
+                <Field>
+                  <DescriptionBox>
+                    <FieldName>Join Date</FieldName>
+                    <FieldContent>
+                      {requestDetails
+                        ? moment
+                            .unix(requestDetails.kur_user.join_date || 0)
+                            .format('DD MMMM YYYY hh:mm:ss A')
+                        : '-'}
+                    </FieldContent>
+                  </DescriptionBox>
+                </Field>
+
+                <Field>
+                  <DescriptionBox>
+                    <FieldName>Request Status</FieldName>
+                    <FieldContent>
+                      <InvoiceStatus status={requestDetails?.status}>
+                        {requestDetails?.status}
+                      </InvoiceStatus>
+                    </FieldContent>
+                  </DescriptionBox>
+                </Field>
+              </ContentGrid>
+            </Box>
           </Box>
         </Content>
 
@@ -355,14 +410,15 @@ export default function RequestKURDetails(props: RequestKURProps) {
         </Header>
         <Content>
           <Typography>Total Amount</Typography>
-          <Amount>11,280,200.00</Amount>
+          <Amount>{digitFormatter.format(totalAmount || 0)}</Amount>
           <Table
-            data={data}
+            data={details.detailsTableData || []}
             selected={[]}
+            count={details.detailParams.count}
             headCells={headCell}
-            page={1}
-            totalData={1}
-            onChangePage={(e) => console.log(e)}
+            page={details.detailParams.page}
+            totalData={details.totalDetailsTable}
+            onChangePage={(page) => handleChangePage(page)}
           />
         </Content>
       </Box>
@@ -371,7 +427,7 @@ export default function RequestKURDetails(props: RequestKURProps) {
         title="Refusal Reason"
         onClose={formModal.closeModal}
       >
-        <RefusalReason />
+        <RefusalReason onSubmitRefusal={handleRejectRequest} id={id || 0} />
       </Modal>
     </div>
   );

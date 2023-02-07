@@ -3,21 +3,22 @@ import { Area } from 'models/Area';
 import { Type } from 'models/kur/Type';
 import { ListParams } from '../fetch';
 
-export interface RequestKURParams extends ListParams {
+export interface PaymentKURParams extends ListParams {
   kur_user_type_id?: number;
   kur_user_id?: number;
   area_ids?: string;
   status?: string;
   submit_date_start?: number;
   submit_date_end?: number;
+  bank?: string;
 }
 
-export interface RequestKURDisplayFilter {
+export interface PaymentKURDisplayFilter {
   areas?: Area[];
   types?: Type | null;
 }
 
-export interface RequestKUR {
+export interface PaymentKUR {
   id: number;
   created_at: number;
   updated_at: number;
@@ -27,17 +28,18 @@ export interface RequestKUR {
   updated_by_id: number;
   updated_by_type: string;
   updated_by: ModifierUser;
-  kur_request_number: string;
+  kur_payment_number: string;
   kur_user_id: number;
   kur_user: Customer;
   status: string;
   amount: number;
-  admin_fee: number;
-  remarks: string;
+  paid_to_account_number: string;
+  paid_to_bank: string;
+  proof_of_payment: string;
   decision_date: number;
-  decision_by_admin_id: number;
+  decision_by_admin_id: null;
   decision_by_admin: null;
-  kur_request_detail: KURRequestDetail[];
+  remarks: string;
 }
 
 export interface ModifierUser {
@@ -49,7 +51,7 @@ export interface ModifierUser {
   };
 }
 
-export interface KURRequestDetail {
+export interface KURPaymentDetail {
   id: number;
   created_date: number;
   updated_date: number;

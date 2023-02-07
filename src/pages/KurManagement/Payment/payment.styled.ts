@@ -78,6 +78,12 @@ export const DetailsHeader = styled(Typography)`
   font-weight: 400;
 `;
 
+export const LabelText = styled(Typography)`
+  font-size: 14px;
+  color: #232933;
+  font-weight: 500;
+`;
+
 export const BackButton = styled(Button)`
   background-color: transparent;
   color: #232933;
@@ -114,7 +120,6 @@ export const ContentGrid = styled(Box)`
 
 export const ColumnGrid = styled(Grid)`
   display: flex;
-  width 
 `;
 
 export const ProfileContainer = styled(Box)`

@@ -104,6 +104,7 @@ export default function RoleUser() {
       roleUserAction.setParams({
         account_type: 'cms',
         page: 1,
+        // defaultSearch: value,
         search: value,
       }),
     );
@@ -142,7 +143,7 @@ export default function RoleUser() {
     },
     {
       id: 'email',
-      label: 'Email',
+      label: 'Email Address',
       align: 'left',
     },
     {
@@ -328,7 +329,9 @@ export default function RoleUser() {
       </Modal>
       <Modal
         open={setStatusUserModal.open}
-        title="Delete Role"
+        title={`Set to ${
+          formData.data.id_status === 1 ? 'Inactive' : 'Active'
+        }`}
         onClose={setStatusUserModal.closeModal}
       >
         <SetStatusUser

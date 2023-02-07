@@ -9,6 +9,7 @@ import { useAppDispatch } from 'store/hooks';
 
 interface DeleteConfirmTypes {
   onClose: () => void;
+  onCancel: () => void;
   data: RoleAccess | null;
 }
 
@@ -38,7 +39,12 @@ export default function DeleteConfirm(props: DeleteConfirmTypes) {
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <Button variant="text" onClick={props.onClose}>
+        <Button
+          variant="text"
+          onClick={() => {
+            props.onCancel();
+          }}
+        >
           Cancel
         </Button>
         <Button color="error" onClick={onDelete}>

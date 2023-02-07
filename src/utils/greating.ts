@@ -1,17 +1,18 @@
 export const greating = (timeDate: Date) => {
-  const time = timeDate.getHours();
+  // const time = timeDate.getHours();
+  const time = 16;
   let day;
   let greeting;
 
-  if (time >= 7 && time <= 10) {
+  if (time >= 7 && time <= 11) {
     day = 'morning';
     greeting = 'Good Morning';
-  } else if (time <= 15 && time >= 11) {
+  } else if (time <= 15 && time >= 12) {
     day = 'day';
     greeting = 'Good Day';
-  } else if (time < 19 && time >= 16) {
+  } else if (time <= 19 && time >= 16) {
     day = 'afternoon';
-    greeting = 'Selamat Sore';
+    greeting = 'Good Afternoon';
   } else {
     day = 'night';
     greeting = 'Good Evening';

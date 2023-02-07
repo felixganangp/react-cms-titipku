@@ -21,32 +21,36 @@ import MenuList from 'components/MenuList';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { Link, useNavigate } from 'react-router-dom';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { RequestKUR } from 'models/kur/Request';
 import debounce from 'utils/debounce';
 import { HeadCells } from 'components/Table/types';
 import moment from 'moment';
 import { areaAction } from 'store/slice/Area';
 import { typeAction } from 'store/slice/kur/Type';
+// import { requestKURAction } from 'store/slice/kur/Request';
+import { paymentKURAction } from 'store/slice/kur/Payment';
 import { Area } from 'models/Area';
 import { Type } from 'models/kur/Type';
-import { requestKURAction } from 'store/slice/kur/Request';
+// import { RequestKUR } from 'models/kur/Request';
+import { PaymentKUR } from 'models/kur/Payment';
 import digitFormatter from 'utils/digitFormatter';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-import Modal from 'components/Modal';
-import RefusalReason from './components/InputMessage';
+import bankData from 'data/list-bank.json';
+// import Modal from 'components/Modal';
+// import RefusalReason from './components/InputMessage';
 import {
   FilterButton,
   FilterDataBox,
   InvoiceLabel,
   InvoiceStatus,
-} from './request.styled';
+  LabelText,
+} from './payment.styled';
 
-export default function RequestKURPage() {
+export default function paymentKURPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const request = useAppSelector((state) => state.request);
+  const request = useAppSelector((state) => state.payment);
 
   // define filter
   const [openFilter, setOpenFilter] = useState<boolean>(false);
@@ -70,7 +74,7 @@ export default function RequestKURPage() {
 
   // table
   useEffect(() => {
-    dispatch(requestKURAction.fetchData(request.params));
+    dispatch(paymentKURAction.fetchData(request.params));
   }, [
     request.params.search,
     request.params.order_by,
@@ -80,7 +84,7 @@ export default function RequestKURPage() {
 
   const handleSearch = (value: string) => {
     dispatch(
-      requestKURAction.setParams({
+      paymentKURAction.setParams({
         page: 1,
         search: value,
       }),
@@ -91,7 +95,7 @@ export default function RequestKURPage() {
 
   const handleChangePage = (value: number) => {
     dispatch(
-      requestKURAction.setParams({
+      paymentKURAction.setParams({
         page: value,
       }),
     );
@@ -102,7 +106,7 @@ export default function RequestKURPage() {
     orderType: 'asc' | 'desc';
   }) => {
     dispatch(
-      requestKURAction.setParams({
+      paymentKURAction.setParams({
         page: 1,
         order_by: value.orderBy,
         order_type: value.orderType,
@@ -112,13 +116,27 @@ export default function RequestKURPage() {
 
   const handleChangeType = (value: any) => {
     dispatch(
-      requestKURAction.setParams({
+      paymentKURAction.setParams({
         page: 1,
         kur_user_type_id: value ? value?.id : null,
       }),
     );
     dispatch(
-      requestKURAction.setDisplayFilter({
+      paymentKURAction.setDisplayFilter({
+        types: value,
+      }),
+    );
+  };
+
+  const handleChangeBank = (value: any) => {
+    dispatch(
+      paymentKURAction.setParams({
+        page: 1,
+        kur_user_type_id: value ? value?.id : null,
+      }),
+    );
+    dispatch(
+      paymentKURAction.setDisplayFilter({
         types: value,
       }),
     );
@@ -128,13 +146,13 @@ export default function RequestKURPage() {
     const areasId: (number | undefined)[] = [];
     if (value.length > 0) value.map((item: Area) => areasId.push(item.id));
     dispatch(
-      requestKURAction.setParams({
+      paymentKURAction.setParams({
         page: 1,
         area_ids: areasId.length > 0 ? areasId.join(',') : undefined,
       }),
     );
     dispatch(
-      requestKURAction.setDisplayFilter({
+      paymentKURAction.setDisplayFilter({
         areas: value,
       }),
     );
@@ -142,7 +160,7 @@ export default function RequestKURPage() {
 
   const handleChangeStartDate = (value: any) => {
     dispatch(
-      requestKURAction.setParams({
+      paymentKURAction.setParams({
         page: 1,
         submit_date_start: Math.floor(new Date(value).getTime() / 1000),
       }),
@@ -151,7 +169,7 @@ export default function RequestKURPage() {
 
   const handleChangeEndDate = (value: any) => {
     dispatch(
-      requestKURAction.setParams({
+      paymentKURAction.setParams({
         page: 1,
         submit_date_end: Math.floor(
           new Date(value).setHours(23, 59, 59, 59) / 1000,
@@ -161,14 +179,14 @@ export default function RequestKURPage() {
   };
 
   const handleApplyFilter = () => {
-    dispatch(requestKURAction.fetchData(request.params));
+    dispatch(paymentKURAction.fetchData(request.params));
   };
 
   const handleResetFilter = async () => {
     setStartDate(null);
     setEndDate(null);
     await dispatch(
-      requestKURAction.setParams({
+      paymentKURAction.setParams({
         page: 1,
         area_ids: undefined,
         kur_user_type_id: undefined,
@@ -177,13 +195,13 @@ export default function RequestKURPage() {
       }),
     );
     await dispatch(
-      requestKURAction.setDisplayFilter({
+      paymentKURAction.setDisplayFilter({
         areas: [],
         types: null,
       }),
     );
     await dispatch(
-      requestKURAction.fetchData({
+      paymentKURAction.fetchData({
         page: 1,
         search: request.params.search,
         area_ids: undefined,
@@ -196,26 +214,27 @@ export default function RequestKURPage() {
 
   // action
   const rejectModal = useModal();
-  const [selected, setSelected] = useState<RequestKUR | null>(null);
-  const handleApproveRequest = (id: number | string) => {
-    dispatch(requestKURAction.approveRequest({ id, detailsPage: false }));
-  };
-  const handleRejectRequest = (id: number | string, remarks: string) => {
-    dispatch(
-      requestKURAction.rejectRequest({ id, detailsPage: false, remarks }),
-    );
-    rejectModal.closeModal();
-  };
+  const [selected, setSelected] = useState<PaymentKUR | null>(null);
+  // const handleApproveRequest = (id: number | string) => {
+  //   dispatch(paymentKURAction.approveRequest({ id, detailsPage: false }));
+  // };
+  // const handleRejectRequest = (id: number | string, remarks: string) => {
+  //   dispatch(
+  //     paymentKURAction.rejectRequest({ id, detailsPage: false, remarks }),
+  //   );
+  //   rejectModal.closeModal();
+  // };
 
-  const headCell: HeadCells<RequestKUR>[] = [
+  const headCell: HeadCells<PaymentKUR>[] = [
     {
-      id: 'kur_request_number',
-      label: 'No Request',
+      id: 'kur_payment_number',
+      label: 'No. Payment',
       align: 'left',
       enableSort: true,
+      isSticky: true,
       format: (val) => (
-        <Link to={`/kur/request/${val.id}`} style={{ textDecoration: 'none' }}>
-          <InvoiceLabel>{val.kur_request_number}</InvoiceLabel>
+        <Link to={`/kur/payment/${val.id}`} style={{ textDecoration: 'none' }}>
+          <InvoiceLabel>{val.kur_payment_number}</InvoiceLabel>
         </Link>
       ),
     },
@@ -224,19 +243,36 @@ export default function RequestKURPage() {
       label: 'Name',
       align: 'left',
       enableSort: true,
+      isSticky: true,
       format: (val) => <Typography>{val.kur_user.name}</Typography>,
     },
     {
       id: 'kur_type',
       label: 'KUR Type',
       align: 'left',
+      isSticky: true,
       format: (val) => (
         <Typography>{val.kur_user.kur_user_type.name}</Typography>
       ),
     },
     {
-      id: 'request_amount',
-      label: 'Request Amount',
+      id: 'transfer_to',
+      label: 'Transfer to',
+      align: 'left',
+      width: '200px',
+      format: (val) => <Typography>{val.paid_to_bank}</Typography>,
+    },
+    {
+      id: 'payment_amount',
+      label: 'Payment Amount',
+      align: 'left',
+      format: (val) => (
+        <Typography>Rp {digitFormatter.format(val.amount)}</Typography>
+      ),
+    },
+    {
+      id: 'outstanding_credit',
+      label: 'Outstanding Credit',
       align: 'left',
       format: (val) => (
         <Typography>Rp {digitFormatter.format(val.amount)}</Typography>
@@ -253,6 +289,7 @@ export default function RequestKURPage() {
       id: 'area_name',
       label: 'Pasar',
       align: 'left',
+      width: '450px',
       format: (val) => <Typography>{val.kur_user.user.area.name}</Typography>,
     },
     {
@@ -291,19 +328,19 @@ export default function RequestKURPage() {
                         navigate(`/kur/request/${val.id}`);
                       },
                     },
-                    {
-                      label: 'Approve',
-                      onClick: () => {
-                        handleApproveRequest(val.id);
-                      },
-                    },
-                    {
-                      label: 'Reject',
-                      onClick: () => {
-                        setSelected(val);
-                        rejectModal.openModal();
-                      },
-                    },
+                    // {
+                    //   label: 'Approve',
+                    //   onClick: () => {
+                    //     handleApproveRequest(val.id);
+                    //   },
+                    // },
+                    // {
+                    //   label: 'Reject',
+                    //   onClick: () => {
+                    //     setSelected(val);
+                    //     rejectModal.openModal();
+                    //   },
+                    // },
                   ]
                 : [
                     {
@@ -330,7 +367,7 @@ export default function RequestKURPage() {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Card>
-              <Typography variant="titlePage">Request KUR</Typography>
+              <Typography variant="titlePage">KUR Payment</Typography>
             </Card>
           </Grid>
           <Grid item xs={12}>
@@ -403,7 +440,7 @@ export default function RequestKURPage() {
                       }
                       isOptionEqualToValue={(item: Area) => {
                         const filtered = request?.displayFilter?.areas?.filter(
-                          (el) => el.id === item.id,
+                          (el: any) => el.id === item.id,
                         );
                         if (filtered) return item.id === filtered[0]?.id;
                         return false;
@@ -441,85 +478,131 @@ export default function RequestKURPage() {
                       )}
                     />
                   </FormLabel>
+                  <FormLabel text="Transfer To">
+                    <Autocomplete
+                      id="filterBank"
+                      options={bankData.data}
+                      // onChange={(e, value) => {
+                      //   handleChangeType(value);
+                      // }}
+                      // isOptionEqualToValue={(item: Type) => {
+                      //   return item.id === request.displayFilter?.types?.id;
+                      // }}
+                      getOptionLabel={(item) => item.name}
+                      // value={request?.displayFilter?.types}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          name="type"
+                          placeholder="Select Bank"
+                        />
+                      )}
+                    />
+                  </FormLabel>
                 </Box>
                 <Box
                   display={openFilter ? 'flex' : 'none'}
-                  flexDirection="row"
-                  width="100%"
+                  flexDirection="column"
+                  width="32%"
                   justifyContent="space-between"
-                  gap="28px"
                 >
-                  <FormLabel
-                    text="Start Submit Date"
-                    error={startDate === null && endDate !== null}
-                    helperText={
-                      startDate === null &&
-                      endDate !== null &&
-                      'Start Date is required when End Date is filled'
-                    }
+                  <LabelText>Range Date</LabelText>
+                  <Box
+                    display={openFilter ? 'flex' : 'none'}
+                    flexDirection="row"
+                    width="100%"
+                    justifyContent="space-between"
                   >
-                    <LocalizationProvider dateAdapter={AdapterMoment}>
-                      <DesktopDatePicker
-                        open={openStartDate}
-                        onClose={() => {
-                          setOpenStartDate(false);
-                        }}
-                        onOpen={() => {
-                          setOpenStartDate(true);
-                        }}
-                        value={startDate}
-                        inputFormat="DD/MM/YYYY"
-                        onChange={(value) => {
-                          setStartDate(value);
-                          handleChangeStartDate(value);
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            sx={{ width: '100%' }}
-                            {...params}
-                            onClick={() => setOpenStartDate(true)}
-                          />
-                        )}
-                        maxDate={endDate}
-                      />
-                    </LocalizationProvider>
-                  </FormLabel>
-
-                  <FormLabel
-                    text="End Submit Date"
-                    error={startDate !== null && endDate === null}
-                    helperText={
-                      startDate !== null &&
-                      endDate === null &&
-                      'End Date is required when Start Date is filled'
-                    }
-                  >
-                    <LocalizationProvider dateAdapter={AdapterMoment}>
-                      <DesktopDatePicker
-                        open={openEndDate}
-                        onClose={() => {
-                          setOpenEndDate(false);
-                        }}
-                        onOpen={() => {
-                          setOpenEndDate(true);
-                        }}
-                        value={endDate}
-                        inputFormat="DD/MM/YYYY"
-                        onChange={(value) => {
-                          setEndDate(value);
-                          handleChangeEndDate(value);
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            sx={{ width: '100%' }}
-                            {...params}
-                            onClick={() => setOpenEndDate(true)}
-                          />
-                        )}
-                        minDate={startDate}
-                      />
-                    </LocalizationProvider>
-                  </FormLabel>
+                    <FormLabel
+                      text=""
+                      error={startDate === null && endDate !== null}
+                      helperText={
+                        startDate === null &&
+                        endDate !== null &&
+                        'Start Date is required when End Date is filled'
+                      }
+                    >
+                      <LocalizationProvider dateAdapter={AdapterMoment}>
+                        <DesktopDatePicker
+                          open={openStartDate}
+                          onClose={() => {
+                            setOpenStartDate(false);
+                          }}
+                          onOpen={() => {
+                            setOpenStartDate(true);
+                          }}
+                          value={startDate}
+                          inputFormat="DD/MM/YYYY"
+                          onChange={(value) => {
+                            setStartDate(value);
+                            handleChangeStartDate(value);
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              sx={{ width: '100%' }}
+                              {...params}
+                              inputProps={{
+                                ...params.inputProps,
+                                placeholder: 'Start Date',
+                              }}
+                              onClick={() => setOpenStartDate(true)}
+                            />
+                          )}
+                          toolbarPlaceholder="End Date"
+                          maxDate={endDate}
+                        />
+                      </LocalizationProvider>
+                    </FormLabel>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: '40px',
+                      }}
+                    >
+                      -
+                    </Box>
+                    <FormLabel
+                      text=""
+                      error={startDate !== null && endDate === null}
+                      helperText={
+                        startDate !== null &&
+                        endDate === null &&
+                        'End Date is required when Start Date is filled'
+                      }
+                    >
+                      <LocalizationProvider dateAdapter={AdapterMoment}>
+                        <DesktopDatePicker
+                          open={openEndDate}
+                          onClose={() => {
+                            setOpenEndDate(false);
+                          }}
+                          onOpen={() => {
+                            setOpenEndDate(true);
+                          }}
+                          value={endDate}
+                          inputFormat="DD/MM/YYYY"
+                          onChange={(value) => {
+                            setEndDate(value);
+                            handleChangeEndDate(value);
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              sx={{ width: '100%' }}
+                              {...params}
+                              inputProps={{
+                                ...params.inputProps,
+                                placeholder: 'End Date',
+                              }}
+                              onClick={() => setOpenEndDate(true)}
+                            />
+                          )}
+                          minDate={startDate}
+                        />
+                      </LocalizationProvider>
+                    </FormLabel>
+                  </Box>
                 </Box>
                 <Box
                   display={openFilter ? 'flex' : 'none'}
@@ -567,7 +650,7 @@ export default function RequestKURPage() {
           </Grid>
         </Grid>
       </Box>
-      <Modal
+      {/* <Modal
         open={rejectModal.open}
         title="Refusal Reason"
         onClose={rejectModal.closeModal}
@@ -576,7 +659,7 @@ export default function RequestKURPage() {
           onSubmitRefusal={handleRejectRequest}
           id={selected?.id || 0}
         />
-      </Modal>
+      </Modal> */}
     </>
   );
 }

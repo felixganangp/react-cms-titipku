@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
@@ -144,20 +145,52 @@ function Form({ onClose, formData }: Props) {
       adminFee: yup
         .number()
         .required('Admin fee is required')
-        .min(1, 'Please input positive value admin fee')
-        .max(99999999, 'Maximal admin fee is 99.999.999'),
+        .min(0, 'Please input positive value admin fee')
+        .max(100, 'Maximal admin fee is 100%'),
       dpdRate: yup
         .number()
         .required('DPD rate is required')
-        .min(1, 'Please input positive value DPD rate')
-        .max(99999999, 'Maximal DPD rate is 99.999.999'),
+        .min(0, 'Please input positive value DPD rate')
+        .max(100, 'Maximal DPD rate is 100%'),
       birthDate: yup.mixed().required('Birth Day is required'),
-      phoneNumber: yup.string().required('Phone Number is required'),
+      phoneNumber: yup
+        .number()
+        .required('Phone Number is required')
+        .test(
+          'len',
+          'Maximal digit for phone number is 14',
+          (val) => val !== undefined && val.toString().length < 15,
+        )
+        .test(
+          'len',
+          'Minimal digit for phone number is 10',
+          (val) => val !== undefined && val.toString().length > 9,
+        )
+        .typeError('Phone number should be a number'),
       addressKtp: yup.string().required('Address (KTP) is required'),
       addressDomisili: yup.string().required('Address (Domicile) is required'),
-      nikKtp: yup.string().required('NIK KTP is required'),
-      kkNumber: yup.string().required('Kartu Keluarga number is required'),
-      npwp: yup.string().required('NPWP number is required'),
+      nikKtp: yup
+        .number()
+        .required('NIK KTP is required')
+        .test(
+          'len',
+          'NIK should be 16 digits',
+          (val) => val !== undefined && val.toString().length > 15,
+        )
+        .typeError('Phone number should be a number'),
+      kkNumber: yup
+        .number()
+        .required('Kartu Keluarga number is required')
+        .test(
+          'len',
+          'Kartu Keluarga number should be 16 digits',
+          (val) => val !== undefined && val.toString().length > 15,
+        )
+        .typeError('Kartu Keluarga number should be a number'),
+      npwp: yup
+        .number()
+        .required('NPWP number is required')
+        .typeError('NPWP number should be a number'),
       creditLimit: yup
         .number()
         .required('Credit limit is required')
@@ -165,13 +198,15 @@ function Form({ onClose, formData }: Props) {
         .max(500000000, 'Maximal credit limit is 500.000.000'),
       bankName: yup.mixed().required('Bank account is required'),
       bankNumberPrimary: yup
-        .string()
-        .required('Bank account number (primary) is required'),
+        .number()
+        .required('Bank account number (primary) is required')
+        .typeError('Account number (primary) should be a number'),
       pasarName: yup.mixed().required('Pasar is required'),
       merchantName: yup.mixed().required('Lapak is required'),
       nobuAccountNumber: yup
-        .string()
-        .required('Nobu account number is required'),
+        .number()
+        .required('Nobu account number is required')
+        .typeError('Nobu account number should be a number'),
     }),
     enableReinitialize: true,
   });
@@ -186,6 +221,7 @@ function Form({ onClose, formData }: Props) {
     isValid,
     dirty,
   } = formik;
+
   const handleSelectArea = (val: Area | null) => {
     dispatch(
       merchantAction.setParams({
@@ -218,22 +254,22 @@ function Form({ onClose, formData }: Props) {
             disabled={
               !(
                 values.name &&
-                values.adminFee &&
-                +values.adminFee > 1 &&
-                values.dpdRate &&
-                +values.dpdRate > 1 &&
+                (values.adminFee || +values.adminFee === 0) &&
+                (values.dpdRate || +values.dpdRate === 0) &&
                 values.birthDate &&
                 values.phoneNumber &&
                 values.email &&
                 values.addressKtp &&
                 values.addressDomisili &&
                 values.creditLimit &&
-                +values.creditLimit > 1 &&
+                +values.creditLimit > 0 &&
                 values.bankNumberPrimary &&
                 values.kurType &&
                 values.bankName &&
                 values.nobuAccountNumber
-              )
+              ) ||
+              +values.adminFee < 0 ||
+              +values.dpdRate < 0
             }
             sx={{ borderBottom: 1, borderColor: 'divider', color: '#8B95A5' }}
             label="2. KUR Document"
@@ -371,14 +407,24 @@ function Form({ onClose, formData }: Props) {
               <FormLabel
                 text="Birth Date"
                 error={openCalendaer.touched && !values.birthDate}
-                helperText={openCalendaer.touched && 'Birth date is required'}
+                helperText={
+                  (openCalendaer.touched &&
+                    !values.birthDate &&
+                    // values.birthDate === '' &&
+                    'Birth date is required') ||
+                  (values.birthDate === '' && 'Birth date is required')
+                }
               >
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                   <DesktopDatePicker
                     maxDate={new Date()}
                     open={openCalendaer.open}
                     onClose={() => {
-                      setOpenCalendar({ open: false, touched: true });
+                      if (values.birthDate) {
+                        setOpenCalendar({ open: false, touched: false });
+                      } else {
+                        setOpenCalendar({ open: false, touched: true });
+                      }
                     }}
                     onOpen={() => {
                       setOpenCalendar({ open: true, touched: true });
@@ -387,6 +433,7 @@ function Form({ onClose, formData }: Props) {
                     value={values.birthDate}
                     onChange={(e) => {
                       setFieldValue('birthDate', e, true);
+                      // setOpenCalendar({ open: false, touched: false });
                     }}
                     renderInput={(params) => (
                       <TextField
@@ -396,6 +443,12 @@ function Form({ onClose, formData }: Props) {
                           setOpenCalendar({ open: true, touched: true })
                         }
                         onBlur={handleBlur}
+                        onFocus={() => {
+                          setOpenCalendar({ open: false, touched: true });
+                        }}
+                        onKeyDown={() => {
+                          setOpenCalendar({ open: false, touched: true });
+                        }}
                       />
                     )}
                   />
@@ -454,7 +507,10 @@ function Form({ onClose, formData }: Props) {
                   value={values.addressKtp}
                   multiline
                   rows={4}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    setDisabledAddressDom(false);
+                  }}
                   onBlur={handleBlur}
                   fullWidth
                 />
@@ -483,6 +539,12 @@ function Form({ onClose, formData }: Props) {
                     onBlur={handleBlur}
                     fullWidth
                     disabled={disabledAddressDom}
+                    sx={{
+                      // backgroundColor: 'red',
+                      '& .MuiInputBase-root.Mui-disabled': {
+                        backgroundColor: '#ebeff3',
+                      },
+                    }}
                   />
                   <FormControlLabel
                     label={
@@ -491,6 +553,9 @@ function Form({ onClose, formData }: Props) {
                       </Typography>
                     }
                     onChange={() => {
+                      // if (values.addressDomisili === values.addressKtp) {
+                      //   setDisabledAddressDom(true);
+                      // }
                       setDisabledAddressDom((prev) => !prev);
                       setFieldValue('addressDomisili', values.addressKtp);
                     }}
@@ -567,7 +632,7 @@ function Form({ onClose, formData }: Props) {
                   </Grid>
                   <Grid item xs={6}>
                     <FormLabel
-                      text="Bank account number"
+                      text="Bank Account Number"
                       error={
                         touched.bankNumberPrimary &&
                         Boolean(errors.bankNumberPrimary)
@@ -606,7 +671,7 @@ function Form({ onClose, formData }: Props) {
                 <TextField
                   type="text"
                   name="nobuAccountNumber"
-                  placeholder="Input Phone Number"
+                  placeholder="Bank account number (Nobu)"
                   value={values.nobuAccountNumber}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -627,29 +692,37 @@ function Form({ onClose, formData }: Props) {
               boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
             }}
           >
-            <Button variant="text" color="error" onClick={handleCloseForm}>
+            {/* <Button variant="text" color="error" onClick={handleCloseForm}>
               Cancel
-            </Button>
+            </Button> */}
             <Button
               disabled={
                 !(
                   values.name &&
-                  values.adminFee &&
-                  +values.adminFee > 1 &&
-                  values.dpdRate &&
-                  +values.dpdRate > 1 &&
+                  (values.adminFee || +values.adminFee === 0) &&
+                  (values.dpdRate || +values.dpdRate === 0) &&
                   values.birthDate &&
                   values.phoneNumber &&
+                  values.phoneNumber.length > 9 &&
+                  values.phoneNumber.length < 15 &&
                   values.email &&
+                  // eslint-disable-next-line no-useless-escape
+                  values.email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g) &&
                   values.addressKtp &&
                   values.addressDomisili &&
                   values.creditLimit &&
-                  +values.creditLimit > 1 &&
+                  +values.creditLimit > 0 &&
                   values.bankNumberPrimary &&
                   values.kurType &&
                   values.bankName &&
                   values.nobuAccountNumber
-                )
+                ) ||
+                +values.adminFee < 0 ||
+                +values.dpdRate < 0 ||
+                isNaN(+values.phoneNumber) ||
+                isNaN(+values.nobuAccountNumber) ||
+                isNaN(+values.bankNumberPrimary) ||
+                +values.creditLimit > 500000000
               }
               onClick={(e) => handleChangeTab(e, 1)}
               // type="submit"
@@ -663,6 +736,46 @@ function Form({ onClose, formData }: Props) {
             {/** LAPAK / PASAR */}
             <Grid container spacing={2}>
               <Grid item xs={7}>
+                <FormLabel
+                  text="Pasar"
+                  error={touched.pasarName && Boolean(errors.pasarName)}
+                  helperText={
+                    touched.pasarName &&
+                    errors.pasarName &&
+                    !values.pasarName &&
+                    `${errors.pasarName}`
+                  }
+                >
+                  <Autocomplete
+                    id="pasar-name"
+                    options={areaKur.data}
+                    onChange={(e, value) => {
+                      setFieldValue('pasarName', value);
+                      setFieldValue('merchantName', null);
+                      handleSelectArea(value);
+                    }}
+                    isOptionEqualToValue={(option: Area) => {
+                      return option.id === values.pasarName?.id;
+                    }}
+                    getOptionLabel={(option) => `${option.title}`}
+                    value={values.pasarName}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="pasarName"
+                        onBlur={handleBlur}
+                        placeholder="Cari Pasar"
+                      />
+                    )}
+                    renderOption={(props, option) => (
+                      <Box component="li" {...props} key={`area ${option.id}`}>
+                        {option.title}
+                      </Box>
+                    )}
+                  />
+                </FormLabel>
+              </Grid>
+              <Grid item xs={5}>
                 <FormLabel
                   text="Lapak Name"
                   error={touched.merchantName && Boolean(errors.merchantName)}
@@ -709,45 +822,6 @@ function Form({ onClose, formData }: Props) {
                   />
                 </FormLabel>
               </Grid>
-              <Grid item xs={5}>
-                <FormLabel
-                  text="Pasar"
-                  error={touched.pasarName && Boolean(errors.pasarName)}
-                  helperText={
-                    touched.pasarName &&
-                    errors.pasarName &&
-                    `${errors.pasarName}`
-                  }
-                >
-                  <Autocomplete
-                    id="pasar-name"
-                    options={areaKur.data}
-                    onChange={(e, value) => {
-                      setFieldValue('pasarName', value);
-                      setFieldValue('merchantName', null);
-                      handleSelectArea(value);
-                    }}
-                    isOptionEqualToValue={(option: Area) => {
-                      return option.id === values.pasarName?.id;
-                    }}
-                    getOptionLabel={(option) => `${option.title}`}
-                    value={values.pasarName}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="pasarName"
-                        onBlur={handleBlur}
-                        placeholder="Cari Pasar"
-                      />
-                    )}
-                    renderOption={(props, option) => (
-                      <Box component="li" {...props} key={`area ${option.id}`}>
-                        {option.title}
-                      </Box>
-                    )}
-                  />
-                </FormLabel>
-              </Grid>
             </Grid>
             {/** NIK KTP */}
             <FormLabel
@@ -763,6 +837,9 @@ function Form({ onClose, formData }: Props) {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 fullWidth
+                inputProps={{
+                  maxLength: 16,
+                }}
               />
             </FormLabel>
             {/** IMAGE KTP */}
@@ -793,6 +870,9 @@ function Form({ onClose, formData }: Props) {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 fullWidth
+                inputProps={{
+                  maxLength: 16,
+                }}
               />
             </FormLabel>
             {/** IMAGE KK (C1) */}

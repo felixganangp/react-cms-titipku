@@ -51,7 +51,7 @@ export default function DeleteConfirm(props: DeleteConfirmTypes) {
     <Box>
       <Box p={3}>
         <Typography>
-          Are you sure to set{' '}
+          Are you sure to set to{' '}
           {typeChangeStatus(props.data?.id_status).nameChange} this user?
         </Typography>
       </Box>
@@ -66,7 +66,11 @@ export default function DeleteConfirm(props: DeleteConfirmTypes) {
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <Button variant="text" onClick={props.onClose}>
+        <Button
+          variant="text"
+          onClick={props.onClose}
+          color={props.data?.id_status === 2 ? 'error' : 'success'}
+        >
           Cancel
         </Button>
         <Button
