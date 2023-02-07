@@ -34,7 +34,7 @@ function* fetchUserDetails() {
       yield put(
         uiAction.openToast({
           headMsg: 'Error get data',
-          message: 'interval server error',
+          message: 'hi',
           severity: 'error',
         }),
       );
@@ -50,7 +50,7 @@ function* fetchMenuList(params: PayloadAction<MenuParams>) {
       params.payload,
     );
     const mappedMenu: any = [];
-    response.data.map((item) => {
+    response.data?.map((item) => {
       mappedMenu.push({
         id: item.id,
         menu: item.menu,
