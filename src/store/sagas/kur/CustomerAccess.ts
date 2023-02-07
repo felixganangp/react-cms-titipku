@@ -11,6 +11,7 @@ import {
   CreateCustomer,
   CreateCustomerPayload,
   KurUserDocumentPayload,
+  CheckMerchantExistParams,
 } from 'models/kur/Customer';
 
 interface ImageUpdatePayload {
@@ -408,9 +409,30 @@ function* fetchDataDetail(params: PayloadAction<{ id: string | number }>) {
   }
 }
 
+function* checkMerchantExist(params: PayloadAction<CheckMerchantExistParams>) {
+  try {
+    const response: Response<boolean> = yield call(
+      CustomerService.checkMerchantExist,
+      params.payload,
+    );
+    yield put(customerAction.checkMerchantExistSuccess(response));
+  } catch (error) {
+    // yield put(
+    //   uiAction.openToast({
+    //     headMsg: 'Failed to add new role user',
+    //     message: error as string,
+    //     severity: 'error',
+    //   }),
+    // );
+    // yield put(roleUserAction.addOrEditRoleUserSuccess({ error: true }));
+    console.log(`Failed to create user: `, error);
+  }
+}
+
 export default function* customerKurSagas() {
   yield takeLatest(customerAction.fetchData.type, fetchData);
   yield takeLatest(customerAction.createCustomer.type, createCustomer);
   yield takeLatest(customerAction.editCustomer.type, editCustomer);
   yield takeLatest(customerAction.fetchDataDetail.type, fetchDataDetail);
+  yield takeLatest(customerAction.checkMerchantExist.type, checkMerchantExist);
 }
