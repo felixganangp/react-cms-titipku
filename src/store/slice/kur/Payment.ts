@@ -1,28 +1,28 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  RequestKUR,
-  RequestKURDisplayFilter,
-  RequestKURParams,
+  PaymentKUR,
+  PaymentKURDisplayFilter,
+  PaymentKURParams,
   ActionParams,
-  KURRequestDetail,
-} from 'models/kur/Request';
+  KURPaymentDetail,
+} from 'models/kur/Payment';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListParams, ListResponse, Response } from 'models/fetch';
 
-interface RequestKURProps {
-  data: RequestKUR[];
+interface PaymentKURProps {
+  data: PaymentKUR[];
   loading: boolean;
   loadingForm: boolean;
   total: number | undefined;
-  params: RequestKURParams;
-  displayFilter: RequestKURDisplayFilter;
-  detailsData: RequestKUR | null;
-  detailsTableData: KURRequestDetail[];
+  params: PaymentKURParams;
+  displayFilter: PaymentKURDisplayFilter;
+  detailsData: PaymentKUR | null;
+  detailsTableData: KURPaymentDetail[];
   totalDetailsTable: number | undefined;
   detailParams: ListParams;
 }
 
-const initialState: RequestKURProps = {
+const initialState: PaymentKURProps = {
   data: [],
   loading: false,
   loadingForm: false,
@@ -45,26 +45,26 @@ const initialState: RequestKURProps = {
   },
 };
 
-const RequestKURSlice = createSlice({
-  name: 'RequestKUR',
+const PaymentKURSlice = createSlice({
+  name: 'PaymentKUR',
   initialState,
   reducers: {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    fetchData(state: RequestKURProps, action: PayloadAction<RequestKURParams>) {
+    fetchData(state: PaymentKURProps, action: PayloadAction<PaymentKURParams>) {
       state.loading = true;
     },
-    failedFetch(state: RequestKURProps) {
+    failedFetch(state: PaymentKURProps) {
       state.loading = false;
     },
-    setParams(state: RequestKURProps, action: PayloadAction<RequestKURParams>) {
+    setParams(state: PaymentKURProps, action: PayloadAction<PaymentKURParams>) {
       state.params = {
         ...state.params,
         ...action.payload,
       };
     },
     setDisplayFilter(
-      state: RequestKURProps,
-      action: PayloadAction<RequestKURDisplayFilter>,
+      state: PaymentKURProps,
+      action: PayloadAction<PaymentKURDisplayFilter>,
     ) {
       state.displayFilter = {
         ...state.displayFilter,
@@ -72,28 +72,28 @@ const RequestKURSlice = createSlice({
       };
     },
     fetchDataSuccess(
-      state: RequestKURProps,
-      action: PayloadAction<ListResponse<RequestKUR>>,
+      state: PaymentKURProps,
+      action: PayloadAction<ListResponse<PaymentKUR>>,
     ) {
       state.loading = false;
       state.data = action.payload.data;
       state.total = action.payload.total;
     },
     fetchDetails(
-      state: RequestKURProps,
+      state: PaymentKURProps,
       action: PayloadAction<{ id: string | number }>,
     ) {
       state.loading = true;
     },
     fetchDetailsSuccess(
-      state: RequestKURProps,
-      action: PayloadAction<Response<RequestKUR>>,
+      state: PaymentKURProps,
+      action: PayloadAction<Response<PaymentKUR>>,
     ) {
       state.loading = true;
       state.detailsData = action.payload.data;
     },
     setDetailsTableParams(
-      state: RequestKURProps,
+      state: PaymentKURProps,
       action: PayloadAction<ListParams>,
     ) {
       state.detailParams = {
@@ -102,37 +102,37 @@ const RequestKURSlice = createSlice({
       };
     },
     fetchDetailsTable(
-      state: RequestKURProps,
+      state: PaymentKURProps,
       ction: PayloadAction<{ id: string | number; params: ListParams }>,
     ) {
       state.loading = true;
     },
     fetchDetailsTableSuccess(
-      state: RequestKURProps,
-      action: PayloadAction<ListResponse<KURRequestDetail>>,
+      state: PaymentKURProps,
+      action: PayloadAction<ListResponse<KURPaymentDetail>>,
     ) {
       state.loading = false;
       state.detailsTableData = action.payload.data;
       state.totalDetailsTable = action.payload.total;
     },
-    approveRequest(
-      state: RequestKURProps,
-      action: PayloadAction<ActionParams>,
-    ) {
-      state.loading = true;
-    },
-    rejectRequest(state: RequestKURProps, action: PayloadAction<ActionParams>) {
-      state.loading = true;
-    },
+    // approveRequest(
+    //   state: PaymentKURProps,
+    //   action: PayloadAction<ActionParams>,
+    // ) {
+    //   state.loading = true;
+    // },
+    // rejectRequest(state: PaymentKURProps, action: PayloadAction<ActionParams>) {
+    //   state.loading = true;
+    // },
   },
 });
 
 // action
-export const requestKURAction = RequestKURSlice.actions;
+export const paymentKURAction = PaymentKURSlice.actions;
 
 // selector
-export const selectRequestKUR = (state: RequestKURProps) => state.data;
+export const selectPaymentKUR = (state: PaymentKURProps) => state.data;
 
 // reducer
-const requestKURReducer = RequestKURSlice.reducer;
-export default requestKURReducer;
+const paymentKURReducer = PaymentKURSlice.reducer;
+export default paymentKURReducer;
