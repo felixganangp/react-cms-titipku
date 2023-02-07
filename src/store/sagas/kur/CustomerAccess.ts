@@ -11,6 +11,7 @@ import {
   CreateCustomer,
   CreateCustomerPayload,
   KurUserDocumentPayload,
+  CheckMerchantExistParams,
 } from 'models/kur/Customer';
 
 interface ImageUpdatePayload {
@@ -160,6 +161,12 @@ function* createCustomer(payload: PayloadAction<CreateCustomer>) {
 
 function* editCustomer(payload: PayloadAction<CreateCustomer>) {
   try {
+    // let imageNik: string | string[] = payload.payload.imageNik.toString();
+    // imageNik = imageNik.split('.com/');
+    // const payloadImageNik = imageNik[1].split('?');
+    // console.log('🚀 ~ file: ~ payload', payload.payload.imageKk);
+    // console.log('🚀 ~ file: ~ imageNik', imageNik);
+    // console.log('🚀 ~ file: ~ payloadImageNik', payloadImageNik);
     const paramsState: CustomerParams = yield select((state) => {
       return state.customerKur.params;
     });
@@ -195,8 +202,8 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       };
     } else {
       let imageNik: string | string[] = payload.payload.imageNik.toString();
-      imageNik = imageNik.split('//');
-      const payloadImageNik = imageNik[2].split('?');
+      imageNik = imageNik.split('.com/');
+      const payloadImageNik = imageNik[1].split('?');
       payloadKtp = {
         ...payloadKtp,
         document_filepath: `/${payloadImageNik[0]}`,
@@ -234,8 +241,8 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       };
     } else {
       let imageKk: string | string[] = payload.payload.imageKk.toString();
-      imageKk = imageKk.split('//');
-      const payloadImageKk = imageKk[2].split('?');
+      imageKk = imageKk.split('.com/');
+      const payloadImageKk = imageKk[1].split('?');
       payloadKK = {
         ...payloadKK,
         document_filepath: `/${payloadImageKk[0]}`,
@@ -273,8 +280,8 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       };
     } else {
       let imageNpwp: string | string[] = payload.payload.imageNpwp.toString();
-      imageNpwp = imageNpwp.split('//');
-      const payloadImageNpwp = imageNpwp[2].split('?');
+      imageNpwp = imageNpwp.split('.com/');
+      const payloadImageNpwp = imageNpwp[1].split('?');
       payloadNpwp = {
         ...payloadNpwp,
         document_filepath: `/${payloadImageNpwp[0]}`,
@@ -300,8 +307,8 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       };
     } else {
       let imageSku: string | string[] = payload.payload.imageSKUsaha.toString();
-      imageSku = imageSku.split('//');
-      const payloadImageSku = imageSku[2].split('?');
+      imageSku = imageSku.split('.com/');
+      const payloadImageSku = imageSku[1].split('?');
       payloadSKU = {
         ...payloadSKU,
         document_filepath: `/${payloadImageSku[0]}`,
@@ -408,9 +415,30 @@ function* fetchDataDetail(params: PayloadAction<{ id: string | number }>) {
   }
 }
 
+function* checkMerchantExist(params: PayloadAction<CheckMerchantExistParams>) {
+  try {
+    const response: Response<boolean> = yield call(
+      CustomerService.checkMerchantExist,
+      params.payload,
+    );
+    yield put(customerAction.checkMerchantExistSuccess(response));
+  } catch (error) {
+    // yield put(
+    //   uiAction.openToast({
+    //     headMsg: 'Failed to add new role user',
+    //     message: error as string,
+    //     severity: 'error',
+    //   }),
+    // );
+    // yield put(roleUserAction.addOrEditRoleUserSuccess({ error: true }));
+    console.log(`Failed to create user: `, error);
+  }
+}
+
 export default function* customerKurSagas() {
   yield takeLatest(customerAction.fetchData.type, fetchData);
   yield takeLatest(customerAction.createCustomer.type, createCustomer);
   yield takeLatest(customerAction.editCustomer.type, editCustomer);
   yield takeLatest(customerAction.fetchDataDetail.type, fetchDataDetail);
+  yield takeLatest(customerAction.checkMerchantExist.type, checkMerchantExist);
 }
