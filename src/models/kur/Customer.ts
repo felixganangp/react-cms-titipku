@@ -147,3 +147,8 @@ export interface KurUserDocumentPayload {
   document_filepath?: string;
   document_number?: string;
 }
+
+export interface CheckMerchantExistParams {
+  merchant_id: number | undefined;
+  exclude_id?: number | undefined;
+}

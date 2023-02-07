@@ -1,6 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse, Response } from 'models/fetch';
-import { CreateCustomer, Customer, CustomerParams } from 'models/kur/Customer';
+import {
+  CreateCustomer,
+  Customer,
+  CustomerParams,
+  CheckMerchantExistParams,
+} from 'models/kur/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
 
@@ -16,6 +21,8 @@ interface CustomerInitialProps {
     typeKur?: Type | null;
     areaKur?: Area[] | [];
   };
+  loadingMerchantExist: boolean;
+  merchantExistMsg: string;
 }
 const initialState: CustomerInitialProps = {
   data: [],
@@ -35,6 +42,8 @@ const initialState: CustomerInitialProps = {
     areaKur: [],
   },
   details: null,
+  loadingMerchantExist: false,
+  merchantExistMsg: '',
 };
 
 const CustomerSlice = createSlice({
@@ -127,6 +136,19 @@ const CustomerSlice = createSlice({
       // action: PayloadAction<CreateCustomer>,
     ) {
       state.loadingForm = false;
+    },
+    checkMerchantExist(
+      state: CustomerInitialProps,
+      action: PayloadAction<CheckMerchantExistParams>,
+    ) {
+      state.loadingMerchantExist = true;
+    },
+    checkMerchantExistSuccess(
+      state: CustomerInitialProps,
+      action: PayloadAction<any>,
+    ) {
+      state.loadingMerchantExist = false;
+      state.merchantExistMsg = action.payload.data;
     },
   },
 });
