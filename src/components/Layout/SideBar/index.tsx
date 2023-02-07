@@ -93,7 +93,7 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
   useEffect(() => {
     const filtered: FilteredMenu[] = [...sidebarData];
     if (menuData && menuData.length > 0) {
-      sidebarData.map((menu, i) => {
+      sidebarData.map((menu, i = 0) => {
         if (menuData.find((item) => item.id === menu.id) === undefined) {
           filtered.splice(i, 1);
         } else {
@@ -101,7 +101,10 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
             (a) =>
               menuData.find((subitem) => subitem.id === a.id) !== undefined,
           );
-          filtered[i].child = [...filteredChild];
+          if (filteredChild.length > 0)
+            filtered[filtered.findIndex((a) => a.id === menu.id)].child = [
+              ...filteredChild,
+            ];
         }
       });
     }
