@@ -32,6 +32,13 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 
 import { TitlePage, BackButton, Menu } from './details.styled';
 
+function StatusColor(string: string | undefined) {
+  let color = '#c10000';
+
+  if (string === 'Active') color = '#008e58';
+
+  return color;
+}
 interface ModalImageTypes {
   open: boolean;
   filePath: string | null;
@@ -120,7 +127,11 @@ export default function RoleUserDetails() {
               <Typography variant="h1" fontWeight="700">
                 {customerKur.details?.name}
               </Typography>
-              <Status color="#c10000">Rejected</Status>
+              <Status
+                color={StatusColor(customerKur.details?.kur_user_status.name)}
+              >
+                {customerKur.details?.kur_user_status.name || '-'}
+              </Status>
             </Box>
             <Grid container spacing={2}>
               <Grid item xs={6} md={3}>
