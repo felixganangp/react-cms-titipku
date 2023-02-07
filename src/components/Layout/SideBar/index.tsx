@@ -143,6 +143,7 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
       />
       <Box position="absolute" height="calc(100% - 56px)">
         <Drawer
+          data-testid="sidebar-drawer"
           variant="permanent"
           open={open}
           onMouseEnter={() => {

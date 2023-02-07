@@ -1,49 +1,71 @@
 import { expect, test } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from 'store';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
-import SideBar from '../SideBar';
-import Menu from '../SideBar/Menu';
+import ChildrenMenu from '../SideBar/ChildMenu';
 
-const sideBar = render(
-  <Provider store={store}>
-    <BrowserRouter>
-      <SideBar open setOpen={() => console.log('setOpen')} userDetails={null} />
-    </BrowserRouter>
-  </Provider>,
-);
+const menuList = [
+  {
+    id: 48,
+    title: 'KUR',
+    path: '',
+    icon: <LocalAtmIcon />,
+    child: [
+      {
+        id: 52,
+        title: 'Request',
+        path: '/kur/request',
+        child: [],
+      },
+    ],
+  },
+];
 
 test('sidebar is shown', async () => {
-  const sideBarContainer = await sideBar.findByTestId('sidebar');
-  expect(sideBarContainer).toBeInTheDocument();
+  const sideBarContainer = screen.findByTestId('sidebar');
+  waitFor(() => expect(sideBarContainer).toBeInTheDocument());
 });
 
 test('sidebar menu is shown', async () => {
-  const menuList = [
+  const parentMenu = screen.findByTestId('side-bar-parentmenu');
+  waitFor(() => expect(parentMenu).toContainEqual(menuList[0].title));
+});
+
+test('sidebar child menu is shown', async () => {
+  const childMenu = screen.findByTestId('side-bar-childmenu');
+  waitFor(() => expect(childMenu).toContainEqual(menuList[0].child[0].title));
+});
+
+test('child menu background is different when this menu is active', async () => {
+  const child = [
     {
-      id: 48,
-      title: 'KUR',
+      id: 1,
+      title: 'Test Child Menu',
       path: '',
-      icon: <LocalAtmIcon />,
-      child: [
-        {
-          id: 52,
-          title: 'Request',
-          path: '/kur/request',
-          child: [],
-        },
-      ],
+      child: [],
     },
   ];
-  const sidebarMenuList = render(
+  const childMenu = render(
     <Provider store={store}>
       <BrowserRouter>
-        <Menu listOfMenu={menuList} open />
+        <ChildrenMenu
+          child={child}
+          open
+          onSetCurrentMenu={(id) => {
+            console.log(id);
+          }}
+          currentActiveMenu={child[0].id}
+        />
       </BrowserRouter>
     </Provider>,
   );
-  const sidebar = screen.findByTestId('side-bar-parentmenu');
-  waitFor(() => expect(sidebar).toContainEqual(menuList[0].title));
+  const childMenuButton = await childMenu.findByTestId(
+    'sidebar-childmenu-button',
+  );
+  waitFor(() =>
+    expect(childMenuButton).toHaveStyle('backgroundColor: #ebeff3'),
+  );
+  childMenu.unmount();
 });

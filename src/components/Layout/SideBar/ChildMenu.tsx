@@ -46,6 +46,7 @@ export default function ChildrenMenu({
             onClick={() => onSetCurrentMenu(item.id)}
           >
             <ListItemButton
+              data-testid="sidebar-childmenu-button"
               sx={{
                 margin: '6px 20px',
                 padding: '10px',
@@ -56,6 +57,7 @@ export default function ChildrenMenu({
             >
               <ListItemIcon sx={{ minWidth: '46px', fontSize: '20px' }} />
               <ListItemText
+                data-testid="side-bar-childmenu"
                 primary={item.title}
                 primaryTypographyProps={{
                   variant: 'body2',
