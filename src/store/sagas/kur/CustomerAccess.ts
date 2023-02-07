@@ -161,6 +161,12 @@ function* createCustomer(payload: PayloadAction<CreateCustomer>) {
 
 function* editCustomer(payload: PayloadAction<CreateCustomer>) {
   try {
+    // let imageNik: string | string[] = payload.payload.imageNik.toString();
+    // imageNik = imageNik.split('.com/');
+    // const payloadImageNik = imageNik[1].split('?');
+    // console.log('🚀 ~ file: ~ payload', payload.payload.imageKk);
+    // console.log('🚀 ~ file: ~ imageNik', imageNik);
+    // console.log('🚀 ~ file: ~ payloadImageNik', payloadImageNik);
     const paramsState: CustomerParams = yield select((state) => {
       return state.customerKur.params;
     });
@@ -196,8 +202,8 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       };
     } else {
       let imageNik: string | string[] = payload.payload.imageNik.toString();
-      imageNik = imageNik.split('//');
-      const payloadImageNik = imageNik[2].split('?');
+      imageNik = imageNik.split('.com/');
+      const payloadImageNik = imageNik[1].split('?');
       payloadKtp = {
         ...payloadKtp,
         document_filepath: `/${payloadImageNik[0]}`,
@@ -235,8 +241,8 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       };
     } else {
       let imageKk: string | string[] = payload.payload.imageKk.toString();
-      imageKk = imageKk.split('//');
-      const payloadImageKk = imageKk[2].split('?');
+      imageKk = imageKk.split('.com/');
+      const payloadImageKk = imageKk[1].split('?');
       payloadKK = {
         ...payloadKK,
         document_filepath: `/${payloadImageKk[0]}`,
@@ -274,8 +280,8 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       };
     } else {
       let imageNpwp: string | string[] = payload.payload.imageNpwp.toString();
-      imageNpwp = imageNpwp.split('//');
-      const payloadImageNpwp = imageNpwp[2].split('?');
+      imageNpwp = imageNpwp.split('.com/');
+      const payloadImageNpwp = imageNpwp[1].split('?');
       payloadNpwp = {
         ...payloadNpwp,
         document_filepath: `/${payloadImageNpwp[0]}`,
@@ -301,8 +307,8 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       };
     } else {
       let imageSku: string | string[] = payload.payload.imageSKUsaha.toString();
-      imageSku = imageSku.split('//');
-      const payloadImageSku = imageSku[2].split('?');
+      imageSku = imageSku.split('.com/');
+      const payloadImageSku = imageSku[1].split('?');
       payloadSKU = {
         ...payloadSKU,
         document_filepath: `/${payloadImageSku[0]}`,

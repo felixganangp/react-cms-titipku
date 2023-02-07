@@ -253,8 +253,11 @@ function Form({ onClose, formData }: Props) {
             disabled={
               !(
                 values.name &&
-                (values.adminFee || +values.adminFee === 0) &&
-                (values.dpdRate || +values.dpdRate === 0) &&
+                Boolean(
+                  values.adminFee || values.adminFee.toString() === '0',
+                ) &&
+                Boolean(values.dpdRate || values.dpdRate.toString() === '0') &&
+                // (values.dpdRate || +values.dpdRate === 0) &&
                 values.birthDate &&
                 values.phoneNumber &&
                 values.phoneNumber.length > 9 &&
