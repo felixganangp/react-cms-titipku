@@ -143,7 +143,11 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
         height="calc(100% - 56px)"
         boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
       />
-      <Box position="absolute" height="calc(100% - 56px)">
+      <Box
+        position="absolute"
+        height="calc(100% - 56px)"
+        boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
+      >
         <Drawer
           variant="permanent"
           open={open}
