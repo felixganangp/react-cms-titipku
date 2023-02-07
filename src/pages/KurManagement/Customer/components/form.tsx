@@ -231,7 +231,7 @@ function Form({ onClose, formData }: Props) {
   };
 
   return (
-    <Box ref={divRef} data-testid="form-Customer">
+    <Box ref={divRef} data-testid="form-customer">
       <Box sx={{ mx: 1 }}>
         <Tabs
           value={valueTab}
