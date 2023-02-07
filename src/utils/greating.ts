@@ -1,5 +1,6 @@
 export const greating = (timeDate: Date) => {
-  const time = timeDate.getHours();
+  // const time = timeDate.getHours();
+  const time = 16;
   let day;
   let greeting;
 
@@ -11,7 +12,7 @@ export const greating = (timeDate: Date) => {
     greeting = 'Good Day';
   } else if (time <= 19 && time >= 16) {
     day = 'afternoon';
-    greeting = 'Selamat Sore';
+    greeting = 'Good Afternoon';
   } else {
     day = 'night';
     greeting = 'Good Evening';
