@@ -1,22 +1,50 @@
 /* eslint-disable @typescript-eslint/lines-between-class-members */
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { act } from 'react-dom/test-utils';
 import MockTheme from 'utils/MockTheme';
 import { store } from 'store';
 import { customerAction } from 'store/slice/kur/Customer';
 import CustomerView from '../index';
 import { MockLisCustomers } from './MockCustomer';
+import FormCustomer from '../components/form';
 
-// let documentBody: RenderResult;
-// function MockTheme({ children }: any) {
-//   return (
-//     <ThemeProvider theme={theme}>
-//       <CssBaseline />
-//       {children}
-//     </ThemeProvider>
-//   );
-// }
+const formData = {
+  isEdit: false,
+  initialData: {
+    idCustomer: '',
+    name: '',
+    kurType: null,
+    adminFee: '',
+    dpdRate: '',
+    birthDate: null,
+    phoneNumber: '',
+    email: '',
+    addressKtp: '',
+    addressDomisili: '',
+    pasarName: null,
+    merchantName: null,
+    nikKtp: '',
+    imageNik: '',
+    kkNumber: '',
+    imageKk: '',
+    npwp: '',
+    imageNpwp: '',
+    imageSKUsaha: '',
+    creditLimit: '',
+    bankName: null,
+    bankNumberPrimary: '',
+    nobuAccountNumber: '',
+    oldNikKtp: '',
+    oldKkNumber: '',
+    oldNpwp: '',
+    idImageNik: null,
+    idImageKk: null,
+    idImageNpwp: null,
+    idImageSKUsaha: null,
+  },
+};
 
 const showFilter = () => {
   const buttonElement = screen.getByRole('button', { name: 'Filter' });
@@ -85,7 +113,9 @@ describe('Customer KUR Page', async () => {
   });
   //* TABLE */
   it('Content of table list customer kur', async () => {
-    mockCustomer(MockLisCustomers);
+    await act(() => {
+      mockCustomer(MockLisCustomers);
+    });
     const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
     expect(listTableCustomer.length).toBe(2);
   });
@@ -119,5 +149,50 @@ describe('Customer KUR Page', async () => {
     addForm();
     const addModalHeader = screen.getByTestId('form-customer');
     expect(addModalHeader).toBeInTheDocument();
+  });
+});
+
+describe('Form Customer Component', async () => {
+  beforeEach(() => {
+    // vi.clearAllMocks();
+    render(
+      <React.Suspense fallback>
+        <MockTheme>
+          <FormCustomer onClose={() => {}} formData={formData} />
+        </MockTheme>
+      </React.Suspense>,
+    );
+  });
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+  it('Form customer open', () => {
+    const infoText = screen.getByText(/All forms must be filled/i);
+    const firstTabButton = screen.getByText(/Basic Info/i);
+    const secondTabButton = screen.getByText(/KUR Document/i);
+    const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+
+    expect(infoText).toBeInTheDocument();
+    expect(firstTabButton).toBeInTheDocument();
+    expect(firstTabButton).toHaveClass('Mui-selected');
+    expect(secondTabButton).toBeInTheDocument();
+    expect(secondTabButton).toHaveClass('Mui-disabled');
+    expect(nextbuttonElement).toBeInTheDocument();
+    expect(nextbuttonElement).toHaveClass('Mui-disabled');
+  });
+  it('Form initial state first tab (name, kur, admin fee, dpd rate, birth date, phone number, email, address(ktp and domicile), credit limit, list bank, bank account number(primary and nobu))', () => {
+    const inputElementName =
+      screen.getByPlaceholderText(/Input customer name/i);
+    const inputElementKurType = screen.getByPlaceholderText(/Select KUR Type/i);
+    const inputElementAdminFee =
+      screen.getByPlaceholderText(/Input admin fee/i);
+    const inputElementDpdRate = screen.getByPlaceholderText(/Input DPD rate/i);
+    // const inputElementBirthDate = screen.getByTestId('form-customer-birthdate');
+
+    expect(inputElementName).toHaveDisplayValue('');
+    expect(inputElementKurType).toHaveDisplayValue('');
+    expect(inputElementAdminFee).toHaveDisplayValue('');
+    expect(inputElementDpdRate).toHaveDisplayValue('');
+    // expect(inputElementBirthDate).toBeNull();
   });
 });
