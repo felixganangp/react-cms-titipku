@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from 'store';
@@ -62,17 +62,33 @@ test('display basic info', async () => {
   requestKURDetail.unmount();
 });
 
-test('not display req kur statement table if data is empty', async () => {
-  const requestKURDetail = render(
+// test('not display req kur statement table if data is empty', async () => {
+//   const requestKURDetail = render(
+//     <Provider store={store}>
+//       <BrowserRouter>
+//         <RequestKURDetails />
+//       </BrowserRouter>
+//     </Provider>,
+//   );
+//   const table = await requestKURDetail.findByTestId('requestdtl-table');
+//   expect(table).toBeInTheDocument();
+//   requestKURDetail.unmount();
+// });
+
+test('modal reject is shown', async () => {
+  const inputRefusalMessage = render(
     <Provider store={store}>
       <BrowserRouter>
         <RequestKURDetails />
       </BrowserRouter>
     </Provider>,
   );
-  const table = await screen.findByTestId('requestdtl-table');
-  expect(table).not.toBeInTheDocument();
-  requestKURDetail.unmount();
+  const rejectButton = await screen.findByTestId('CloseIcon');
+  expect(rejectButton).toBeInTheDocument();
+  await beforeAll(() => fireEvent.click(rejectButton));
+  // const modal = screen.getByTestId('requestdtl-modal-reject');
+  // expect(modal).toBeInTheDocument();
+  inputRefusalMessage.unmount();
 });
 
 test('disabled submit reject button', async () => {

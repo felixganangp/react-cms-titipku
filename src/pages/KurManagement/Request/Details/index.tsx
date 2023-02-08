@@ -439,6 +439,7 @@ export default function RequestKURDetails() {
         </Content>
       </Box>
       <Modal
+        data-testid="requestdtl-modal-reject"
         open={formModal.open}
         title="Refusal Reason"
         onClose={formModal.closeModal}
