@@ -178,10 +178,12 @@ function EnhancedTable<T extends Data>({
           stickyHeader
           aria-labelledby="tableTitle"
           size="medium"
-          sx={{
-            // wordBreak: 'break-all',
-            // tableLayout: 'fixed',
-          }}
+          sx={
+            {
+              // wordBreak: 'break-all',
+              // tableLayout: 'fixed',
+            }
+          }
         >
           <EnhancedTableHead
             numSelected={enableCheckBox ? selected.length : 0}
@@ -212,6 +214,7 @@ function EnhancedTable<T extends Data>({
                     tabIndex={-1}
                     key={String(index)}
                     selected={isItemSelected}
+                    data-testid={`list-table-${index}`}
                   >
                     {!props.loading && enableCheckBox && (
                       <TableCell
