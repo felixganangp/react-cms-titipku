@@ -6,7 +6,7 @@ import typeKurSagas from 'store/sagas/kur/TypeAccess';
 import userDetailsSaga from './sagas/UserDetails';
 import areaSagas from './sagas/AreaAccess';
 import requestKurSagas from './sagas/kur/Request';
-import paymentKurSagas from './sagas/kur/Payment'
+import paymentKurSagas from './sagas/kur/Payment';
 import merchantSagas from './sagas/MerchantAccess';
 
 export default function* rootSaga() {

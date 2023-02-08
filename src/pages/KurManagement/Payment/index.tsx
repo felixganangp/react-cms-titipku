@@ -26,19 +26,15 @@ import { HeadCells } from 'components/Table/types';
 import moment from 'moment';
 import { areaAction } from 'store/slice/Area';
 import { typeAction } from 'store/slice/kur/Type';
-// import { requestKURAction } from 'store/slice/kur/Request';
 import { paymentKURAction } from 'store/slice/kur/Payment';
 import { Area } from 'models/Area';
 import { Type } from 'models/kur/Type';
-// import { RequestKUR } from 'models/kur/Request';
 import { PaymentKUR } from 'models/kur/Payment';
 import digitFormatter from 'utils/digitFormatter';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import bankData from 'data/list-bank.json';
-// import Modal from 'components/Modal';
-// import RefusalReason from './components/InputMessage';
 import {
   FilterButton,
   FilterDataBox,
@@ -47,7 +43,7 @@ import {
   LabelText,
 } from './payment.styled';
 
-export default function paymentKURPage() {
+export default function PaymentKURPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const request = useAppSelector((state) => state.payment);
@@ -132,7 +128,7 @@ export default function paymentKURPage() {
     dispatch(
       paymentKURAction.setParams({
         page: 1,
-        kur_user_type_id: value ? value?.id : null,
+        bank: value ? value.name : null,
       }),
     );
     dispatch(
@@ -325,7 +321,7 @@ export default function paymentKURPage() {
                     {
                       label: 'Details',
                       onClick: () => {
-                        navigate(`/kur/request/${val.id}`);
+                        navigate(`/kur/payment/${val.id}`);
                       },
                     },
                     // {
@@ -346,7 +342,7 @@ export default function paymentKURPage() {
                     {
                       label: 'Details',
                       onClick: () => {
-                        navigate(`/kur/request/${val.id}`);
+                        navigate(`/kur/payment/${val.id}`);
                       },
                     },
                   ]

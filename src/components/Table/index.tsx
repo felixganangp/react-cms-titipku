@@ -369,19 +369,21 @@ function EnhancedTable<T extends Data>({
           </TableBody>
         </Table>
       </TableContainer>
-      <Box marginY={3}>
-        <PaginationStyle
-          count={totalPage()}
-          shape="rounded"
-          color="primary"
-          page={props.page}
-          onChange={(_, e) => {
-            if (props.onChangePage) {
-              props.onChangePage(e);
-            }
-          }}
-        />
-      </Box>
+      {!props.disablePagination && (
+        <Box marginY={3}>
+          <PaginationStyle
+            count={totalPage()}
+            shape="rounded"
+            color="primary"
+            page={props.page}
+            onChange={(_, e) => {
+              if (props.onChangePage) {
+                props.onChangePage(e);
+              }
+            }}
+          />
+        </Box>
+      )}
     </Box>
   );
 }
