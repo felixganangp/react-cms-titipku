@@ -85,6 +85,11 @@ function Form({ onClose, formData }: Props) {
     touched: false,
   });
   useEffect(() => {
+    dispatch(
+      merchantAction.setParams({ area_id: formData.initialData.pasarName?.id }),
+    );
+  }, []);
+  useEffect(() => {
     dispatch(merchantAction.fetchData(merchantKur.params));
   }, [merchantKur.params]);
   const [disabledAddressDom, setDisabledAddressDom] = useState(false);

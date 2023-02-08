@@ -83,11 +83,17 @@ describe('Customer KUR Page', async () => {
     const tableCustomer = screen.getByTestId('table-customer');
     expect(tableCustomer).toBeInTheDocument();
   });
+  //* TABLE */
   it('Content of table list customer kur', async () => {
     mockCustomer(MockLisCustomers);
     const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
     expect(listTableCustomer.length).toBe(2);
   });
+  // it('Content of table list customer kur', async () => {
+  //   mockCustomer(MockLisCustomers);
+  //   const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
+  //   expect(listTableCustomer.length).toBe(2);
+  // });
   it('Add button, search, filter not be clicked', () => {
     const filterCollapse = screen.getByTestId('filter-collapse-customer');
     const addCusstomer = screen.getByTestId('button-add-customer');
@@ -97,7 +103,7 @@ describe('Customer KUR Page', async () => {
     expect(filterCollapse).toHaveClass('MuiCollapse-hidden');
   });
   //* FILTER */
-  it('Filter button clicked', () => {
+  it('Open filter button clicked', () => {
     showFilter();
     const filterCollapse = screen.getByTestId('filter-collapse-customer');
     const filterTypeInput = screen.getByTestId('filter-type-customer');
