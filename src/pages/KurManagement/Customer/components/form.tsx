@@ -354,6 +354,7 @@ function Form({ onClose, formData }: Props) {
                 }
               >
                 <Autocomplete
+                  data-testid="form-customer-kur-type"
                   id="kur-type"
                   options={typeKur.data}
                   onChange={(e, value) => {
@@ -454,6 +455,7 @@ function Form({ onClose, formData }: Props) {
                     }}
                     renderInput={(params) => (
                       <TextField
+                        data-testid="form-customer-birthdate"
                         sx={{ width: '100%' }}
                         {...params}
                         onClick={() =>
