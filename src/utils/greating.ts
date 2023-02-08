@@ -11,7 +11,7 @@ export const greating = (timeDate: Date) => {
     greeting = 'Good Day';
   } else if (time <= 19 && time >= 16) {
     day = 'afternoon';
-    greeting = 'Selamat Sore';
+    greeting = 'Good Afternoon';
   } else {
     day = 'night';
     greeting = 'Good Evening';

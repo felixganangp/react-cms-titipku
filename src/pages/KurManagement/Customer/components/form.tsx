@@ -28,9 +28,11 @@ import { customerAction } from 'store/slice/kur/Customer';
 import FormLabel from 'components/FormLabel';
 import InputImage from 'components/InputImage';
 import { CreateCustomer } from 'models/kur/Customer';
+import { Response } from 'models/fetch';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
 import { MerchantResp } from 'models/Merchant';
+import { checkMerchantExist } from 'service/Kur/Customer';
 import bankData from 'data/list-bank.json';
 
 function a11yProps(index: number) {
@@ -68,32 +70,7 @@ interface Props {
     initialData: CreateCustomer;
   };
 }
-const initial: CreateCustomer = {
-  // imageCustomer: '',
-  idCustomer: '',
-  name: '',
-  kurType: null,
-  adminFee: '',
-  dpdRate: '',
-  birthDate: null,
-  phoneNumber: '',
-  email: '',
-  addressKtp: '',
-  addressDomisili: '',
-  pasarName: null,
-  merchantName: null,
-  nikKtp: '',
-  imageNik: '',
-  kkNumber: '',
-  imageKk: '',
-  npwp: '',
-  imageNpwp: '',
-  imageSKUsaha: '',
-  creditLimit: '',
-  bankName: null,
-  bankNumberPrimary: '',
-  nobuAccountNumber: '',
-};
+
 function Form({ onClose, formData }: Props) {
   const dispatch = useAppDispatch();
   const [loadingForm, setLoadingForm] = useState(false);
@@ -108,6 +85,11 @@ function Form({ onClose, formData }: Props) {
     touched: false,
   });
   useEffect(() => {
+    dispatch(
+      merchantAction.setParams({ area_id: formData.initialData.pasarName?.id }),
+    );
+  }, []);
+  useEffect(() => {
     dispatch(merchantAction.fetchData(merchantKur.params));
   }, [merchantKur.params]);
   const [disabledAddressDom, setDisabledAddressDom] = useState(false);
@@ -121,6 +103,10 @@ function Form({ onClose, formData }: Props) {
     setOpenCalendar({ open: false, touched: false });
     onClose();
   };
+  const [merchantExistMsg, setMerchantExistMsg] = useState({
+    error: false,
+    msg: '',
+  });
   const formik = useFormik({
     initialValues,
     onSubmit: async (value, { resetForm }) => {
@@ -133,6 +119,7 @@ function Form({ onClose, formData }: Props) {
       await setLoadingForm(false);
       await resetForm();
       await setOpenCalendar({ open: false, touched: false });
+      await setMerchantExistMsg({ error: false, msg: '' });
       await handleCloseForm();
     },
     validationSchema: yup.object({
@@ -221,7 +208,6 @@ function Form({ onClose, formData }: Props) {
     isValid,
     dirty,
   } = formik;
-
   const handleSelectArea = (val: Area | null) => {
     dispatch(
       merchantAction.setParams({
@@ -231,8 +217,26 @@ function Form({ onClose, formData }: Props) {
     );
     dispatch(merchantAction.fetchData(merchantKur.params));
   };
+  const handleMerchantExist = async (payload: MerchantResp | null) => {
+    const response: Response<boolean> = await checkMerchantExist({
+      merchant_id: payload?.id,
+      exclude_id: +values.idCustomer!,
+    });
+    if (response.data) {
+      setMerchantExistMsg({
+        error: true,
+        msg: 'Lapak is already exist to other customer',
+      });
+    } else {
+      setMerchantExistMsg({
+        error: false,
+        msg: '',
+      });
+    }
+  };
+
   return (
-    <Box ref={divRef} data-testid="form-Customer">
+    <Box ref={divRef} data-testid="form-customer">
       <Box sx={{ mx: 1 }}>
         <Tabs
           value={valueTab}
@@ -254,11 +258,18 @@ function Form({ onClose, formData }: Props) {
             disabled={
               !(
                 values.name &&
-                (values.adminFee || +values.adminFee === 0) &&
-                (values.dpdRate || +values.dpdRate === 0) &&
+                Boolean(
+                  values.adminFee || values.adminFee.toString() === '0',
+                ) &&
+                Boolean(values.dpdRate || values.dpdRate.toString() === '0') &&
+                // (values.dpdRate || +values.dpdRate === 0) &&
                 values.birthDate &&
                 values.phoneNumber &&
+                values.phoneNumber.length > 9 &&
+                values.phoneNumber.length < 15 &&
                 values.email &&
+                // eslint-disable-next-line no-useless-escape
+                values.email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g) &&
                 values.addressKtp &&
                 values.addressDomisili &&
                 values.creditLimit &&
@@ -269,7 +280,13 @@ function Form({ onClose, formData }: Props) {
                 values.nobuAccountNumber
               ) ||
               +values.adminFee < 0 ||
-              +values.dpdRate < 0
+              +values.adminFee > 100 ||
+              +values.dpdRate < 0 ||
+              +values.dpdRate > 100 ||
+              isNaN(+values.phoneNumber) ||
+              isNaN(+values.nobuAccountNumber) ||
+              isNaN(+values.bankNumberPrimary) ||
+              +values.creditLimit > 500000000
             }
             sx={{ borderBottom: 1, borderColor: 'divider', color: '#8B95A5' }}
             label="2. KUR Document"
@@ -699,8 +716,13 @@ function Form({ onClose, formData }: Props) {
               disabled={
                 !(
                   values.name &&
-                  (values.adminFee || +values.adminFee === 0) &&
-                  (values.dpdRate || +values.dpdRate === 0) &&
+                  Boolean(
+                    values.adminFee || values.adminFee.toString() === '0',
+                  ) &&
+                  Boolean(
+                    values.dpdRate || values.dpdRate.toString() === '0',
+                  ) &&
+                  // (values.dpdRate || +values.dpdRate === 0) &&
                   values.birthDate &&
                   values.phoneNumber &&
                   values.phoneNumber.length > 9 &&
@@ -718,7 +740,9 @@ function Form({ onClose, formData }: Props) {
                   values.nobuAccountNumber
                 ) ||
                 +values.adminFee < 0 ||
+                +values.adminFee > 100 ||
                 +values.dpdRate < 0 ||
+                +values.dpdRate > 100 ||
                 isNaN(+values.phoneNumber) ||
                 isNaN(+values.nobuAccountNumber) ||
                 isNaN(+values.bankNumberPrimary) ||
@@ -778,17 +802,22 @@ function Form({ onClose, formData }: Props) {
               <Grid item xs={5}>
                 <FormLabel
                   text="Lapak Name"
-                  error={touched.merchantName && Boolean(errors.merchantName)}
+                  error={
+                    (touched.merchantName && Boolean(errors.merchantName)) ||
+                    merchantExistMsg.error
+                  }
                   helperText={
-                    touched.merchantName &&
-                    errors.merchantName &&
-                    `${errors.merchantName}`
+                    (touched.merchantName &&
+                      errors.merchantName &&
+                      `${errors.merchantName}`) ||
+                    (merchantExistMsg.error && merchantExistMsg.msg)
                   }
                 >
                   <Autocomplete
                     id="merchant-name"
                     options={merchantKur.data}
                     onChange={(e, value) => {
+                      handleMerchantExist(value);
                       setFieldValue('merchantName', value);
                     }}
                     isOptionEqualToValue={(option: MerchantResp) => {
@@ -961,7 +990,8 @@ function Form({ onClose, formData }: Props) {
                   values.imageNpwp &&
                   values.imageSKUsaha
                 ) ||
-                loadingForm
+                loadingForm ||
+                merchantExistMsg.error
               }
               // onClick={(e) => handleChangeTab(e, 1)}
               type="submit"

@@ -49,7 +49,7 @@ export interface Customer {
   user_id: number;
   user_type: string;
   user: Merchant;
-  kur_user_number: string;
+  kur_user_number?: string;
   name: string;
   nik: string;
   birth_date: number;
@@ -146,4 +146,9 @@ export interface KurUserDocumentPayload {
   document_type: 'ktp' | 'kk' | 'npwp' | 'sku'; // available options : ktp, kk, npwp, sku
   document_filepath?: string;
   document_number?: string;
+}
+
+export interface CheckMerchantExistParams {
+  merchant_id: number | undefined;
+  exclude_id?: number | undefined;
 }

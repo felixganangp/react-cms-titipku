@@ -21,6 +21,7 @@ import MenuList from 'components/MenuList';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { Link, useNavigate } from 'react-router-dom';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import CalendarIcon from '@mui/icons-material/CalendarTodayOutlined';
 import { RequestKUR } from 'models/kur/Request';
 import debounce from 'utils/debounce';
 import { HeadCells } from 'components/Table/types';
@@ -441,85 +442,114 @@ export default function RequestKURPage() {
                       )}
                     />
                   </FormLabel>
-                </Box>
-                <Box
-                  display={openFilter ? 'flex' : 'none'}
-                  flexDirection="row"
-                  width="100%"
-                  justifyContent="space-between"
-                  gap="28px"
-                >
-                  <FormLabel
-                    text="Start Submit Date"
-                    error={startDate === null && endDate !== null}
-                    helperText={
-                      startDate === null &&
-                      endDate !== null &&
-                      'Start Date is required when End Date is filled'
-                    }
+                  <Box
+                    display="flex"
+                    flexDirection="row"
+                    justifyContent="space-between"
+                    alignItems="flex-start"
+                    width="100%"
+                    gap="14px"
                   >
-                    <LocalizationProvider dateAdapter={AdapterMoment}>
-                      <DesktopDatePicker
-                        open={openStartDate}
-                        onClose={() => {
-                          setOpenStartDate(false);
+                    <FormLabel
+                      text="Range Date"
+                      error={startDate === null && endDate !== null}
+                      helperText={
+                        startDate === null &&
+                        endDate !== null &&
+                        'Start Date is required when End Date is filled'
+                      }
+                    >
+                      <LocalizationProvider dateAdapter={AdapterMoment}>
+                        <DesktopDatePicker
+                          components={{
+                            OpenPickerIcon: CalendarIcon,
+                          }}
+                          open={openStartDate}
+                          onClose={() => {
+                            setOpenStartDate(false);
+                          }}
+                          onOpen={() => {
+                            setOpenStartDate(true);
+                          }}
+                          value={startDate}
+                          inputFormat="DD/MM/YYYY"
+                          onChange={(value) => {
+                            setStartDate(value);
+                            handleChangeStartDate(value);
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              sx={{ width: '100%' }}
+                              {...params}
+                              onClick={() => setOpenStartDate(true)}
+                              inputProps={{
+                                ...params.inputProps,
+                                placeholder: 'Start Date',
+                              }}
+                            />
+                          )}
+                          maxDate={endDate}
+                        />
+                      </LocalizationProvider>
+                    </FormLabel>
+                    <Box
+                      display="flex"
+                      flexDirection="row"
+                      justifyContent="flex-start"
+                      alignItems="center"
+                      marginTop="50px"
+                    >
+                      <div
+                        style={{
+                          width: '22px',
+                          height: '1px',
+                          backgroundColor: '#303030',
                         }}
-                        onOpen={() => {
-                          setOpenStartDate(true);
-                        }}
-                        value={startDate}
-                        inputFormat="DD/MM/YYYY"
-                        onChange={(value) => {
-                          setStartDate(value);
-                          handleChangeStartDate(value);
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            sx={{ width: '100%' }}
-                            {...params}
-                            onClick={() => setOpenStartDate(true)}
-                          />
-                        )}
-                        maxDate={endDate}
                       />
-                    </LocalizationProvider>
-                  </FormLabel>
-
-                  <FormLabel
-                    text="End Submit Date"
-                    error={startDate !== null && endDate === null}
-                    helperText={
-                      startDate !== null &&
-                      endDate === null &&
-                      'End Date is required when Start Date is filled'
-                    }
-                  >
-                    <LocalizationProvider dateAdapter={AdapterMoment}>
-                      <DesktopDatePicker
-                        open={openEndDate}
-                        onClose={() => {
-                          setOpenEndDate(false);
-                        }}
-                        onOpen={() => {
-                          setOpenEndDate(true);
-                        }}
-                        value={endDate}
-                        inputFormat="DD/MM/YYYY"
-                        onChange={(value) => {
-                          setEndDate(value);
-                          handleChangeEndDate(value);
-                        }}
-                        renderInput={(params) => (
-                          <TextField
-                            sx={{ width: '100%' }}
-                            {...params}
-                            onClick={() => setOpenEndDate(true)}
-                          />
-                        )}
-                        minDate={startDate}
-                      />
-                    </LocalizationProvider>
-                  </FormLabel>
+                    </Box>
+                    <FormLabel
+                      text="&nbsp;"
+                      error={startDate !== null && endDate === null}
+                      helperText={
+                        startDate !== null &&
+                        endDate === null &&
+                        'End Date is required when Start Date is filled'
+                      }
+                    >
+                      <LocalizationProvider dateAdapter={AdapterMoment}>
+                        <DesktopDatePicker
+                          open={openEndDate}
+                          components={{
+                            OpenPickerIcon: CalendarIcon,
+                          }}
+                          onClose={() => {
+                            setOpenEndDate(false);
+                          }}
+                          onOpen={() => {
+                            setOpenEndDate(true);
+                          }}
+                          value={endDate}
+                          inputFormat="DD/MM/YYYY"
+                          onChange={(value) => {
+                            setEndDate(value);
+                            handleChangeEndDate(value);
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              sx={{ width: '100%' }}
+                              {...params}
+                              onClick={() => setOpenEndDate(true)}
+                              inputProps={{
+                                ...params.inputProps,
+                                placeholder: 'End Date',
+                              }}
+                            />
+                          )}
+                          minDate={startDate}
+                        />
+                      </LocalizationProvider>
+                    </FormLabel>
+                  </Box>
                 </Box>
                 <Box
                   display={openFilter ? 'flex' : 'none'}

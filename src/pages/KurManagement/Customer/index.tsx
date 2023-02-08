@@ -307,10 +307,6 @@ export default function KurCustomer() {
         page: value,
       }),
     );
-    console.log(
-      '🚀 ~ file: index.tsx:292 ~ handleChangePage ~ customerKur.params',
-      customerKur.params,
-    );
   };
 
   const handleChangeType = (value: Type | null) => {
@@ -371,11 +367,6 @@ export default function KurCustomer() {
   };
 
   const handleApplyFilter = () => {
-    console.log(
-      '🚀 ~ file: index.tsx:363 ~ handleApplyFilter ~ customerKur.stateFilter',
-      customerKur.stateFilter?.areaKur,
-    );
-
     const payloadParams = {
       ...customerKur.params,
       page: 1,
@@ -385,7 +376,7 @@ export default function KurCustomer() {
       customerKur.stateFilter?.areaKur &&
       customerKur.stateFilter?.areaKur.length > 0
     ) {
-      const ids = customerKur.stateFilter?.areaKur.map((el) => el.id);
+      const ids = customerKur.stateFilter?.areaKur.map((el: Area) => el.id);
       const areas = ids.toString();
       payloadParams.area_ids = areas;
     } else {
@@ -540,7 +531,7 @@ export default function KurCustomer() {
                     Pasar
                   </Typography>
                   <Autocomplete
-                    data-testid="filter-pasar"
+                    data-testid="filter-pasar-customer"
                     multiple
                     id="pasar-kur"
                     options={areaKur.data}
@@ -550,7 +541,7 @@ export default function KurCustomer() {
                     isOptionEqualToValue={(option: Area) => {
                       const filtered =
                         customerKur?.stateFilter?.areaKur?.filter(
-                          (el) => el.id === option.id,
+                          (el: Area) => el.id === option.id,
                         );
                       if (filtered) {
                         return option.id === filtered[0]?.id;

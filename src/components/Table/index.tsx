@@ -214,6 +214,7 @@ function EnhancedTable<T extends Data>({
                     tabIndex={-1}
                     key={String(index)}
                     selected={isItemSelected}
+                    data-testid={`list-table-${index}`}
                   >
                     {!props.loading && enableCheckBox && (
                       <TableCell
