@@ -1,6 +1,7 @@
 import { Customer } from 'models/kur/Customer';
 import { Area } from 'models/Area';
 import { Type } from 'models/kur/Type';
+import { string } from 'yup';
 import { ListParams } from '../fetch';
 
 export interface PaymentKURParams extends ListParams {
@@ -61,10 +62,18 @@ export interface KURPaymentDetail {
   updated_by_id: number;
   updated_by_type: string;
   updated_by: null | ModifierUser;
-  kur_request_id: number;
+  kur_payment_number: string;
+  kur_user_id: number;
+  kur_user: Customer[];
+  status: string;
   amount: number;
-  description: string;
-  image_filepath: string;
+  paid_to_account_number: string;
+  paid_to_bank: string;
+  proof_of_payment: string;
+  decision_date: number;
+  decision_by_admin_id: number;
+  decision_by_admin: null | ModifierUser;
+  remarks: string;
 }
 
 export interface ActionParams {

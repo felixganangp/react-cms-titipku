@@ -8,18 +8,17 @@ import {
   fireEvent,
 } from '@testing-library/react';
 import MockTheme from 'utils/MockTheme';
-import RoleAccesPage from '..';
+import PaymentPage from '..';
 
-describe('Role Access Page', async () => {
+describe('KUR Payment Page', async () => {
   beforeEach(() => {
     vi.clearAllMocks();
     render(
       <Suspense fallback>
         <MockTheme>
-          <RoleAccesPage />
+          <PaymentPage />
         </MockTheme>
       </Suspense>,
     );
   });
-  it('DESCRIBE', () => {});
 });

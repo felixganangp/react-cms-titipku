@@ -467,6 +467,9 @@ export default function RequestKURPage() {
                       <LocalizationProvider dateAdapter={AdapterMoment}>
                         <DesktopDatePicker
                           data-testid="request-kur-start-date"
+                          components={{
+                            OpenPickerIcon: CalendarIcon,
+                          }}
                           open={openStartDate}
                           onClose={() => {
                             setOpenStartDate(false);
@@ -485,6 +488,10 @@ export default function RequestKURPage() {
                               sx={{ width: '100%' }}
                               {...params}
                               onClick={() => setOpenStartDate(true)}
+                              inputProps={{
+                                ...params.inputProps,
+                                placeholder: 'Start Date',
+                              }}
                             />
                           )}
                           maxDate={endDate}
@@ -519,6 +526,9 @@ export default function RequestKURPage() {
                         <DesktopDatePicker
                           data-testid="request-kur-end-date"
                           open={openEndDate}
+                          components={{
+                            OpenPickerIcon: CalendarIcon,
+                          }}
                           onClose={() => {
                             setOpenEndDate(false);
                           }}
@@ -536,6 +546,10 @@ export default function RequestKURPage() {
                               sx={{ width: '100%' }}
                               {...params}
                               onClick={() => setOpenEndDate(true)}
+                              inputProps={{
+                                ...params.inputProps,
+                                placeholder: 'End Date',
+                              }}
                             />
                           )}
                           minDate={startDate}

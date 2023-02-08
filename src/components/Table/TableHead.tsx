@@ -110,6 +110,12 @@ export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
           >
             {headCell.enableSort ? (
               <TableSortLabel
+                sx={{
+                  width: '100%',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? orderType : 'asc'}
                 IconComponent={SwapVertIcon}

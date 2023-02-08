@@ -9,6 +9,9 @@ const RoleAccess = lazy(() => import('pages/RoleAccess'));
 const RoleAccessDetails = lazy(() => import('pages/RoleAccess/Details'));
 const SkuManagement = lazy(() => import('pages/SkuManagement'));
 const KurPaymentManagement = lazy(() => import('pages/KurManagement/Payment'));
+const KurPaymentDetails = lazy(
+  () => import('pages/KurManagement/Payment/Details'),
+);
 const KurRequestManagement = lazy(() => import('pages/KurManagement/Request'));
 const KurRequestDetails = lazy(
   () => import('pages/KurManagement/Request/Details'),
@@ -98,6 +101,13 @@ const ListRoute: RouteProps[] = [
     id: 53,
     comp: KurPaymentManagement,
     path: '/kur/payment',
+    index: true,
+    auth: 'Private',
+  },
+  {
+    id: 53,
+    comp: KurPaymentDetails,
+    path: '/kur/payment/:id',
     index: true,
     auth: 'Private',
   },
