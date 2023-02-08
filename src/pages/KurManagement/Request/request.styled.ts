@@ -114,7 +114,6 @@ export const ContentGrid = styled(Box)`
 
 export const ColumnGrid = styled(Grid)`
   display: flex;
-  width 
 `;
 
 export const ProfileContainer = styled(Box)`
