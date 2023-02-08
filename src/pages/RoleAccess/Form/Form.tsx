@@ -278,7 +278,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
     >
       <form onSubmit={handleSubmit}>
         <TitleWrapper>
-          <Title>
+          <Title data-testid="role-access-form-title">
             {editValue ? 'Edit Role Access' : 'Add New Role Access'}
           </Title>
           <CloseIcon
@@ -340,6 +340,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
           <FormGroup>
             {listOfMenu.map((parentMenu: any) => (
               <AccordionOnDetails
+                data-testid={`role-access-form-acc-header-${parentMenu.menu}`}
                 title={parentMenu.menu}
                 key={parentMenu.id + parentMenu.menu}
                 parent

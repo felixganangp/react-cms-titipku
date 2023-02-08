@@ -1,10 +1,14 @@
 import { expect, test } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from 'store';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import ChildrenMenu from '../SideBar/ChildMenu';
+
+afterEach(() => {
+  cleanup();
+});
 
 const menuList = [
   {
