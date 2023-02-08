@@ -107,6 +107,7 @@ export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
             align={headCell.align as Align}
             padding={headCell.disablePadding ? 'none' : 'normal'}
             // sortDirection={orderBy === headCell.id ? orderType : false}
+            data-testid={`header-${headCell.id}`}
           >
             {headCell.enableSort ? (
               <TableSortLabel
