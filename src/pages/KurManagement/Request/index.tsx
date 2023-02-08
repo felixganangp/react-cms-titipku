@@ -466,6 +466,7 @@ export default function RequestKURPage() {
                     >
                       <LocalizationProvider dateAdapter={AdapterMoment}>
                         <DesktopDatePicker
+                          data-testid="request-kur-start-date"
                           open={openStartDate}
                           onClose={() => {
                             setOpenStartDate(false);
@@ -516,6 +517,7 @@ export default function RequestKURPage() {
                     >
                       <LocalizationProvider dateAdapter={AdapterMoment}>
                         <DesktopDatePicker
+                          data-testid="request-kur-end-date"
                           open={openEndDate}
                           onClose={() => {
                             setOpenEndDate(false);

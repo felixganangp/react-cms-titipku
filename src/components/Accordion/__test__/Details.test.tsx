@@ -73,3 +73,24 @@ test('button color is white if parent is false', async () => {
   expect(currentIndex).toHaveStyle('backgroundColor: #ffff');
   accordion2.unmount();
 });
+
+test('arrow is transparent if current item is not a parent or having a child', async () => {
+  const accordion3 = render(
+    <Provider store={store}>
+      <BrowserRouter>
+        <AccordionOnDetails
+          title="Title"
+          parent={false}
+          headerContent={<Box>Title</Box>}
+          havingChild={false}
+        >
+          <Box>This is children</Box>
+        </AccordionOnDetails>
+        ,
+      </BrowserRouter>
+    </Provider>,
+  );
+  const currentIndex = accordion3.getByTestId('accordion-arrow');
+  expect(currentIndex).toHaveStyle('color: transparent');
+  accordion3.unmount();
+});

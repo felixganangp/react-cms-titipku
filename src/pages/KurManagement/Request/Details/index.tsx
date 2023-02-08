@@ -152,7 +152,11 @@ export default function RequestKURDetails() {
               >
                 <Box display="flex" flexDirection="column">
                   <DetailsHeader>Request</DetailsHeader>
-                  <Link style={{ textDecoration: 'none' }} to="/kur/request">
+                  <Link
+                    data-testid="requestdtl-title-inv-numb"
+                    style={{ textDecoration: 'none' }}
+                    to="/kur/request"
+                  >
                     <BackButton
                       sx={{
                         '&:hover': { bgcolor: '#fff' },
@@ -221,7 +225,12 @@ export default function RequestKURDetails() {
           <span>Basic Info</span>
         </Header>
         <Content>
-          <Box display="flex" flexDirection="column" gap="40px">
+          <Box
+            data-testid="requestdtl-basic-info"
+            display="flex"
+            flexDirection="column"
+            gap="40px"
+          >
             <Box display="flex" flexDirection="row" justifyContent="flex-start">
               <Typography fontWeight={700} variant="h1">
                 {requestDetails?.kur_user?.name}
@@ -418,6 +427,7 @@ export default function RequestKURDetails() {
           <Typography>Total Amount</Typography>
           <Amount>{digitFormatter.format(totalAmount || 0)}</Amount>
           <Table
+            data-testid="requestdtl-table"
             data={details.detailsTableData || []}
             selected={[]}
             count={details.detailParams.count}

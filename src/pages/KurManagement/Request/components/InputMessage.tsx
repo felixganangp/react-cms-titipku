@@ -38,7 +38,11 @@ const RefusalReason = ({ onSubmitRefusal, id }: RefusalReasonProps) => {
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <Button onClick={() => onSubmitRefusal(id, desc)} disabled={!desc}>
+        <Button
+          data-testid="refusal-request-button"
+          onClick={() => onSubmitRefusal(id, desc)}
+          disabled={!desc}
+        >
           Submit
         </Button>
       </Box>
