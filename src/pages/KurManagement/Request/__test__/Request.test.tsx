@@ -1,53 +1,159 @@
 import { expect, test } from 'vitest';
-import { render, fireEvent, screen, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { persistStore } from 'redux-persist';
-import { PersistGate } from 'redux-persist/integration/react';
+import {
+  render,
+  fireEvent,
+  screen,
+  cleanup,
+  waitFor,
+} from '@testing-library/react';
 import { store } from 'store';
+import { requestKURAction } from 'store/slice/kur/Request';
+import { act } from 'react-dom/test-utils';
+import { Suspense } from 'react';
+import MockTheme from 'utils/MockTheme';
 import RequestKUR from '..';
+import { MockRequestList } from './MockRequest';
 
-const persistor = persistStore(store);
+const mockRequest = vi.fn((data) =>
+  store.dispatch(
+    requestKURAction.fetchDataSuccess({
+      timestamp: 1675755225,
+      status: 'ok',
+      message: 'Retrieved successfully',
+      page: 1,
+      count: 2,
+      total: 2,
+      data,
+    }),
+  ),
+);
 
-test('request kur table is shown', async () => {
-  const requestKUR = render(
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <BrowserRouter>
-          <RequestKUR />
-        </BrowserRouter>
-      </PersistGate>
-    </Provider>,
+const mockRequestFilter = vi.fn((filter) =>
+  store.dispatch(requestKURAction.setParams(filter)),
+);
+
+const unhideFilter = async () => {
+  const filterButton = await screen.findByTestId('request-kur-show-filter');
+  fireEvent.click(filterButton);
+};
+
+beforeEach(() => {
+  render(
+    <Suspense fallback>
+      <MockTheme>
+        <RequestKUR />
+      </MockTheme>
+    </Suspense>,
   );
-  const requestKurTable = await requestKUR.findByTestId('request-kur-table');
-  expect(requestKurTable).toBeInTheDocument();
-  requestKUR.unmount();
 });
+afterEach(cleanup);
 
 test('request kur title is shown', async () => {
-  const requestKUR = render(
-    <Provider store={store}>
-      <BrowserRouter>
-        <RequestKUR />
-      </BrowserRouter>
-    </Provider>,
-  );
-  const requestKURTitle = await requestKUR.findByTestId('request-kur-title');
+  const requestKURTitle = await screen.findByTestId('request-kur-title');
   expect(requestKURTitle).toBeInTheDocument();
-  requestKUR.unmount();
 });
 
-test('all filter is shown', async () => {
-  const requestKUR = render(
-    <Provider store={store}>
-      <BrowserRouter>
-        <RequestKUR />
-      </BrowserRouter>
-    </Provider>,
-  );
-  const filterButton = await requestKUR.findByTestId('request-kur-show-filter');
-  const filterBox = await requestKUR.findByTestId('request-kur-filter-box');
-  fireEvent.click(filterButton);
-  expect(filterBox).toBeInTheDocument();
-  requestKUR.unmount();
+describe('filter and search', () => {
+  test('search is shown with right placeholder', async () => {
+    const search = await screen.findByTestId('search-request-kur');
+    const searchByPlaceHolder = screen.getByPlaceholderText('Search item');
+    expect(search).toBeInTheDocument();
+    expect(searchByPlaceHolder).toBeInTheDocument();
+  });
+  test('all filter is shown after user click filter button', async () => {
+    unhideFilter();
+    const filterBox = await screen.findByTestId('request-kur-filter-box');
+    expect(filterBox).toBeInTheDocument();
+    expect(filterBox).toHaveStyle('display: flex');
+    expect(filterBox).not.toHaveStyle('display: none');
+  });
+  test('filter pasar is shown', () => {
+    unhideFilter();
+    waitFor(() =>
+      expect(
+        screen.findByTestId('request-kur-filterpasar'),
+      ).toBeInTheDocument(),
+    );
+  });
+  test('filter pasar placeholder is match with the design', () => {
+    unhideFilter();
+    waitFor(() =>
+      expect(screen.findByPlaceholderText('Select Pasar')).toBeInTheDocument(),
+    );
+  });
+  test('filter type is shown', () => {
+    unhideFilter();
+    waitFor(() =>
+      expect(screen.findByTestId('request-kur-filtertype')).toBeInTheDocument(),
+    );
+  });
+  test('filter type placeholder is match with the design', () => {
+    unhideFilter();
+    waitFor(() =>
+      expect(
+        screen.findByPlaceholderText('Select Type of KUR'),
+      ).toBeInTheDocument(),
+    );
+  });
+  test('filter start date is shown', () => {
+    unhideFilter();
+    waitFor(() =>
+      expect(screen.findByTestId('request-kur-start-date')).toBeInTheDocument(),
+    );
+  });
+  test('filter start date placeholder is match with the design', () => {
+    unhideFilter();
+    waitFor(() =>
+      expect(screen.findByPlaceholderText('Start Date')).toBeInTheDocument(),
+    );
+  });
+  test('filter end date is shown', () => {
+    unhideFilter();
+    waitFor(() =>
+      expect(screen.findByTestId('request-kur-end-date')).toBeInTheDocument(),
+    );
+  });
+  test('filter end date placeholder is match with the design', () => {
+    unhideFilter();
+    waitFor(() =>
+      expect(screen.findByPlaceholderText('End Date')).toBeInTheDocument(),
+    );
+  });
+  test('if start date is filled and end date is empty, warning is shown', async () => {
+    unhideFilter();
+    await act(() => {
+      mockRequestFilter({ submit_date_start: 1675844640 });
+    });
+    waitFor(() =>
+      expect(screen.findByTestId('form-label-helpertext')).toHaveTextContent(
+        'End Date is required when Start Date is filled',
+      ),
+    );
+  });
+  test('if end date is filled and start date is empty, warning is shown', async () => {
+    unhideFilter();
+    await act(() => {
+      mockRequestFilter({ submit_end_start: 1675844640 });
+    });
+    waitFor(() =>
+      expect(screen.findByTestId('form-label-helpertext')).toHaveTextContent(
+        'Start Date is required when End Date is filled',
+      ),
+    );
+    // expect(screen.findByTestId())
+  });
+});
+
+describe('request kur table', () => {
+  test('request kur table is shown', async () => {
+    const requestKurTable = screen.findByTestId('request-kur-table');
+    waitFor(() => expect(requestKurTable).toBeInTheDocument());
+  });
+  test('data of request kur table', async () => {
+    await act(() => {
+      mockRequest(MockRequestList);
+    });
+    const arrList = await screen.findAllByTestId(/list-table-/i);
+    expect(arrList.length).toBe(2);
+  });
 });

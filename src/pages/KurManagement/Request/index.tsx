@@ -63,10 +63,6 @@ export default function RequestKURPage() {
   useEffect(() => {
     dispatch(typeAction.fetchData());
     dispatch(areaAction.fetchData());
-    if (request.params.submit_date_start)
-      setStartDate(new Date(request.params.submit_date_start * 1000));
-    if (request.params.submit_date_end)
-      setEndDate(new Date(request.params.submit_date_end * 1000));
   }, []);
 
   // table
@@ -381,6 +377,7 @@ export default function RequestKURPage() {
                 >
                   <FormLabel text="Pasar">
                     <Autocomplete
+                      data-testid="request-kur-filterpasar"
                       multiple
                       id="filterPasar"
                       options={areas}
@@ -428,6 +425,7 @@ export default function RequestKURPage() {
                   </FormLabel>
                   <FormLabel text="Type">
                     <Autocomplete
+                      data-testid="request-kur-filtertype"
                       id="filterType"
                       options={types}
                       onChange={(e, value) => {
@@ -477,7 +475,13 @@ export default function RequestKURPage() {
                           onOpen={() => {
                             setOpenStartDate(true);
                           }}
-                          value={startDate}
+                          value={
+                            request.params.submit_date_start
+                              ? new Date(
+                                  request.params.submit_date_start * 1000,
+                                )
+                              : null
+                          }
                           inputFormat="DD/MM/YYYY"
                           onChange={(value) => {
                             setStartDate(value);
@@ -535,7 +539,11 @@ export default function RequestKURPage() {
                           onOpen={() => {
                             setOpenEndDate(true);
                           }}
-                          value={endDate}
+                          value={
+                            request.params.submit_date_end
+                              ? new Date(request.params.submit_date_end * 1000)
+                              : null
+                          }
                           inputFormat="DD/MM/YYYY"
                           onChange={(value) => {
                             setEndDate(value);
@@ -583,11 +591,11 @@ export default function RequestKURPage() {
           </Grid>
           <Grid item xs={12}>
             <Box
+              data-testid="request-kur-table"
               bgcolor="#fff"
               p="7px"
               borderRadius="5px"
               boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
-              data-testid="request-kur-table"
             >
               <Table
                 data={request.data || []}
