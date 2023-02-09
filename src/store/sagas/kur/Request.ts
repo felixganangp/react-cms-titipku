@@ -182,10 +182,45 @@ function* fetchDetailsTable(
   }
 }
 
+function* fetchCreditBalanceById(
+  params: PayloadAction<{ id: string | number }>,
+) {
+  try {
+    const response: Response<number> = yield call(
+      service.getCreditBalanceById,
+      params.payload.id,
+    );
+    yield put(requestKURAction.fetchCreditBalanceSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
 export default function* requestKurSagas() {
   yield takeLatest(requestKURAction.fetchData.type, fetchData);
   yield takeLatest(requestKURAction.approveRequest.type, approveRequest);
   yield takeLatest(requestKURAction.rejectRequest.type, rejectRequest);
   yield takeLatest(requestKURAction.fetchDetails.type, fetchDetails);
   yield takeLatest(requestKURAction.fetchDetailsTable.type, fetchDetailsTable);
+  yield takeLatest(
+    requestKURAction.fetchCreditBalance.type,
+    fetchCreditBalanceById,
+  );
 }

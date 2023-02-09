@@ -42,6 +42,7 @@ export default function RequestKURDetails() {
   const dispatch = useAppDispatch();
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const requestDetails = useAppSelector((state) => state.request.detailsData);
+  const creditBalance = useAppSelector((state) => state.request.creditBalance);
   const details = useAppSelector((state) => state.request);
 
   // action
@@ -85,7 +86,10 @@ export default function RequestKURDetails() {
 
   // get details
   useEffect(() => {
-    if (id) dispatch(requestKURAction.fetchDetails({ id }));
+    if (id) {
+      dispatch(requestKURAction.fetchDetails({ id }));
+      dispatch(requestKURAction.fetchCreditBalance({ id }));
+    }
   }, []);
 
   // table's
@@ -106,10 +110,12 @@ export default function RequestKURDetails() {
   useEffect(() => {
     if (requestDetails) {
       let total = 0;
-      // eslint-disable-next-line array-callback-return
-      requestDetails.kur_request_detail.some((item) => {
-        total += item.amount;
-      });
+      if (requestDetails.kur_request_detail) {
+        // eslint-disable-next-line array-callback-return
+        requestDetails.kur_request_detail.some((item) => {
+          total += item.amount;
+        });
+      }
       setTotalAmount(total);
     }
   }, [requestDetails]);
@@ -336,15 +342,17 @@ export default function RequestKURDetails() {
                   </DescriptionBox>
                 </Field>
 
-                {/* <Field>
+                <Field>
                   <AttachMoneyOutlinedIcon
                     sx={{ color: 'transparent', mr: '4px' }}
                   />
                   <DescriptionBox>
                     <FieldName>Credit Balance</FieldName>
-                    <FieldContent>{requestDetails?.kur_user.}</FieldContent>
+                    <FieldContent>
+                      Rp {digitFormatter.format(creditBalance)}
+                    </FieldContent>
                   </DescriptionBox>
-                </Field> */}
+                </Field>
 
                 <Field>
                   <AttachMoneyOutlinedIcon

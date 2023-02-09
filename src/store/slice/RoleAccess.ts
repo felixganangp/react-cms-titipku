@@ -78,7 +78,7 @@ const RoleAccessSlice = createSlice({
     },
     fetchDataDetail(
       state: RoleAccessProps,
-      action: PayloadAction<{ id: string | number }>,
+      action: PayloadAction<{ id: string | number | undefined }>,
     ) {
       state.loading = true;
     },
