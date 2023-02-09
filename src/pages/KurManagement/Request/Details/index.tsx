@@ -104,10 +104,12 @@ export default function RequestKURDetails() {
   useEffect(() => {
     if (requestDetails) {
       let total = 0;
-      // eslint-disable-next-line array-callback-return
-      requestDetails.kur_request_detail.some((item) => {
-        total += item.amount;
-      });
+      if (requestDetails.kur_request_detail) {
+        // eslint-disable-next-line array-callback-return
+        requestDetails.kur_request_detail.some((item) => {
+          total += item.amount;
+        });
+      }
       setTotalAmount(total);
     }
   }, [requestDetails]);
