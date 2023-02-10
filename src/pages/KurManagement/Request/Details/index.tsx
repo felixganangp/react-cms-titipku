@@ -35,6 +35,7 @@ import {
 } from '../request.styled';
 import RefusalReason from '../components/InputMessage';
 import CustomerData from '../components/CustomerData';
+import { light } from '../../../../theme/pallets';
 
 export default function RequestKURDetails() {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -50,31 +51,41 @@ export default function RequestKURDetails() {
       id: 'image',
       label: 'Image',
       align: 'left',
+      width: '130px',
       format: (val: any) => (
-        <img
-          src={val.image_filepath}
-          onError={({ currentTarget }) => {
-            currentTarget.onerror = null;
-            currentTarget.src = noImage;
-          }}
-          alt="statement img"
-          style={{ height: '80px', width: '80px' }}
-        />
+        <Box>
+          <img
+            src={val.image_filepath}
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null;
+              currentTarget.src = noImage;
+            }}
+            alt="statement img"
+            style={{ height: '80px', width: '80px' }}
+          />
+        </Box>
       ),
     },
     {
       id: 'amount',
       label: 'Amount',
       align: 'left',
+      width: '230px',
       format: (val: any) => (
-        <Typography> Rp {digitFormatter.format(val.amount)}</Typography>
+        <Typography color="#008E58">
+          Rp {digitFormatter.format(val.amount)}
+        </Typography>
       ),
     },
     {
       id: 'description',
       label: 'Description',
       align: 'left',
-      format: (val: any) => <Typography>{val.description || '-'}</Typography>,
+      format: (val: any) => (
+        <Box>
+          <Typography>{val.description || '-'}</Typography>
+        </Box>
+      ),
     },
   ];
 
