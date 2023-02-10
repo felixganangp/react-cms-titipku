@@ -95,52 +95,58 @@ describe('filter and search', () => {
       ).toBeInTheDocument(),
     );
   });
-  test('filter start date is shown', () => {
+  test('filter start date is shown', async () => {
     unhideFilter();
     waitFor(() =>
       expect(screen.findByTestId('request-kur-start-date')).toBeInTheDocument(),
     );
   });
-  test('filter start date placeholder is match with the design', () => {
+  test('filter start date placeholder is match with the design', async () => {
     unhideFilter();
     waitFor(() =>
       expect(screen.findByPlaceholderText('Start Date')).toBeInTheDocument(),
     );
   });
-  test('filter end date is shown', () => {
+  test('filter end date is shown', async () => {
     unhideFilter();
     waitFor(() =>
       expect(screen.findByTestId('request-kur-end-date')).toBeInTheDocument(),
     );
   });
-  test('filter end date placeholder is match with the design', () => {
+  test('filter end date placeholder is match with the design', async () => {
     unhideFilter();
     waitFor(() =>
       expect(screen.findByPlaceholderText('End Date')).toBeInTheDocument(),
     );
   });
-  test('if start date is filled and end date is empty, warning is shown', async () => {
-    unhideFilter();
+  test('if start date is filled and end date is empty, apply button is disabled', async () => {
+    const applyButton = screen.findByTestId('request-kur-apply-btn');
+    await unhideFilter();
     await act(() => {
       mockRequestFilter({ submit_date_start: 1675844640 });
     });
-    waitFor(() =>
-      expect(screen.findByTestId('form-label-helpertext')).toHaveTextContent(
-        'End Date is required when Start Date is filled',
-      ),
-    );
+    waitFor(() => expect(applyButton).toHaveAttribute('disabled'));
   });
-  test('if end date is filled and start date is empty, warning is shown', async () => {
-    unhideFilter();
-    await act(() => {
-      mockRequestFilter({ submit_end_start: 1675844640 });
+  test('if end date is filled and start date is empty, apply button is disabled', async () => {
+    const applyButton = screen.findByTestId('request-kur-apply-btn');
+    await unhideFilter();
+    act(() => {
+      mockRequestFilter({ submit_date_end: 1675844640 });
     });
-    waitFor(() =>
-      expect(screen.findByTestId('form-label-helpertext')).toHaveTextContent(
-        'Start Date is required when End Date is filled',
-      ),
-    );
-    // expect(screen.findByTestId())
+    await unhideFilter();
+    waitFor(() => expect(applyButton).toHaveAttribute('disabled'));
+  });
+  test('if end date and start date is not empty, apply button is not disabled', async () => {
+    const applyButton = screen.findByTestId('request-kur-apply-btn');
+    await unhideFilter();
+    act(() => {
+      mockRequestFilter({
+        submit_date_start: 1675844640,
+        submit_date_end: 1675844640,
+      });
+    });
+    await unhideFilter();
+    waitFor(() => expect(applyButton).not.toHaveAttribute('disabled'));
   });
 });
 

@@ -4,9 +4,21 @@ import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from 'store';
 import { Person2Outlined } from '@mui/icons-material';
+import { requestKURAction } from 'store/slice/kur/Request';
 import CustomerData from '../components/CustomerData';
 import RequestKURDetails from '../Details/index';
 import RefusalReason from '../components/InputMessage';
+
+const mockRequestDetail = vi.fn((data) =>
+  store.dispatch(
+    requestKURAction.fetchDetailsSuccess({
+      timestamp: 1675988503,
+      status: 'ok',
+      message: 'Retrieved successfully',
+      data,
+    }),
+  ),
+);
 
 afterEach(() => {
   cleanup();

@@ -454,6 +454,7 @@ export default function RequestKURPage() {
                     gap="14px"
                   >
                     <FormLabel
+                      data-testid="request-kur-start-date"
                       text="Range Date"
                       error={startDate === null && endDate !== null}
                       helperText={
@@ -464,7 +465,6 @@ export default function RequestKURPage() {
                     >
                       <LocalizationProvider dateAdapter={AdapterMoment}>
                         <DesktopDatePicker
-                          data-testid="request-kur-start-date"
                           components={{
                             OpenPickerIcon: CalendarIcon,
                           }}
@@ -518,6 +518,7 @@ export default function RequestKURPage() {
                       />
                     </Box>
                     <FormLabel
+                      data-testid="request-kur-end-date"
                       text="&nbsp;"
                       error={startDate !== null && endDate === null}
                       helperText={
@@ -528,7 +529,6 @@ export default function RequestKURPage() {
                     >
                       <LocalizationProvider dateAdapter={AdapterMoment}>
                         <DesktopDatePicker
-                          data-testid="request-kur-end-date"
                           open={openEndDate}
                           components={{
                             OpenPickerIcon: CalendarIcon,
@@ -577,6 +577,7 @@ export default function RequestKURPage() {
                     Reset
                   </Button>
                   <FilterButton
+                    data-testid="request-kur-apply-btn"
                     onClick={() => handleApplyFilter()}
                     disabled={
                       (startDate === null && endDate !== null) ||
