@@ -94,15 +94,6 @@ export default function RequestKURDetails() {
     if (id) {
       dispatch(requestKURAction.fetchDetails({ id }));
     }
-    if (requestDetails) {
-      if (requestDetails.kur_user.id) {
-        dispatch(
-          requestKURAction.fetchCreditBalance({
-            id: requestDetails.kur_user.id,
-          }),
-        );
-      }
-    }
   }, []);
 
   // table's
