@@ -82,7 +82,15 @@ export default function RequestKURDetails() {
   useEffect(() => {
     if (id) {
       dispatch(requestKURAction.fetchDetails({ id }));
-      dispatch(requestKURAction.fetchCreditBalance({ id }));
+    }
+    if (requestDetails) {
+      if (requestDetails.kur_user.id) {
+        dispatch(
+          requestKURAction.fetchCreditBalance({
+            id: requestDetails.kur_user.id,
+          }),
+        );
+      }
     }
   }, []);
 
