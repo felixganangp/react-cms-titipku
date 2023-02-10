@@ -164,6 +164,7 @@ export default function RequestKURDetails() {
                     to="/kur/request"
                   >
                     <BackButton
+                      data-testid="request-kur-dtl-req-number"
                       sx={{
                         '&:hover': { bgcolor: '#fff' },
                       }}

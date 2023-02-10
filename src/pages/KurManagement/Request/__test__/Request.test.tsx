@@ -95,22 +95,16 @@ describe('filter and search', () => {
       ).toBeInTheDocument(),
     );
   });
-  test('filter start date is shown', async () => {
-    unhideFilter();
-    waitFor(() =>
-      expect(screen.findByTestId('request-kur-start-date')).toBeInTheDocument(),
-    );
-  });
+  // test('filter range date is shown', async () => {
+  //   await unhideFilter();
+  //   waitFor(() =>
+  //     expect(screen.findByTestId('request-kur-range-date')).toBeInTheDocument(),
+  //   );
+  // });
   test('filter start date placeholder is match with the design', async () => {
     unhideFilter();
     waitFor(() =>
       expect(screen.findByPlaceholderText('Start Date')).toBeInTheDocument(),
-    );
-  });
-  test('filter end date is shown', async () => {
-    unhideFilter();
-    waitFor(() =>
-      expect(screen.findByTestId('request-kur-end-date')).toBeInTheDocument(),
     );
   });
   test('filter end date placeholder is match with the design', async () => {

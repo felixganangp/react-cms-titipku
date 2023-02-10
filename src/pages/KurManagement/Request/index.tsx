@@ -454,7 +454,7 @@ export default function RequestKURPage() {
                     gap="14px"
                   >
                     <FormLabel
-                      data-testid="request-kur-start-date"
+                      data-testid="request-kur-range-date"
                       text="Range Date"
                       error={startDate === null && endDate !== null}
                       helperText={
@@ -518,7 +518,6 @@ export default function RequestKURPage() {
                       />
                     </Box>
                     <FormLabel
-                      data-testid="request-kur-end-date"
                       text="&nbsp;"
                       error={startDate !== null && endDate === null}
                       helperText={
