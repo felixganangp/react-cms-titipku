@@ -128,6 +128,11 @@ function* fetchDetails(params: PayloadAction<{ id: string | number }>) {
     );
 
     yield put(requestKURAction.fetchDetailsSuccess(response));
+    if (response.data.kur_user.id) {
+      yield put(
+        requestKURAction.fetchCreditBalance({ id: response.data.kur_user.id }),
+      );
+    }
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
