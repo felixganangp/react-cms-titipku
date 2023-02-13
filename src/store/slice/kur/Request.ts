@@ -62,6 +62,13 @@ const RequestKURSlice = createSlice({
         ...action.payload,
       };
     },
+    setResetParams(state: RequestKURProps) {
+      state.params = {
+        page: 1,
+        count: 10,
+        search: '',
+      };
+    },
     setDisplayFilter(
       state: RequestKURProps,
       action: PayloadAction<RequestKURDisplayFilter>,
@@ -76,7 +83,7 @@ const RequestKURSlice = createSlice({
       action: PayloadAction<ListResponse<RequestKUR>>,
     ) {
       state.loading = false;
-      state.data = action.payload.data;
+      state.data = action.payload.data || [];
       state.total = action.payload.total;
     },
     fetchDetails(

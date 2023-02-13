@@ -76,7 +76,7 @@ const PaymentKURSlice = createSlice({
       action: PayloadAction<ListResponse<PaymentKUR>>,
     ) {
       state.loading = false;
-      state.data = action.payload.data;
+      state.data = action.payload.data || [];
       state.total = action.payload.total;
     },
     fetchDetails(
@@ -114,6 +114,13 @@ const PaymentKURSlice = createSlice({
       state.loading = false;
       state.detailsTableData = action.payload.data;
       state.totalDetailsTable = action.payload.total;
+    },
+    setResetParams(state: PaymentKURProps) {
+      state.params = {
+        page: 1,
+        count: 10,
+        search: '',
+      };
     },
     // approveRequest(
     //   state: PaymentKURProps,

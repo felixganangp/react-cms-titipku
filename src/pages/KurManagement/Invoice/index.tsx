@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -12,129 +12,220 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import Table from 'components/Table';
+import { HeadCells } from 'components/Table/types';
 import MenuList from 'components/MenuList';
 import Status from 'components/Status';
 import useModal from 'hooks/useModal';
+import digitFormatter from 'utils/digitFormatter';
+import moment from 'moment';
+import debounce from 'utils/debounce';
 
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { invoiceKurAction } from 'store/slice/kur/Invoice';
+import { InvoiceKur } from 'models/kur/Invoice';
+
 export default function Ivoice() {
-  const formModal = useModal();
+  const dispatch = useAppDispatch();
+  const invoice = useAppSelector((state) => state.invoice);
   const [collapseFilter, setCollapseFilter] = useState(false);
 
-  const headCell = [
+  useEffect(() => {
+    dispatch(invoiceKurAction.fetchData(invoice.params));
+  }, [invoice.params]);
+
+  const handleChangePage = (value: number) => {
+    dispatch(
+      invoiceKurAction.setParams({
+        page: value,
+      }),
+    );
+  };
+
+  const handleSearch = (value: string) => {
+    dispatch(
+      invoiceKurAction.setParams({
+        page: 1,
+        search: value,
+      }),
+    );
+  };
+
+  const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
+
+  const handleChangeSort = (value: {
+    orderBy: string | number;
+    orderType: 'asc' | 'desc';
+  }) => {
+    dispatch(
+      invoiceKurAction.setParams({
+        order_by: value.orderBy,
+        page: 1,
+        order_type: value.orderType,
+      }),
+    );
+  };
+
+  const headCell: HeadCells<InvoiceKur>[] = [
     {
-      id: 'id',
-      label: 'ID',
+      id: 'kur_invoice_number',
+      label: 'No. Payment',
       align: 'left',
+      minWidth: '160px',
       enableSort: true,
-      format: () => {
-        return (
-          <Link
-            to="INV/192323934"
-            style={{ textDecoration: 'none', color: '#0774d1' }}
-          >
-            INV/192323934
-          </Link>
-        );
-      },
+      format: (val) => (
+        <Typography sx={{ color: '#0774d1' }}>
+          {val.kur_invoice_number}
+        </Typography>
+      ),
     },
     {
       id: 'condition',
       label: 'Condition',
       align: 'left',
-      enableSort: true,
-      width: '60px',
-      format: () => {
-        return <Status color="#cecece">Late</Status>;
+      width: '160px',
+      format: (val) => {
+        const color = () => {
+          let result = '#cecece';
+          if (val.condition === 'on_schedule') {
+            result = '#008e58';
+          }
+
+          if (val.condition === 'late') {
+            result = '#c10000';
+          }
+
+          return result;
+        };
+        return (
+          <Status color={color()}>{val.condition.replaceAll('_', ' ')}</Status>
+        );
       },
     },
     {
       id: 'status',
       label: 'Status',
       align: 'left',
-      enableSort: true,
-      width: '60px',
-      format: () => {
-        return <Status color="#cecece">Debt</Status>;
-      },
-    },
-    {
-      id: 'cust',
-      label: 'Name',
-      align: 'left',
-      enableSort: true,
-      format: () => {
+      width: '160px',
+      format: (val) => {
+        const color = () => {
+          let result = '#cecece';
+          if (val.paid_status === 'paid_off') {
+            result = '#008e58';
+          }
+
+          if (val.paid_status === 'debt') {
+            result = '#c10000';
+          }
+          return result;
+        };
         return (
-          <Box display="flex" alignItems="center" gap="10px">
-            <Box
-              bgcolor="#cecece"
-              width="8px"
-              height="8px"
-              borderRadius="100%"
-            />
-            <Typography>Neneng Murdiyati</Typography>
-          </Box>
+          <Status color={color()}>
+            {val.paid_status.replaceAll('_', ' ')}
+          </Status>
         );
       },
     },
     {
-      id: 'kurType',
+      id: 'name',
+      label: 'Name',
+      align: 'left',
+      minWidth: '160px',
+      enableSort: true,
+      format: (val) => <Typography>{val.kur_request.kur_user.name}</Typography>,
+    },
+    {
+      id: 'kur_user_type',
       label: 'KUR Type',
       align: 'left',
+      format: (val) => <Typography>{val.kur_user_type.name}</Typography>,
     },
     {
-      id: 'req_amount',
+      id: 'request_amount',
       label: 'Request Amount',
       align: 'left',
+      minWidth: '160px',
+      format: (val) => (
+        <Typography>Rp {digitFormatter.format(val.request_amount)}</Typography>
+      ),
     },
     {
-      id: 'delivy',
+      id: 'delivery_date',
       label: 'Delivery Date',
       align: 'left',
+      enableSort: true,
+      format: (val) => (
+        <Typography>
+          {moment.unix(val.created_at).format('DD/MM/YYYY')}
+        </Typography>
+      ),
     },
     {
-      id: 'invoice',
+      id: 'invoice_date',
       label: 'Invoice Date',
       align: 'left',
+      enableSort: true,
+      format: (val) => (
+        <Typography>
+          {moment.unix(val.release_date).format('DD/MM/YYYY')}
+        </Typography>
+      ),
     },
     {
-      id: 'due',
-      label: 'Due Date',
+      id: 'invoice_amount',
+      label: 'Invoice Amount',
       align: 'left',
+      minWidth: '160px',
+      format: (val) => (
+        <Typography>
+          Rp{' '}
+          {digitFormatter.format(
+            val.request_amount +
+              val.total_admin_fee +
+              val.total_dpd +
+              val.total_adjustment,
+          )}
+        </Typography>
+      ),
     },
     {
-      id: 'due',
+      id: 'due_date',
+      label: 'Due date',
+      align: 'left',
+      format: (val) => (
+        <Typography>
+          {moment.unix(val.due_date).format('DD/MM/YYYY')}
+        </Typography>
+      ),
+    },
+    {
+      id: 'last_paid',
       label: 'Last Paid',
       align: 'left',
+      format: (val) => (
+        <Typography>
+          {val.kur_invoice_Detail !== null
+            ? moment
+                .unix(
+                  val.kur_invoice_Detail[val.kur_invoice_Detail.length - 1]
+                    .created_at,
+                )
+                .format('DD/MM/YYYY')
+            : '-'}
+        </Typography>
+      ),
     },
     {
       id: 'paid_amount',
-      label: 'Paid amount',
+      label: 'Paid Amount',
       align: 'left',
-    },
-    {
-      id: 'action',
-      label: 'Action',
-      align: 'left',
-      format: () => (
-        <>
-          <MenuList
-            menu={[
-              {
-                label: 'Details',
-                onClick: () => {},
-              },
-            ]}
-          >
-            <IconButton>
-              <MoreVertIcon />
-            </IconButton>
-          </MenuList>
-        </>
+      minWidth: '160px',
+      format: (val) => (
+        <Typography>Rp {digitFormatter.format(val.total_payment)}</Typography>
       ),
     },
   ];
@@ -152,9 +243,6 @@ export default function Ivoice() {
             <Grid item xs={12}>
               <Card>
                 <Box display="flex" gap="20px" flexWrap="wrap">
-                  <Button startIcon={<AddIcon />} onClick={formModal.openModal}>
-                    Add New
-                  </Button>
                   <Box flex="1">
                     <TextField
                       placeholder="Search for name or email"
@@ -170,7 +258,7 @@ export default function Ivoice() {
                         ),
                       }}
                       onChange={(event) => {
-                        // debounceSearch(event.target.value);
+                        debounceSearch(event.target.value);
                       }}
                     />
                   </Box>
@@ -328,18 +416,17 @@ export default function Ivoice() {
                 data-testid="table-customer"
               >
                 <Table
-                  data={[]}
+                  data={invoice.data}
                   headCells={headCell}
-                  selected={[]}
-                  // page={customerKur.params.page}
-                  // totalData={customerKur.total}
-                  // count={customerKur.params.count}
-                  // orderBy={customerKur.params.order_by}
-                  // orderType={customerKur.params.order_type}
-                  // onChangePage={(val) => handleChangePage(val)}
-                  // onChangeSort={(val) => handleChangeSort(val)}
-                  enableCheckBox
-                  disableNumber
+                  page={invoice.params.page}
+                  totalData={invoice.total}
+                  count={invoice.params.count}
+                  orderBy={invoice.params.order_by}
+                  orderType={invoice.params.order_type}
+                  onChangePage={(val) => handleChangePage(val)}
+                  onChangeSort={(val) => handleChangeSort(val)}
+                  // enableCheckBox
+                  // disableNumber
                 />
               </Box>
             </Grid>
