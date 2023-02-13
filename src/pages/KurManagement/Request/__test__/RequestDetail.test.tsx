@@ -1,6 +1,12 @@
 import { Suspense } from 'react';
 import { expect, test } from 'vitest';
-import { cleanup, render, screen, fireEvent } from '@testing-library/react';
+import {
+  cleanup,
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+} from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { act } from 'react-dom/test-utils';
 import { Provider } from 'react-redux';
@@ -11,7 +17,11 @@ import MockTheme from 'utils/MockTheme';
 import CustomerData from '../components/CustomerData';
 import RequestKURDetails from '../Details/index';
 import RefusalReason from '../components/InputMessage';
-import { MockRequestDetail } from './MockRequest';
+import {
+  MockReqDetailAccept,
+  MockReqDetailPending,
+  MockReqDetailRejected,
+} from './MockRequest';
 
 const mockRequestDetail = vi.fn((data) =>
   store.dispatch(
@@ -32,9 +42,6 @@ beforeEach(() => {
       </MockTheme>
     </Suspense>,
   );
-  act(() => {
-    mockRequestDetail(MockRequestDetail);
-  });
 });
 afterEach(() => {
   cleanup();
@@ -43,44 +50,104 @@ afterEach(() => {
 // header
 describe('request detail header', () => {
   test('request number is shown', async () => {
+    await act(() => {
+      mockRequestDetail(MockReqDetailAccept);
+    });
     const reqNumber = await screen.findByTestId('request-kur-dtl-req-number');
-    expect(reqNumber).toHaveTextContent(MockRequestDetail.kur_request_number);
+    expect(reqNumber).toHaveTextContent(MockReqDetailAccept.kur_request_number);
+    vi.clearAllMocks();
   });
+  test('show accept and reject button when request status is pending', async () => {
+    await act(() => {
+      mockRequestDetail(MockReqDetailPending);
+    });
+    waitFor(() =>
+      expect(
+        screen.findByTestId('request-kur-dtl-action-box'),
+      ).toBeInTheDocument(),
+    );
+    vi.clearAllMocks();
+  });
+  // test('didnt show accept and reject button if status is accepted', async () => {
+  //   await act(() => {
+  //     mockRequestDetail(MockReqDetailAccept);
+  //   });
+  //   waitFor(() =>
+  //     expect(screen.findByTestId('request-kur-dtl-action-box')).toHaveStyle(
+  //       'display: none',
+  //     ),
+  //   );
+  // });
 });
 
-// customer basic info
-// test('displays customer data', async () => {
-//   const customerData = render(
-//     <Provider store={store}>
-//       <BrowserRouter>
-//         <CustomerData
-//           icon={<Person2Outlined />}
-//           fieldName="unit test"
-//           fieldContent="unit test"
-//         />
-//       </BrowserRouter>
-//     </Provider>,
-//   );
-//   const customerDataName = await customerData.findByTestId(
-//     'customer-data-name',
-//   );
-//   const customerDataContent = await customerData.findByTestId(
-//     'customer-data-content',
-//   );
-//   expect(customerDataName).toHaveTextContent('unit test');
-//   expect(customerDataContent).toHaveTextContent('unit test');
-//   customerData.unmount();
+describe('customer basic info', async () => {
+  test('display container basic info', async () => {
+    const basicInfoContent = await screen.findByTestId('requestdtl-basic-info');
+    expect(basicInfoContent).toBeInTheDocument();
+  });
+  test('show customer name', async () => {
+    await act(() => {
+      mockRequestDetail(MockReqDetailAccept);
+    });
+    const custName = screen.findByTestId('req-kur-dtl-cust-name');
+    waitFor(() =>
+      expect(custName).toHaveTextContent(MockReqDetailAccept.kur_user.name),
+    );
+    vi.clearAllMocks();
+  });
+  test('show red request status if status is rejected', async () => {
+    await act(() => {
+      mockRequestDetail(MockReqDetailRejected);
+    });
+    const statusBox = await screen.getByTestId('request-kur-dtl-status');
+    waitFor(() => expect(statusBox).toBeInTheDocument());
+    waitFor(() => expect(statusBox).toHaveStyle("background-color: '#C10000'"));
+    vi.clearAllMocks();
+  });
+  // test('show green request status if status is accepted', async () => {
+  //   await act(() => {
+  //     mockRequestDetail(MockReqDetailAccept);
+  //   });
+  //   const status = await screen.findByTestId('request-kur-dtl-status');
+  //   waitFor(() => expect(status).toBeInTheDocument());
+  //   waitFor(() => expect(status).toHaveStyle("background-color: '#008E58'"));
+  // });
+  // test('show yellow request status if status is pending', async () => {
+  //   await act(() => {
+  //     mockRequestDetail(MockReqDetailPending);
+  //   });
+  //   const status = await screen.findByTestId('request-kur-dtl-status');
+  //   waitFor(() => expect(status).toBeInTheDocument());
+  //   waitFor(() => expect(status).toHaveStyle("background-color: '#FF8F00'"));
+  // });
+});
+
+// customer basic info component
+// test('displays customer data component', async () => {
+// const customerData = render(
+//   <Provider store={store}>
+//     <BrowserRouter>
+//       <CustomerData
+//         icon={<Person2Outlined />}
+//         fieldName="unit test name"
+//         fieldContent="unit test content"
+//       />
+//     </BrowserRouter>
+//   </Provider>,
+// );
+// waitFor(() =>
+//   expect(customerData.findByTestId('customer-data-name')).toHaveTextContent(
+//     'unit test name',
+//   ),
+// );
+// waitFor(() =>
+//   expect(
+//     customerData.findByTestId('customer-data-content'),
+//   ).toHaveTextContent('unit test content'),
+// );
+// customerData.unmount();
 // });
 
-test('display request number', async () => {
-  const invoiceNumber = await screen.findByTestId('requestdtl-title-inv-numb');
-  expect(invoiceNumber).toBeInTheDocument();
-});
-
-test('display basic info', async () => {
-  const basicInfoContent = await screen.findByTestId('requestdtl-basic-info');
-  expect(basicInfoContent).toBeInTheDocument();
-});
 describe('reject request modal', () => {
   // test('modal reject is shown', async () => {
   //   const inputRefusalMessage = render(

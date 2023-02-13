@@ -175,6 +175,7 @@ export default function RequestKURDetails() {
                   </Link>
                 </Box>
                 <Box
+                  data-testid="request-kur-dtl-action-box"
                   display={
                     requestDetails?.status === 'pending' ? 'flex' : 'none'
                   }
@@ -239,7 +240,11 @@ export default function RequestKURDetails() {
             gap="40px"
           >
             <Box display="flex" flexDirection="row" justifyContent="flex-start">
-              <Typography fontWeight={700} variant="h1">
+              <Typography
+                fontWeight={700}
+                variant="h1"
+                data-testid="req-kur-dtl-cust-name"
+              >
                 {requestDetails?.kur_user?.name}
               </Typography>
               {/* <CustomerStatusDetail status={customerStatus}>
@@ -416,11 +421,14 @@ export default function RequestKURDetails() {
                 <Field>
                   <DescriptionBox>
                     <FieldName>Request Status</FieldName>
-                    <FieldContent>
-                      <InvoiceStatus status={requestDetails?.status}>
-                        {requestDetails?.status}
-                      </InvoiceStatus>
-                    </FieldContent>
+                    {/* <FieldContent> */}
+                    <InvoiceStatus
+                      data-testid="request-kur-dtl-status"
+                      status={requestDetails?.status}
+                    >
+                      {requestDetails?.status}
+                    </InvoiceStatus>
+                    {/* </FieldContent> */}
                   </DescriptionBox>
                 </Field>
               </ContentGrid>

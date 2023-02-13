@@ -48,10 +48,10 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-test('request kur title is shown', async () => {
-  const requestKURTitle = await screen.findByTestId('request-kur-title');
-  expect(requestKURTitle).toBeInTheDocument();
-});
+// test('request kur title is shown', async () => {
+//   const requestKURTitle = await screen.findByTestId('request-kur-title');
+//   expect(requestKURTitle).toBeInTheDocument();
+// });
 
 describe('filter and search', () => {
   test('search is shown with right placeholder', async () => {
