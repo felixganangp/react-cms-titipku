@@ -17,7 +17,7 @@ interface PaymentKURProps {
   params: PaymentKURParams;
   displayFilter: PaymentKURDisplayFilter;
   detailsData: PaymentKUR | null;
-  detailsTableData: KURPaymentDetail[];
+  detailsTableData: PaymentKUR[];
   totalDetailsTable: number | undefined;
   detailParams: ListParams;
 }
@@ -91,29 +91,7 @@ const PaymentKURSlice = createSlice({
     ) {
       state.loading = true;
       state.detailsData = action.payload.data;
-    },
-    setDetailsTableParams(
-      state: PaymentKURProps,
-      action: PayloadAction<ListParams>,
-    ) {
-      state.detailParams = {
-        ...state.detailParams,
-        ...action.payload,
-      };
-    },
-    fetchDetailsTable(
-      state: PaymentKURProps,
-      ction: PayloadAction<{ id: string | number; params: ListParams }>,
-    ) {
-      state.loading = true;
-    },
-    fetchDetailsTableSuccess(
-      state: PaymentKURProps,
-      action: PayloadAction<ListResponse<KURPaymentDetail>>,
-    ) {
-      state.loading = false;
-      state.detailsTableData = action.payload.data;
-      state.totalDetailsTable = action.payload.total;
+      state.detailsTableData = [action.payload.data];
     },
     setResetParams(state: PaymentKURProps) {
       state.params = {
@@ -122,15 +100,6 @@ const PaymentKURSlice = createSlice({
         search: '',
       };
     },
-    // approveRequest(
-    //   state: PaymentKURProps,
-    //   action: PayloadAction<ActionParams>,
-    // ) {
-    //   state.loading = true;
-    // },
-    // rejectRequest(state: PaymentKURProps, action: PayloadAction<ActionParams>) {
-    //   state.loading = true;
-    // },
   },
 });
 

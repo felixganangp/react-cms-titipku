@@ -35,6 +35,7 @@ import {
 } from '../request.styled';
 import RefusalReason from '../components/InputMessage';
 import CustomerData from '../components/CustomerData';
+import { light } from '../../../../theme/pallets';
 
 export default function RequestKURDetails() {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -42,6 +43,7 @@ export default function RequestKURDetails() {
   const dispatch = useAppDispatch();
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const requestDetails = useAppSelector((state) => state.request.detailsData);
+  const creditBalance = useAppSelector((state) => state.request.creditBalance);
   const details = useAppSelector((state) => state.request);
 
   const headCell = [
@@ -49,37 +51,49 @@ export default function RequestKURDetails() {
       id: 'image',
       label: 'Image',
       align: 'left',
+      width: '130px',
       format: (val: any) => (
-        <img
-          src={val.image_filepath}
-          onError={({ currentTarget }) => {
-            currentTarget.onerror = null;
-            currentTarget.src = noImage;
-          }}
-          alt="statement img"
-          style={{ height: '80px', width: '80px' }}
-        />
+        <Box>
+          <img
+            src={val.image_filepath}
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null;
+              currentTarget.src = noImage;
+            }}
+            alt="statement img"
+            style={{ height: '80px', width: '80px' }}
+          />
+        </Box>
       ),
     },
     {
       id: 'amount',
       label: 'Amount',
       align: 'left',
+      width: '230px',
       format: (val: any) => (
-        <Typography> Rp {digitFormatter.format(val.amount)}</Typography>
+        <Typography color="#008E58">
+          Rp {digitFormatter.format(val.amount)}
+        </Typography>
       ),
     },
     {
       id: 'description',
       label: 'Description',
       align: 'left',
-      format: (val: any) => <Typography>{val.description || '-'}</Typography>,
+      format: (val: any) => (
+        <Box>
+          <Typography>{val.description || '-'}</Typography>
+        </Box>
+      ),
     },
   ];
 
   // get details
   useEffect(() => {
-    if (id) dispatch(requestKURAction.fetchDetails({ id }));
+    if (id) {
+      dispatch(requestKURAction.fetchDetails({ id }));
+    }
   }, []);
 
   // table's
@@ -100,10 +114,12 @@ export default function RequestKURDetails() {
   useEffect(() => {
     if (requestDetails) {
       let total = 0;
-      // eslint-disable-next-line array-callback-return
-      requestDetails.kur_request_detail.some((item) => {
-        total += item.amount;
-      });
+      if (requestDetails.kur_request_detail) {
+        // eslint-disable-next-line array-callback-return
+        requestDetails.kur_request_detail.some((item) => {
+          total += item.amount;
+        });
+      }
       setTotalAmount(total);
     }
   }, [requestDetails]);
@@ -321,15 +337,17 @@ export default function RequestKURDetails() {
                   </DescriptionBox>
                 </Field>
 
-                {/* <Field>
+                <Field>
                   <AttachMoneyOutlinedIcon
                     sx={{ color: 'transparent', mr: '4px' }}
                   />
                   <DescriptionBox>
                     <FieldName>Credit Balance</FieldName>
-                    <FieldContent>{requestDetails?.kur_user.}</FieldContent>
+                    <FieldContent>
+                      Rp {digitFormatter.format(creditBalance)}
+                    </FieldContent>
                   </DescriptionBox>
-                </Field> */}
+                </Field>
 
                 <Field>
                   <AttachMoneyOutlinedIcon

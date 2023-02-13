@@ -84,3 +84,16 @@ export const getDetailsTable = (id: number | string, params: ListParams) =>
       reject(message);
     }
   });
+
+export const getCreditBalanceById = (id: number | string) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.get(`/kur/user/${id}/balance`);
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });

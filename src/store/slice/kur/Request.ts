@@ -20,6 +20,7 @@ interface RequestKURProps {
   detailsTableData: KURRequestDetail[];
   totalDetailsTable: number | undefined;
   detailParams: ListParams;
+  creditBalance: number;
 }
 
 const initialState: RequestKURProps = {
@@ -43,6 +44,7 @@ const initialState: RequestKURProps = {
     page: 1,
     count: 5,
   },
+  creditBalance: 0,
 };
 
 const RequestKURSlice = createSlice({
@@ -110,7 +112,7 @@ const RequestKURSlice = createSlice({
     },
     fetchDetailsTable(
       state: RequestKURProps,
-      ction: PayloadAction<{ id: string | number; params: ListParams }>,
+      action: PayloadAction<{ id: string | number; params: ListParams }>,
     ) {
       state.loading = true;
     },
@@ -130,6 +132,19 @@ const RequestKURSlice = createSlice({
     },
     rejectRequest(state: RequestKURProps, action: PayloadAction<ActionParams>) {
       state.loading = true;
+    },
+    fetchCreditBalance(
+      state: RequestKURProps,
+      action: PayloadAction<{ id: string | number }>,
+    ) {
+      state.loading = true;
+    },
+    fetchCreditBalanceSuccess(
+      state: RequestKURProps,
+      action: PayloadAction<Response<number>>,
+    ) {
+      state.loading = false;
+      state.creditBalance = action.payload.data;
     },
   },
 });

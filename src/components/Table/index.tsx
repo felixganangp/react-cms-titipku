@@ -178,10 +178,12 @@ function EnhancedTable<T extends Data>({
           stickyHeader
           aria-labelledby="tableTitle"
           size="medium"
-          sx={{
-            // wordBreak: 'break-all',
-            // tableLayout: 'fixed',
-          }}
+          sx={
+            {
+              // wordBreak: 'break-all',
+              // tableLayout: 'fixed',
+            }
+          }
         >
           <EnhancedTableHead
             numSelected={enableCheckBox ? selected.length : 0}
@@ -212,6 +214,7 @@ function EnhancedTable<T extends Data>({
                     tabIndex={-1}
                     key={String(index)}
                     selected={isItemSelected}
+                    data-testid={`list-table-${index}`}
                   >
                     {!props.loading && enableCheckBox && (
                       <TableCell
@@ -366,19 +369,21 @@ function EnhancedTable<T extends Data>({
           </TableBody>
         </Table>
       </TableContainer>
-      <Box marginY={3}>
-        <PaginationStyle
-          count={totalPage()}
-          shape="rounded"
-          color="primary"
-          page={props.page}
-          onChange={(_, e) => {
-            if (props.onChangePage) {
-              props.onChangePage(e);
-            }
-          }}
-        />
-      </Box>
+      {!props.disablePagination && (
+        <Box marginY={3}>
+          <PaginationStyle
+            count={totalPage()}
+            shape="rounded"
+            color="primary"
+            page={props.page}
+            onChange={(_, e) => {
+              if (props.onChangePage) {
+                props.onChangePage(e);
+              }
+            }}
+          />
+        </Box>
+      )}
     </Box>
   );
 }

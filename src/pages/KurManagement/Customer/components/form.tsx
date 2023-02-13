@@ -85,6 +85,11 @@ function Form({ onClose, formData }: Props) {
     touched: false,
   });
   useEffect(() => {
+    dispatch(
+      merchantAction.setParams({ area_id: formData.initialData.pasarName?.id }),
+    );
+  }, []);
+  useEffect(() => {
     dispatch(merchantAction.fetchData(merchantKur.params));
   }, [merchantKur.params]);
   const [disabledAddressDom, setDisabledAddressDom] = useState(false);
@@ -231,7 +236,7 @@ function Form({ onClose, formData }: Props) {
   };
 
   return (
-    <Box ref={divRef} data-testid="form-Customer">
+    <Box ref={divRef} data-testid="form-customer">
       <Box sx={{ mx: 1 }}>
         <Tabs
           value={valueTab}
@@ -349,6 +354,7 @@ function Form({ onClose, formData }: Props) {
                 }
               >
                 <Autocomplete
+                  data-testid="form-customer-kur-type"
                   id="kur-type"
                   options={typeKur.data}
                   onChange={(e, value) => {
@@ -449,6 +455,7 @@ function Form({ onClose, formData }: Props) {
                     }}
                     renderInput={(params) => (
                       <TextField
+                        data-testid="form-customer-birthdate"
                         sx={{ width: '100%' }}
                         {...params}
                         onClick={() =>

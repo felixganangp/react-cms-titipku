@@ -57,6 +57,7 @@ export interface EnhancedTableProps<T extends { id?: string | number }> {
   bgHeader?: string;
   headCells: Array<HeadCells<T>>;
   data: Data<T>;
+  disablePagination?: boolean;
 }
 
 export type Align = 'inherit' | 'left' | 'center' | 'right' | 'justify';

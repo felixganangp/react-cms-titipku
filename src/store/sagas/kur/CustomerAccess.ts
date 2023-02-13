@@ -161,12 +161,6 @@ function* createCustomer(payload: PayloadAction<CreateCustomer>) {
 
 function* editCustomer(payload: PayloadAction<CreateCustomer>) {
   try {
-    // let imageNik: string | string[] = payload.payload.imageNik.toString();
-    // imageNik = imageNik.split('.com/');
-    // const payloadImageNik = imageNik[1].split('?');
-    // console.log('🚀 ~ file: ~ payload', payload.payload.imageKk);
-    // console.log('🚀 ~ file: ~ imageNik', imageNik);
-    // console.log('🚀 ~ file: ~ payloadImageNik', payloadImageNik);
     const paramsState: CustomerParams = yield select((state) => {
       return state.customerKur.params;
     });

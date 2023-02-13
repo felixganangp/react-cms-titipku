@@ -49,7 +49,7 @@ export interface Customer {
   user_id: number;
   user_type: string;
   user: Merchant;
-  kur_user_number: string;
+  kur_user_number?: string;
   name: string;
   nik: string;
   birth_date: number;

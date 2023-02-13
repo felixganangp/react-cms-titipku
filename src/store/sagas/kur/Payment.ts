@@ -43,125 +43,46 @@ function* fetchData(params: PayloadAction<PaymentKUR>) {
   }
 }
 
-// function* approveRequest(params: PayloadAction<ActionParams>) {
-//   try {
-//     const listParams: RequestKURParams = yield select(
-//       (state) => state.request.params,
-//     );
-//     yield call(service.approveRequest, params.payload.id);
-//     yield put(
-//       uiAction.openToast({
-//         headMsg: 'Success',
-//         message: 'Successfully approve request',
-//         severity: 'success',
-//       }),
-//     );
-//     // eslint-disable-next-line radix
-//     if (params.payload.detailsPage)
-//       yield put(requestKURAction.fetchDetails({ id: params.payload.id }));
-//     else yield put(requestKURAction.fetchData(listParams));
-//   } catch (err) {
-//     const headMsg = 'Failed to Approve Request';
-//     if (typeof err === 'string') {
-//       const error = err as string;
-//       yield put(
-//         uiAction.openToast({
-//           headMsg,
-//           message: error,
-//           severity: 'error',
-//         }),
-//       );
-//     } else {
-//       yield put(
-//         uiAction.openToast({
-//           headMsg,
-//           message: 'interval server error',
-//           severity: 'error',
-//         }),
-//       );
-//     }
-//   }
-// }
+function* fetchDetails(params: PayloadAction<{ id: string | number }>) {
+  try {
+    const response: Response<PaymentKUR> = yield call(
+      service.getRequestDetails,
+      params.payload.id,
+    );
 
-// function* rejectRequest(params: PayloadAction<ActionParams>) {
-//   try {
-//     const listParams: RequestKURParams = yield select(
-//       (state) => state.request.params,
-//     );
-//     yield call(service.rejectRequest, params.payload);
-//     yield put(
-//       uiAction.openToast({
-//         headMsg: 'Success',
-//         message: 'Successfully reject request',
-//         severity: 'success',
-//       }),
-//     );
-//     if (params.payload.detailsPage)
-//       yield put(requestKURAction.fetchDetails({ id: params.payload.id }));
-//     else yield put(requestKURAction.fetchData(listParams));
-//   } catch (err) {
-//     const headMsg = 'Failed to Approve Request';
-//     if (typeof err === 'string') {
-//       const error = err as string;
-//       yield put(
-//         uiAction.openToast({
-//           headMsg,
-//           message: error,
-//           severity: 'error',
-//         }),
-//       );
-//     } else {
-//       yield put(
-//         uiAction.openToast({
-//           headMsg,
-//           message: 'interval server error',
-//           severity: 'error',
-//         }),
-//       );
-//     }
-//   }
-// }
-
-// function* fetchDetails(params: PayloadAction<{ id: string | number }>) {
-//   try {
-//     const response: Response<RequestKUR> = yield call(
-//       service.getRequestDetails,
-//       params.payload.id,
-//     );
-
-//     yield put(requestKURAction.fetchDetailsSuccess(response));
-//   } catch (err) {
-//     if (typeof err === 'string') {
-//       const error = err as string;
-//       yield put(
-//         uiAction.openToast({
-//           headMsg: 'Error get data',
-//           message: error,
-//           severity: 'error',
-//         }),
-//       );
-//     } else {
-//       yield put(
-//         uiAction.openToast({
-//           headMsg: 'Error get data',
-//           message: 'interval server error',
-//           severity: 'error',
-//         }),
-//       );
-//     }
-//   }
-// }
+    yield put(paymentKURAction.fetchDetailsSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
 
 // function* fetchDetailsTable(
 //   params: PayloadAction<{ id: string | number; params: ListParams }>,
 // ) {
 //   try {
-//     const response: ListResponse<KURRequestDetail> = yield call(
+//     const response: ListResponse<KURPaymentDetail> = yield call(
 //       service.getDetailsTable,
 //       params.payload.id,
 //       params.payload.params,
 //     );
-//     yield put(requestKURAction.fetchDetailsTableSuccess(response));
+//     yield put(paymentKURAction.fetchDetailsTableSuccess(response));
 //   } catch (err) {
 //     if (typeof err === 'string') {
 //       const error = err as string;
@@ -186,8 +107,6 @@ function* fetchData(params: PayloadAction<PaymentKUR>) {
 
 export default function* requestKurSagas() {
   yield takeLatest(paymentKURAction.fetchData.type, fetchData);
-  // yield takeLatest(requestKURAction.approveRequest.type, approveRequest);
-  // yield takeLatest(requestKURAction.rejectRequest.type, rejectRequest);
-  // yield takeLatest(paymentKURAction.fetchDetails.type, fetchDetails);
+  yield takeLatest(paymentKURAction.fetchDetails.type, fetchDetails);
   // yield takeLatest(paymentKURAction.fetchDetailsTable.type, fetchDetailsTable);
 }
