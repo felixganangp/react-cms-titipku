@@ -239,6 +239,7 @@ export default function PaymentKURPage() {
       label: 'Name',
       align: 'left',
       enableSort: true,
+
       isSticky: true,
       format: (val) => <Typography>{val.kur_user.name}</Typography>,
     },

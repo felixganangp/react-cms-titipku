@@ -77,6 +77,7 @@ export default function RequestKURPage() {
     request.params.order_by,
     request.params.order_type,
     request.params.page,
+    request.params.count,
   ]);
 
   const handleSearch = (value: string) => {

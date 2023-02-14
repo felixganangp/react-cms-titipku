@@ -20,7 +20,9 @@ export const StatusStyle = styled.div<Pick<StatusStyleTypes, 'color'>>`
   text-align: center;
   white-space: nowrap;
   word-wrap: break-word;
+  text-transform: capitalize;
 `;
+
 export default function Status(props: StatusTypes) {
   return <StatusStyle color={props.color}>{props.children}</StatusStyle>;
 }

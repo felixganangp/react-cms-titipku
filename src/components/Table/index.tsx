@@ -315,6 +315,7 @@ function EnhancedTable<T extends Data>({
                       flexDirection: 'column',
                       padding: '50px',
                     }}
+                    data-testid="data-table-not-result-found"
                   >
                     <img
                       src="/images/no-data.svg"
