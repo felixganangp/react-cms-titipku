@@ -73,18 +73,18 @@ export default function RequestKURPage() {
   useEffect(() => {
     dispatch(requestKURAction.fetchData(request.params));
   }, [
-    // request.params.search,
+    request.params.search,
     request.params.order_by,
     request.params.order_type,
     request.params.page,
     request.params.count,
   ]);
 
-  const handleSearch = (value: string) => {
+  const handleSearch = (value: any) => {
     dispatch(
       requestKURAction.setParams({
         page: 1,
-        search: value,
+        search: value.value,
       }),
     );
   };
@@ -351,7 +351,7 @@ export default function RequestKURPage() {
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
                     fullWidth
                     defaultValue={request.params.search}
-                    value={request.params.search}
+                    // value={request.params.search}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -359,8 +359,10 @@ export default function RequestKURPage() {
                         </InputAdornment>
                       ),
                     }}
-                    onChange={(event) => {
-                      handleSearch(event.target.value);
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        handleSearch(event.target);
+                      }
                     }}
                   />
                   <FilterButton
