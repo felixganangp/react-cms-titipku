@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -20,25 +20,25 @@ import { HeadCells } from 'components/Table/types';
 import MenuList from 'components/MenuList';
 import FormLabel from 'components/FormLabel';
 import Status from 'components/Status';
-import useModal from 'hooks/useModal';
 import digitFormatter from 'utils/digitFormatter';
 import moment from 'moment';
 import debounce from 'utils/debounce';
 
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import AddIcon from '@mui/icons-material/Add';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { invoiceKurAction } from 'store/slice/kur/Invoice';
-import { InvoiceKur, PaymentKURParams } from 'models/kur/Invoice';
+import { InvoiceKur } from 'models/kur/Invoice';
 import { areaAction } from 'store/slice/Area';
 import { typeAction } from 'store/slice/kur/Type';
 import { Area } from 'models/Area';
 import { Type } from 'models/kur/Type';
 
 export default function Ivoice() {
+  const navigate = useNavigate();
+
   const dispatch = useAppDispatch();
   const invoice = useAppSelector((state) => state.invoice);
 
@@ -212,12 +212,15 @@ export default function Ivoice() {
   const headCell: HeadCells<InvoiceKur>[] = [
     {
       id: 'kur_invoice_number',
-      label: 'No. Payment',
+      label: 'No. Invoice',
       align: 'left',
       minWidth: '160px',
       enableSort: true,
       format: (val) => (
-        <Typography sx={{ color: '#0774d1' }}>
+        <Typography
+          sx={{ color: '#0774d1', cursor: 'pointer' }}
+          onClick={() => navigate(`/kur/invoice/${val.id}`)}
+        >
           {val.kur_invoice_number}
         </Typography>
       ),
@@ -365,6 +368,29 @@ export default function Ivoice() {
       minWidth: '160px',
       format: (val) => (
         <Typography>Rp {digitFormatter.format(val.total_payment)}</Typography>
+      ),
+    },
+    {
+      id: 'menu',
+      label: 'Action',
+      align: 'left',
+      format: (val) => (
+        <>
+          <MenuList
+            menu={[
+              {
+                label: 'Detail',
+                onClick: () => {
+                  navigate(`/kur/invoice/${val.id}`);
+                },
+              },
+            ]}
+          >
+            <IconButton>
+              <MoreVertIcon />
+            </IconButton>
+          </MenuList>
+        </>
       ),
     },
   ];

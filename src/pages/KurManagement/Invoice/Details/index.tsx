@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
@@ -33,6 +33,8 @@ const colorStatusUser = (string: string | undefined) => {
 };
 export default function DetailsInvoice() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const dispatch = useAppDispatch();
   const invoice = useAppSelector((state) => state.invoice.details);
 
@@ -50,9 +52,12 @@ export default function DetailsInvoice() {
       enableSort: true,
       format: (val) => {
         return (
-          <Link to="/" style={{ textDecoration: 'none', color: '#0774d1' }}>
+          <Typography
+            sx={{ color: '#0774d1', cursor: 'pointer' }}
+            onClick={() => navigate(`/kur/payment/${val.id}`)}
+          >
             {val.kur_payment.kur_payment_number || '-'}
-          </Link>
+          </Typography>
         );
       },
     },
