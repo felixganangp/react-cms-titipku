@@ -73,7 +73,7 @@ export default function RequestKURPage() {
   useEffect(() => {
     dispatch(requestKURAction.fetchData(request.params));
   }, [
-    request.params.search,
+    // request.params.search,
     request.params.order_by,
     request.params.order_type,
     request.params.page,
@@ -89,7 +89,7 @@ export default function RequestKURPage() {
     );
   };
 
-  const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
+  // const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
 
   const handleChangePage = (value: number) => {
     dispatch(
@@ -176,6 +176,7 @@ export default function RequestKURPage() {
         kur_user_type_id: undefined,
         submit_date_start: undefined,
         submit_date_end: undefined,
+        search: '',
       }),
     );
     await dispatch(
@@ -187,7 +188,7 @@ export default function RequestKURPage() {
     await dispatch(
       requestKURAction.fetchData({
         page: 1,
-        search: request.params.search,
+        search: '',
         area_ids: undefined,
         kur_user_type_id: undefined,
         submit_date_start: undefined,
@@ -350,6 +351,7 @@ export default function RequestKURPage() {
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
                     fullWidth
                     defaultValue={request.params.search}
+                    value={request.params.search}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -358,7 +360,7 @@ export default function RequestKURPage() {
                       ),
                     }}
                     onChange={(event) => {
-                      debounceSearch(event.target.value);
+                      handleSearch(event.target.value);
                     }}
                   />
                   <FilterButton

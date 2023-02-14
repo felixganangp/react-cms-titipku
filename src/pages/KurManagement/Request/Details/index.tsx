@@ -11,6 +11,8 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import CallOutlinedIcon from '@mui/icons-material/CallOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
+
+import DefaultModal from '@mui/material/Modal';
 import { ExpandMore } from '@mui/icons-material';
 import Table from 'components/Table';
 import useModal from 'hooks/useModal';
@@ -46,6 +48,18 @@ export default function RequestKURDetails() {
   const creditBalance = useAppSelector((state) => state.request.creditBalance);
   const details = useAppSelector((state) => state.request);
 
+  const [modalImage, setModalImage] = useState<{
+    open: boolean;
+    filePath: string | null;
+  }>({
+    open: false,
+    filePath: null,
+  });
+
+  const handleZoomImage = (open: boolean, filePath: string | null) => {
+    setModalImage({ open, filePath });
+  };
+
   const headCell = [
     {
       id: 'image',
@@ -53,7 +67,7 @@ export default function RequestKURDetails() {
       align: 'left',
       width: '130px',
       format: (val: any) => (
-        <Box>
+        <Box onClick={() => handleZoomImage(true, val.image_filepath)}>
           <img
             src={val.image_filepath}
             onError={({ currentTarget }) => {
@@ -440,6 +454,7 @@ export default function RequestKURDetails() {
           />
         </Content>
       </Box>
+      {/* modals */}
       <Modal
         open={formModal.open}
         title="Refusal Reason"
@@ -447,6 +462,25 @@ export default function RequestKURDetails() {
       >
         <RefusalReason onSubmitRefusal={handleRejectRequest} id={id || 0} />
       </Modal>
+      <DefaultModal
+        open={modalImage.open}
+        onClose={() => setModalImage({ open: false, filePath: null })}
+      >
+        <Box
+          position="absolute"
+          maxHeight="70vh"
+          maxWidth="90vw"
+          component="img"
+          bgcolor="#cecece"
+          top="50%"
+          left="50%"
+          sx={{
+            objectFit: 'contain',
+            transform: 'translate(-50%, -50%)',
+          }}
+          src={modalImage.filePath || undefined}
+        />
+      </DefaultModal>
     </div>
   );
 }
