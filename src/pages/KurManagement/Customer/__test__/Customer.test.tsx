@@ -14,9 +14,10 @@ import MockTheme from 'utils/MockTheme';
 import { store } from 'store';
 import { customerAction } from 'store/slice/kur/Customer';
 import { typeAction } from 'store/slice/kur/Type';
+import { areaAction } from 'store/slice/Area';
 import { CreateCustomer } from 'models/kur/Customer';
 import CustomerView from '../index';
-import { MockLisCustomers } from './MockCustomer';
+import { MockLisCustomers, MockKurType, MockKurArea } from './MockCustomer';
 import FormCustomer from '../components/form';
 
 const formData: {
@@ -102,6 +103,32 @@ describe('Customer KUR Page', async () => {
       }),
     ),
   );
+
+  const mockKurType = vi.fn((data) =>
+    store.dispatch(
+      typeAction.fetchDataSuccess({
+        timestamp: 1675755225,
+        status: 'ok',
+        message: 'Retrieved successfully',
+        count: 2,
+        total: 2,
+        data,
+      }),
+    ),
+  );
+
+  const mockKurArea = vi.fn((data) =>
+    store.dispatch(
+      areaAction.fetchDataSuccess({
+        timestamp: 1675755225,
+        status: 'ok',
+        message: 'Retrieved successfully',
+        count: 2,
+        total: 2,
+        data,
+      }),
+    ),
+  );
   beforeEach(() => {
     // vi.clearAllMocks();
     render(
@@ -116,14 +143,6 @@ describe('Customer KUR Page', async () => {
     vi.clearAllMocks();
   });
   it('Page customer kur should be shown', () => {
-    // const { debug } = render(
-    //   <React.Suspense fallback>
-    //     <MockTheme theme={theme}>
-    //       <CustomerView />
-    //     </MockTheme>
-    //   </React.Suspense>,
-    // );
-    // debug();
     const customerPageHeader = screen.getByText(/KUR Customer/i);
     expect(customerPageHeader).toBeInTheDocument();
   });
@@ -138,6 +157,16 @@ describe('Customer KUR Page', async () => {
     });
     const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
     expect(listTableCustomer.length).toBe(2);
+  });
+  it('Show pagination of table customer kur', async () => {
+    await act(() => {
+      mockCustomer(MockLisCustomers);
+    });
+    const getPagination = screen.getByLabelText('pagination navigation');
+    const buttonPage = within(getPagination).getByLabelText('page 1');
+
+    fireEvent.click(buttonPage);
+    expect(buttonPage).toHaveClass('Mui-selected');
   });
   // it('Content of table list customer kur', async () => {
   //   mockCustomer(MockLisCustomers);
@@ -162,6 +191,45 @@ describe('Customer KUR Page', async () => {
     expect(filterCollapse).not.toHaveClass('MuiCollapse-hidden');
     expect(filterTypeInput).toBeInTheDocument();
     expect(filterPasarInput).toBeInTheDocument();
+    // expect(filterScoreInput).toBeInTheDocument();
+  });
+  it('Open filter, change type and area filter, then reset filter', async () => {
+    await act(() => {
+      mockKurType(MockKurType);
+      mockKurArea(MockKurArea);
+    });
+    showFilter();
+    // const filterCollapse = screen.getByTestId('filter-collapse-customer');
+    const filterTypeInput = screen.getByTestId('filter-type-customer');
+    fireEvent.click(filterTypeInput);
+    const inputType = within(filterTypeInput).getByRole('combobox');
+    fireEvent.change(inputType, { target: { value: 'b2' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+    const filterPasarInput = screen.getByTestId('filter-pasar-customer');
+    fireEvent.click(filterPasarInput);
+    const inputArea = within(filterPasarInput).getByRole('combobox');
+    fireEvent.change(inputArea, { target: { value: 'Pas' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+    // const selectedPasar = screen.getAllByText(/Pasar BSD Tekno mandiri/i);
+
+    // const filterScoreInput = screen.getByTestId('filter-credit-score-customer');
+    // expect(filterCollapse).not.toHaveClass('MuiCollapse-hidden');
+    // const input = screen.getByRole('presentation');
+    const resetButton = screen.getByRole('button', { name: 'Reset' });
+    fireEvent.click(resetButton);
+    expect(inputType).toHaveValue('');
+    expect(filterPasarInput).toBeInTheDocument();
+    // expect(inputArea.length).toBe(1);
+
+    // expect(filterPasarInput).toBeInTheDocument();
     // expect(filterScoreInput).toBeInTheDocument();
   });
   //* FORM */

@@ -33,6 +33,7 @@ import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
 import { MerchantResp } from 'models/Merchant';
 import debounce from 'utils/debounce';
+import { getColorCreditScore } from 'utils/creditScoreColor';
 import bankData from 'data/list-bank.json';
 
 import FormCustomer from './components/form';
@@ -203,6 +204,16 @@ export default function KurCustomer() {
     setFormHead('Add Customer');
     formModal.openModal();
   };
+
+  const convertStrCreditScore = (val: string) => {
+    const splitStr = val.split(' ');
+    const firstCharUpperCase = splitStr.map((el) => {
+      return el.charAt(0).toUpperCase() + el.slice(1);
+    });
+
+    const result = firstCharUpperCase.join(' ');
+    return result;
+  };
   const headCell = [
     {
       id: 'id',
@@ -238,7 +249,7 @@ export default function KurCustomer() {
       id: 'merchant',
       label: 'Merchant',
       align: 'left',
-      width: '439px',
+      width: '410px',
       format: (val: Customer) => <div>{val.user.name}</div>,
     },
     {
@@ -247,11 +258,29 @@ export default function KurCustomer() {
       align: 'left',
       format: (val: Customer) => <div>{val.user.area.name}</div>,
     },
-    // {
-    //   id: 'credit_score',
-    //   label: 'Credit Score',
-    //   align: 'left',
-    // },
+    {
+      id: 'credit_status',
+      label: 'Credit Score',
+      align: 'left',
+      width: '200px',
+      format: (val: Customer) => {
+        const bgColor = getColorCreditScore(val.kur_user_credit_score.id);
+        return (
+          <Chip
+            sx={{
+              borderRadius: '8px',
+              paddingX: '16px',
+              paddingY: '8px',
+              color: '#fff',
+              backgroundColor: bgColor,
+              fontSize: '12px',
+              fontWeight: 500,
+            }}
+            label={convertStrCreditScore(val.kur_user_credit_score.name)}
+          />
+        );
+      },
+    },
     {
       id: 'action',
       label: 'Action',
@@ -432,6 +461,7 @@ export default function KurCustomer() {
     setFormData({ isEdit: false, initialData });
     await formModal.closeModal();
   };
+
   return (
     <Box p="20px" bgcolor="#F5F7FA">
       <Grid container spacing={2}>
