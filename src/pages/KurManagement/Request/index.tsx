@@ -23,7 +23,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CalendarIcon from '@mui/icons-material/CalendarTodayOutlined';
 import { RequestKUR } from 'models/kur/Request';
-import debounce from 'utils/debounce';
 import { HeadCells } from 'components/Table/types';
 import moment from 'moment';
 import { areaAction } from 'store/slice/Area';
@@ -38,6 +37,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import Modal from 'components/Modal';
 import RefusalReason from './components/InputMessage';
 import {
+  CustomerStatus,
   FilterButton,
   FilterDataBox,
   InvoiceLabel,
@@ -88,8 +88,6 @@ export default function RequestKURPage() {
       }),
     );
   };
-
-  // const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
 
   const handleChangePage = (value: number) => {
     dispatch(
@@ -226,8 +224,31 @@ export default function RequestKURPage() {
       id: 'name',
       label: 'Name',
       align: 'left',
+      width: '150px',
       enableSort: true,
-      format: (val) => <Typography>{val.kur_user.name}</Typography>,
+      format: (val) => (
+        <Box
+          display="flex"
+          flexDirection="row"
+          justifyContent="flex-start"
+          alignItems="center"
+          marginRight="5px"
+        >
+          <Box display="absolute">
+            <CustomerStatus
+              status={val.kur_user.kur_user_credit_score.id || 1}
+            />
+          </Box>
+          <Box
+            display="flex"
+            flexDirection="row"
+            justifyContent="flex-start"
+            flexWrap="wrap"
+          >
+            <Typography>{val.kur_user.name}</Typography>
+          </Box>
+        </Box>
+      ),
     },
     {
       id: 'kur_type',
