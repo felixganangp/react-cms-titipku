@@ -73,7 +73,7 @@ export default function RequestKURPage() {
   useEffect(() => {
     dispatch(requestKURAction.fetchData(request.params));
   }, [
-    request.params.search,
+    // request.params.search,
     request.params.order_by,
     request.params.order_type,
     request.params.page,
@@ -359,9 +359,10 @@ export default function RequestKURPage() {
                         </InputAdornment>
                       ),
                     }}
+                    onChange={(event) => handleSearch(event.target)}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter') {
-                        handleSearch(event.target);
+                        handleApplyFilter();
                       }
                     }}
                   />
