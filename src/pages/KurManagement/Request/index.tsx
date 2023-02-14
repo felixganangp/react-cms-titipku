@@ -80,11 +80,11 @@ export default function RequestKURPage() {
     request.params.count,
   ]);
 
-  const handleSearch = (value: string) => {
+  const handleSearch = (value: any) => {
     dispatch(
       requestKURAction.setParams({
         page: 1,
-        search: value,
+        search: value.value,
       }),
     );
   };
@@ -351,7 +351,7 @@ export default function RequestKURPage() {
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
                     fullWidth
                     defaultValue={request.params.search}
-                    value={request.params.search}
+                    // value={request.params.search}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -359,8 +359,11 @@ export default function RequestKURPage() {
                         </InputAdornment>
                       ),
                     }}
-                    onChange={(event) => {
-                      handleSearch(event.target.value);
+                    onChange={(event) => handleSearch(event.target)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        handleApplyFilter();
+                      }
                     }}
                   />
                   <FilterButton

@@ -68,13 +68,18 @@ export const CreditScore = styled(Box)<Pick<CreditScoreProps, 'status'>>`
   padding: 6px 10px;
   color: #fff;
   background-color: ${(p) =>
-    p.status === 'pending'
-      ? '#FF8F00'
-      : p.status === 'lancar'
-      ? '#008E58'
-      : '#C10000'};
+    p.status === 'Lancar'
+      ? '#008e58'
+      : p.status === 'Dalam perhatian khusus'
+      ? '#0774d1'
+      : p.status === 'Kurang lancar'
+      ? '#ff8f00'
+      : p.status === 'Diragukan'
+      ? '#ec6470'
+      : '#bf370c'};
   border-radius: 10px;
-  width: 80px;
+  min-width: 80px;
+  width: auto;
   font-size: 12px;
 `;
 

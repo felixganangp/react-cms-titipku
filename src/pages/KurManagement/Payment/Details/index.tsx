@@ -131,8 +131,10 @@ export default function PaymentKURDetails() {
                 {paymentDetails?.kur_user?.name}
               </Typography>
               <FieldContent sx={{ marginLeft: '20px' }}>
-                <CreditScore status={paymentDetails?.kur_user?.credit_status}>
-                  {paymentDetails?.kur_user?.credit_status}
+                <CreditScore
+                  status={paymentDetails?.kur_user?.kur_user_credit_score?.name}
+                >
+                  {paymentDetails?.kur_user?.kur_user_credit_score?.name}
                 </CreditScore>
               </FieldContent>
             </Box>

@@ -68,7 +68,7 @@ export interface Customer {
   kur_user_type: KurUserType;
   kur_user_document: KurUserDocument[];
   total_outstanding_amount: number;
-  credit_status: string;
+  kur_user_credit_score: UserCreditScore;
 }
 export interface KurUserStatus {
   id?: number;
@@ -153,4 +153,16 @@ export interface KurUserDocumentPayload {
 export interface CheckMerchantExistParams {
   merchant_id: number | undefined;
   exclude_id?: number | undefined;
+}
+
+export interface UserCreditScore {
+  id?: number;
+  created_at: number;
+  updated_at: number;
+  created_by_id: number;
+  created_by_type: string;
+  updated_by_id: number;
+  updated_by_type: string;
+  name: string;
+  description: string;
 }

@@ -140,12 +140,12 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
     >
       <Box
         width={drawerWidthClose}
-        height="calc(100% - 56px)"
+        height="100%"
         boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
       />
       <Box
         position="absolute"
-        height="calc(100% - 56px)"
+        height="100%"
         boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
       >
         <Drawer
