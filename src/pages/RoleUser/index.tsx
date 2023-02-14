@@ -1,5 +1,4 @@
 import React, { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -20,7 +19,6 @@ import moment from 'moment';
 
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search';
-// import SimCardDownloadOutlinedIcon from '@mui/icons-material/SimCardDownloadOutlined';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
@@ -53,7 +51,6 @@ const statusColor = (id: number, name: string) => {
   return { nameCurrent, colorCurrent };
 };
 export default function RoleUser() {
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const roleUser = useAppSelector((state) => state.roleUser);
 

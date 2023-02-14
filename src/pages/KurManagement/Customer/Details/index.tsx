@@ -29,7 +29,7 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import HideImageOutlinedIcon from '@mui/icons-material/HideImageOutlined';
 
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { customerAction } from 'store/slice/kur/Customer';
 import { requestKURAction } from 'store/slice/kur/Request';
 import { paymentKURAction } from 'store/slice/kur/Payment';
@@ -55,6 +55,7 @@ interface ModalImageTypes {
 }
 export default function RoleUserDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const customerKur = useAppSelector((state) => state.customerKur);
   const request = useAppSelector((state) => state.request);
@@ -179,7 +180,10 @@ export default function RoleUserDetails() {
       label: 'Order Number',
       align: 'left',
       format: (val) => (
-        <Typography sx={{ color: '#0774d1' }}>
+        <Typography
+          sx={{ color: '#0774d1', cursor: 'pointer' }}
+          onClick={() => navigate(`/kur/request/${val.id}`)}
+        >
           {val.kur_request_number}
         </Typography>
       ),
@@ -251,7 +255,10 @@ export default function RoleUserDetails() {
       align: 'left',
       minWidth: '160px',
       format: (val) => (
-        <Typography sx={{ color: '#0774d1' }}>
+        <Typography
+          sx={{ color: '#0774d1', cursor: 'pointer' }}
+          onClick={() => navigate(`/kur/payment/${val.id}`)}
+        >
           {val.kur_payment_number}
         </Typography>
       ),
@@ -324,11 +331,14 @@ export default function RoleUserDetails() {
   const headCellInvoice: HeadCells<InvoiceKur>[] = [
     {
       id: 'kur_payment_number',
-      label: 'No. Payment',
+      label: 'No. Invoice',
       align: 'left',
       minWidth: '160px',
       format: (val) => (
-        <Typography sx={{ color: '#0774d1' }}>
+        <Typography
+          sx={{ color: '#0774d1', cursor: 'pointer' }}
+          onClick={() => navigate(`/kur/invoice/${val.id}`)}
+        >
           {val.kur_invoice_number}
         </Typography>
       ),
