@@ -13,7 +13,6 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
 
 import DefaultModal from '@mui/material/Modal';
-import { ExpandMore } from '@mui/icons-material';
 import Table from 'components/Table';
 import useModal from 'hooks/useModal';
 import Modal from 'components/Modal';
@@ -26,8 +25,6 @@ import SubDetailsPagesWrapper from 'components/Accordion/SubDetailsPagesWrapper'
 import {
   DetailsHeader,
   BackButton,
-  Header,
-  Content,
   ContentGrid,
   Field,
   DescriptionBox,
@@ -35,10 +32,10 @@ import {
   FieldContent,
   Amount,
   InvoiceStatus,
+  CustomerStatusDetail,
 } from '../request.styled';
 import RefusalReason from '../components/InputMessage';
 import CustomerData from '../components/CustomerData';
-import { light } from '../../../../theme/pallets';
 
 export default function RequestKURDetails() {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -131,7 +128,7 @@ export default function RequestKURDetails() {
       let total = 0;
       if (requestDetails.kur_request_detail) {
         // eslint-disable-next-line array-callback-return
-        requestDetails.kur_request_detail.some((item) => {
+        requestDetails.kur_request_detail.some((item: any) => {
           total += item.amount;
         });
       }
@@ -252,9 +249,16 @@ export default function RequestKURDetails() {
                 <Typography fontWeight={700} variant="h1">
                   {requestDetails?.kur_user?.name}
                 </Typography>
-                {/* <CustomerStatusDetail status={customerStatus}>
-                Customer Status
-              </CustomerStatusDetail> */}
+                <CustomerStatusDetail
+                  status={
+                    requestDetails &&
+                    requestDetails.kur_user.kur_user_credit_score.id
+                      ? requestDetails.kur_user.kur_user_credit_score.id
+                      : 1
+                  }
+                >
+                  {requestDetails?.kur_user.kur_user_credit_score.name}
+                </CustomerStatusDetail>
               </Box>
               <Box
                 display="flex"
