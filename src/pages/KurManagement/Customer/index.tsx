@@ -132,6 +132,11 @@ export default function KurCustomer() {
     setFormHead('Edit Customer');
     const birthDate = new Date(0);
     birthDate.setUTCSeconds(val.birth_date);
+    const date = birthDate.getDate();
+    const month = birthDate.getMonth();
+    const year = birthDate.getFullYear();
+    const d = moment({ year, month: month + 1, day: date });
+    // const convertBirthDate = `${date}/${month + 1}/${year}`;
     const convertBirthDate = moment(birthDate).format('MM/DD/YYYY');
     const findBank = bankData.data.filter((el) => el.name === val.user_bank);
 
@@ -266,6 +271,7 @@ export default function KurCustomer() {
                 onClick: () => {
                   handleOpenEdit(val);
                 },
+                dataId: 'button-edit-customer',
               },
               // {
               //   label: `Hold`,
