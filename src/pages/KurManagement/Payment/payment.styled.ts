@@ -11,6 +11,10 @@ interface InvoiceStatusProps {
   status: string | undefined;
 }
 
+interface CreditScoreProps {
+  status: string | undefined;
+}
+
 export const InvoiceLabel = styled(Typography)`
   color: #0774d1;
 `;
@@ -49,6 +53,24 @@ export const InvoiceStatus = styled(Box)<Pick<InvoiceStatusProps, 'status'>>`
     p.status === 'pending'
       ? '#FF8F00'
       : p.status === 'approved'
+      ? '#008E58'
+      : '#C10000'};
+  border-radius: 10px;
+  width: 80px;
+  font-size: 12px;
+`;
+
+export const CreditScore = styled(Box)<Pick<CreditScoreProps, 'status'>>`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 10px;
+  color: #fff;
+  background-color: ${(p) =>
+    p.status === 'pending'
+      ? '#FF8F00'
+      : p.status === 'lancar'
       ? '#008E58'
       : '#C10000'};
   border-radius: 10px;
