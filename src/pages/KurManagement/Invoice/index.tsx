@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
@@ -10,10 +11,14 @@ import Collapse from '@mui/material/Collapse';
 import Autocomplete from '@mui/material/Autocomplete';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 import Table from 'components/Table';
 import { HeadCells } from 'components/Table/types';
 import MenuList from 'components/MenuList';
+import FormLabel from 'components/FormLabel';
 import Status from 'components/Status';
 import useModal from 'hooks/useModal';
 import digitFormatter from 'utils/digitFormatter';
@@ -27,16 +32,40 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { invoiceKurAction } from 'store/slice/kur/Invoice';
-import { InvoiceKur } from 'models/kur/Invoice';
+import { InvoiceKur, PaymentKURParams } from 'models/kur/Invoice';
+import { areaAction } from 'store/slice/Area';
+import { typeAction } from 'store/slice/kur/Type';
+import { Area } from 'models/Area';
+import { Type } from 'models/kur/Type';
 
 export default function Ivoice() {
   const dispatch = useAppDispatch();
   const invoice = useAppSelector((state) => state.invoice);
+
+  // define filter
   const [collapseFilter, setCollapseFilter] = useState(false);
+  const areasData = useAppSelector((state) => state.area.data);
+  const typesData = useAppSelector((state) => state.typeKur.data);
+  const [inputValueArea, setInputValueArea] = useState('');
+  const [openDatePicker, setOpenDatePicker] = useState({
+    deliveryStart: false,
+    deliveryEnd: false,
+    invoiceStart: false,
+    invoiceEnd: false,
+    dueStart: false,
+    dueEnd: false,
+  });
 
   useEffect(() => {
     dispatch(invoiceKurAction.fetchData(invoice.params));
   }, [invoice.params]);
+
+  useEffect(() => {
+    dispatch(typeAction.fetchData());
+    dispatch(areaAction.fetchData());
+    dispatch(invoiceKurAction.fetchDataConditionInvoice());
+    dispatch(invoiceKurAction.fetchDataStatusInvoice());
+  }, []);
 
   const handleChangePage = (value: number) => {
     dispatch(
@@ -68,6 +97,116 @@ export default function Ivoice() {
         order_type: value.orderType,
       }),
     );
+  };
+
+  const handleChangeType = (value: Type) => {
+    dispatch(
+      invoiceKurAction.setDisplayFilter({
+        type: value,
+      }),
+    );
+  };
+
+  const handleChangePasar = (value: Area[]) => {
+    dispatch(
+      invoiceKurAction.setDisplayFilter({
+        areas: value,
+      }),
+    );
+  };
+
+  const handleChangeStatus = (value: string | null) => {
+    dispatch(
+      invoiceKurAction.setDisplayFilter({
+        status: value,
+      }),
+    );
+  };
+
+  const handleChangeCondition = (value: string | null) => {
+    dispatch(
+      invoiceKurAction.setDisplayFilter({
+        condition: value,
+      }),
+    );
+  };
+
+  const handleChangeDate = (type: string, value: Date | null) => {
+    dispatch(
+      invoiceKurAction.setDisplayFilter({
+        [type]: value,
+      }),
+    );
+  };
+
+  const handleOpenDatePicker = (type: string, value: boolean) => {
+    setOpenDatePicker({
+      ...openDatePicker,
+      [type]: value,
+    });
+  };
+
+  const handleApplyFilter = () => {
+    const { areas, type, condition, status, ...date } = invoice.displayFilter;
+    const newParams = { ...invoice.params, page: 1 };
+
+    if (type !== null) {
+      newParams.kur_user_type_id = type?.id;
+    }
+
+    if (areas && areas?.length > 0) {
+      newParams.area_ids = areas.map((val) => val.id).join(',');
+    }
+
+    if (condition !== null) {
+      newParams.condition = condition;
+    }
+
+    if (status !== null) {
+      newParams.paid_status = status;
+    }
+
+    if (date.delivery_date_start) {
+      newParams.delivery_date_start = Math.floor(
+        new Date(date.delivery_date_start).getTime() / 1000,
+      );
+    }
+
+    if (date.delivery_date_end) {
+      newParams.delivery_date_end = Math.floor(
+        new Date(date.delivery_date_end).setHours(23, 59, 59, 59) / 1000,
+      );
+    }
+
+    if (date.invoice_date_start) {
+      newParams.invoice_date_start = Math.floor(
+        new Date(date.invoice_date_start).getTime() / 1000,
+      );
+    }
+
+    if (date.invoice_date_end) {
+      newParams.invoice_date_end = Math.floor(
+        new Date(date.invoice_date_end).setHours(23, 59, 59, 59) / 1000,
+      );
+    }
+
+    if (date.due_date_start) {
+      newParams.due_date_start = Math.floor(
+        new Date(date.due_date_start).getTime() / 1000,
+      );
+    }
+
+    if (date.due_date_end) {
+      newParams.due_date_end = Math.floor(
+        new Date(date.due_date_end).setHours(23, 59, 59, 59) / 1000,
+      );
+    }
+    dispatch(invoiceKurAction.setParams(newParams));
+  };
+
+  const handleResetFilter = () => {
+    dispatch(invoiceKurAction.setResetParams());
+    dispatch(invoiceKurAction.setResetDisplayFilter());
   };
 
   const headCell: HeadCells<InvoiceKur>[] = [
@@ -249,7 +388,7 @@ export default function Ivoice() {
                       size="small"
                       sx={{ bgcolor: '#ebeff3', maxWidth: '560px' }}
                       fullWidth
-                      // defaultValue={roleUser.params.search}
+                      defaultValue={invoice.params.search}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
@@ -272,105 +411,117 @@ export default function Ivoice() {
                 <Collapse in={collapseFilter}>
                   <Grid container spacing={2} sx={{ marginTop: '2rem' }}>
                     <Grid item xs={3}>
-                      <Typography
-                        sx={{
-                          fontSize: '14px',
-                          fontWeight: '500',
-                          marginBottom: 1,
-                        }}
-                      >
-                        Type
-                      </Typography>
-                      <Autocomplete
-                        data-testid="filter-type-customer"
-                        id="type"
-                        options={[]}
-                        onChange={(e, value) => {
-                          // setTypeKurFilter(value);
-                        }}
-                        // isOptionEqualToValue={(option: Type) => {
-                        //   return (
-                        //     option.id === customerKur.stateFilter?.typeKur?.id
-                        //   );
-                        // }}
-                        getOptionLabel={(option) => `${option.name}`}
-                        // value={customerKur?.stateFilter?.typeKur}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            name="type"
-                            placeholder="Select Type of KUR"
-                          />
-                        )}
-                      />
+                      <FormLabel text="Type">
+                        <Autocomplete
+                          id="filterType"
+                          options={typesData}
+                          onChange={(e, value) => {
+                            const selected = value as Type;
+                            handleChangeType(selected);
+                          }}
+                          isOptionEqualToValue={(item: Type) => {
+                            return item.id === invoice.displayFilter?.type?.id;
+                          }}
+                          getOptionLabel={(item) => item.name}
+                          value={invoice?.displayFilter?.type}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              name="type"
+                              placeholder="Select Type of KUR"
+                            />
+                          )}
+                        />
+                      </FormLabel>
                     </Grid>
                     <Grid item xs={3}>
-                      <Typography
-                        sx={{
-                          fontSize: '14px',
-                          fontWeight: '500',
-                          marginBottom: 1,
-                        }}
-                      >
-                        Pasar
-                      </Typography>
-                      <Autocomplete
-                        data-testid="filter-type-customer"
-                        id="type"
-                        options={[]}
-                        onChange={(e, value) => {
-                          // setTypeKurFilter(value);
-                        }}
-                        // isOptionEqualToValue={(option: Type) => {
-                        //   return (
-                        //     option.id === customerKur.stateFilter?.typeKur?.id
-                        //   );
-                        // }}
-                        getOptionLabel={(option) => `${option.name}`}
-                        // value={customerKur?.stateFilter?.typeKur}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            name="type"
-                            placeholder="Select Type of KUR"
-                          />
-                        )}
-                      />
+                      <FormLabel text="Pasar">
+                        <Autocomplete
+                          multiple
+                          id="filterPasar"
+                          options={areasData}
+                          onChange={(e, value) => {
+                            handleChangePasar(value);
+                          }}
+                          getOptionLabel={(option) => `${option.title}`}
+                          renderInput={(params) => {
+                            return (
+                              <TextField
+                                {...params}
+                                name="type"
+                                placeholder="Select Pasar"
+                                variant="outlined"
+                              />
+                            );
+                          }}
+                          isOptionEqualToValue={(item: Area) => {
+                            const filtered =
+                              invoice?.displayFilter?.areas?.filter(
+                                (el: any) => el.id === item.id,
+                              );
+                            if (filtered) return item.id === filtered[0]?.id;
+                            return false;
+                          }}
+                          renderOption={(props, item) => (
+                            <Box
+                              component="li"
+                              {...props}
+                              key={`area${item.id}`}
+                            >
+                              {item.title}
+                            </Box>
+                          )}
+                          value={invoice?.displayFilter?.areas}
+                          inputValue={inputValueArea}
+                          onInputChange={(_, newInput) => {
+                            setInputValueArea(newInput);
+                          }}
+                        />
+                      </FormLabel>
                     </Grid>
                     <Grid item xs={3}>
-                      <Typography
-                        sx={{
-                          fontSize: '14px',
-                          fontWeight: '500',
-                          marginBottom: 1,
-                        }}
-                      >
-                        Status
-                      </Typography>
-                      <Autocomplete
-                        data-testid="filter-type-customer"
-                        id="type"
-                        options={[]}
-                        onChange={(e, value) => {
-                          // setTypeKurFilter(value);
-                        }}
-                        // isOptionEqualToValue={(option: Type) => {
-                        //   return (
-                        //     option.id === customerKur.stateFilter?.typeKur?.id
-                        //   );
-                        // }}
-                        getOptionLabel={(option) => `${option.name}`}
-                        // value={customerKur?.stateFilter?.typeKur}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            name="type"
-                            placeholder="Select Type of KUR"
-                          />
-                        )}
-                      />
+                      <FormLabel text="Status">
+                        <Autocomplete
+                          data-testid="filter-type-customer"
+                          id="type"
+                          options={invoice.stateFilter.status}
+                          onChange={(e, value) => {
+                            handleChangeStatus(value);
+                          }}
+                          getOptionLabel={(item) => item.replaceAll('_', ' ')}
+                          value={invoice?.displayFilter?.status}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              name="type"
+                              placeholder="Select Type of KUR"
+                            />
+                          )}
+                        />
+                      </FormLabel>
                     </Grid>
                     <Grid item xs={3}>
+                      <FormLabel text="Condition">
+                        <Autocomplete
+                          data-testid="filter-type-customer"
+                          id="type"
+                          options={invoice.stateFilter.condition}
+                          onChange={(e, value) => {
+                            handleChangeCondition(value);
+                          }}
+                          getOptionLabel={(item) => item.replaceAll('_', ' ')}
+                          value={invoice?.displayFilter?.condition}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              name="type"
+                              placeholder="Select Type of KUR"
+                            />
+                          )}
+                        />
+                      </FormLabel>
+                    </Grid>
+                    <Grid item xs={4}>
                       <Typography
                         sx={{
                           fontSize: '14px',
@@ -378,30 +529,364 @@ export default function Ivoice() {
                           marginBottom: 1,
                         }}
                       >
-                        Condition
+                        Delivery Date Range
                       </Typography>
-                      <Autocomplete
-                        data-testid="filter-type-customer"
-                        id="type"
-                        options={[]}
-                        onChange={(e, value) => {
-                          // setTypeKurFilter(value);
+                      <Box
+                        display="flex"
+                        flexDirection="row"
+                        width="100%"
+                        justifyContent="space-between"
+                      >
+                        <FormLabel
+                          text=""
+                          error={
+                            invoice.displayFilter.delivery_date_start ===
+                              null &&
+                            invoice.displayFilter.delivery_date_end !== null
+                          }
+                          helperText={
+                            invoice.displayFilter.delivery_date_start ===
+                              null &&
+                            invoice.displayFilter.delivery_date_end !== null &&
+                            'Start Date is required when End Date is filled'
+                          }
+                        >
+                          <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <DesktopDatePicker
+                              open={openDatePicker.deliveryStart}
+                              onClose={() => {
+                                handleOpenDatePicker('deliveryStart', false);
+                              }}
+                              onOpen={() => {
+                                handleOpenDatePicker('deliveryStart', true);
+                              }}
+                              value={invoice.displayFilter.delivery_date_start}
+                              inputFormat="DD/MM/YYYY"
+                              onChange={(value) => {
+                                handleChangeDate('delivery_date_start', value);
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  sx={{ width: '100%' }}
+                                  {...params}
+                                  inputProps={{
+                                    ...params.inputProps,
+                                    placeholder: 'Start Date',
+                                  }}
+                                  onClick={() =>
+                                    handleOpenDatePicker('deliveryStart', true)
+                                  }
+                                />
+                              )}
+                              toolbarPlaceholder="Start Date"
+                              maxDate={invoice.displayFilter.delivery_date_end}
+                            />
+                          </LocalizationProvider>
+                        </FormLabel>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '40px',
+                          }}
+                        >
+                          -
+                        </Box>
+                        <FormLabel
+                          text=""
+                          error={
+                            invoice.displayFilter.delivery_date_start !==
+                              null &&
+                            invoice.displayFilter.delivery_date_end === null
+                          }
+                          helperText={
+                            invoice.displayFilter.delivery_date_start !==
+                              null &&
+                            invoice.displayFilter.delivery_date_end === null &&
+                            'End Date is required when Start Date is filled'
+                          }
+                        >
+                          <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <DesktopDatePicker
+                              open={openDatePicker.deliveryEnd}
+                              onClose={() => {
+                                handleOpenDatePicker('deliveryEnd', false);
+                              }}
+                              onOpen={() => {
+                                handleOpenDatePicker('deliveryEnd', true);
+                              }}
+                              value={invoice.displayFilter.delivery_date_end}
+                              inputFormat="DD/MM/YYYY"
+                              onChange={(value) => {
+                                handleChangeDate('delivery_date_end', value);
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  sx={{ width: '100%' }}
+                                  {...params}
+                                  inputProps={{
+                                    ...params.inputProps,
+                                    placeholder: 'End Date',
+                                  }}
+                                  onClick={() =>
+                                    handleOpenDatePicker('deliveryEnd', true)
+                                  }
+                                />
+                              )}
+                              toolbarPlaceholder="End Date"
+                              minDate={
+                                invoice.displayFilter.delivery_date_start
+                              }
+                            />
+                          </LocalizationProvider>
+                        </FormLabel>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Typography
+                        sx={{
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          marginBottom: 1,
                         }}
-                        // isOptionEqualToValue={(option: Type) => {
-                        //   return (
-                        //     option.id === customerKur.stateFilter?.typeKur?.id
-                        //   );
-                        // }}
-                        getOptionLabel={(option) => `${option.name}`}
-                        // value={customerKur?.stateFilter?.typeKur}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            name="type"
-                            placeholder="Select Type of KUR"
-                          />
-                        )}
-                      />
+                      >
+                        Invoice Date Range
+                      </Typography>
+                      <Box
+                        display="flex"
+                        flexDirection="row"
+                        width="100%"
+                        justifyContent="space-between"
+                      >
+                        <FormLabel
+                          text=""
+                          error={
+                            invoice.displayFilter.invoice_date_start === null &&
+                            invoice.displayFilter.invoice_date_end !== null
+                          }
+                          helperText={
+                            invoice.displayFilter.invoice_date_start === null &&
+                            invoice.displayFilter.invoice_date_end !== null &&
+                            'Start Date is required when End Date is filled'
+                          }
+                        >
+                          <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <DesktopDatePicker
+                              open={openDatePicker.invoiceStart}
+                              onClose={() => {
+                                handleOpenDatePicker('invoiceStart', false);
+                              }}
+                              onOpen={() => {
+                                handleOpenDatePicker('invoiceStart', true);
+                              }}
+                              value={invoice.displayFilter.invoice_date_start}
+                              inputFormat="DD/MM/YYYY"
+                              onChange={(value) => {
+                                handleChangeDate('invoice_date_start', value);
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  sx={{ width: '100%' }}
+                                  {...params}
+                                  inputProps={{
+                                    ...params.inputProps,
+                                    placeholder: 'Start Date',
+                                  }}
+                                  onClick={() =>
+                                    handleOpenDatePicker('invoiceStart', true)
+                                  }
+                                />
+                              )}
+                              toolbarPlaceholder="Start Date"
+                              maxDate={invoice.displayFilter.invoice_date_end}
+                            />
+                          </LocalizationProvider>
+                        </FormLabel>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '40px',
+                          }}
+                        >
+                          -
+                        </Box>
+                        <FormLabel
+                          text=""
+                          error={
+                            invoice.displayFilter.invoice_date_start !== null &&
+                            invoice.displayFilter.invoice_date_end === null
+                          }
+                          helperText={
+                            invoice.displayFilter.invoice_date_start !== null &&
+                            invoice.displayFilter.invoice_date_end === null &&
+                            'End Date is required when Start Date is filled'
+                          }
+                        >
+                          <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <DesktopDatePicker
+                              open={openDatePicker.invoiceEnd}
+                              onClose={() => {
+                                handleOpenDatePicker('invoiceEnd', false);
+                              }}
+                              onOpen={() => {
+                                handleOpenDatePicker('invoiceEnd', true);
+                              }}
+                              value={invoice.displayFilter.invoice_date_end}
+                              inputFormat="DD/MM/YYYY"
+                              onChange={(value) => {
+                                handleChangeDate('invoice_date_end', value);
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  sx={{ width: '100%' }}
+                                  {...params}
+                                  inputProps={{
+                                    ...params.inputProps,
+                                    placeholder: 'End Date',
+                                  }}
+                                  onClick={() =>
+                                    handleOpenDatePicker('invoiceEnd', true)
+                                  }
+                                />
+                              )}
+                              toolbarPlaceholder="End Date"
+                              minDate={invoice.displayFilter.invoice_date_start}
+                            />
+                          </LocalizationProvider>
+                        </FormLabel>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Typography
+                        sx={{
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          marginBottom: 1,
+                        }}
+                      >
+                        Due Date Range
+                      </Typography>
+                      <Box
+                        display="flex"
+                        flexDirection="row"
+                        width="100%"
+                        justifyContent="space-between"
+                      >
+                        <FormLabel
+                          text=""
+                          error={
+                            invoice.displayFilter.due_date_start === null &&
+                            invoice.displayFilter.due_date_end !== null
+                          }
+                          helperText={
+                            invoice.displayFilter.due_date_start === null &&
+                            invoice.displayFilter.due_date_end !== null &&
+                            'Start Date is required when End Date is filled'
+                          }
+                        >
+                          <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <DesktopDatePicker
+                              open={openDatePicker.dueStart}
+                              onClose={() => {
+                                handleOpenDatePicker('dueStart', false);
+                              }}
+                              onOpen={() => {
+                                handleOpenDatePicker('dueStart', true);
+                              }}
+                              value={invoice.displayFilter.due_date_start}
+                              inputFormat="DD/MM/YYYY"
+                              onChange={(value) => {
+                                handleChangeDate('due_date_start', value);
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  sx={{ width: '100%' }}
+                                  {...params}
+                                  inputProps={{
+                                    ...params.inputProps,
+                                    placeholder: 'Start Date',
+                                  }}
+                                  onClick={() =>
+                                    handleOpenDatePicker('dueStart', true)
+                                  }
+                                />
+                              )}
+                              toolbarPlaceholder="Start Date"
+                              maxDate={invoice.displayFilter.due_date_end}
+                            />
+                          </LocalizationProvider>
+                        </FormLabel>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '40px',
+                          }}
+                        >
+                          -
+                        </Box>
+                        <FormLabel
+                          text=""
+                          error={
+                            invoice.displayFilter.due_date_start !== null &&
+                            invoice.displayFilter.due_date_end === null
+                          }
+                          helperText={
+                            invoice.displayFilter.due_date_start !== null &&
+                            invoice.displayFilter.due_date_end === null &&
+                            'End Date is required when Start Date is filled'
+                          }
+                        >
+                          <LocalizationProvider dateAdapter={AdapterMoment}>
+                            <DesktopDatePicker
+                              open={openDatePicker.dueEnd}
+                              onClose={() => {
+                                handleOpenDatePicker('dueEnd', false);
+                              }}
+                              onOpen={() => {
+                                handleOpenDatePicker('dueEnd', true);
+                              }}
+                              value={invoice.displayFilter.due_date_end}
+                              inputFormat="DD/MM/YYYY"
+                              onChange={(value) => {
+                                handleChangeDate('due_date_end', value);
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  sx={{ width: '100%' }}
+                                  {...params}
+                                  inputProps={{
+                                    ...params.inputProps,
+                                    placeholder: 'End Date',
+                                  }}
+                                  onClick={() =>
+                                    handleOpenDatePicker('dueEnd', true)
+                                  }
+                                />
+                              )}
+                              toolbarPlaceholder="End Date"
+                              minDate={invoice.displayFilter.due_date_start}
+                            />
+                          </LocalizationProvider>
+                        </FormLabel>
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Box display="flex" justifyContent="flex-end" gap="20px">
+                        <Button
+                          variant="text"
+                          onClick={() => handleResetFilter()}
+                        >
+                          Reset
+                        </Button>
+                        <Button onClick={() => handleApplyFilter()}>
+                          Apply
+                        </Button>
+                      </Box>
                     </Grid>
                   </Grid>
                 </Collapse>
@@ -416,6 +901,7 @@ export default function Ivoice() {
                 data-testid="table-customer"
               >
                 <Table
+                  loading={invoice.loading}
                   data={invoice.data}
                   headCells={headCell}
                   page={invoice.params.page}

@@ -7,9 +7,9 @@ export interface PaymentKURParams extends ListParams {
   kur_user_type_id?: number;
   kur_user_id?: number;
   area_ids?: string;
-  paid_status?: 'paid_off' | 'debt';
+  paid_status?: string;
   bank?: string;
-  condition?: 'late' | 'on_schedule';
+  condition?: string;
   delivery_date_start?: number;
   delivery_date_end?: number;
   invoice_date_start?: number;

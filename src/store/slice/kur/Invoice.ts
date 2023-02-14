@@ -5,17 +5,52 @@ import {
   InvoiceKurDetail,
   PaymentKURParams,
 } from 'models/kur/Invoice';
+import { Area } from 'models/Area';
+import { Type } from 'models/kur/Type';
 
+interface DisplayFilter {
+  areas?: Area[];
+  type?: Type | null;
+  condition?: string | null;
+  status?: string | null;
+  delivery_date_start?: Date | null;
+  delivery_date_end?: Date | null;
+  invoice_date_start?: Date | null;
+  invoice_date_end?: Date | null;
+  due_date_start?: Date | null;
+  due_date_end?: Date | null;
+}
 interface InvoiceInitialProps {
   data: InvoiceKur[];
+  stateFilter: {
+    status: string[];
+    condition: string[];
+  };
   loading: boolean;
   total?: number;
   params: PaymentKURParams;
   details: InvoiceKur | null;
+  displayFilter: DisplayFilter;
 }
 
 const initialState: InvoiceInitialProps = {
   data: [],
+  stateFilter: {
+    status: [],
+    condition: [],
+  },
+  displayFilter: {
+    areas: [],
+    type: null,
+    condition: null,
+    status: null,
+    delivery_date_start: null,
+    delivery_date_end: null,
+    invoice_date_start: null,
+    invoice_date_end: null,
+    due_date_start: null,
+    due_date_end: null,
+  },
   loading: false,
   total: 0,
   params: {
@@ -75,6 +110,43 @@ const InvoiceSlice = createSlice({
     ) {
       state.loading = false;
       state.details = action.payload.data;
+    },
+    fetchDataStatusInvoice() {},
+    fetchDataConditionInvoice() {},
+    fetchDataStatusInvoiceSuccess(
+      state: InvoiceInitialProps,
+      action: PayloadAction<Response<string[]>>,
+    ) {
+      state.stateFilter.status = action.payload.data;
+    },
+    fetchDataConditionInvoiceSuccess(
+      state: InvoiceInitialProps,
+      action: PayloadAction<Response<string[]>>,
+    ) {
+      state.stateFilter.condition = action.payload.data;
+    },
+    setDisplayFilter(
+      state: InvoiceInitialProps,
+      action: PayloadAction<DisplayFilter>,
+    ) {
+      state.displayFilter = {
+        ...state.displayFilter,
+        ...action.payload,
+      };
+    },
+    setResetDisplayFilter(state: InvoiceInitialProps) {
+      state.displayFilter = {
+        areas: [],
+        type: null,
+        condition: null,
+        status: null,
+        delivery_date_start: null,
+        delivery_date_end: null,
+        invoice_date_start: null,
+        invoice_date_end: null,
+        due_date_start: null,
+        due_date_end: null,
+      };
     },
   },
 });

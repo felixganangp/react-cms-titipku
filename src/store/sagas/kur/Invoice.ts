@@ -73,7 +73,75 @@ function* fetchDataDetail(params: PayloadAction<{ id: string | number }>) {
   }
 }
 
+function* fetchDataStatusInvoice() {
+  try {
+    const response: Response<string[]> = yield call(
+      InvoiceService.getAllStatusInvoice,
+    );
+
+    yield put(invoiceKurAction.fetchDataStatusInvoiceSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(invoiceKurAction.failedFetch());
+  }
+}
+
+function* fetchDataConditionInvoice() {
+  try {
+    const response: Response<string[]> = yield call(
+      InvoiceService.getAllConditionInvoice,
+    );
+
+    yield put(invoiceKurAction.fetchDataConditionInvoiceSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(invoiceKurAction.failedFetch());
+  }
+}
+
 export default function* customerKurSagas() {
   yield takeLatest(invoiceKurAction.fetchData.type, fetchData);
   yield takeLatest(invoiceKurAction.fetchDataDetail.type, fetchDataDetail);
+  yield takeLatest(
+    invoiceKurAction.fetchDataConditionInvoice.type,
+    fetchDataConditionInvoice,
+  );
+  yield takeLatest(
+    invoiceKurAction.fetchDataStatusInvoice.type,
+    fetchDataStatusInvoice,
+  );
 }
