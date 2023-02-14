@@ -20,6 +20,7 @@ interface PaymentKURProps {
   detailsTableData: PaymentKUR[];
   totalDetailsTable: number | undefined;
   detailParams: ListParams;
+  creditBalance: number;
 }
 
 const initialState: PaymentKURProps = {
@@ -43,6 +44,7 @@ const initialState: PaymentKURProps = {
     page: 1,
     count: 5,
   },
+  creditBalance: 0,
 };
 
 const PaymentKURSlice = createSlice({
@@ -99,6 +101,28 @@ const PaymentKURSlice = createSlice({
         count: 10,
         search: '',
       };
+    },
+    fetchCreditBalance(
+      state: PaymentKURProps,
+      action: PayloadAction<{ id: string | number }>,
+    ) {
+      state.loading = true;
+    },
+    fetchCreditBalanceSuccess(
+      state: PaymentKURProps,
+      action: PayloadAction<Response<number>>,
+    ) {
+      state.loading = false;
+      state.creditBalance = action.payload.data;
+    },
+    approvePayment(
+      state: PaymentKURProps,
+      action: PayloadAction<ActionParams>,
+    ) {
+      state.loading = true;
+    },
+    rejectPayment(state: PaymentKURProps, action: PayloadAction<ActionParams>) {
+      state.loading = true;
     },
   },
 });

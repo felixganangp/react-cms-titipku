@@ -1,7 +1,6 @@
 import { Customer } from 'models/kur/Customer';
 import { Area } from 'models/Area';
 import { Type } from 'models/kur/Type';
-import { string } from 'yup';
 import { ListParams } from '../fetch';
 
 export interface PaymentKURParams extends ListParams {
@@ -11,7 +10,7 @@ export interface PaymentKURParams extends ListParams {
   status?: string;
   submit_date_start?: number;
   submit_date_end?: number;
-  bank?: string;
+  paid_to_bank?: string;
 }
 
 export interface PaymentKURDisplayFilter {
