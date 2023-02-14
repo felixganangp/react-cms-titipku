@@ -11,6 +11,10 @@ interface InvoiceStatusProps {
   status: string | undefined;
 }
 
+interface CreditScoreProps {
+  status: string | undefined;
+}
+
 export const InvoiceLabel = styled(Typography)`
   color: #0774d1;
 `;
@@ -53,6 +57,29 @@ export const InvoiceStatus = styled(Box)<Pick<InvoiceStatusProps, 'status'>>`
       : '#C10000'};
   border-radius: 10px;
   width: 80px;
+  font-size: 12px;
+`;
+
+export const CreditScore = styled(Box)<Pick<CreditScoreProps, 'status'>>`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 10px;
+  color: #fff;
+  background-color: ${(p) =>
+    p.status === 'Lancar'
+      ? '#008e58'
+      : p.status === 'Dalam perhatian khusus'
+      ? '#0774d1'
+      : p.status === 'Kurang lancar'
+      ? '#ff8f00'
+      : p.status === 'Diragukan'
+      ? '#ec6470'
+      : '#bf370c'};
+  border-radius: 10px;
+  min-width: 80px;
+  width: auto;
   font-size: 12px;
 `;
 
