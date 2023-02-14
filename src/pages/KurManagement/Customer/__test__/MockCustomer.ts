@@ -123,6 +123,17 @@ export const MockLisCustomers = [
         is_exist: true,
       },
     ],
+    kur_user_credit_score: {
+      id: 1,
+      created_at: 1676346352,
+      updated_at: 0,
+      created_by_id: 1,
+      created_by_type: 'admin',
+      updated_by_id: 0,
+      updated_by_type: '',
+      name: 'Lancar',
+      description: '',
+    },
   },
   {
     id: 31,
@@ -248,5 +259,72 @@ export const MockLisCustomers = [
         is_exist: true,
       },
     ],
+    kur_user_credit_score: {
+      id: 1,
+      created_at: 1676346352,
+      updated_at: 0,
+      created_by_id: 1,
+      created_by_type: 'admin',
+      updated_by_id: 0,
+      updated_by_type: '',
+      name: 'Lancar',
+      description: '',
+    },
+  },
+];
+
+export const MockKurType = [
+  {
+    id: 1,
+    created_at: 1674441599,
+    updated_at: 0,
+    created_by_id: 1,
+    created_by_type: 'admin',
+    updated_by_id: 0,
+    updated_by_type: '',
+    name: 'B2B',
+    description: 'B2B',
+  },
+  {
+    id: 2,
+    created_at: 1674441599,
+    updated_at: 0,
+    created_by_id: 1,
+    created_by_type: 'admin',
+    updated_by_id: 0,
+    updated_by_type: '',
+    name: 'WC',
+    description: 'WC',
+  },
+  {
+    id: 3,
+    created_at: 1674441600,
+    updated_at: 0,
+    created_by_id: 1,
+    created_by_type: 'admin',
+    updated_by_id: 0,
+    updated_by_type: '',
+    name: 'KUR WC',
+    description: 'KUR WC',
+  },
+];
+
+export const MockKurArea = [
+  {
+    id: 1,
+    created_at: 1558515788,
+    updated_at: 1674668394,
+    title: 'Pasar BSD Tekno mandiri',
+    description: 'dfsfsf',
+    is_exist: true,
+  },
+  {
+    id: 2,
+    created_at: 1558515788,
+    updated_at: 1654872083,
+    title: 'Pasar Bersih BSD',
+    description:
+      'Nomor telepon untuk Pasar Bersih Malabar adalah (021) 55656264. Q2. Di manakah lokasi Pasar Bersih Malabar? Pasar Bersih Malabar berlokasi di Jalan Mangga Raya',
+    is_exist: true,
   },
 ];

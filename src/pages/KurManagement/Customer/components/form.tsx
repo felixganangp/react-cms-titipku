@@ -367,6 +367,7 @@ function Form({ onClose, formData }: Props) {
                   value={values.kurType}
                   renderInput={(params) => (
                     <TextField
+                      data-testid="form-customer-kur-type-input"
                       {...params}
                       name="kurType"
                       onBlur={handleBlur}
