@@ -1,3 +1,4 @@
+import { Moment } from 'moment';
 import { Merchant, MerchantResp } from 'models/Merchant';
 import { ListParams } from 'models/fetch';
 import { Type } from './Type';
