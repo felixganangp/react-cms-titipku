@@ -10,6 +10,7 @@ import requestKURReducer from './slice/kur/Request';
 import paymentKURReducer from './slice/kur/Payment';
 import merchantReducer from './slice/Merchant';
 import creditScoreKurReducer from './slice/kur/CreditScore';
+import invoiceReducer from './slice/kur/Invoice';
 
 const reducers = {
   ui: uiReducer,
@@ -24,6 +25,7 @@ const reducers = {
   payment: paymentKURReducer,
   merchant: merchantReducer,
   creditScore: creditScoreKurReducer,
+  invoice: invoiceReducer,
 };
 
 export default reducers;

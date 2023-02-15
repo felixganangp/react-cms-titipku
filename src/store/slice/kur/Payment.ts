@@ -17,9 +17,10 @@ interface PaymentKURProps {
   params: PaymentKURParams;
   displayFilter: PaymentKURDisplayFilter;
   detailsData: PaymentKUR | null;
-  detailsTableData: KURPaymentDetail[];
+  detailsTableData: PaymentKUR[];
   totalDetailsTable: number | undefined;
   detailParams: ListParams;
+  creditBalance: number;
 }
 
 const initialState: PaymentKURProps = {
@@ -43,6 +44,7 @@ const initialState: PaymentKURProps = {
     page: 1,
     count: 5,
   },
+  creditBalance: 0,
 };
 
 const PaymentKURSlice = createSlice({
@@ -76,7 +78,7 @@ const PaymentKURSlice = createSlice({
       action: PayloadAction<ListResponse<PaymentKUR>>,
     ) {
       state.loading = false;
-      state.data = action.payload.data;
+      state.data = action.payload.data || [];
       state.total = action.payload.total;
     },
     fetchDetails(
@@ -91,39 +93,37 @@ const PaymentKURSlice = createSlice({
     ) {
       state.loading = true;
       state.detailsData = action.payload.data;
+      state.detailsTableData = [action.payload.data];
     },
-    setDetailsTableParams(
-      state: PaymentKURProps,
-      action: PayloadAction<ListParams>,
-    ) {
-      state.detailParams = {
-        ...state.detailParams,
-        ...action.payload,
+    setResetParams(state: PaymentKURProps) {
+      state.params = {
+        page: 1,
+        count: 10,
+        search: '',
       };
     },
-    fetchDetailsTable(
+    fetchCreditBalance(
       state: PaymentKURProps,
-      ction: PayloadAction<{ id: string | number; params: ListParams }>,
+      action: PayloadAction<{ id: string | number }>,
     ) {
       state.loading = true;
     },
-    fetchDetailsTableSuccess(
+    fetchCreditBalanceSuccess(
       state: PaymentKURProps,
-      action: PayloadAction<ListResponse<KURPaymentDetail>>,
+      action: PayloadAction<Response<number>>,
     ) {
       state.loading = false;
-      state.detailsTableData = action.payload.data;
-      state.totalDetailsTable = action.payload.total;
+      state.creditBalance = action.payload.data;
     },
-    // approveRequest(
-    //   state: PaymentKURProps,
-    //   action: PayloadAction<ActionParams>,
-    // ) {
-    //   state.loading = true;
-    // },
-    // rejectRequest(state: PaymentKURProps, action: PayloadAction<ActionParams>) {
-    //   state.loading = true;
-    // },
+    approvePayment(
+      state: PaymentKURProps,
+      action: PayloadAction<ActionParams>,
+    ) {
+      state.loading = true;
+    },
+    rejectPayment(state: PaymentKURProps, action: PayloadAction<ActionParams>) {
+      state.loading = true;
+    },
   },
 });
 

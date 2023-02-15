@@ -67,6 +67,7 @@ export interface Customer {
   kur_user_status: KurUserStatus;
   kur_user_type: KurUserType;
   kur_user_document: KurUserDocument[];
+  total_outstanding_amount: number;
   kur_user_credit_score: UserCreditScore;
 }
 export interface KurUserStatus {

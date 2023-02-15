@@ -11,8 +11,13 @@ import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import Skeleton from '@mui/material/Skeleton';
-import Pagination from '@mui/material/Pagination';
+import Pagination, {
+  PaginationRenderItemParams,
+} from '@mui/material/Pagination';
+import PrevIcon from '@mui/icons-material/KeyboardDoubleArrowLeftOutlined';
+import NextIcon from '@mui/icons-material/KeyboardDoubleArrowRightOutlined';
 
+import { PaginationItem } from '@mui/material';
 import EnhancedTableHead from './TableHead';
 
 import { EnhancedTableProps, Align } from './types';
@@ -315,6 +320,7 @@ function EnhancedTable<T extends Data>({
                       flexDirection: 'column',
                       padding: '50px',
                     }}
+                    data-testid="data-table-not-result-found"
                   >
                     <img
                       src="/images/no-data.svg"
@@ -369,19 +375,27 @@ function EnhancedTable<T extends Data>({
           </TableBody>
         </Table>
       </TableContainer>
-      <Box marginY={3}>
-        <PaginationStyle
-          count={totalPage()}
-          shape="rounded"
-          color="primary"
-          page={props.page}
-          onChange={(_, e) => {
-            if (props.onChangePage) {
-              props.onChangePage(e);
-            }
-          }}
-        />
-      </Box>
+      {!props.disablePagination && (
+        <Box marginY={3}>
+          <PaginationStyle
+            count={totalPage()}
+            shape="rounded"
+            color="primary"
+            page={props.page}
+            onChange={(_, e) => {
+              if (props.onChangePage) {
+                props.onChangePage(e);
+              }
+            }}
+            renderItem={(item: PaginationRenderItemParams) => (
+              <PaginationItem
+                components={{ previous: PrevIcon, next: NextIcon }}
+                {...item}
+              />
+            )}
+          />
+        </Box>
+      )}
     </Box>
   );
 }

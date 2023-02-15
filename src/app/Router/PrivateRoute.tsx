@@ -49,7 +49,15 @@ export default function PrivateRoute({
           flexDirection: 'row',
         }}
       >
-        <div>
+        <div
+          style={{
+            position: 'sticky',
+            top: 0,
+            width: '63px',
+            height: '100vh',
+            zIndex: 20,
+          }}
+        >
           <SideBar open={open} setOpen={setOpen} userDetails={userDetails} />
         </div>
         <div style={{ flex: 1, overflow: 'auto' }}>{children} </div>
