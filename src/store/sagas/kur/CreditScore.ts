@@ -1,16 +1,18 @@
 import { call, put, takeLatest } from 'redux-saga/effects';
-import { typeAction } from 'store/slice/kur/Type';
+import { creditScoreAction } from 'store/slice/kur/CreditScore';
 import { uiAction } from 'store/slice/ui';
 
-import * as TypeService from 'service/Kur/Type';
+import * as creditScoreService from 'service/Kur/CreditScore';
 import { ListResponse } from 'models/fetch';
-import { Type } from 'models/kur/Type';
+import { UserCreditScore } from 'models/kur/Customer';
 
 function* fetchData() {
   try {
-    const response: ListResponse<Type> = yield call(TypeService.getAllTypes);
+    const response: ListResponse<UserCreditScore> = yield call(
+      creditScoreService.getAllCreditScores,
+    );
 
-    yield put(typeAction.fetchDataSuccess(response));
+    yield put(creditScoreAction.fetchDataSuccess(response));
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
@@ -30,10 +32,10 @@ function* fetchData() {
         }),
       );
     }
-    yield put(typeAction.failedFetch());
+    yield put(creditScoreAction.failedFetch());
   }
 }
 
-export default function* typeKurSagas() {
-  yield takeLatest(typeAction.fetchData.type, fetchData);
+export default function* customerKurSagas() {
+  yield takeLatest(creditScoreAction.fetchData.type, fetchData);
 }

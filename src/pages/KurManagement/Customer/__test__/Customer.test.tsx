@@ -232,6 +232,37 @@ describe('Customer KUR Page', async () => {
     // expect(filterPasarInput).toBeInTheDocument();
     // expect(filterScoreInput).toBeInTheDocument();
   });
+  it('Open filter, then filter customer', async () => {
+    await act(() => {
+      mockKurType(MockKurType);
+      mockKurArea(MockKurArea);
+    });
+    showFilter();
+    const filterTypeInput = screen.getByTestId('filter-type-customer');
+    fireEvent.click(filterTypeInput);
+    const inputType = within(filterTypeInput).getByRole('combobox');
+    fireEvent.change(inputType, { target: { value: 'b2' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+    const filterPasarInput = screen.getByTestId('filter-pasar-customer');
+    fireEvent.click(filterPasarInput);
+    const inputArea = within(filterPasarInput).getByRole('combobox');
+    fireEvent.change(inputArea, { target: { value: 'Pas' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+    const applyButton = screen.getByRole('button', { name: 'Apply' });
+    fireEvent.click(applyButton);
+    const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
+    expect(inputType).toHaveValue('B2B');
+    // expect(inputArea).toBeTruthy();
+    expect(listTableCustomer.length).toBe(2);
+  });
   //* FORM */
   it('Add customer button clicked', () => {
     openForm('button-add-customer');

@@ -112,6 +112,7 @@ export interface KurUserDocument {
 export interface CustomerParams extends ListParams {
   kur_user_type_id?: number;
   area_ids?: string;
+  credit_score?: number;
 }
 
 export interface BankList {
