@@ -23,6 +23,7 @@ import Status from 'components/Status';
 import digitFormatter from 'utils/digitFormatter';
 import moment from 'moment';
 import debounce from 'utils/debounce';
+import { getColorCreditScore } from 'utils/creditScoreColor';
 
 import SearchIcon from '@mui/icons-material/Search';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -276,9 +277,23 @@ export default function Ivoice() {
       id: 'name',
       label: 'Name',
       align: 'left',
-      minWidth: '160px',
+      minWidth: '190px',
       enableSort: true,
-      format: (val) => <Typography>{val.kur_request.kur_user.name}</Typography>,
+      format: (val) => {
+        return (
+          <Box display="flex" alignItems="center" gap="10px">
+            <Box
+              width="10px"
+              height="10px"
+              borderRadius="100%"
+              bgcolor={getColorCreditScore(
+                val.kur_request.kur_user.kur_user_credit_score.id,
+              )}
+            />
+            <Typography>{val.kur_request.kur_user.name}</Typography>
+          </Box>
+        );
+      },
     },
     {
       id: 'kur_user_type',
