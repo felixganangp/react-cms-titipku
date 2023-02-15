@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import styled from '@emotion/styled';
 import {
   Card,
   Box,
@@ -24,11 +24,17 @@ import moment from 'moment';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { customerAction } from 'store/slice/kur/Customer';
 import { typeAction } from 'store/slice/kur/Type';
+import { creditScoreAction } from 'store/slice/kur/CreditScore';
 import { areaAction } from 'store/slice/Area';
 import useModal from 'hooks/useModal';
 import Table from 'components/Table';
 import Modal from 'components/Modal';
-import { Customer, CustomerParams, CreateCustomer } from 'models/kur/Customer';
+import {
+  Customer,
+  CustomerParams,
+  CreateCustomer,
+  UserCreditScore,
+} from 'models/kur/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
 import { MerchantResp } from 'models/Merchant';
@@ -49,6 +55,7 @@ export default function KurCustomer() {
   const customerKur = useAppSelector((state) => state.customerKur);
   const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
+  const creditScore = useAppSelector((state) => state.creditScore);
 
   useEffect(() => {
     dispatch(customerAction.fetchData(customerKur.params));
@@ -106,6 +113,7 @@ export default function KurCustomer() {
     }
     dispatch(typeAction.fetchData());
     dispatch(areaAction.fetchData());
+    dispatch(creditScoreAction.fetchData());
   }, []);
 
   // const [typeKurFilter, setTypeKurFilter] = useState<Type | null>(null);
@@ -259,10 +267,11 @@ export default function KurCustomer() {
       format: (val: Customer) => <div>{val.user.area.name}</div>,
     },
     {
-      id: 'credit_status',
+      id: 'kur_user_credit_score',
       label: 'Credit Score',
       align: 'left',
       width: '200px',
+      enableSort: true,
       format: (val: Customer) => {
         const bgColor = getColorCreditScore(val.kur_user_credit_score.id);
         return (
@@ -319,23 +328,63 @@ export default function KurCustomer() {
   ];
 
   const handleChangePage = (value: number) => {
-    if (!customerKur.params.kur_user_type_id) {
-      dispatch(
-        customerAction.setFilter({
-          areaKur: customerKur.stateFilter?.areaKur,
-          typeKur: null,
-        }),
-      );
+    let payload: {
+      typeKur?: Type | null;
+      areaKur?: Area[] | [];
+      creditScore?: UserCreditScore | null;
+    } = {
+      areaKur: [],
+      typeKur: null,
+      creditScore: null,
+    };
+
+    if (customerKur.params.kur_user_type_id) {
+      payload = {
+        ...payload,
+        typeKur: customerKur.stateFilter?.typeKur,
+      };
     }
-    if (!customerKur.params.area_ids) {
-      dispatch(
-        customerAction.setFilter({
-          areaKur: [],
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          typeKur: customerKur.stateFilter!.typeKur!,
-        }),
-      );
+    if (customerKur.params.area_ids) {
+      payload = {
+        ...payload,
+        areaKur: customerKur.stateFilter?.areaKur,
+      };
     }
+    if (customerKur.params.credit_score) {
+      payload = {
+        ...payload,
+        creditScore: customerKur.stateFilter?.creditScore,
+      };
+    }
+    // if (!customerKur.params.kur_user_type_id) {
+    //   dispatch(
+    //     customerAction.setFilter({
+    //       areaKur: customerKur.stateFilter?.areaKur,
+    //       typeKur: null,
+    //       creditScore: customerKur.stateFilter!.creditScore!,
+    //     }),
+    //   );
+    // }
+    // if (!customerKur.params.area_ids) {
+    //   dispatch(
+    //     customerAction.setFilter({
+    //       areaKur: [],
+    //       typeKur: customerKur.stateFilter!.typeKur!,
+    //       creditScore: customerKur.stateFilter!.creditScore!,
+    //     }),
+    //   );
+    // }
+    // if (!customerKur.params.credit_score) {
+    dispatch(
+      customerAction.setFilter(
+        payload as {
+          typeKur: Type | null;
+          areaKur: Area[] | [];
+          creditScore: UserCreditScore | null;
+        },
+      ),
+    );
+    // }
     dispatch(
       customerAction.setParams({
         ...customerKur.params,
@@ -349,6 +398,7 @@ export default function KurCustomer() {
       customerAction.setFilter({
         typeKur: value,
         areaKur: customerKur.stateFilter?.areaKur,
+        creditScore: customerKur.stateFilter?.creditScore || null,
       }),
     );
     // dispatch(
@@ -357,6 +407,16 @@ export default function KurCustomer() {
     //     kur_user_type_id: value?.id,
     //   }),
     // );
+  };
+
+  const handleChangeCreditScore = (value: UserCreditScore | null) => {
+    dispatch(
+      customerAction.setFilter({
+        typeKur: customerKur.stateFilter?.typeKur || null,
+        areaKur: customerKur.stateFilter?.areaKur,
+        creditScore: value,
+      }),
+    );
   };
 
   const handleChangeArea = (value: Area[]) => {
@@ -374,6 +434,7 @@ export default function KurCustomer() {
       customerAction.setFilter({
         typeKur: customerKur.stateFilter?.typeKur || null,
         areaKur: value,
+        creditScore: customerKur.stateFilter?.creditScore || null,
       }),
     );
     // dispatch(customerAction.setParams(payload));
@@ -406,6 +467,7 @@ export default function KurCustomer() {
       ...customerKur.params,
       page: 1,
       kur_user_type_id: customerKur.stateFilter?.typeKur?.id,
+      credit_score: customerKur.stateFilter?.creditScore?.id,
     };
     if (
       customerKur.stateFilter?.areaKur &&
@@ -422,10 +484,6 @@ export default function KurCustomer() {
   };
 
   const handleResetFilter = async () => {
-    // setAreaKurFilter([]);
-    // setTypeKurFilter(null);
-    // setSearchKur('');
-
     const params: CustomerParams = {
       ...customerKur.params,
       page: 1,
@@ -433,12 +491,14 @@ export default function KurCustomer() {
       order_by: 'id',
       order_type: 'desc',
       kur_user_type_id: undefined,
+      credit_score: undefined,
       area_ids: undefined,
     };
     await dispatch(
       customerAction.setFilter({
         areaKur: [],
         typeKur: null,
+        creditScore: null,
       }),
     );
     await dispatch(customerAction.setParams(params));
@@ -524,7 +584,7 @@ export default function KurCustomer() {
 
             <Collapse in={openFilter} data-testid="filter-collapse-customer">
               <Grid container spacing={2} sx={{ marginTop: '2rem' }}>
-                <Grid item xs={6}>
+                <Grid item xs={4}>
                   <Typography
                     sx={{
                       fontSize: '14px',
@@ -556,7 +616,7 @@ export default function KurCustomer() {
                     )}
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={4}>
                   <Typography
                     sx={{
                       fontSize: '14px',
@@ -630,7 +690,7 @@ export default function KurCustomer() {
                     )}
                   />
                 </Grid>
-                {/* <Grid item xs={4}>
+                <Grid item xs={4}>
                   <Typography
                     sx={{
                       fontSize: '14px',
@@ -640,21 +700,30 @@ export default function KurCustomer() {
                   >
                     Credit Score
                   </Typography>
-                  <TextField
+                  <Autocomplete
                     data-testid="filter-credit-score-customer"
-                    placeholder="Credit Score"
-                    size="small"
-                    sx={{ bgcolor: '#fafafa' }}
-                    fullWidth
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
+                    id="type"
+                    options={creditScore.data}
+                    onChange={(e, value) => {
+                      // setTypeKurFilter(value);
+                      handleChangeCreditScore(value);
                     }}
+                    isOptionEqualToValue={(option: UserCreditScore) => {
+                      return (
+                        option.id === customerKur.stateFilter?.creditScore?.id
+                      );
+                    }}
+                    getOptionLabel={(option) => `${option.name}`}
+                    value={customerKur?.stateFilter?.creditScore}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="type"
+                        placeholder="Select Credit Score"
+                      />
+                    )}
                   />
-                </Grid> */}
+                </Grid>
                 <Grid item xs={12}>
                   <Box
                     sx={{
