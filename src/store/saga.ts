@@ -1,10 +1,10 @@
 import { all } from 'redux-saga/effects';
 import roleUserSagas from 'store/sagas/RoleUser';
 import roleAccessSagas from 'store/sagas/RoleAccess';
-import customerKurSagas from 'store/sagas/kur/CustomerAccess';
-import typeKurSagas from 'store/sagas/kur/TypeAccess';
+import customerKurSagas from 'store/sagas/kur/Customer';
+import typeKurSagas from 'store/sagas/kur/Type';
+import areaSagas from 'store/sagas/Area';
 import userDetailsSaga from './sagas/UserDetails';
-import areaSagas from './sagas/AreaAccess';
 import requestKurSagas from './sagas/kur/Request';
 import paymentKurSagas from './sagas/kur/Payment';
 import invoiceKurSagas from './sagas/kur/Invoice';
