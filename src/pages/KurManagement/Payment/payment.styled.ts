@@ -127,8 +127,7 @@ export const Header = styled(Box)`
 `;
 
 export const Content = styled(Box)`
-  padding: 16px 30px;
-  border-radius: 5px;
+  padding: 12px 12px;
   width: 100%;
   height: 100%;
   background-color: #fafafa;

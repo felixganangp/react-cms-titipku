@@ -1,6 +1,5 @@
 import http from 'utils/request';
-// import { RequestKURParams } from 'models/kur/Request';
-import { PaymentKURParams } from 'models/kur/Payment';
+import { CreatePayment, PaymentKURParams } from 'models/kur/Payment';
 import { ListParams } from 'models/fetch';
 
 export const getAllPaymentKUR = (params: PaymentKURParams) =>
@@ -104,6 +103,35 @@ export const rejectPayment = (body: any) =>
         remarks,
       });
       if (response) resolve(response);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const createPayment = (body: CreatePayment) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const fd = new FormData();
+      fd.append('data', JSON.stringify(body.body.data));
+      fd.append('file', body.body.file);
+      const response = await http.post(`/kur/payment`, fd);
+      if (response) resolve(response);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const fetchBankAccount = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.get(`/kur/config/bank-account`);
+      if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response
         ? `${err.response.message}`
