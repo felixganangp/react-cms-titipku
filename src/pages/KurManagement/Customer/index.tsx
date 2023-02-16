@@ -144,7 +144,7 @@ export default function KurCustomer() {
     const date = birthDate.getDate();
     const month = birthDate.getMonth();
     const year = birthDate.getFullYear();
-    const d = moment({ year, month: month + 1, day: date });
+    const d = moment({ year, month, day: date });
     // const convertBirthDate = `${date}/${month + 1}/${year}`;
     const convertBirthDate = moment(birthDate).format('MM/DD/YYYY');
     const findBank = bankData.data.filter((el) => el.name === val.user_bank);
@@ -356,25 +356,6 @@ export default function KurCustomer() {
         creditScore: customerKur.stateFilter?.creditScore,
       };
     }
-    // if (!customerKur.params.kur_user_type_id) {
-    //   dispatch(
-    //     customerAction.setFilter({
-    //       areaKur: customerKur.stateFilter?.areaKur,
-    //       typeKur: null,
-    //       creditScore: customerKur.stateFilter!.creditScore!,
-    //     }),
-    //   );
-    // }
-    // if (!customerKur.params.area_ids) {
-    //   dispatch(
-    //     customerAction.setFilter({
-    //       areaKur: [],
-    //       typeKur: customerKur.stateFilter!.typeKur!,
-    //       creditScore: customerKur.stateFilter!.creditScore!,
-    //     }),
-    //   );
-    // }
-    // if (!customerKur.params.credit_score) {
     dispatch(
       customerAction.setFilter(
         payload as {

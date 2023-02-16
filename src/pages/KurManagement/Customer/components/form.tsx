@@ -234,6 +234,14 @@ function Form({ onClose, formData }: Props) {
       });
     }
   };
+  const maxDate = () => {
+    const dateToday = new Date();
+    const date = dateToday.getDate() - 1;
+    const month = dateToday.getMonth() + 1;
+    const year = dateToday.getFullYear();
+    const newDate = new Date(`${year}-${month}-${date}`);
+    return newDate;
+  };
 
   return (
     <Box ref={divRef} data-testid="form-customer">
@@ -436,7 +444,7 @@ function Form({ onClose, formData }: Props) {
               >
                 <LocalizationProvider dateAdapter={AdapterMoment}>
                   <DesktopDatePicker
-                    maxDate={new Date()}
+                    maxDate={maxDate()}
                     open={openCalendaer.open}
                     onClose={() => {
                       if (values.birthDate) {

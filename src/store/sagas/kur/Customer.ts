@@ -309,6 +309,8 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       };
     }
 
+    // const jsDate = payload.payload.birthDate?.date.valueOf();
+    // const convertBirthDate = jsDate && +jsDate / 1000;
     let jsDate;
     if (typeof payload.payload.birthDate !== 'string') {
       // eslint-disable-next-line no-underscore-dangle
