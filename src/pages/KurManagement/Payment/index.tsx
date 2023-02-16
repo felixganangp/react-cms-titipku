@@ -13,6 +13,7 @@ import {
   Chip,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
 import Table from 'components/Table';
 import useModal from 'hooks/useModal';
 import ArrowDown from '@mui/icons-material/KeyboardArrowDown';
@@ -44,6 +45,7 @@ import {
   InvoiceStatus,
   LabelText,
 } from './payment.styled';
+import PaymentForm from './components/Form';
 
 export default function PaymentKURPage() {
   const dispatch = useAppDispatch();
@@ -362,6 +364,16 @@ export default function PaymentKURPage() {
     },
   ];
 
+  // form
+  const formModal = useModal();
+  useEffect(() => {
+    dispatch(paymentKURAction.setSelectedCustomer(null));
+  }, [formModal.open]);
+
+  useEffect(() => {
+    dispatch(paymentKURAction.fetchBankAccount());
+  }, []);
+
   return (
     <>
       <Box p="20px" bgcolor="#F5F7FA">
@@ -378,31 +390,48 @@ export default function PaymentKURPage() {
                   display="flex"
                   flexDirection="row"
                   width="100%"
-                  justifyContent="space-between"
+                  justifyContent="flex-start"
+                  gap="28px"
                 >
-                  <TextField
-                    placeholder="Search item"
-                    size="small"
-                    sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
-                    fullWidth
-                    defaultValue={payment.params.search}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
+                  <Button
+                    sx={{ width: '12%' }}
+                    startIcon={<AddIcon />}
+                    onClick={() => {
+                      formModal.openModal();
                     }}
-                    onChange={(event) => {
-                      debounceSearch(event.target.value);
-                    }}
-                  />
-                  <FilterButton
-                    endIcon={<ArrowDown />}
-                    onClick={() => setOpenFilter(!openFilter)}
                   >
-                    Filter
-                  </FilterButton>
+                    Add Payment
+                  </Button>
+                  <Box
+                    display="flex"
+                    flexDirection="row"
+                    width="100%"
+                    justifyContent="space-between"
+                  >
+                    <TextField
+                      placeholder="Search item"
+                      size="small"
+                      sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
+                      fullWidth
+                      defaultValue={payment.params.search}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                      onChange={(event) => {
+                        debounceSearch(event.target.value);
+                      }}
+                    />
+                    <FilterButton
+                      endIcon={<ArrowDown />}
+                      onClick={() => setOpenFilter(!openFilter)}
+                    >
+                      Filter
+                    </FilterButton>
+                  </Box>
                 </Box>
                 <Box
                   display={openFilter ? 'flex' : 'none'}
@@ -670,6 +699,13 @@ export default function PaymentKURPage() {
           onSubmitRefusal={handleRejectPayment}
           id={selected?.id || 0}
         />
+      </Modal>
+      <Modal
+        open={formModal.open}
+        title="Create Payment"
+        onClose={formModal.closeModal}
+      >
+        <PaymentForm onClose={formModal.closeModal} />
       </Modal>
     </>
   );

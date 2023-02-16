@@ -1,10 +1,18 @@
 import { call, put, select, takeLatest } from 'redux-saga/effects';
 import { uiAction } from 'store/slice/ui';
 import * as service from 'service/Kur/Payment';
+import * as customerService from 'service/Kur/Customer';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse, Response } from 'models/fetch';
-import { PaymentKUR, PaymentKURParams, ActionParams } from 'models/kur/Payment';
+import {
+  PaymentKUR,
+  PaymentKURParams,
+  ActionParams,
+  CreatePayment,
+  BankAccount,
+} from 'models/kur/Payment';
 import { paymentKURAction } from 'store/slice/kur/Payment';
+import { Customer, CustomerParams } from 'models/kur/Customer';
 
 function* fetchData(params: PayloadAction<PaymentKUR>) {
   try {
@@ -182,6 +190,100 @@ function* rejectPayment(params: PayloadAction<ActionParams>) {
   }
 }
 
+function* createPayment(params: PayloadAction<CreatePayment>) {
+  try {
+    const listParams: PaymentKURParams = yield select(
+      (state) => state.payment.params,
+    );
+    yield put(paymentKURAction.setSelectedCustomer(null));
+    yield call(service.createPayment, params.payload);
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Success',
+        message: 'Successfully create payment',
+        severity: 'success',
+      }),
+    );
+    yield put(paymentKURAction.fetchData(listParams));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create payment',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create payment',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* fetchCustomer(params: PayloadAction<CustomerParams>) {
+  try {
+    const response: ListResponse<Customer> = yield call(
+      customerService.getAllCustomers,
+      params.payload,
+    );
+    yield put(paymentKURAction.fetchCustomerDataSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error fetch customer data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error fetch customer data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* fetchBankAccount() {
+  try {
+    const response: Response<{ bank_account: BankAccount[] }> = yield call(
+      service.fetchBankAccount,
+    );
+    yield put(paymentKURAction.fetchBankAccountSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error fetch bank account',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error fetch bank account',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
 export default function* paymentKurSagas() {
   yield takeLatest(paymentKURAction.fetchData.type, fetchData);
   yield takeLatest(paymentKURAction.fetchDetails.type, fetchDetails);
@@ -191,4 +293,7 @@ export default function* paymentKurSagas() {
     paymentKURAction.fetchCreditBalance.type,
     fetchCreditBalanceById,
   );
+  yield takeLatest(paymentKURAction.createPayment.type, createPayment);
+  yield takeLatest(paymentKURAction.fetchCustomerData.type, fetchCustomer);
+  yield takeLatest(paymentKURAction.fetchBankAccount.type, fetchBankAccount);
 }
