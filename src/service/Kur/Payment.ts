@@ -1,5 +1,4 @@
 import http from 'utils/request';
-// import { RequestKURParams } from 'models/kur/Request';
 import { CreatePayment, PaymentKURParams } from 'models/kur/Payment';
 import { ListParams } from 'models/fetch';
 
@@ -132,7 +131,6 @@ export const fetchBankAccount = () =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await http.get(`/kur/config/bank-account`);
-      console.log('fetch bank account', response);
       if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response
