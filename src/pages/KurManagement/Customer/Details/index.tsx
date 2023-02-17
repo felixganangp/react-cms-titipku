@@ -23,6 +23,7 @@ import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
+import CallIcon from '@mui/icons-material/Call';
 import DateRangeRoundedIcon from '@mui/icons-material/DateRangeRounded';
 import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
@@ -219,16 +220,16 @@ export default function RoleUserDetails() {
       ),
     },
     {
-      id: 'request_amount',
-      label: 'Request Amount',
+      id: 'amount',
+      label: 'Amount',
       align: 'left',
       format: (val) => (
         <Typography>Rp {digitFormatter.format(val.amount)}</Typography>
       ),
     },
     {
-      id: 'request_amount',
-      label: 'Request Amount',
+      id: 'status',
+      label: 'Status',
       align: 'center',
       width: '150px',
       format: (val) => {
@@ -264,26 +265,15 @@ export default function RoleUserDetails() {
       ),
     },
     {
-      id: 'name',
-      label: 'Name',
+      id: 'paid_to_account_number',
+      label: 'Transfer To',
       align: 'left',
       minWidth: '200px',
-      format: (val) => <Typography>{val.kur_user.name}</Typography>,
-    },
-    {
-      id: 'kur_type',
-      label: 'KUR Type',
-      align: 'left',
       format: (val) => (
-        <Typography>{val.kur_user.kur_user_type.name}</Typography>
+        <Typography>
+          {val.paid_to_account_number} - {val.paid_to_bank}
+        </Typography>
       ),
-    },
-    {
-      id: 'transfer_to',
-      label: 'Transfer to',
-      align: 'left',
-      width: '200px',
-      format: (val) => <Typography>{val.paid_to_bank}</Typography>,
     },
     {
       id: 'payment_amount',
@@ -294,29 +284,6 @@ export default function RoleUserDetails() {
       ),
     },
     {
-      id: 'outstanding_credit',
-      label: 'Outstanding Credit',
-      align: 'left',
-      format: (val) => (
-        <Typography>Rp {digitFormatter.format(val.amount)}</Typography>
-      ),
-    },
-    {
-      id: 'merchant_name',
-      label: 'Merchant',
-      align: 'left',
-      enableSort: true,
-      minWidth: '200px',
-      format: (val) => <Typography>{val.kur_user.user.name}</Typography>,
-    },
-    {
-      id: 'area_name',
-      label: 'Pasar',
-      align: 'left',
-      minWidth: '200px',
-      format: (val) => <Typography>{val.kur_user.user.area.name}</Typography>,
-    },
-    {
       id: 'created_at',
       label: 'Submit Date',
       align: 'left',
@@ -325,6 +292,40 @@ export default function RoleUserDetails() {
           {moment.unix(val.created_at).format('DD/MM/YYYY')}
         </Typography>
       ),
+    },
+    {
+      id: 'decision_date',
+      label: 'Approve Date',
+      align: 'left',
+      format: (val) => (
+        <Typography>
+          {moment.unix(val.decision_date).format('DD/MM/YYYY')}
+        </Typography>
+      ),
+    },
+    {
+      id: 'status',
+      label: 'Status',
+      align: 'left',
+      width: '160px',
+      format: (val) => {
+        const color = () => {
+          let result = '#cecece';
+          if (val.status === 'approved') {
+            result = '#008e58';
+          }
+          if (val.status === 'pending') {
+            result = '#FF8F00';
+          }
+          if (val.status === 'rejected') {
+            result = '#c10000';
+          }
+          return result;
+        };
+        return (
+          <Status color={color()}>{val.status.replaceAll('_', ' ')}</Status>
+        );
+      },
     },
   ];
 
@@ -512,79 +513,95 @@ export default function RoleUserDetails() {
               </Status>
             </Box>
             <Grid container spacing={2}>
-              <Grid item xs={6} md={3}>
+              <Grid
+                item
+                xs={6}
+                md={3}
+                gap="20px"
+                display="flex"
+                flexDirection="column"
+                alignItems="start"
+              >
                 <DescDetails
                   title="Customer ID"
                   icon={<Person2OutlinedIcon sx={{ color: '#008e58' }} />}
                   content={customerKur.details?.id}
                 />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <DescDetails
-                  title="Phone Number"
-                  icon={<PhoneIcon sx={{ color: '#008e58' }} />}
-                  content={customerKur.details?.phone_number}
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <DescDetails
-                  title="Credit Limit"
-                  icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
-                  content={customerKur.details?.credit_limit}
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <DescDetails
-                  title="Primary Account Number "
-                  content={`${customerKur.details?.user_bank} - ${customerKur.details?.user_account_number} `}
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <DescDetails
-                  title="NIK"
-                  icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
-                  content={customerKur.details?.nik}
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <DescDetails
-                  title="Address (KTP)"
-                  icon={<LocationOnOutlinedIcon sx={{ color: '#008e58' }} />}
-                  content={customerKur.details?.registered_address}
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <DescDetails
-                  title="Admin Fee"
-                  content={customerKur.details?.admin_fee}
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <DescDetails
-                  title="Nobu Account Number "
-                  content={`NOBU - ${customerKur.details?.nobu_account_number}`}
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
                 <DescDetails
                   title="Birth Date"
                   icon={<DateRangeRoundedIcon sx={{ color: '#008e58' }} />}
                   content={customerKur.details?.birth_date}
                 />
+                <DescDetails
+                  icon={<MailOutlineRoundedIcon sx={{ color: '#008e58' }} />}
+                  title="Email"
+                  content={customerKur.details?.email}
+                />
+                <DescDetails
+                  icon={<CallIcon sx={{ color: '#008e58' }} />}
+                  title="Phone Number"
+                  content={customerKur.details?.phone_number}
+                />
               </Grid>
-              <Grid item xs={6} md={3}>
+              <Grid
+                item
+                xs={6}
+                md={3}
+                gap="20px"
+                display="flex"
+                flexDirection="column"
+                alignItems="start"
+              >
+                <DescDetails
+                  title="Address (KTP)"
+                  icon={<LocationOnOutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={customerKur.details?.registered_address}
+                />
                 <DescDetails
                   title="Address (Domicile)"
                   content={customerKur.details?.living_address}
                 />
               </Grid>
-              <Grid item xs={6} md={3}>
+              <Grid
+                item
+                xs={6}
+                md={3}
+                gap="20px"
+                display="flex"
+                flexDirection="column"
+                alignItems="start"
+              >
+                <DescDetails
+                  title="Credit Limit"
+                  icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
+                  content={customerKur.details?.credit_limit}
+                />
+                <DescDetails
+                  title="Admin Fee"
+                  content={customerKur.details?.admin_fee}
+                />
                 <DescDetails
                   title="DPD rate"
                   content={`${customerKur.details?.dpd_rate || '-'} %`}
                 />
               </Grid>
-              <Grid item xs={6} md={3}>
+              <Grid
+                item
+                xs={6}
+                md={3}
+                gap="20px"
+                display="flex"
+                flexDirection="column"
+                alignItems="start"
+              >
+                <DescDetails
+                  title="Primary Account Number "
+                  content={`${customerKur.details?.user_bank} - ${customerKur.details?.user_account_number} `}
+                />
+                <DescDetails
+                  title="Nobu Account Number "
+                  content={`NOBU - ${customerKur.details?.nobu_account_number}`}
+                />
                 <DescDetails
                   title="Join Date"
                   // content="Jan 25, 2022 08:00 AM"
@@ -595,13 +612,6 @@ export default function RoleUserDetails() {
                           .format('MMM DD, YYYY hh:mm A')
                       : '-'
                   }
-                />
-              </Grid>
-              <Grid item xs={6} md={3}>
-                <DescDetails
-                  icon={<MailOutlineRoundedIcon sx={{ color: '#008e58' }} />}
-                  title="Email"
-                  content={customerKur.details?.email}
                 />
               </Grid>
             </Grid>
@@ -699,7 +709,7 @@ export default function RoleUserDetails() {
               sx={{ mb: 1 }}
             >
               <Tabs.Item label="Request" />
-              <Tabs.Item label="Settlement" />
+              <Tabs.Item label="Payment" />
               <Tabs.Item label="Invoice" />
             </Tabs.Container>
             {kurHistoryTab === 0 && (

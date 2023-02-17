@@ -1,6 +1,6 @@
-import { Box, Card, Grid, Button, Typography } from '@mui/material';
+import { Box, Card, Grid, Button, Typography, IconButton } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBack from '@mui/icons-material/ArrowBackIos';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
@@ -39,6 +39,7 @@ import { light } from '../../../../theme/pallets';
 
 export default function RequestKURDetails() {
   // eslint-disable-next-line @typescript-eslint/naming-convention
+  const navigate = useNavigate();
   const { id } = useParams();
   const dispatch = useAppDispatch();
   const [totalAmount, setTotalAmount] = useState<number>(0);
@@ -162,16 +163,16 @@ export default function RequestKURDetails() {
               >
                 <Box display="flex" flexDirection="column">
                   <DetailsHeader>Request</DetailsHeader>
-                  <Link style={{ textDecoration: 'none' }} to="/kur/request">
-                    <BackButton
-                      sx={{
-                        '&:hover': { bgcolor: '#fff' },
-                      }}
-                      startIcon={<ArrowBack />}
-                    >
-                      {requestDetails?.kur_request_number}
-                    </BackButton>
-                  </Link>
+                  {/* <Link style={{ textDecoration: 'none' }} to="/kur/request"> */}
+                  <BackButton
+                    sx={{
+                      '&:hover': { bgcolor: '#fff' },
+                    }}
+                    startIcon={<ArrowBack />}
+                    onClick={() => navigate(-1)}
+                  >
+                    {requestDetails?.kur_request_number}
+                  </BackButton>
                 </Box>
                 <Box
                   display={
