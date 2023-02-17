@@ -1,7 +1,6 @@
-import { Customer } from 'models/kur/Customer';
+import { BankList, Customer } from 'models/kur/Customer';
 import { Area } from 'models/Area';
 import { Type } from 'models/kur/Type';
-import { string } from 'yup';
 import { ListParams } from '../fetch';
 
 export interface PaymentKURParams extends ListParams {
@@ -11,7 +10,7 @@ export interface PaymentKURParams extends ListParams {
   status?: string;
   submit_date_start?: number;
   submit_date_end?: number;
-  bank?: string;
+  paid_to_bank?: string;
 }
 
 export interface PaymentKURDisplayFilter {
@@ -80,4 +79,37 @@ export interface ActionParams {
   id: string | number;
   detailsPage: boolean;
   remarks?: string;
+}
+
+export interface BodyCreatePayment {
+  kur_user_id: number | null | undefined;
+  amount: number | null | string;
+  paid_to_account_number: string | null;
+  paid_to_bank: string | null;
+  description: string;
+  decision_date: number | null;
+  remarks: string;
+}
+
+export interface CreatePayment {
+  body: {
+    data: BodyCreatePayment;
+    file: string | Blob;
+  };
+}
+
+export interface InitialCreatePayment {
+  kur_user_id: Customer | null;
+  amount: number | null | string;
+  paid_to_account_number: string | null;
+  paid_to_bank: string | null;
+  description: string;
+  decision_date: number | null;
+  remarks: string;
+  file: File | string | Blob;
+}
+
+export interface BankAccount {
+  bank: string;
+  account_number: string;
 }

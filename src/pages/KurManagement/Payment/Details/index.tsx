@@ -26,6 +26,7 @@ import {
   FieldName,
   FieldContent,
   InvoiceStatus,
+  CreditScore,
 } from '../payment.styled';
 import CustomerData from '../components/CustomerData';
 
@@ -37,7 +38,7 @@ export default function PaymentKURDetails() {
   const dispatch = useAppDispatch();
   const paymentDetails = useAppSelector((state) => state.payment.detailsData);
   const statement = useAppSelector((state) => state.payment.detailsTableData);
-
+  const creditBalance = useAppSelector((state) => state.payment.creditBalance);
   const headCell = [
     {
       id: 'image',
@@ -130,9 +131,11 @@ export default function PaymentKURDetails() {
                 {paymentDetails?.kur_user?.name}
               </Typography>
               <FieldContent sx={{ marginLeft: '20px' }}>
-                <InvoiceStatus status={paymentDetails?.status}>
-                  {paymentDetails?.status}
-                </InvoiceStatus>
+                <CreditScore
+                  status={paymentDetails?.kur_user?.kur_user_credit_score?.name}
+                >
+                  {paymentDetails?.kur_user?.kur_user_credit_score?.name}
+                </CreditScore>
               </FieldContent>
             </Box>
             <Box
@@ -238,7 +241,9 @@ export default function PaymentKURDetails() {
                   />
                   <DescriptionBox>
                     <FieldName>Credit Balance</FieldName>
-                    <FieldContent>-</FieldContent>
+                    <FieldContent>
+                      Rp {digitFormatter.format(creditBalance)}
+                    </FieldContent>
                   </DescriptionBox>
                 </Field>
 

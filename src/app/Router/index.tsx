@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { useAppSelector } from 'store/hooks';
+import ProgresBar from 'components/Loading/ProgresBar';
 import ListRoute from './ListRoute';
 import PrivateRoute from './PrivateRoute';
 
@@ -23,12 +24,12 @@ export default function IndexRoute() {
           element={
             val.auth === 'Private' ? (
               <PrivateRoute redirect="/sign-in">
-                <Suspense>
+                <Suspense fallback={<ProgresBar />}>
                   <val.comp />
                 </Suspense>
               </PrivateRoute>
             ) : (
-              <Suspense>
+              <Suspense fallback={<ProgresBar />}>
                 <val.comp />
               </Suspense>
             )

@@ -1,3 +1,4 @@
+import { Moment } from 'moment';
 import { Merchant, MerchantResp } from 'models/Merchant';
 import { ListParams } from 'models/fetch';
 import { Type } from './Type';
@@ -67,6 +68,8 @@ export interface Customer {
   kur_user_status: KurUserStatus;
   kur_user_type: KurUserType;
   kur_user_document: KurUserDocument[];
+  total_outstanding_amount: number;
+  kur_user_credit_score: UserCreditScore;
 }
 export interface KurUserStatus {
   id?: number;
@@ -110,6 +113,7 @@ export interface KurUserDocument {
 export interface CustomerParams extends ListParams {
   kur_user_type_id?: number;
   area_ids?: string;
+  credit_score?: number;
 }
 
 export interface BankList {
@@ -151,4 +155,16 @@ export interface KurUserDocumentPayload {
 export interface CheckMerchantExistParams {
   merchant_id: number | undefined;
   exclude_id?: number | undefined;
+}
+
+export interface UserCreditScore {
+  id?: number;
+  created_at: number;
+  updated_at: number;
+  created_by_id: number;
+  created_by_type: string;
+  updated_by_id: number;
+  updated_by_type: string;
+  name: string;
+  description: string;
 }
