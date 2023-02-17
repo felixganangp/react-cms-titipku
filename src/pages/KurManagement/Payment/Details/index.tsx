@@ -1,6 +1,6 @@
 import { Box, Card, Grid, Typography } from '@mui/material';
 import { useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import ArrowBack from '@mui/icons-material/ArrowBackIos';
 import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
@@ -32,6 +32,7 @@ import CustomerData from '../components/CustomerData';
 
 export default function PaymentKURDetails() {
   // eslint-disable-next-line @typescript-eslint/naming-convention
+  const navigate = useNavigate();
   const { id } = useParams();
   const isPaginationDisable = true;
   const dispatch = useAppDispatch();
@@ -108,16 +109,15 @@ export default function PaymentKURDetails() {
             >
               <Box display="flex" flexDirection="column">
                 <Typography variant="titlePage">Payment Detail</Typography>
-                <Link style={{ textDecoration: 'none' }} to="/kur/payment">
-                  <BackButton
-                    sx={{
-                      '&:hover': { bgcolor: '#fff' },
-                    }}
-                    startIcon={<ArrowBack />}
-                  >
-                    {paymentDetails?.kur_payment_number}
-                  </BackButton>
-                </Link>
+                <BackButton
+                  sx={{
+                    '&:hover': { bgcolor: '#fff' },
+                  }}
+                  startIcon={<ArrowBack />}
+                  onClick={() => navigate(-1)}
+                >
+                  {paymentDetails?.kur_payment_number}
+                </BackButton>
               </Box>
             </Box>
           </Card>

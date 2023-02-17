@@ -100,14 +100,13 @@ export default function DetailsInvoice() {
               <Box display="flex" justifyContent="space-between">
                 <Box>
                   <Menu>Invoice Detail</Menu>
-                  <Link style={{ textDecoration: 'none' }} to="/kur/invoice">
-                    <BackButton
-                      sx={{ '&:hover': { backgroundColor: '#ffff' } }}
-                      startIcon={<ArrowBackIosIcon />}
-                    >
-                      <TitlePage>Details</TitlePage>
-                    </BackButton>
-                  </Link>
+                  <BackButton
+                    sx={{ '&:hover': { backgroundColor: '#ffff' } }}
+                    startIcon={<ArrowBackIosIcon />}
+                    onClick={() => navigate(-1)}
+                  >
+                    <TitlePage>Details</TitlePage>
+                  </BackButton>
                 </Box>
               </Box>
             </Card>
