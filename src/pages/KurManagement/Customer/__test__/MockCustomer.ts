@@ -143,7 +143,7 @@ export const MockLisCustomers = [
     created_by_type: 'admin',
     created_by: {
       id: 17,
-      name: 'Asra',
+      name: 'Asra test kedua',
     },
     updated_by_id: 17,
     updated_by_type: 'admin',
@@ -326,5 +326,30 @@ export const MockKurArea = [
     description:
       'Nomor telepon untuk Pasar Bersih Malabar adalah (021) 55656264. Q2. Di manakah lokasi Pasar Bersih Malabar? Pasar Bersih Malabar berlokasi di Jalan Mangga Raya',
     is_exist: true,
+  },
+];
+
+export const MockCreditScore = [
+  {
+    id: 1,
+    created_at: 1676346352,
+    updated_at: 0,
+    created_by_id: 1,
+    created_by_type: 'admin',
+    updated_by_id: 0,
+    updated_by_type: '',
+    name: 'Lancar',
+    description: '',
+  },
+  {
+    id: 2,
+    created_at: 1676346352,
+    updated_at: 0,
+    created_by_id: 1,
+    created_by_type: 'admin',
+    updated_by_id: 0,
+    updated_by_type: '',
+    name: 'Dalam perhatian khusus',
+    description: '',
   },
 ];
