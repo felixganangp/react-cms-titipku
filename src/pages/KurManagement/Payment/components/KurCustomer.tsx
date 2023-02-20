@@ -121,7 +121,7 @@ export default function KurCustomer({ onClose }: KURCustomerProps) {
   };
 
   return (
-    <Box sx={{ ...childModalStyle, width: '80%', height: '620px' }}>
+    <Box sx={{ ...childModalStyle, width: '80%', height: '720px' }}>
       <Header>
         <ExpandMore sx={{ mr: '5px' }} />
         <span>Payment</span>
