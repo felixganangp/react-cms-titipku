@@ -55,6 +55,13 @@ export default function KurCustomer({ onClose }: KURCustomerProps) {
 
   const handleChooseCustomer = (customer: Customer) => {
     dispatch(paymentKURAction.setSelectedCustomer(customer));
+    dispatch(
+      paymentKURAction.setCustomerDataParams({
+        search: '',
+        order_by: 'id',
+        order_type: 'asc',
+      }),
+    );
     onClose();
   };
 
@@ -129,7 +136,7 @@ export default function KurCustomer({ onClose }: KURCustomerProps) {
       </Header>
       <Content>
         <TextField
-          placeholder="Search item"
+          placeholder="Search Name"
           size="small"
           sx={{ bgcolor: '#fafafa', width: '100%', marginBottom: '10px' }}
           fullWidth
