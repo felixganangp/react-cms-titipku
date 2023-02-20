@@ -622,7 +622,6 @@ export default function KurCustomer() {
                     //       (el: Area) => el.id === option.id,
                     //     );
                     //   if (filtered) {
-                    //     console.log("🚀 ~ file: index.tsx:625 ~ filtered", filtered)
                     //     return option.id === filtered[0]?.id;
                     //   }
                     //   return false;
