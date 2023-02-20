@@ -74,3 +74,10 @@ export interface InvoiceKurDetail {
   kur_request: RequestKUR;
   kur_payment: PaymentKUR;
 }
+
+export interface AdjustInvoice {
+  kur_user_id: number;
+  kur_invoice_id: number;
+  amount: number | string;
+  remarks: string;
+}
