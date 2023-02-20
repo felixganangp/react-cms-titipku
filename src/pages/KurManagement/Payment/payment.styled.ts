@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import styled from '@emotion/styled';
-import { Typography, Box, Button, Grid } from '@mui/material';
+import { Typography, Box, Button, Grid, IconButton } from '@mui/material';
 import { DayPicker } from 'react-day-picker';
 
 interface CustomerStatusProps {
@@ -246,4 +246,18 @@ export const SelectedDate = styled.p`
 
 export const DateButton = styled(Button)`
   width: 150px;
+`;
+
+export const AddButton = styled(IconButton)`
+  border-radius: 4px;
+  width: fit-content;
+  padding: 4px;
+  margin-right: 0;
+  box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.24);
+  background-color: #008e58;
+  color: #fff;
+  '&:hover': {
+    background-color: #008e58;
+    color: #008e58;
+  }
 `;

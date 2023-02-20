@@ -100,7 +100,7 @@ export interface CreatePayment {
 
 export interface InitialCreatePayment {
   kur_user_id: Customer | null;
-  amount: number | null | string;
+  amount: string;
   paid_to_account_number: string | null;
   paid_to_bank: string | null;
   description: string;
