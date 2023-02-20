@@ -16,8 +16,14 @@ import { customerAction } from 'store/slice/kur/Customer';
 import { typeAction } from 'store/slice/kur/Type';
 import { areaAction } from 'store/slice/Area';
 import { CreateCustomer } from 'models/kur/Customer';
+import { creditScoreAction } from 'store/slice/kur/CreditScore';
 import CustomerView from '../index';
-import { MockLisCustomers, MockKurType, MockKurArea } from './MockCustomer';
+import {
+  MockLisCustomers,
+  MockKurType,
+  MockKurArea,
+  MockCreditScore,
+} from './MockCustomer';
 import FormCustomer from '../components/form';
 
 const formData: {
@@ -129,6 +135,19 @@ describe('Customer KUR Page', async () => {
       }),
     ),
   );
+
+  const mockKurCreditScore = vi.fn((data) =>
+    store.dispatch(
+      creditScoreAction.fetchDataSuccess({
+        timestamp: 1675755225,
+        status: 'ok',
+        message: 'Retrieved successfully',
+        count: 2,
+        total: 2,
+        data,
+      }),
+    ),
+  );
   beforeEach(() => {
     // vi.clearAllMocks();
     render(
@@ -141,6 +160,7 @@ describe('Customer KUR Page', async () => {
   });
   afterEach(() => {
     vi.clearAllMocks();
+    // showFilter();
   });
   it('Page customer kur should be shown', () => {
     const customerPageHeader = screen.getByText(/KUR Customer/i);
@@ -181,7 +201,7 @@ describe('Customer KUR Page', async () => {
     expect(searchCustomer).toBeInTheDocument();
     expect(filterCollapse).toHaveClass('MuiCollapse-hidden');
   });
-  //* FILTER */
+  //* FILTER, SORT AND SEARCH */
   it('Open filter button clicked', () => {
     showFilter();
     const filterCollapse = screen.getByTestId('filter-collapse-customer');
@@ -232,10 +252,11 @@ describe('Customer KUR Page', async () => {
     // expect(filterPasarInput).toBeInTheDocument();
     // expect(filterScoreInput).toBeInTheDocument();
   });
-  it('Open filter, then filter customer', async () => {
+  it('Open filter, then filter customer and change page', async () => {
     await act(() => {
       mockKurType(MockKurType);
       mockKurArea(MockKurArea);
+      mockKurCreditScore(MockCreditScore);
     });
     showFilter();
     const filterTypeInput = screen.getByTestId('filter-type-customer');
@@ -247,6 +268,7 @@ describe('Customer KUR Page', async () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
     fireEvent.click(screen.getAllByRole('option')[0]);
+
     const filterPasarInput = screen.getByTestId('filter-pasar-customer');
     fireEvent.click(filterPasarInput);
     const inputArea = within(filterPasarInput).getByRole('combobox');
@@ -256,18 +278,106 @@ describe('Customer KUR Page', async () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
     fireEvent.click(screen.getAllByRole('option')[0]);
+
+    const filterCreditScoreInput = screen.getByTestId(
+      'filter-credit-score-customer',
+    );
+    fireEvent.click(filterCreditScoreInput);
+    const inputCreditScore = within(filterCreditScoreInput).getByRole(
+      'combobox',
+    );
+    fireEvent.change(inputCreditScore, { target: { value: 'Lancar' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+
     const applyButton = screen.getByRole('button', { name: 'Apply' });
     fireEvent.click(applyButton);
+    // Change Page
+    const getPagination = screen.getByLabelText('pagination navigation');
+    const buttonPage = within(getPagination).getByLabelText('page 1');
+    fireEvent.click(buttonPage);
+
+    expect(buttonPage).toHaveClass('Mui-selected');
     const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
     expect(inputType).toHaveValue('B2B');
+    expect(inputCreditScore).toHaveValue('Lancar');
     // expect(inputArea).toBeTruthy();
     expect(listTableCustomer.length).toBe(2);
+  });
+  it('Open filter, then filter area with []', async () => {
+    await act(() => {
+      mockKurType(MockKurType);
+      mockKurArea(MockKurArea);
+      mockKurCreditScore(MockCreditScore);
+    });
+
+    const filterPasarInput = screen.getByTestId('filter-pasar-customer');
+    fireEvent.click(filterPasarInput);
+    const inputArea = within(filterPasarInput).getByRole('combobox');
+    fireEvent.change(inputArea, { target: { value: 'Pas' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    });
+
+    const applyButton = screen.getByRole('button', { name: 'Apply' });
+    fireEvent.click(applyButton);
+
+    const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
+    // expect(inputType).toHaveValue('B2B');
+    // expect(inputCreditScore).toHaveValue('Lancar');
+    // expect(inputArea).toBeTruthy();
+    expect(listTableCustomer.length).toBe(2);
+  });
+  // SEARCH
+  it('Search customer', async () => {
+    await act(() => {
+      mockCustomer(MockLisCustomers);
+    });
+    const searchCustomer = screen.getByTestId('search-customer');
+    const inputSearch =
+      within(searchCustomer).getByPlaceholderText('Search item');
+    fireEvent.change(inputSearch, { target: { value: 'test' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    });
+    expect(inputSearch).toHaveValue('test');
+  });
+  // SORT
+  it('Sort customer clicked', async () => {
+    await act(() => {
+      mockCustomer(MockLisCustomers);
+    });
+    const getIdHead = screen.getByTestId('header-id');
+    const sortCustomerIcon = within(getIdHead).getByTestId('SwapVertIcon');
+    fireEvent.click(sortCustomerIcon);
+    expect(sortCustomerIcon).toBeInTheDocument();
   });
   //* FORM */
   it('Add customer button clicked', () => {
     openForm('button-add-customer');
     const addModalHeader = screen.getByTestId('form-customer');
     expect(addModalHeader).toBeInTheDocument();
+  });
+  it('Add customer button clicked and closed', async () => {
+    openForm('button-add-customer');
+    const addModalHeader = screen.getByRole('dialog');
+    const closeButton = within(addModalHeader).getByTestId('CloseIcon');
+    fireEvent.click(closeButton);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    });
+    expect(addModalHeader).not.toBeInTheDocument();
   });
   it('Edit customer button clicked', async () => {
     await act(() => {
@@ -276,6 +386,16 @@ describe('Customer KUR Page', async () => {
     openForm('button-edit-customer', true);
     const addModalHeader = screen.getByTestId('form-customer');
     expect(addModalHeader).toBeInTheDocument();
+  });
+  it('Details customer button clicked', async () => {
+    await act(() => {
+      mockCustomer(MockLisCustomers);
+    });
+    openForm('button-details-customer', true);
+    const idSelectedCustomer = MockLisCustomers[0].id;
+    expect(window.location.pathname).toBe(
+      `/kur/customer/${idSelectedCustomer}`,
+    );
   });
 });
 

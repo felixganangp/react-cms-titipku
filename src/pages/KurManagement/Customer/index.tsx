@@ -303,6 +303,7 @@ export default function KurCustomer() {
                 onClick: () => {
                   navigate(`/kur/customer/${val.id}`);
                 },
+                dataId: 'button-details-customer',
               },
               {
                 label: `Edit`,
@@ -615,16 +616,17 @@ export default function KurCustomer() {
                     onChange={(e, value) => {
                       handleChangeArea(value);
                     }}
-                    isOptionEqualToValue={(option: Area) => {
-                      const filtered =
-                        customerKur?.stateFilter?.areaKur?.filter(
-                          (el: Area) => el.id === option.id,
-                        );
-                      if (filtered) {
-                        return option.id === filtered[0]?.id;
-                      }
-                      return false;
-                    }}
+                    // isOptionEqualToValue={(option: Area) => {
+                    //   const filtered =
+                    //     customerKur?.stateFilter?.areaKur?.filter(
+                    //       (el: Area) => el.id === option.id,
+                    //     );
+                    //   if (filtered) {
+                    //     console.log("🚀 ~ file: index.tsx:625 ~ filtered", filtered)
+                    //     return option.id === filtered[0]?.id;
+                    //   }
+                    //   return false;
+                    // }}
                     getOptionLabel={(option) => {
                       return `${option.title}`;
                     }}
