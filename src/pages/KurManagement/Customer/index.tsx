@@ -179,7 +179,7 @@ export default function KurCustomer() {
         kurType: val.kur_user_type,
         adminFee: val.admin_fee.toString(),
         dpdRate: val.dpd_rate.toString(),
-        birthDate: convertBirthDate,
+        birthDate: d,
         phoneNumber: val.phone_number,
         email: val.email,
         addressKtp: val.registered_address,
