@@ -368,6 +368,10 @@ export default function PaymentKURPage() {
   const formModal = useModal();
 
   useEffect(() => {
+    dispatch(paymentKURAction.setSelectedCustomer(null));
+  }, [formModal.open]);
+
+  useEffect(() => {
     dispatch(paymentKURAction.fetchBankAccount());
   }, []);
 
