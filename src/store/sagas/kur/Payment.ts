@@ -195,7 +195,6 @@ function* createPayment(params: PayloadAction<CreatePayment>) {
     const listParams: PaymentKURParams = yield select(
       (state) => state.payment.params,
     );
-    yield put(paymentKURAction.setSelectedCustomer(null));
     yield call(service.createPayment, params.payload);
     yield put(
       uiAction.openToast({
