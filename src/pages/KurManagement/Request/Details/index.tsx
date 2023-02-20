@@ -11,6 +11,7 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import CallOutlinedIcon from '@mui/icons-material/CallOutlined';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
+import PhoneIcon from '@mui/icons-material/Phone';
 
 import DefaultModal from '@mui/material/Modal';
 import Table from 'components/Table';
@@ -281,16 +282,6 @@ export default function RequestKURDetails() {
 
                   <CustomerData
                     icon={
-                      <ErrorOutlineOutlinedIcon
-                        sx={{ color: '#008e58', mr: '4px' }}
-                      />
-                    }
-                    fieldName="NIK"
-                    fieldContent={requestDetails?.kur_user?.nik}
-                  />
-
-                  <CustomerData
-                    icon={
                       <CalendarTodayOutlinedIcon
                         sx={{ color: '#008e58', mr: '4px' }}
                       />
@@ -312,17 +303,15 @@ export default function RequestKURDetails() {
                     fieldName="Email"
                     fieldContent={requestDetails?.kur_user?.email}
                   />
-                </ContentGrid>
 
-                <ContentGrid>
                   <CustomerData
-                    icon={
-                      <CallOutlinedIcon sx={{ color: '#008e58', mr: '4px' }} />
-                    }
+                    icon={<PhoneIcon sx={{ color: '#008e58', mr: '4px' }} />}
                     fieldName="Phone Number"
                     fieldContent={requestDetails?.kur_user.phone_number}
                   />
+                </ContentGrid>
 
+                <ContentGrid>
                   <CustomerData
                     icon={
                       <LocationOnOutlinedIcon
@@ -424,7 +413,7 @@ export default function RequestKURDetails() {
                         {requestDetails
                           ? moment
                               .unix(requestDetails.kur_user.join_date || 0)
-                              .format('DD MMMM YYYY hh:mm:ss A')
+                              .format('MMM DD, YYYY hh:mm A')
                           : '-'}
                       </FieldContent>
                     </DescriptionBox>
