@@ -54,6 +54,14 @@ export default function KurCustomer({ onClose }: KURCustomerProps) {
   };
 
   const handleChooseCustomer = (customer: Customer) => {
+    dispatch(paymentKURAction.setSelectedCustomer(customer));
+    dispatch(
+      paymentKURAction.setCustomerDataParams({
+        search: '',
+        order_by: 'id',
+        order_type: 'asc',
+      }),
+    );
     onClose(customer);
   };
 
@@ -114,7 +122,7 @@ export default function KurCustomer({ onClose }: KURCustomerProps) {
 
   const childModalStyle = {
     position: 'absolute',
-    top: '50%',
+    top: '48%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: 'fit-content',

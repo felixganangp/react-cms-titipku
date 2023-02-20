@@ -203,6 +203,7 @@ function* createPayment(params: PayloadAction<CreatePayment>) {
         severity: 'success',
       }),
     );
+    yield put(paymentKURAction.setSelectedCustomer(null));
     yield put(paymentKURAction.fetchData(listParams));
   } catch (err) {
     if (typeof err === 'string') {
