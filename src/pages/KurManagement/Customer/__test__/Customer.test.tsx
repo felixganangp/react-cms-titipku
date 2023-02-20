@@ -217,6 +217,7 @@ describe('Customer KUR Page', async () => {
     await act(() => {
       mockKurType(MockKurType);
       mockKurArea(MockKurArea);
+      mockKurCreditScore(MockCreditScore);
     });
     showFilter();
     // const filterCollapse = screen.getByTestId('filter-collapse-customer');
@@ -238,19 +239,10 @@ describe('Customer KUR Page', async () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
     fireEvent.click(screen.getAllByRole('option')[0]);
-    // const selectedPasar = screen.getAllByText(/Pasar BSD Tekno mandiri/i);
-
-    // const filterScoreInput = screen.getByTestId('filter-credit-score-customer');
-    // expect(filterCollapse).not.toHaveClass('MuiCollapse-hidden');
-    // const input = screen.getByRole('presentation');
     const resetButton = screen.getByRole('button', { name: 'Reset' });
     fireEvent.click(resetButton);
     expect(inputType).toHaveValue('');
     expect(filterPasarInput).toBeInTheDocument();
-    // expect(inputArea.length).toBe(1);
-
-    // expect(filterPasarInput).toBeInTheDocument();
-    // expect(filterScoreInput).toBeInTheDocument();
   });
   it('Open filter, then filter customer and change page', async () => {
     await act(() => {
@@ -334,6 +326,60 @@ describe('Customer KUR Page', async () => {
     const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
     // expect(inputType).toHaveValue('B2B');
     // expect(inputCreditScore).toHaveValue('Lancar');
+    // expect(inputArea).toBeTruthy();
+    expect(listTableCustomer.length).toBe(2);
+  });
+  it('Open filter, then filter customer only area', async () => {
+    await act(() => {
+      mockKurType(MockKurType);
+      mockKurArea(MockKurArea);
+      mockKurCreditScore(MockCreditScore);
+    });
+    showFilter();
+    const resetButton = screen.getByRole('button', { name: 'Reset' });
+    fireEvent.click(resetButton);
+    const filterPasarInput = screen.getByTestId('filter-pasar-customer');
+    fireEvent.click(filterPasarInput);
+    const inputArea = within(filterPasarInput).getByRole('combobox');
+    fireEvent.change(inputArea, { target: { value: 'Pas' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+
+    const applyButton = screen.getByRole('button', { name: 'Apply' });
+    fireEvent.click(applyButton);
+    const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
+    // expect(inputArea).toBeTruthy();
+    expect(listTableCustomer.length).toBe(2);
+  });
+  it('Open filter, then filter customer only credit score', async () => {
+    await act(() => {
+      mockKurType(MockKurType);
+      mockKurArea(MockKurArea);
+      mockKurCreditScore(MockCreditScore);
+    });
+    const resetButton = screen.getByRole('button', { name: 'Reset' });
+    fireEvent.click(resetButton);
+
+    const filterCreditScoreInput = screen.getByTestId(
+      'filter-credit-score-customer',
+    );
+    fireEvent.click(filterCreditScoreInput);
+    const inputCreditScore = within(filterCreditScoreInput).getByRole(
+      'combobox',
+    );
+    fireEvent.change(inputCreditScore, { target: { value: 'Lancar' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+
+    const applyButton = screen.getByRole('button', { name: 'Apply' });
+    fireEvent.click(applyButton);
+    const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
     // expect(inputArea).toBeTruthy();
     expect(listTableCustomer.length).toBe(2);
   });
