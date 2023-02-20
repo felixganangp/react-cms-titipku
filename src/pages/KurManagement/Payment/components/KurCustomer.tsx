@@ -18,7 +18,7 @@ import { ExpandMore } from '@mui/icons-material';
 import { Content, Header } from '../payment.styled';
 
 interface KURCustomerProps {
-  onClose: () => void;
+  onClose: (customer: Customer) => void;
 }
 
 export default function KurCustomer({ onClose }: KURCustomerProps) {
@@ -54,15 +54,7 @@ export default function KurCustomer({ onClose }: KURCustomerProps) {
   };
 
   const handleChooseCustomer = (customer: Customer) => {
-    dispatch(paymentKURAction.setSelectedCustomer(customer));
-    dispatch(
-      paymentKURAction.setCustomerDataParams({
-        search: '',
-        order_by: 'id',
-        order_type: 'asc',
-      }),
-    );
-    onClose();
+    onClose(customer);
   };
 
   const headCell: HeadCells<Customer>[] = [
@@ -129,7 +121,7 @@ export default function KurCustomer({ onClose }: KURCustomerProps) {
   };
 
   return (
-    <Box sx={{ ...childModalStyle, width: '80%', height: '50%' }}>
+    <Box sx={{ ...childModalStyle, width: '80%', height: '620px' }}>
       <Header>
         <ExpandMore sx={{ mr: '5px' }} />
         <span>Payment</span>
