@@ -116,6 +116,16 @@ export default function DetailsInvoice() {
 
   // adjust invoice
   const adjustModal = useModal();
+  const [finalOutstanding, setFinalOutstanding] = useState<number>();
+
+  useEffect(() => {
+    if (invoice) {
+      // eslint-disable-next-line array-callback-return
+      invoice.kur_invoice_detail.map((history) => {
+        if (history.is_last) setFinalOutstanding(history.outstanding_amount);
+      });
+    }
+  }, [invoice]);
 
   return (
     <div>
@@ -292,6 +302,7 @@ export default function DetailsInvoice() {
         <AdjustInvoiceModal
           kurUserId={invoice?.kur_request.kur_user.id || 0}
           id={invoice?.id || 0}
+          outstanding={finalOutstanding || 0}
           invoiceNumber={invoice?.kur_invoice_number || ''}
           onClose={adjustModal.closeModal}
         />

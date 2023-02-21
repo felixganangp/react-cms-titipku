@@ -15,6 +15,7 @@ interface RequestKURProps {
   loadingForm: boolean;
   total: number | undefined;
   params: RequestKURParams;
+  displayParams: RequestKURParams;
   displayFilter: RequestKURDisplayFilter;
   detailsData: RequestKUR | null;
   detailsTableData: KURRequestDetail[];
@@ -29,6 +30,11 @@ const initialState: RequestKURProps = {
   loadingForm: false,
   total: 0,
   params: {
+    page: 1,
+    count: 10,
+    search: '',
+  },
+  displayParams: {
     page: 1,
     count: 10,
     search: '',
@@ -61,6 +67,15 @@ const RequestKURSlice = createSlice({
     setParams(state: RequestKURProps, action: PayloadAction<RequestKURParams>) {
       state.params = {
         ...state.params,
+        ...action.payload,
+      };
+    },
+    setDisplayParams(
+      state: RequestKURProps,
+      action: PayloadAction<RequestKURParams>,
+    ) {
+      state.displayParams = {
+        ...state.displayParams,
         ...action.payload,
       };
     },
