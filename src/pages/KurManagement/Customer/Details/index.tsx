@@ -299,7 +299,9 @@ export default function RoleUserDetails() {
       align: 'left',
       format: (val) => (
         <Typography>
-          {moment.unix(val.decision_date).format('DD/MM/YYYY')}
+          {val.decision_date !== 0 && val.decision_date !== null
+            ? moment.unix(val.decision_date).format('DD/MM/YYYY')
+            : '-'}
         </Typography>
       ),
     },
@@ -481,6 +483,18 @@ export default function RoleUserDetails() {
     },
   ];
 
+  const renameDocument = (value: string) => {
+    let term = value;
+
+    if (term === 'kk') {
+      term = 'Kartu Keluarga C1';
+    } else if (term === 'sku') {
+      term = 'Surat Keterangan Usaha';
+    } else {
+      term = term.toLocaleUpperCase().replaceAll('_', ' ');
+    }
+    return term;
+  };
   return (
     <div>
       <Box p="20px" bgcolor="#F5F7FA">
@@ -649,9 +663,7 @@ export default function RoleUserDetails() {
               {customerKur.details?.kur_user_document?.map((val, i) => (
                 <Grid item xs={6} md={4} key={val.id}>
                   <DescDetails
-                    title={val.document_type
-                      .toLocaleUpperCase()
-                      .replaceAll('_', ' ')}
+                    title={renameDocument(val.document_type)}
                     icon={
                       <AddPhotoAlternateOutlinedIcon
                         sx={{ color: '#008e58' }}
