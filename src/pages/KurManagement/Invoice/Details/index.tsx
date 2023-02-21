@@ -177,9 +177,16 @@ export default function DetailsInvoice() {
               <Grid item xs={6} md={3}>
                 <DescDetails
                   title="Invoice Amount"
-                  content={`Rp ${digitFormatter.format(
-                    invoice?.total_payment || 0,
-                  )}`}
+                  content={
+                    invoice
+                      ? `Rp ${digitFormatter.format(
+                          invoice.request_amount +
+                            invoice.total_admin_fee +
+                            invoice.total_dpd +
+                            invoice.total_adjustment,
+                        )}`
+                      : 'Rp. 0.00'
+                  }
                 />
               </Grid>
               <Grid item xs={6} md={3} />
