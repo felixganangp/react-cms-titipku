@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse, Response } from 'models/fetch';
 import {
+  AdjustInvoice,
   InvoiceKur,
   InvoiceKurDetail,
   PaymentKURParams,
@@ -31,6 +32,7 @@ interface InvoiceInitialProps {
   params: PaymentKURParams;
   details: InvoiceKur | null;
   displayFilter: DisplayFilter;
+  loadingForm: boolean;
 }
 
 const initialState: InvoiceInitialProps = {
@@ -59,6 +61,7 @@ const initialState: InvoiceInitialProps = {
     search: '',
   },
   details: null,
+  loadingForm: false,
 };
 
 const InvoiceSlice = createSlice({
@@ -147,6 +150,15 @@ const InvoiceSlice = createSlice({
         due_date_start: null,
         due_date_end: null,
       };
+    },
+    adjust(state: InvoiceInitialProps, action: PayloadAction<AdjustInvoice>) {
+      state.loadingForm = true;
+    },
+    adjustSuccess(state: InvoiceInitialProps) {
+      state.loadingForm = false;
+    },
+    adjustFailed(state: InvoiceInitialProps) {
+      state.loadingForm = false;
     },
   },
 });
