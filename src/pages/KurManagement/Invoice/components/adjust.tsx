@@ -98,29 +98,24 @@ export default function AdjustInvoiceModal({
             <FormLabel
               text="Outstanding Amount"
               error={
-                (touched.final_outstanding_amount || !isValid) &&
-                (Boolean(errors.final_outstanding_amount) ||
-                  values.final_outstanding_amount === undefined ||
-                  values.final_outstanding_amount < 0)
+                Boolean(errors.final_outstanding_amount) ||
+                values.final_outstanding_amount === undefined ||
+                values.final_outstanding_amount < 0
               }
               helperText={
-                (touched.final_outstanding_amount || !isValid) &&
-                ((errors.final_outstanding_amount &&
+                (errors.final_outstanding_amount &&
                   `${errors.final_outstanding_amount}`) ||
-                  (values.final_outstanding_amount === undefined &&
-                    `Outstanding Amount is required`) ||
-                  (values.final_outstanding_amount !== undefined &&
-                    values.final_outstanding_amount < 0 &&
-                    `Outstanding Amount can't be less than zero`))
+                (values.final_outstanding_amount === undefined &&
+                  `Outstanding Amount is required`) ||
+                (values.final_outstanding_amount !== undefined &&
+                  values.final_outstanding_amount < 0 &&
+                  `Outstanding Amount can't be less than zero`)
               }
             >
               <NumericFormat
                 name="amount"
                 customInput={TextField}
                 placeholder="Input outstanding amount"
-                // onChange={(e) =>
-                //   setFieldValue('final_outstanding_amount', e.target.value)
-                // }
                 onValueChange={(values) => {
                   setFieldValue('final_outstanding_amount', values.floatValue);
                 }}
@@ -172,7 +167,15 @@ export default function AdjustInvoiceModal({
               boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
             }}
           >
-            <Button sx={{ width: '20px' }} type="submit" disabled={!isValid}>
+            <Button
+              sx={{ width: '20%' }}
+              type="submit"
+              disabled={
+                !isValid ||
+                values.final_outstanding_amount === undefined ||
+                values.final_outstanding_amount < 0
+              }
+            >
               Save
             </Button>
           </Box>

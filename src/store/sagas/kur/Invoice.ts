@@ -143,6 +143,9 @@ function* adjustment(body: PayloadAction<AdjustInvoice>) {
         severity: 'success',
       }),
     );
+    yield put(
+      invoiceKurAction.fetchDataDetail({ id: body.payload.kur_invoice_id }),
+    );
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
