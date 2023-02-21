@@ -748,6 +748,7 @@ export default function KurCustomer() {
               onChangePage={(val) => handleChangePage(val)}
               onChangeSort={(val) => handleChangeSort(val)}
               disableNumber
+              loading={customerKur.loading}
             />
           </Box>
         </Grid>
