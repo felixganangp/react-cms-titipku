@@ -1,6 +1,12 @@
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { act } from 'react-dom/test-utils';
 import MockTheme from 'utils/MockTheme';
@@ -60,6 +66,18 @@ let formData: {
 };
 
 describe('Form Customer Component Add', async () => {
+  const mockKurType = vi.fn((data) =>
+    store.dispatch(
+      typeAction.fetchDataSuccess({
+        timestamp: 1675755225,
+        status: 'ok',
+        message: 'Retrieved successfully',
+        count: 2,
+        total: 2,
+        data,
+      }),
+    ),
+  );
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -71,11 +89,10 @@ describe('Form Customer Component Add', async () => {
         kurType: null,
       },
     };
-    console.log(
-      '🚀 ~ file: FormCustomer.test.tsx:68 ~ it ~ formData:',
-      formData,
-    );
-    const { debug } = render(
+    await act(() => {
+      mockKurType(MockKurType);
+    });
+    const { debug, queryByText } = render(
       <React.Suspense fallback>
         <MockTheme>
           <FormCustomer onClose={() => {}} formData={formData} />
@@ -100,13 +117,118 @@ describe('Form Customer Component Add', async () => {
       expect(errorMsgAdminFee).toBeInTheDocument();
     });
 
-    const inputElementKurType = screen.getByTestId('form-customer-kur-type');
-    await fireEvent.click(inputElementKurType);
-    // await fireEvent.blur(allFormText);
-    // await waitFor(async () => {
-    //   const errorMsgKurType = screen.getByText('KUR Type is required');
-    //   expect(errorMsgKurType).toBeInTheDocument();
-    // });
+    const inputElementDpdRate = screen.getByPlaceholderText(/Input DPD rate/i);
+    await fireEvent.blur(inputElementDpdRate);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgAdminDpdRate = screen.getByText('DPD rate is required');
+      expect(errorMsgAdminDpdRate).toBeInTheDocument();
+    });
+
+    const inputElementPhoneNumber =
+      screen.getByPlaceholderText(/Input Phone Number/i);
+    await fireEvent.blur(inputElementPhoneNumber);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgAdminPhoneNumber = screen.getByText(
+        'Phone Number is required',
+      );
+      expect(errorMsgAdminPhoneNumber).toBeInTheDocument();
+    });
+
+    const inputElementEmail = screen.getByPlaceholderText(/Input email/i);
+    await fireEvent.blur(inputElementEmail);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgAdminEmail = screen.getByText('Email is required');
+      expect(errorMsgAdminEmail).toBeInTheDocument();
+    });
+
+    const inputElementAddressKtp =
+      screen.getByPlaceholderText(/Input address ktp/i);
+    await fireEvent.blur(inputElementAddressKtp);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgAdminAddressKtp = screen.getByText(
+        'Address (KTP) is required',
+      );
+      expect(errorMsgAdminAddressKtp).toBeInTheDocument();
+    });
+
+    const inputElementAddressDomicile = screen.getByPlaceholderText(
+      /Input address domicile/i,
+    );
+    await fireEvent.blur(inputElementAddressDomicile);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgAdminAddressDomicile = screen.getByText(
+        'Address (Domicile) is required',
+      );
+      expect(errorMsgAdminAddressDomicile).toBeInTheDocument();
+    });
+
+    const inputElementCreditLimit =
+      screen.getByPlaceholderText(/Input credit limit/i);
+    await fireEvent.blur(inputElementCreditLimit);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgAdminCreditLimit = screen.getByText(
+        'Credit limit is required',
+      );
+      expect(errorMsgAdminCreditLimit).toBeInTheDocument();
+    });
+
+    const inputElementBankPrimary =
+      screen.getByPlaceholderText(`Bank account number`);
+    await fireEvent.blur(inputElementBankPrimary);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgAdminBankPrimary = screen.getByText(
+        'Bank account number (primary) is required',
+      );
+      expect(errorMsgAdminBankPrimary).toBeInTheDocument();
+    });
+
+    const inputElementBankNobu = screen.getByPlaceholderText(
+      `Bank account number (Nobu)`,
+    );
+    await fireEvent.blur(inputElementBankNobu);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgAdminBankNobu = screen.getByText(
+        'Nobu account number is required',
+      );
+      expect(errorMsgAdminBankNobu).toBeInTheDocument();
+    });
+
+    // TYPE KUR
+    const inputElementKurType = screen.getByPlaceholderText(/Select KUR Type/i);
+    await fireEvent.blur(inputElementKurType);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgKurType = screen.getByText('KUR Type is required');
+      expect(errorMsgKurType).toBeInTheDocument();
+    });
+
+    // LIST BANK KUR
+    const inputElementKurListBank = screen.getByPlaceholderText(
+      /Select your bank account/i,
+    );
+    await fireEvent.blur(inputElementKurListBank);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgKurListBank = screen.getByText('Bank account is required');
+      expect(errorMsgKurListBank).toBeInTheDocument();
+    });
+
+    // BIRTH DATE
+    const inputElementKurBirthDate = screen.getByPlaceholderText('dd/mm/yyyy');
+    await fireEvent.click(inputElementKurBirthDate);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgKurBirthDate = screen.getByText('Birth date is required');
+      expect(errorMsgKurBirthDate).toBeInTheDocument();
+    });
 
     // await userEvent.setup().type(inputElementName, 'Asra');
     // const inputElementKurType = screen.getByPlaceholderText(/Select KUR Type/i);
@@ -219,7 +341,6 @@ describe('Form Customer Component Add', async () => {
   //   // autocomplete.focus();
   //   // const input = screen.getByRole('presentation');
   //   // // const input = container.getElementsByClassName('MuiAutocomplete-popper');
-  //   // console.log('🚀 ~ file: Customer.test.tsx:269 ~ it ~ autocomplete', input);
   //   // // fireEvent.change(input, { target: { value: 'B2' } });
   //   // fireEvent.keyDown(autocomplete, { key: 'ArrowDown' });
   //   // fireEvent.keyDown(autocomplete, { key: 'Enter' });
@@ -234,7 +355,6 @@ describe('Form Customer Component Add', async () => {
   //   // const inputElementName =
   //   //   screen.getByPlaceholderText(/Input customer name/i);
   //   // console.log(
-  //   //   '🚀 ~ file: Customer.test.tsx:234 ~ it ~ inputElementName',
   //   //   inputElementName,
   //   // );
   //   // await userEvent.setup().type(inputElementName, 'Jonny');
