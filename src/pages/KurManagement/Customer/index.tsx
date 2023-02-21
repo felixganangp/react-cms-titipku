@@ -232,9 +232,16 @@ export default function KurCustomer() {
   };
 
   const handleHoldCustomer = async (val: Customer) => {
+    let statusId;
+    if (val.kur_user_status?.id === 3) {
+      statusId = 1;
+    }
+    if (val.kur_user_status?.id === 1) {
+      statusId = 3;
+    }
     const newPayload: Customer = {
       ...val,
-      kur_user_status: { ...val.kur_user_status, id: 3 },
+      kur_user_status: { ...val.kur_user_status, id: statusId },
     };
     const initialDataPayload = getInitialData(newPayload);
     await dispatch(customerAction.editCustomer(initialDataPayload));
@@ -330,8 +337,8 @@ export default function KurCustomer() {
                 dataId: 'button-edit-customer',
               },
               {
-                label: `Hold`,
-                color: '#c10000',
+                label: val.kur_user_status?.id === 3 ? 'Active' : 'Hold',
+                color: val.kur_user_status?.id === 3 ? '#008e58' : '#c10000',
                 onClick: () => {
                   handleHoldCustomer(val);
                 },
