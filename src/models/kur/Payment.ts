@@ -16,6 +16,19 @@ export interface PaymentKURParams extends ListParams {
 export interface PaymentKURDisplayFilter {
   areas?: Area[];
   types?: Type | null;
+  paid_to_bank?: string;
+  submit_date_start?: number;
+  submit_date_end?: number;
+}
+
+export interface PaymentKURStateParams {
+  area_ids?: string;
+  kur_user_type_id?: number;
+  kur_user_id?: number;
+  status?: string;
+  submit_date_start?: number;
+  submit_date_end?: number;
+  paid_to_bank?: string;
 }
 
 export interface PaymentKUR {
