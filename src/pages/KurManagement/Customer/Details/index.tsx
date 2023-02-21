@@ -38,7 +38,7 @@ import { invoiceKurAction } from 'store/slice/kur/Invoice';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { RequestKUR } from 'models/kur/Request';
 import { PaymentKUR } from 'models/kur/Payment';
-import { InvoiceKur } from 'models/kur/Invoice';
+import { InvoiceKur, InvoiceKurDetail } from 'models/kur/Invoice';
 
 import { TitlePage, BackButton, Menu } from './details.styled';
 
@@ -299,7 +299,9 @@ export default function RoleUserDetails() {
       align: 'left',
       format: (val) => (
         <Typography>
-          {moment.unix(val.decision_date).format('DD/MM/YYYY')}
+          {val.decision_date !== 0 && val.decision_date !== null
+            ? moment.unix(val.decision_date).format('DD/MM/YYYY')
+            : '-'}
         </Typography>
       ),
     },
@@ -457,18 +459,20 @@ export default function RoleUserDetails() {
       id: 'last_paid',
       label: 'Last Paid',
       align: 'left',
-      format: (val) => (
-        <Typography>
-          {val.kur_invoice_Detail !== null
-            ? moment
-                .unix(
-                  val.kur_invoice_Detail[val.kur_invoice_Detail.length - 1]
-                    .created_at,
-                )
-                .format('DD/MM/YYYY')
-            : '-'}
-        </Typography>
-      ),
+      format: (val) => {
+        if (val.kur_invoice_detail?.length > 0) {
+          const getLast: InvoiceKurDetail = val.kur_invoice_detail?.filter(
+            (e: InvoiceKurDetail) => e.is_last,
+          )[0];
+          return (
+            <Typography>
+              {moment.unix(getLast.created_at).format('DD/MM/YYYY')}
+            </Typography>
+          );
+        }
+
+        return <span>-</span>;
+      },
     },
     {
       id: 'paid_amount',
@@ -481,6 +485,18 @@ export default function RoleUserDetails() {
     },
   ];
 
+  const renameDocument = (value: string) => {
+    let term = value;
+
+    if (term === 'kk') {
+      term = 'Kartu Keluarga C1';
+    } else if (term === 'sku') {
+      term = 'Surat Keterangan Usaha';
+    } else {
+      term = term.toLocaleUpperCase().replaceAll('_', ' ');
+    }
+    return term;
+  };
   return (
     <div>
       <Box p="20px" bgcolor="#F5F7FA">
@@ -649,9 +665,7 @@ export default function RoleUserDetails() {
               {customerKur.details?.kur_user_document?.map((val, i) => (
                 <Grid item xs={6} md={4} key={val.id}>
                   <DescDetails
-                    title={val.document_type
-                      .toLocaleUpperCase()
-                      .replaceAll('_', ' ')}
+                    title={renameDocument(val.document_type)}
                     icon={
                       <AddPhotoAlternateOutlinedIcon
                         sx={{ color: '#008e58' }}

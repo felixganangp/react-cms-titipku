@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { capitalize } from '@mui/material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
@@ -31,7 +32,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { invoiceKurAction } from 'store/slice/kur/Invoice';
-import { InvoiceKur } from 'models/kur/Invoice';
+import { InvoiceKur, InvoiceKurDetail } from 'models/kur/Invoice';
 import { areaAction } from 'store/slice/Area';
 import { typeAction } from 'store/slice/kur/Type';
 import { Area } from 'models/Area';
@@ -48,6 +49,7 @@ export default function Ivoice() {
   const areasData = useAppSelector((state) => state.area.data);
   const typesData = useAppSelector((state) => state.typeKur.data);
   const [inputValueArea, setInputValueArea] = useState('');
+  const [searchValue, setSearchValue] = useState('');
   const [openDatePicker, setOpenDatePicker] = useState({
     deliveryStart: false,
     deliveryEnd: false,
@@ -62,6 +64,10 @@ export default function Ivoice() {
   }, [invoice.params]);
 
   useEffect(() => {
+    console.log(invoice.params.search);
+    if (invoice.params.search) {
+      setSearchValue(invoice.params.search);
+    }
     dispatch(typeAction.fetchData());
     dispatch(areaAction.fetchData());
     dispatch(invoiceKurAction.fetchDataConditionInvoice());
@@ -76,16 +82,16 @@ export default function Ivoice() {
     );
   };
 
-  const handleSearch = (value: string) => {
-    dispatch(
-      invoiceKurAction.setParams({
-        page: 1,
-        search: value,
-      }),
-    );
-  };
+  // const handleSearch = (value: string) => {
+  //   dispatch(
+  //     invoiceKurAction.setParams({
+  //       page: 1,
+  //       search: value,
+  //     }),
+  //   );
+  // };
 
-  const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
+  // const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
 
   const handleChangeSort = (value: {
     orderBy: string | number;
@@ -201,6 +207,10 @@ export default function Ivoice() {
       newParams.due_date_end = Math.floor(
         new Date(date.due_date_end).setHours(23, 59, 59, 59) / 1000,
       );
+    }
+
+    if (searchValue) {
+      newParams.search = searchValue;
     }
     dispatch(invoiceKurAction.setParams(newParams));
   };
@@ -363,18 +373,20 @@ export default function Ivoice() {
       id: 'last_paid',
       label: 'Last Paid',
       align: 'left',
-      format: (val) => (
-        <Typography>
-          {val.kur_invoice_detail !== null
-            ? moment
-                .unix(
-                  val.kur_invoice_detail[val.kur_invoice_detail.length - 1]
-                    .created_at,
-                )
-                .format('DD/MM/YYYY')
-            : '-'}
-        </Typography>
-      ),
+      format: (val) => {
+        if (val.kur_invoice_detail?.length > 0) {
+          const getLast: InvoiceKurDetail = val.kur_invoice_detail?.filter(
+            (e: InvoiceKurDetail) => e.is_last,
+          )[0];
+          return (
+            <Typography>
+              {moment.unix(getLast.created_at).format('DD/MM/YYYY')}
+            </Typography>
+          );
+        }
+
+        return <span>-</span>;
+      },
     },
     {
       id: 'paid_amount',
@@ -427,9 +439,9 @@ export default function Ivoice() {
                     <TextField
                       placeholder="Search for name or email"
                       size="small"
-                      sx={{ bgcolor: '#ebeff3', maxWidth: '560px' }}
+                      sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
                       fullWidth
-                      defaultValue={invoice.params.search}
+                      value={searchValue}
                       InputProps={{
                         startAdornment: (
                           <InputAdornment position="start">
@@ -438,7 +450,7 @@ export default function Ivoice() {
                         ),
                       }}
                       onChange={(event) => {
-                        debounceSearch(event.target.value);
+                        setSearchValue(event.target.value);
                       }}
                     />
                   </Box>
@@ -463,7 +475,7 @@ export default function Ivoice() {
                           isOptionEqualToValue={(item: Type) => {
                             return item.id === invoice.displayFilter?.type?.id;
                           }}
-                          getOptionLabel={(item) => item.name}
+                          getOptionLabel={(item) => capitalize(item.name)}
                           value={invoice?.displayFilter?.type}
                           renderInput={(params) => (
                             <TextField
@@ -484,7 +496,9 @@ export default function Ivoice() {
                           onChange={(e, value) => {
                             handleChangePasar(value);
                           }}
-                          getOptionLabel={(option) => `${option.title}`}
+                          getOptionLabel={(option) =>
+                            `${capitalize(option.title)}`
+                          }
                           renderInput={(params) => {
                             return (
                               <TextField
@@ -529,7 +543,9 @@ export default function Ivoice() {
                           onChange={(e, value) => {
                             handleChangeStatus(value);
                           }}
-                          getOptionLabel={(item) => item.replaceAll('_', ' ')}
+                          getOptionLabel={(item) =>
+                            capitalize(item.replaceAll('_', ' '))
+                          }
                           value={invoice?.displayFilter?.status}
                           renderInput={(params) => (
                             <TextField
@@ -550,7 +566,9 @@ export default function Ivoice() {
                           onChange={(e, value) => {
                             handleChangeCondition(value);
                           }}
-                          getOptionLabel={(item) => item.replaceAll('_', ' ')}
+                          getOptionLabel={(item) =>
+                            capitalize(item.replaceAll('_', ' '))
+                          }
                           value={invoice?.displayFilter?.condition}
                           renderInput={(params) => (
                             <TextField

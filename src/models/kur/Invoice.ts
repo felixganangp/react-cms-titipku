@@ -56,6 +56,7 @@ export interface InvoiceKur {
 export interface InvoiceKurDetail {
   id: number;
   created_at: number;
+  is_last: boolean;
   updated_at: number;
   created_by_id: number;
   created_by_type: string;
