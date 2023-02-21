@@ -335,6 +335,7 @@ export default function KurCustomer() {
                 onClick: () => {
                   handleHoldCustomer(val);
                 },
+                dataId: 'button-hold-customer',
               },
             ]}
           >
