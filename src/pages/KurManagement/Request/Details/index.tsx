@@ -254,10 +254,7 @@ export default function RequestKURDetails() {
                 </Typography>
                 <CustomerStatusDetail
                   status={
-                    requestDetails &&
-                    requestDetails.kur_user.kur_user_credit_score.id
-                      ? requestDetails.kur_user.kur_user_credit_score.id
-                      : 1
+                    requestDetails?.kur_user.kur_user_credit_score.id || 1
                   }
                 >
                   {requestDetails?.kur_user.kur_user_credit_score.name}
