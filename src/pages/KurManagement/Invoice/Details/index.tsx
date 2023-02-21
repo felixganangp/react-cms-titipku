@@ -1,9 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
+import MenuAction from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 import Status from 'components/Status';
 import Table from 'components/Table';
@@ -12,13 +15,17 @@ import DescDetails from 'components/DescDetails';
 import SubDetailsPagesWrapper from 'components/Accordion/SubDetailsPagesWrapper';
 import digitFormatter from 'utils/digitFormatter';
 import moment from 'moment';
+import useModal from 'hooks/useModal';
 
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { invoiceKurAction } from 'store/slice/kur/Invoice';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { InvoiceKurDetail } from 'models/kur/Invoice';
 
+import ArrowDown from '@mui/icons-material/KeyboardArrowDown';
+import Modal from 'components/Modal';
 import { TitlePage, BackButton, Menu } from './details.styled';
+import AdjustInvoiceModal from '../components/adjust';
 
 const colorStatusUser = (string: string | undefined) => {
   let color = '#cecece';
@@ -91,13 +98,31 @@ export default function DetailsInvoice() {
       },
     },
   ];
+
+  // action
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  // adjust invoice
+  const adjustModal = useModal();
+
   return (
     <div>
       <Box p="20px" bgcolor="#F5F7FA">
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Card>
-              <Box display="flex" justifyContent="space-between">
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+              >
                 <Box>
                   <Menu>Invoice Detail</Menu>
                   <BackButton
@@ -108,6 +133,30 @@ export default function DetailsInvoice() {
                     <TitlePage>Details</TitlePage>
                   </BackButton>
                 </Box>
+                <Button
+                  endIcon={<ArrowDown />}
+                  sx={{ height: 'fit-content' }}
+                  onClick={(e) => handleClick(e)}
+                >
+                  Action
+                </Button>
+                <MenuAction
+                  id="basic-menu"
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleClose}
+                  MenuListProps={{
+                    'aria-labelledby': 'basic-button',
+                  }}
+                >
+                  <MenuItem
+                    onClick={() => {
+                      adjustModal.openModal();
+                    }}
+                  >
+                    Adjust Invoice
+                  </MenuItem>
+                </MenuAction>
               </Box>
             </Card>
           </Grid>
@@ -201,6 +250,18 @@ export default function DetailsInvoice() {
           </Box>
         </SubDetailsPagesWrapper>
       </Box>
+      <Modal
+        open={adjustModal.open}
+        title="Adjust Invoice"
+        onClose={adjustModal.closeModal}
+      >
+        <AdjustInvoiceModal
+          kurUserId={invoice?.kur_request.kur_user.id || 0}
+          id={invoice?.id || 0}
+          invoiceNumber={invoice?.kur_invoice_number || ''}
+          onClose={adjustModal.closeModal}
+        />
+      </Modal>
     </div>
   );
 }

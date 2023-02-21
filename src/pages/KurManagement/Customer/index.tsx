@@ -98,6 +98,7 @@ export default function KurCustomer() {
     idImageKk: null,
     idImageNpwp: null,
     idImageSKUsaha: null,
+    kurUserStatus: '',
   };
   const [openFilter, setOpenFilter] = useState(false);
   const [formData, setFormData] = useState<FormDataType>({
@@ -136,9 +137,7 @@ export default function KurCustomer() {
     return result;
   };
 
-  const [formHead, setFormHead] = useState('');
-  const handleOpenEdit = (val: Customer) => {
-    setFormHead('Edit Customer');
+  const getInitialData = (val: Customer) => {
     const birthDate = new Date(0);
     birthDate.setUTCSeconds(val.birth_date);
     const date = birthDate.getDate();
@@ -170,41 +169,50 @@ export default function KurCustomer() {
       id: val.user.area.id,
       title: val.user.area.name,
     };
+    const initialDataPayload = {
+      // imageCustomer: '',
+      idCustomer: val.id?.toString(),
+      name: val.name,
+      kurType: val.kur_user_type,
+      adminFee: val.admin_fee.toString(),
+      dpdRate: val.dpd_rate.toString(),
+      birthDate: d,
+      phoneNumber: val.phone_number,
+      email: val.email,
+      addressKtp: val.registered_address,
+      addressDomisili: val.living_address,
+      pasarName,
+      merchantName,
+      nikKtp: findKtp[0].document_number,
+      oldNikKtp: findKtp[0].document_number,
+      imageNik: findKtp[0].document_filepath,
+      kkNumber: findKk[0].document_number,
+      oldKkNumber: findKk[0].document_number,
+      imageKk: findKk[0].document_filepath,
+      npwp: findNpwp[0].document_number,
+      oldNpwp: findNpwp[0].document_number,
+      imageNpwp: findNpwp[0].document_filepath,
+      imageSKUsaha: findSKU[0].document_filepath,
+      creditLimit: val.credit_limit.toString(),
+      bankName: findBank[0],
+      bankNumberPrimary: val.user_account_number,
+      nobuAccountNumber: val.nobu_account_number,
+      idImageNik: findKtp[0].id,
+      idImageKk: findKk[0].id,
+      idImageNpwp: findNpwp[0].id,
+      idImageSKUsaha: findSKU[0].id,
+      kurUserStatus: val.kur_user_status.id?.toString(),
+    };
+    return initialDataPayload;
+  };
+
+  const [formHead, setFormHead] = useState('');
+  const handleOpenEdit = (val: Customer) => {
+    setFormHead('Edit Customer');
+    const initialDataPayload = getInitialData(val);
     setFormData({
       isEdit: true,
-      initialData: {
-        // imageCustomer: '',
-        idCustomer: val.id?.toString(),
-        name: val.name,
-        kurType: val.kur_user_type,
-        adminFee: val.admin_fee.toString(),
-        dpdRate: val.dpd_rate.toString(),
-        birthDate: convertBirthDate,
-        phoneNumber: val.phone_number,
-        email: val.email,
-        addressKtp: val.registered_address,
-        addressDomisili: val.living_address,
-        pasarName,
-        merchantName,
-        nikKtp: findKtp[0].document_number,
-        oldNikKtp: findKtp[0].document_number,
-        imageNik: findKtp[0].document_filepath,
-        kkNumber: findKk[0].document_number,
-        oldKkNumber: findKk[0].document_number,
-        imageKk: findKk[0].document_filepath,
-        npwp: findNpwp[0].document_number,
-        oldNpwp: findNpwp[0].document_number,
-        imageNpwp: findNpwp[0].document_filepath,
-        imageSKUsaha: findSKU[0].document_filepath,
-        creditLimit: val.credit_limit.toString(),
-        bankName: findBank[0],
-        bankNumberPrimary: val.user_account_number,
-        nobuAccountNumber: val.nobu_account_number,
-        idImageNik: findKtp[0].id,
-        idImageKk: findKk[0].id,
-        idImageNpwp: findNpwp[0].id,
-        idImageSKUsaha: findSKU[0].id,
-      },
+      initialData: initialDataPayload,
     });
     formModal.openModal();
   };
@@ -221,6 +229,15 @@ export default function KurCustomer() {
 
     const result = firstCharUpperCase.join(' ');
     return result;
+  };
+
+  const handleHoldCustomer = async (val: Customer) => {
+    const newPayload: Customer = {
+      ...val,
+      kur_user_status: { ...val.kur_user_status, id: 3 },
+    };
+    const initialDataPayload = getInitialData(newPayload);
+    await dispatch(customerAction.editCustomer(initialDataPayload));
   };
   const headCell = [
     {
@@ -303,6 +320,7 @@ export default function KurCustomer() {
                 onClick: () => {
                   navigate(`/kur/customer/${val.id}`);
                 },
+                dataId: 'button-details-customer',
               },
               {
                 label: `Edit`,
@@ -311,11 +329,14 @@ export default function KurCustomer() {
                 },
                 dataId: 'button-edit-customer',
               },
-              // {
-              //   label: `Hold`,
-              //   color: '#c10000',
-              //   onClick: () => {},
-              // },
+              {
+                label: `Hold`,
+                color: '#c10000',
+                onClick: () => {
+                  handleHoldCustomer(val);
+                },
+                dataId: 'button-hold-customer',
+              },
             ]}
           >
             <IconButton>
@@ -615,16 +636,16 @@ export default function KurCustomer() {
                     onChange={(e, value) => {
                       handleChangeArea(value);
                     }}
-                    isOptionEqualToValue={(option: Area) => {
-                      const filtered =
-                        customerKur?.stateFilter?.areaKur?.filter(
-                          (el: Area) => el.id === option.id,
-                        );
-                      if (filtered) {
-                        return option.id === filtered[0]?.id;
-                      }
-                      return false;
-                    }}
+                    // isOptionEqualToValue={(option: Area) => {
+                    //   const filtered =
+                    //     customerKur?.stateFilter?.areaKur?.filter(
+                    //       (el: Area) => el.id === option.id,
+                    //     );
+                    //   if (filtered) {
+                    //     return option.id === filtered[0]?.id;
+                    //   }
+                    //   return false;
+                    // }}
                     getOptionLabel={(option) => {
                       return `${option.title}`;
                     }}
@@ -747,6 +768,7 @@ export default function KurCustomer() {
               onChangePage={(val) => handleChangePage(val)}
               onChangeSort={(val) => handleChangeSort(val)}
               disableNumber
+              loading={customerKur.loading}
             />
           </Box>
         </Grid>

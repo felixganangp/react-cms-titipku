@@ -9,7 +9,7 @@ export interface CreateCustomer {
   name: string;
   kurType: Type | null;
   adminFee: string;
-  birthDate: { _d?: Date } | null | string;
+  birthDate: Moment | null;
   phoneNumber: string;
   email: string;
   addressKtp: string;
@@ -35,6 +35,7 @@ export interface CreateCustomer {
   bankName: BankList | null;
   bankNumberPrimary: string;
   nobuAccountNumber: string;
+  kurUserStatus: string | undefined;
 }
 
 export interface Customer {

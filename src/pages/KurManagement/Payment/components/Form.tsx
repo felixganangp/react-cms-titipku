@@ -1,6 +1,6 @@
 /* eslint-disable radix */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import {
@@ -10,7 +10,6 @@ import {
   Button,
   Autocomplete,
   Modal,
-  IconButton,
 } from '@mui/material';
 import FormLabel from 'components/FormLabel';
 import AddIcon from '@mui/icons-material/Add';
@@ -22,6 +21,7 @@ import { paymentKURAction } from 'store/slice/kur/Payment';
 import moment from 'moment';
 import InputImage from 'components/InputImage/index';
 import { NumberFormatValues, NumericFormat } from 'react-number-format';
+import { Customer } from 'models/kur/Customer';
 import KurCustomer from './KurCustomer';
 import { AddButton } from '../payment.styled';
 
@@ -32,16 +32,6 @@ interface PaymentFormProps {
 export default function PaymentForm({ onClose }: PaymentFormProps) {
   const payment = useAppSelector((state) => state.payment);
   const dispatch = useAppDispatch();
-
-  // currency format
-  const defaultReactNumberFormatProps = {
-    allowNegative: false,
-    decimalScale: 2,
-    decimalSeparator: ',',
-    thousandSeparator: '.',
-    allowEmptyFormatting: false,
-    isNumericString: false,
-  };
 
   // date picker
   const [openDate, setOpenDate] = useState<{
@@ -63,25 +53,11 @@ export default function PaymentForm({ onClose }: PaymentFormProps) {
   const formik = useFormik({
     initialValues,
     onSubmit: async (values, { resetForm }) => {
-      console.log(
-        values.amount,
-        values.amount.split('.').join(''),
-        typeof Number(
-          parseFloat(
-            values.amount.split('.').join('').replace(/,/g, '.'),
-          ).toFixed(2),
-        ),
-        Number(
-          parseFloat(
-            values.amount.split('.').join('').replace(/,/g, '.'),
-          ).toFixed(2),
-        ),
-      );
       await dispatch(
         paymentKURAction.createPayment({
           body: {
             data: {
-              kur_user_id: payment.selectedCustomer?.id,
+              kur_user_id: values.kur_user_id?.id,
               amount: Number(
                 parseFloat(
                   values.amount.split('.').join('').replace(/,/g, '.'),
@@ -102,12 +78,10 @@ export default function PaymentForm({ onClose }: PaymentFormProps) {
       await onClose();
     },
     validationSchema: yup.object({
+      kur_user_id: yup.mixed().required('KUR Customer is required'),
       decision_date: yup.mixed().required('Payment Date is required'),
       amount: yup.string().required('Amount is required'),
-      //   .min(1, 'Please input valid amount')
-      //   .max(9999999999, 'Maximum value of amount is 9.999.999.999'),
       file: yup.mixed().required('Attachment is required'),
-      // paid_to_bank: yup.string().required('Transfer to is required'),
     }),
     enableReinitialize: true,
   });
@@ -129,6 +103,18 @@ export default function PaymentForm({ onClose }: PaymentFormProps) {
     open: false,
   });
 
+  const handleCloseModal = (customer: Customer) => {
+    setCustomerModal({ open: false });
+    dispatch(
+      paymentKURAction.setCustomerDataParams({
+        search: '',
+        order_by: 'id',
+        order_type: 'asc',
+      }),
+    );
+    if (customer.id) setFieldValue('kur_user_id', customer);
+  };
+
   return (
     <Box sx={{ margin: 0 }}>
       <form onSubmit={handleSubmit}>
@@ -136,26 +122,20 @@ export default function PaymentForm({ onClose }: PaymentFormProps) {
           {/* KUR Customer */}
           <FormLabel
             text="KUR Customer"
-            error={!isValid && !payment.selectedCustomer}
-            helperText={
-              !isValid &&
-              !payment.selectedCustomer &&
-              `KUR Customer is required`
-            }
+            error={Boolean(errors.kur_user_id)}
+            helperText={errors.kur_user_id && `${errors.kur_user_id}`}
           >
             <TextField
               type="text"
               name="kur_user_id"
               placeholder="Input KUR customer"
-              value={payment.selectedCustomer?.name}
+              value={values.kur_user_id?.name}
               disabled
               fullWidth
               sx={{
                 '.MuiInputBase-root': {
                   paddingRight: '5px',
-                  backgroundColor: payment.selectedCustomer
-                    ? '#f5f8ff'
-                    : '#ffff',
+                  backgroundColor: values.kur_user_id ? '#f5f8ff' : '#ffff',
                 },
               }}
               InputProps={{
@@ -248,10 +228,6 @@ export default function PaymentForm({ onClose }: PaymentFormProps) {
               minLength={2}
               fullWidth
               allowNegative={false}
-              // renderText={(value) => <TextField />}
-              // inputProps={{
-              //   maxLength: 12,
-              // }}
               isAllowed={(val: NumberFormatValues) => {
                 const { floatValue } = val;
                 return (
@@ -342,20 +318,13 @@ export default function PaymentForm({ onClose }: PaymentFormProps) {
             boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
           }}
         >
-          <Button
-            sx={{ width: '20%' }}
-            type="submit"
-            disabled={!isValid || !payment.selectedCustomer}
-          >
+          <Button sx={{ width: '20%' }} type="submit" disabled={!isValid}>
             Create
           </Button>
         </Box>
       </form>
-      <Modal
-        open={customerModal.open}
-        onClose={() => setCustomerModal({ open: false })}
-      >
-        <KurCustomer onClose={() => setCustomerModal({ open: false })} />
+      <Modal open={customerModal.open} onClose={handleCloseModal}>
+        <KurCustomer onClose={handleCloseModal} />
       </Modal>
     </Box>
   );

@@ -1,5 +1,5 @@
 import http from 'utils/request';
-import { PaymentKURParams } from 'models/kur/Invoice';
+import { PaymentKURParams, AdjustInvoice } from 'models/kur/Invoice';
 
 export const getAllInvoiceKur = (params: PaymentKURParams) =>
   new Promise<PaymentKURParams>(async (resolve, reject) => {
@@ -55,6 +55,19 @@ export const getAllConditionInvoice = () =>
       if (respon.data) {
         resolve(respon.data);
       }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const adjust = (body: AdjustInvoice) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.post(`kur/adjustment`, body);
+      if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response
         ? `${err.response.data.message}`

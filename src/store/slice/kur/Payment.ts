@@ -27,8 +27,8 @@ interface PaymentKURProps {
   customerParams: CustomerParams;
   customersData: Customer[];
   customersTotal: number;
-  selectedCustomer: Customer | null;
   bankAccounts: BankAccount[];
+  selectedCustomer: Customer | null;
 }
 
 const initialState: PaymentKURProps = {
@@ -62,8 +62,8 @@ const initialState: PaymentKURProps = {
   },
   customersData: [],
   customersTotal: 0,
-  selectedCustomer: null,
   bankAccounts: [],
+  selectedCustomer: null,
 };
 
 const PaymentKURSlice = createSlice({
@@ -178,6 +178,15 @@ const PaymentKURSlice = createSlice({
       state.customersData = action.payload.data || [];
       state.total = action.payload.total;
     },
+    fetchBankAccount(state: PaymentKURProps, action: PayloadAction) {
+      state.loading = true;
+    },
+    fetchBankAccountSuccess(
+      state: PaymentKURProps,
+      action: PayloadAction<Response<{ bank_account: BankAccount[] }>>,
+    ) {
+      state.bankAccounts = action.payload.data.bank_account;
+    },
     setSelectedCustomer(
       state: PaymentKURProps,
       action: PayloadAction<Customer | null>,
@@ -188,15 +197,6 @@ const PaymentKURSlice = createSlice({
           ...action.payload,
         };
       } else state.selectedCustomer = null;
-    },
-    fetchBankAccount(state: PaymentKURProps, action: PayloadAction) {
-      state.loading = true;
-    },
-    fetchBankAccountSuccess(
-      state: PaymentKURProps,
-      action: PayloadAction<Response<{ bank_account: BankAccount[] }>>,
-    ) {
-      state.bankAccounts = action.payload.data.bank_account;
     },
   },
 });

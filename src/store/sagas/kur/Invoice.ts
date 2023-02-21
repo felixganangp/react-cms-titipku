@@ -1,14 +1,14 @@
-import { call, put, takeLatest, select } from 'redux-saga/effects';
+import { call, put, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
-import { invoiceKurAction, selectDataInvoice } from 'store/slice/kur/Invoice';
+import { invoiceKurAction } from 'store/slice/kur/Invoice';
 import { uiAction } from 'store/slice/ui';
 
 import * as InvoiceService from 'service/Kur/Invoice';
 import { ListResponse, Response } from 'models/fetch';
 import {
-  InvoiceKurDetail,
   InvoiceKur,
   PaymentKURParams,
+  AdjustInvoice,
 } from 'models/kur/Invoice';
 
 function* fetchData(params: PayloadAction<PaymentKURParams>) {
@@ -133,6 +133,39 @@ function* fetchDataConditionInvoice() {
   }
 }
 
+function* adjustment(body: PayloadAction<AdjustInvoice>) {
+  try {
+    yield call(InvoiceService.adjust, body.payload);
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Success',
+        message: 'Successfully adjust invoice',
+        severity: 'success',
+      }),
+    );
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error adjust invoice',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error adjust invoice',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(invoiceKurAction.adjustFailed());
+  }
+}
+
 export default function* customerKurSagas() {
   yield takeLatest(invoiceKurAction.fetchData.type, fetchData);
   yield takeLatest(invoiceKurAction.fetchDataDetail.type, fetchDataDetail);
@@ -144,4 +177,5 @@ export default function* customerKurSagas() {
     invoiceKurAction.fetchDataStatusInvoice.type,
     fetchDataStatusInvoice,
   );
+  yield takeLatest(invoiceKurAction.adjust.type, adjustment);
 }

@@ -374,6 +374,7 @@ export default function PaymentKURPage() {
 
   // form
   const formModal = useModal();
+
   useEffect(() => {
     dispatch(paymentKURAction.setSelectedCustomer(null));
   }, [formModal.open]);

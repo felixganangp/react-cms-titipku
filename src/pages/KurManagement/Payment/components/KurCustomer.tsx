@@ -18,7 +18,7 @@ import { ExpandMore } from '@mui/icons-material';
 import { Content, Header } from '../payment.styled';
 
 interface KURCustomerProps {
-  onClose: () => void;
+  onClose: (customer: Customer) => void;
 }
 
 export default function KurCustomer({ onClose }: KURCustomerProps) {
@@ -62,7 +62,7 @@ export default function KurCustomer({ onClose }: KURCustomerProps) {
         order_type: 'asc',
       }),
     );
-    onClose();
+    onClose(customer);
   };
 
   const headCell: HeadCells<Customer>[] = [
@@ -122,14 +122,14 @@ export default function KurCustomer({ onClose }: KURCustomerProps) {
 
   const childModalStyle = {
     position: 'absolute',
-    top: '50%',
+    top: '48%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: 'fit-content',
   };
 
   return (
-    <Box sx={{ ...childModalStyle, width: '80%', height: '50%' }}>
+    <Box sx={{ ...childModalStyle, width: '80%', height: '720px' }}>
       <Header>
         <ExpandMore sx={{ mr: '5px' }} />
         <span>Payment</span>
