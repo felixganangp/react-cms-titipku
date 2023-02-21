@@ -179,7 +179,7 @@ export default function KurCustomer() {
         kurType: val.kur_user_type,
         adminFee: val.admin_fee.toString(),
         dpdRate: val.dpd_rate.toString(),
-        birthDate: convertBirthDate,
+        birthDate: d,
         phoneNumber: val.phone_number,
         email: val.email,
         addressKtp: val.registered_address,
@@ -303,6 +303,7 @@ export default function KurCustomer() {
                 onClick: () => {
                   navigate(`/kur/customer/${val.id}`);
                 },
+                dataId: 'button-details-customer',
               },
               {
                 label: `Edit`,
@@ -615,16 +616,16 @@ export default function KurCustomer() {
                     onChange={(e, value) => {
                       handleChangeArea(value);
                     }}
-                    isOptionEqualToValue={(option: Area) => {
-                      const filtered =
-                        customerKur?.stateFilter?.areaKur?.filter(
-                          (el: Area) => el.id === option.id,
-                        );
-                      if (filtered) {
-                        return option.id === filtered[0]?.id;
-                      }
-                      return false;
-                    }}
+                    // isOptionEqualToValue={(option: Area) => {
+                    //   const filtered =
+                    //     customerKur?.stateFilter?.areaKur?.filter(
+                    //       (el: Area) => el.id === option.id,
+                    //     );
+                    //   if (filtered) {
+                    //     return option.id === filtered[0]?.id;
+                    //   }
+                    //   return false;
+                    // }}
                     getOptionLabel={(option) => {
                       return `${option.title}`;
                     }}
@@ -747,6 +748,7 @@ export default function KurCustomer() {
               onChangePage={(val) => handleChangePage(val)}
               onChangeSort={(val) => handleChangeSort(val)}
               disableNumber
+              loading={customerKur.loading}
             />
           </Box>
         </Grid>

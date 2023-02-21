@@ -435,11 +435,12 @@ function Form({ onClose, formData }: Props) {
                 text="Birth Date"
                 error={openCalendaer.touched && !values.birthDate}
                 helperText={
-                  (openCalendaer.touched &&
-                    !values.birthDate &&
-                    // values.birthDate === '' &&
-                    'Birth date is required') ||
-                  (values.birthDate === '' && 'Birth date is required')
+                  openCalendaer.touched &&
+                  !values.birthDate &&
+                  // values.birthDate === '' &&
+                  'Birth date is required'
+                  //   ||
+                  // (values.birthDate === '' && 'Birth date is required')
                 }
               >
                 <LocalizationProvider dateAdapter={AdapterMoment}>
