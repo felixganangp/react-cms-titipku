@@ -78,6 +78,6 @@ export interface InvoiceKurDetail {
 export interface AdjustInvoice {
   kur_user_id: number;
   kur_invoice_id: number;
-  amount: number | string;
+  amount: number;
   remarks: string;
 }

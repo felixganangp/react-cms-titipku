@@ -10,22 +10,28 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import FormLabel from 'components/FormLabel';
 import { NumericFormat, NumberFormatValues } from 'react-number-format';
+import { useAppDispatch } from 'store/hooks';
+import { invoiceKurAction } from 'store/slice/kur/Invoice';
 
 interface Props {
   kurUserId: number;
-  invoiceId: number;
+  id: number;
+  invoiceNumber: string;
   onClose: () => void;
 }
 
 export default function AdjustInvoiceModal({
   kurUserId,
-  invoiceId,
+  id,
+  invoiceNumber,
   onClose,
 }: Props) {
+  const dispatch = useAppDispatch();
+
   // formik
-  const initialValues: AdjustInvoice = {
+  const initialValues = {
     kur_user_id: kurUserId,
-    kur_invoice_id: invoiceId,
+    kur_invoice_id: id,
     amount: '',
     remarks: '',
   };
@@ -33,7 +39,18 @@ export default function AdjustInvoiceModal({
   const formik = useFormik({
     initialValues,
     onSubmit: async (values, { resetForm }) => {
-      console.log('values', values);
+      await dispatch(
+        invoiceKurAction.adjust({
+          kur_user_id: kurUserId,
+          kur_invoice_id: id,
+          amount: Number(
+            parseFloat(
+              values.amount.split('.').join('').replace(/,/g, '.'),
+            ).toFixed(2),
+          ),
+          remarks: values.remarks,
+        }),
+      );
       await resetForm();
       await onClose();
     },
@@ -60,10 +77,31 @@ export default function AdjustInvoiceModal({
       <form onSubmit={handleSubmit}>
         <Box sx={{ padding: '24px' }}>
           {/* invoice id */}
-          <Typography fontSize="20px" fontWeight={500}>
-            {invoiceId}
+          <Typography fontSize="20px" fontWeight={500} marginBottom="24px">
+            {invoiceNumber}
           </Typography>
-          <FormLabel text="Outstanding Amount">
+          <FormLabel
+            text="Outstanding Amount"
+            error={
+              (touched.amount || !isValid) &&
+              (Number(
+                parseFloat(
+                  values.amount.split('.').join('').replace(/,/g, '.'),
+                ).toFixed(2),
+              ) === 0.0 ||
+                Boolean(errors.amount))
+            }
+            helperText={
+              (touched.amount || !isValid) &&
+              ((errors.amount && `${errors.amount}`) ||
+                (Number(
+                  parseFloat(
+                    values.amount.split('.').join('').replace(/,/g, '.'),
+                  ).toFixed(2),
+                ) === 0.0 &&
+                  `Please input valid amount`))
+            }
+          >
             <NumericFormat
               name="amount"
               customInput={TextField}
@@ -89,7 +127,15 @@ export default function AdjustInvoiceModal({
             />
           </FormLabel>
           {/* reason */}
-          <FormLabel text="Reason">
+          <FormLabel
+            text="Reason"
+            error={(touched.remarks || !isValid) && Boolean(errors.remarks)}
+            helperText={
+              (touched.remarks || !isValid) &&
+              errors.remarks &&
+              `${errors.remarks}`
+            }
+          >
             <TextField
               id="remarks"
               value={values.remarks}
