@@ -365,10 +365,10 @@ export default function Ivoice() {
       align: 'left',
       format: (val) => (
         <Typography>
-          {val.kur_invoice_Detail !== null
+          {val.kur_invoice_detail !== null
             ? moment
                 .unix(
-                  val.kur_invoice_Detail[val.kur_invoice_Detail.length - 1]
+                  val.kur_invoice_detail[val.kur_invoice_detail.length - 1]
                     .created_at,
                 )
                 .format('DD/MM/YYYY')
