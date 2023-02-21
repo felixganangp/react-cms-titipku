@@ -122,11 +122,11 @@ export default function PaymentKURPage() {
         kur_user_type_id: value ? value?.id : null,
       }),
     );
-    dispatch(
-      paymentKURAction.setDisplayFilter({
-        types: value,
-      }),
-    );
+    // dispatch(
+    //   paymentKURAction.setDisplayFilter({
+    //     types: value,
+    //   }),
+    // );
   };
 
   const handleChangeBank = (value: any) => {
@@ -179,6 +179,10 @@ export default function PaymentKURPage() {
     dispatch(paymentKURAction.fetchData(payment.params));
   };
 
+  const uppercaseWord = (word: string) => {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  };
+
   const handleResetFilter = async () => {
     setStartDate(null);
     setEndDate(null);
@@ -191,6 +195,8 @@ export default function PaymentKURPage() {
         submit_date_start: undefined,
         submit_date_end: undefined,
         paid_to_bank: undefined,
+        order_by: 'created_at',
+        order_type: 'asc',
       }),
     );
     await dispatch(
@@ -311,7 +317,9 @@ export default function PaymentKURPage() {
       align: 'left',
       enableSort: true,
       format: (val) => (
-        <InvoiceStatus status={val.status}>{val.status}</InvoiceStatus>
+        <InvoiceStatus status={val.status}>
+          {uppercaseWord(val.status)}
+        </InvoiceStatus>
       ),
     },
     {

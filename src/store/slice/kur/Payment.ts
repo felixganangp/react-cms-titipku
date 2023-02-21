@@ -40,6 +40,8 @@ const initialState: PaymentKURProps = {
     page: 1,
     count: 10,
     search: '',
+    order_by: 'created_at',
+    order_type: 'desc',
   },
   displayFilter: {
     areas: [],
