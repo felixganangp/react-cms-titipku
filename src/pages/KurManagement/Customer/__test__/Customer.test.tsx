@@ -56,6 +56,7 @@ const formData: {
     idImageKk: null,
     idImageNpwp: null,
     idImageSKUsaha: null,
+    kurUserStatus: '',
   },
 };
 
@@ -398,11 +399,25 @@ describe('Customer KUR Page', async () => {
     expect(addModalHeader).not.toBeInTheDocument();
   });
   it('Edit customer button clicked', async () => {
+    await act(() => {
+      mockCustomer(MockLisCustomers);
+    });
     openForm('button-edit-customer', true);
     const addModalHeader = screen.getByTestId('form-customer');
     expect(addModalHeader).toBeInTheDocument();
   });
+  //* HOLD CUSTOMER */
+  it('Hold customer button clicked', async () => {
+    await act(() => {
+      mockCustomer(MockLisCustomers);
+    });
+    openForm('button-hold-customer', true);
+    expect(screen.getByTestId('button-hold-customer')).toBeInTheDocument();
+  });
   it('Details customer button clicked', async () => {
+    await act(() => {
+      mockCustomer(MockLisCustomers);
+    });
     openForm('button-details-customer', true);
     const idSelectedCustomer = MockLisCustomers[0].id;
     expect(window.location.pathname).toBe(
