@@ -1,19 +1,14 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from 'store/hooks';
-import { userDetailsAction } from 'store/slice/UserDetails';
+import { useAppSelector } from 'store/hooks';
+import ProgresBar from 'components/Loading/ProgresBar';
 import ListRoute from './ListRoute';
 import PrivateRoute from './PrivateRoute';
 
 export default function IndexRoute() {
-  const dispatch = useAppDispatch();
   const menuRoleUserCurrent = useAppSelector(
     (state) => state.userDetails.menuData,
   );
-
-  // useEffect(() => {
-  //   dispatch(userDetailsAction.fetchUserDetails());
-  // }, []);
 
   const listIdMenu = menuRoleUserCurrent.map((val) => val.id);
 
@@ -29,12 +24,12 @@ export default function IndexRoute() {
           element={
             val.auth === 'Private' ? (
               <PrivateRoute redirect="/sign-in">
-                <Suspense>
+                <Suspense fallback={<ProgresBar />}>
                   <val.comp />
                 </Suspense>
               </PrivateRoute>
             ) : (
-              <Suspense>
+              <Suspense fallback={<ProgresBar />}>
                 <val.comp />
               </Suspense>
             )

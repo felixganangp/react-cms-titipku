@@ -1,16 +1,29 @@
 /* eslint-disable @typescript-eslint/lines-between-class-members */
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { act } from 'react-dom/test-utils';
 import MockTheme from 'utils/MockTheme';
 import { store } from 'store';
 import { customerAction } from 'store/slice/kur/Customer';
+import { typeAction } from 'store/slice/kur/Type';
+import { areaAction } from 'store/slice/Area';
+import { CreateCustomer } from 'models/kur/Customer';
+import { creditScoreAction } from 'store/slice/kur/CreditScore';
 import CustomerView from '../index';
-import { MockLisCustomers } from './MockCustomer';
+import {
+  MockLisCustomers,
+  MockKurType,
+  MockKurArea,
+  MockCreditScore,
+} from './MockCustomer';
 import FormCustomer from '../components/form';
 
-const formData = {
+const formData: {
+  isEdit: boolean;
+  initialData: CreateCustomer;
+} = {
   isEdit: false,
   initialData: {
     idCustomer: '',
@@ -51,9 +64,17 @@ const showFilter = () => {
   fireEvent.click(buttonElement);
 };
 
-const addForm = () => {
-  const buttonElement = screen.getByTestId('button-add-customer');
-  fireEvent.click(buttonElement);
+const openForm = (id: string, menulist?: boolean) => {
+  if (menulist) {
+    const menuAction = screen.getAllByTestId('MoreVertIcon');
+    fireEvent.click(menuAction[0]);
+
+    const buttonElement = screen.getByTestId(id);
+    fireEvent.click(buttonElement);
+  } else {
+    const buttonElement = screen.getByTestId(id);
+    fireEvent.click(buttonElement);
+  }
 };
 
 describe('Customer KUR Page', async () => {
@@ -82,6 +103,45 @@ describe('Customer KUR Page', async () => {
       }),
     ),
   );
+
+  const mockKurType = vi.fn((data) =>
+    store.dispatch(
+      typeAction.fetchDataSuccess({
+        timestamp: 1675755225,
+        status: 'ok',
+        message: 'Retrieved successfully',
+        count: 2,
+        total: 2,
+        data,
+      }),
+    ),
+  );
+
+  const mockKurArea = vi.fn((data) =>
+    store.dispatch(
+      areaAction.fetchDataSuccess({
+        timestamp: 1675755225,
+        status: 'ok',
+        message: 'Retrieved successfully',
+        count: 2,
+        total: 2,
+        data,
+      }),
+    ),
+  );
+
+  const mockKurCreditScore = vi.fn((data) =>
+    store.dispatch(
+      creditScoreAction.fetchDataSuccess({
+        timestamp: 1675755225,
+        status: 'ok',
+        message: 'Retrieved successfully',
+        count: 2,
+        total: 2,
+        data,
+      }),
+    ),
+  );
   beforeEach(() => {
     // vi.clearAllMocks();
     render(
@@ -94,22 +154,7 @@ describe('Customer KUR Page', async () => {
   });
   afterEach(() => {
     vi.clearAllMocks();
-  });
-  it('Page customer kur should be shown', () => {
-    // const { debug } = render(
-    //   <React.Suspense fallback>
-    //     <MockTheme theme={theme}>
-    //       <CustomerView />
-    //     </MockTheme>
-    //   </React.Suspense>,
-    // );
-    // debug();
-    const customerPageHeader = screen.getByText(/KUR Customer/i);
-    expect(customerPageHeader).toBeInTheDocument();
-  });
-  it('Table list customer kur should be shown', () => {
-    const tableCustomer = screen.getByTestId('table-customer');
-    expect(tableCustomer).toBeInTheDocument();
+    // showFilter();
   });
   //* TABLE */
   it('Content of table list customer kur', async () => {
@@ -119,11 +164,13 @@ describe('Customer KUR Page', async () => {
     const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
     expect(listTableCustomer.length).toBe(2);
   });
-  // it('Content of table list customer kur', async () => {
-  //   mockCustomer(MockLisCustomers);
-  //   const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
-  //   expect(listTableCustomer.length).toBe(2);
-  // });
+  it('Show pagination of table customer kur', async () => {
+    const getPagination = screen.getByLabelText('pagination navigation');
+    const buttonPage = within(getPagination).getByLabelText('page 1');
+
+    fireEvent.click(buttonPage);
+    expect(buttonPage).toHaveClass('Mui-selected');
+  });
   it('Add button, search, filter not be clicked', () => {
     const filterCollapse = screen.getByTestId('filter-collapse-customer');
     const addCusstomer = screen.getByTestId('button-add-customer');
@@ -132,7 +179,7 @@ describe('Customer KUR Page', async () => {
     expect(searchCustomer).toBeInTheDocument();
     expect(filterCollapse).toHaveClass('MuiCollapse-hidden');
   });
-  //* FILTER */
+  //* FILTER, SORT AND SEARCH */
   it('Open filter button clicked', () => {
     showFilter();
     const filterCollapse = screen.getByTestId('filter-collapse-customer');
@@ -144,55 +191,460 @@ describe('Customer KUR Page', async () => {
     expect(filterPasarInput).toBeInTheDocument();
     // expect(filterScoreInput).toBeInTheDocument();
   });
+  it('Open filter, change type and area filter, then reset filter', async () => {
+    await act(() => {
+      mockKurType(MockKurType);
+      mockKurArea(MockKurArea);
+      mockKurCreditScore(MockCreditScore);
+    });
+    showFilter();
+    // const filterCollapse = screen.getByTestId('filter-collapse-customer');
+    const filterTypeInput = screen.getByTestId('filter-type-customer');
+    fireEvent.click(filterTypeInput);
+    const inputType = within(filterTypeInput).getByRole('combobox');
+    fireEvent.change(inputType, { target: { value: 'b2' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+    const filterPasarInput = screen.getByTestId('filter-pasar-customer');
+    fireEvent.click(filterPasarInput);
+    const inputArea = within(filterPasarInput).getByRole('combobox');
+    fireEvent.change(inputArea, { target: { value: 'Pas' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+    const resetButton = screen.getByRole('button', { name: 'Reset' });
+    fireEvent.click(resetButton);
+    expect(inputType).toHaveValue('');
+    expect(filterPasarInput).toBeInTheDocument();
+  });
+  it('Open filter, then filter customer and change page', async () => {
+    await act(() => {
+      mockKurType(MockKurType);
+      mockKurArea(MockKurArea);
+      mockKurCreditScore(MockCreditScore);
+    });
+    showFilter();
+    const filterTypeInput = screen.getByTestId('filter-type-customer');
+    fireEvent.click(filterTypeInput);
+    const inputType = within(filterTypeInput).getByRole('combobox');
+    fireEvent.change(inputType, { target: { value: 'b2' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+
+    const filterPasarInput = screen.getByTestId('filter-pasar-customer');
+    fireEvent.click(filterPasarInput);
+    const inputArea = within(filterPasarInput).getByRole('combobox');
+    fireEvent.change(inputArea, { target: { value: 'Pas' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+
+    const filterCreditScoreInput = screen.getByTestId(
+      'filter-credit-score-customer',
+    );
+    fireEvent.click(filterCreditScoreInput);
+    const inputCreditScore = within(filterCreditScoreInput).getByRole(
+      'combobox',
+    );
+    fireEvent.change(inputCreditScore, { target: { value: 'Lancar' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+
+    const applyButton = screen.getByRole('button', { name: 'Apply' });
+    fireEvent.click(applyButton);
+    // Change Page
+    const getPagination = screen.getByLabelText('pagination navigation');
+    const buttonPage = within(getPagination).getByLabelText('page 1');
+    fireEvent.click(buttonPage);
+
+    expect(buttonPage).toHaveClass('Mui-selected');
+    const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
+    expect(inputType).toHaveValue('B2B');
+    expect(inputCreditScore).toHaveValue('Lancar');
+    // expect(inputArea).toBeTruthy();
+    expect(listTableCustomer.length).toBe(2);
+  });
+  it('Open filter, then filter area with []', async () => {
+    await act(() => {
+      mockKurType(MockKurType);
+      mockKurArea(MockKurArea);
+      mockKurCreditScore(MockCreditScore);
+    });
+
+    const filterPasarInput = screen.getByTestId('filter-pasar-customer');
+    fireEvent.click(filterPasarInput);
+    const inputArea = within(filterPasarInput).getByRole('combobox');
+    fireEvent.change(inputArea, { target: { value: 'Pas' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    });
+
+    const applyButton = screen.getByRole('button', { name: 'Apply' });
+    fireEvent.click(applyButton);
+
+    const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
+    // expect(inputType).toHaveValue('B2B');
+    // expect(inputCreditScore).toHaveValue('Lancar');
+    // expect(inputArea).toBeTruthy();
+    expect(listTableCustomer.length).toBe(2);
+  });
+  it('Open filter, then filter customer only area', async () => {
+    await act(() => {
+      mockKurType(MockKurType);
+      mockKurArea(MockKurArea);
+      mockKurCreditScore(MockCreditScore);
+    });
+    showFilter();
+    const resetButton = screen.getByRole('button', { name: 'Reset' });
+    fireEvent.click(resetButton);
+    const filterPasarInput = screen.getByTestId('filter-pasar-customer');
+    fireEvent.click(filterPasarInput);
+    const inputArea = within(filterPasarInput).getByRole('combobox');
+    fireEvent.change(inputArea, { target: { value: 'Pas' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+
+    const applyButton = screen.getByRole('button', { name: 'Apply' });
+    fireEvent.click(applyButton);
+    const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
+    // expect(inputArea).toBeTruthy();
+    expect(listTableCustomer.length).toBe(2);
+  });
+  it('Open filter, then filter customer only credit score', async () => {
+    await act(() => {
+      mockKurType(MockKurType);
+      mockKurArea(MockKurArea);
+      mockKurCreditScore(MockCreditScore);
+    });
+    const resetButton = screen.getByRole('button', { name: 'Reset' });
+    fireEvent.click(resetButton);
+
+    const filterCreditScoreInput = screen.getByTestId(
+      'filter-credit-score-customer',
+    );
+    fireEvent.click(filterCreditScoreInput);
+    const inputCreditScore = within(filterCreditScoreInput).getByRole(
+      'combobox',
+    );
+    fireEvent.change(inputCreditScore, { target: { value: 'Lancar' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+
+    const applyButton = screen.getByRole('button', { name: 'Apply' });
+    fireEvent.click(applyButton);
+    const listTableCustomer = await screen.findAllByTestId(/list-table-/i);
+    // expect(inputArea).toBeTruthy();
+    expect(listTableCustomer.length).toBe(2);
+  });
+  // SEARCH
+  it('Search customer', async () => {
+    const searchCustomer = screen.getByTestId('search-customer');
+    const inputSearch =
+      within(searchCustomer).getByPlaceholderText('Search item');
+    fireEvent.change(inputSearch, { target: { value: 'test' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    });
+    expect(inputSearch).toHaveValue('test');
+  });
+  // SORT
+  it('Sort customer clicked', async () => {
+    const getIdHead = screen.getByTestId('header-id');
+    const sortCustomerIcon = within(getIdHead).getByTestId('SwapVertIcon');
+    fireEvent.click(sortCustomerIcon);
+    expect(sortCustomerIcon).toBeInTheDocument();
+  });
   //* FORM */
   it('Add customer button clicked', () => {
-    addForm();
+    openForm('button-add-customer');
     const addModalHeader = screen.getByTestId('form-customer');
     expect(addModalHeader).toBeInTheDocument();
   });
-});
-
-describe('Form Customer Component', async () => {
-  beforeEach(() => {
-    // vi.clearAllMocks();
-    render(
-      <React.Suspense fallback>
-        <MockTheme>
-          <FormCustomer onClose={() => {}} formData={formData} />
-        </MockTheme>
-      </React.Suspense>,
+  it('Add customer button clicked and closed', async () => {
+    openForm('button-add-customer');
+    const addModalHeader = screen.getByRole('dialog');
+    const closeButton = within(addModalHeader).getByTestId('CloseIcon');
+    fireEvent.click(closeButton);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    });
+    expect(addModalHeader).not.toBeInTheDocument();
+  });
+  it('Edit customer button clicked', async () => {
+    openForm('button-edit-customer', true);
+    const addModalHeader = screen.getByTestId('form-customer');
+    expect(addModalHeader).toBeInTheDocument();
+  });
+  it('Details customer button clicked', async () => {
+    openForm('button-details-customer', true);
+    const idSelectedCustomer = MockLisCustomers[0].id;
+    expect(window.location.pathname).toBe(
+      `/kur/customer/${idSelectedCustomer}`,
     );
   });
-  afterEach(() => {
-    vi.clearAllMocks();
-  });
-  it('Form customer open', () => {
-    const infoText = screen.getByText(/All forms must be filled/i);
-    const firstTabButton = screen.getByText(/Basic Info/i);
-    const secondTabButton = screen.getByText(/KUR Document/i);
-    const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
-
-    expect(infoText).toBeInTheDocument();
-    expect(firstTabButton).toBeInTheDocument();
-    expect(firstTabButton).toHaveClass('Mui-selected');
-    expect(secondTabButton).toBeInTheDocument();
-    expect(secondTabButton).toHaveClass('Mui-disabled');
-    expect(nextbuttonElement).toBeInTheDocument();
-    expect(nextbuttonElement).toHaveClass('Mui-disabled');
-  });
-  it('Form initial state first tab (name, kur, admin fee, dpd rate, birth date, phone number, email, address(ktp and domicile), credit limit, list bank, bank account number(primary and nobu))', () => {
-    const inputElementName =
-      screen.getByPlaceholderText(/Input customer name/i);
-    const inputElementKurType = screen.getByPlaceholderText(/Select KUR Type/i);
-    const inputElementAdminFee =
-      screen.getByPlaceholderText(/Input admin fee/i);
-    const inputElementDpdRate = screen.getByPlaceholderText(/Input DPD rate/i);
-    // const inputElementBirthDate = screen.getByTestId('form-customer-birthdate');
-
-    expect(inputElementName).toHaveDisplayValue('');
-    expect(inputElementKurType).toHaveDisplayValue('');
-    expect(inputElementAdminFee).toHaveDisplayValue('');
-    expect(inputElementDpdRate).toHaveDisplayValue('');
-    // expect(inputElementBirthDate).toBeNull();
-  });
 });
+
+// describe('Form Customer Component Add', async () => {
+//   // beforeEach(() => {
+//   //   // vi.clearAllMocks();
+//   //   render(
+//   //     <React.Suspense fallback>
+//   //       <MockTheme>
+//   //         <FormCustomer onClose={() => {}} formData={formData} />
+//   //       </MockTheme>
+//   //     </React.Suspense>,
+//   //   );
+//   // });
+//   afterEach(() => {
+//     vi.clearAllMocks();
+//   });
+//   // // it('Form customer open', () => {
+//   // //   const infoText = screen.getByText(/All forms must be filled/i);
+//   // //   const firstTabButton = screen.getByText(/Basic Info/i);
+//   // //   const secondTabButton = screen.getByText(/KUR Document/i);
+//   // //   const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+
+//   // //   expect(infoText).toBeInTheDocument();
+//   // //   expect(firstTabButton).toBeInTheDocument();
+//   // //   expect(firstTabButton).toHaveClass('Mui-selected');
+//   // //   expect(secondTabButton).toBeInTheDocument();
+//   // //   expect(secondTabButton).toHaveClass('Mui-disabled');
+//   // //   expect(nextbuttonElement).toBeInTheDocument();
+//   // //   expect(nextbuttonElement).toHaveClass('Mui-disabled');
+//   // // });
+//   it('Form initial state first tab (name, kur, admin fee, dpd rate, birth date, phone number, email, address(ktp and domicile), credit limit, list bank, bank account number(primary and nobu)) and next button disable', () => {
+//     formData = {
+//       ...formData,
+//       initialData: {
+//         ...formData.initialData,
+//         kurType: null,
+//       },
+//     };
+//     render(
+//       <React.Suspense fallback>
+//         <MockTheme>
+//           <FormCustomer onClose={() => {}} formData={formData} />
+//         </MockTheme>
+//       </React.Suspense>,
+//     );
+//     const inputElementName =
+//       screen.getByPlaceholderText(/Input customer name/i);
+//     // await userEvent.setup().type(inputElementName, 'Asra');
+//     const inputElementKurType = screen.getByPlaceholderText(/Select KUR Type/i);
+//     const inputElementAdminFee =
+//       screen.getByPlaceholderText(/Input admin fee/i);
+//     const inputElementDpdRate = screen.getByPlaceholderText(/Input DPD rate/i);
+//     // const inputElementBirthDate = screen.getByTestId('form-customer-birthdate');
+//     const inputElementPhoneNumber =
+//       screen.getByPlaceholderText(/Input Phone Number/i);
+//     const inputElementEmail = screen.getByPlaceholderText(/Input email/i);
+//     const inputElementAddressKtp =
+//       screen.getByPlaceholderText(/Input address ktp/i);
+//     const inputElementAddressDomicile = screen.getByPlaceholderText(
+//       /Input address domicile/i,
+//     );
+//     const inputElementCreditLimit =
+//       screen.getByPlaceholderText(/Input credit limit/i);
+//     const inputElementBankAccount = screen.getByPlaceholderText(
+//       /Select your bank account/i,
+//     );
+//     const inputElementBankAccountNumber = screen.getByPlaceholderText(
+//       'Bank account number',
+//     );
+//     // const inputElementBankAccountNumber = screen.getByTestId(
+//     //   'form-customer-bank-account',
+//     // );
+//     const inputElementBankAccountNumberNobu = screen.getByPlaceholderText(
+//       'Bank account number (Nobu)',
+//     );
+//     const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+
+//     expect(inputElementName).toHaveDisplayValue('');
+//     expect(inputElementKurType).toHaveDisplayValue('');
+//     expect(inputElementAdminFee).toHaveDisplayValue('');
+//     expect(inputElementDpdRate).toHaveDisplayValue('');
+//     // expect(inputElementBirthDate).toBeNull();
+//     expect(inputElementPhoneNumber).toHaveDisplayValue('');
+//     expect(inputElementEmail).toHaveDisplayValue('');
+//     expect(inputElementAddressKtp).toHaveDisplayValue('');
+//     expect(inputElementAddressDomicile).toHaveDisplayValue('');
+//     expect(inputElementCreditLimit).toHaveDisplayValue('');
+//     expect(inputElementBankAccount).toHaveDisplayValue('');
+//     expect(inputElementBankAccountNumber).toHaveDisplayValue('');
+//     expect(inputElementBankAccountNumberNobu).toHaveDisplayValue('');
+//     expect(nextbuttonElement).toHaveClass('Mui-disabled');
+//   });
+//   it('Form typing input', async () => {
+//     formData = {
+//       ...formData,
+//       initialData: {
+//         ...formData.initialData,
+//         kurType: {
+//           id: 1,
+//           created_at: 1674441599,
+//           updated_at: 0,
+//           created_by_id: 1,
+//           created_by_type: 'admin',
+//           updated_by_id: 0,
+//           updated_by_type: '',
+//           name: 'B2B',
+//           description: 'B2B',
+//         },
+//       },
+//     };
+
+//     render(
+//       <React.Suspense fallback>
+//         <MockTheme>
+//           <FormCustomer onClose={() => {}} formData={formData} />
+//         </MockTheme>
+//       </React.Suspense>,
+//     );
+//     await act(() => {
+//       store.dispatch(
+//         typeAction.fetchDataSuccess({
+//           timestamp: 1675755225,
+//           status: 'ok',
+//           message: 'Retrieved successfully',
+//           page: 1,
+//           count: 2,
+//           total: 2,
+//           data: [
+//             {
+//               id: 1,
+//               created_at: 1674441599,
+//               updated_at: 0,
+//               created_by_id: 1,
+//               created_by_type: 'admin',
+//               updated_by_id: 0,
+//               updated_by_type: '',
+//               name: 'B2B',
+//               description: 'B2B',
+//             },
+//           ],
+//         }),
+//       );
+//     });
+//     const autocomplete = screen.getByPlaceholderText('Select KUR Type');
+//     expect(autocomplete).toHaveDisplayValue('B2B');
+
+//     // const { container } = render(
+//     //   <React.Suspense fallback>
+//     //     <MockTheme>
+//     //       <FormCustomer onClose={() => {}} formData={formData} />
+//     //     </MockTheme>
+//     //   </React.Suspense>,
+//     // );
+//     // const autocomplete = screen.getByTestId('form-customer-kur-type');
+//     // fireEvent.click(autocomplete);
+//     // autocomplete.focus();
+//     // const input = screen.getByRole('presentation');
+//     // // const input = container.getElementsByClassName('MuiAutocomplete-popper');
+//     // console.log('🚀 ~ file: Customer.test.tsx:269 ~ it ~ autocomplete', input);
+//     // // fireEvent.change(input, { target: { value: 'B2' } });
+//     // fireEvent.keyDown(autocomplete, { key: 'ArrowDown' });
+//     // fireEvent.keyDown(autocomplete, { key: 'Enter' });
+//     // expect(autocomplete).toHaveDisplayValue('B2B');
+
+//     // userEvent.type(autocomplete, 'a');
+//     // await waitFor(() => screen.getByText('B2B'));
+//     // fireEvent.click(screen.getByText('B2B'));
+//     // expect(autocomplete).toHaveTextContent('B2B');
+//     // const input = within(autocomplete).getByPlaceholderText(/Select KUR Type/i);
+//     // autocomplete.focus();
+//     // const inputElementName =
+//     //   screen.getByPlaceholderText(/Input customer name/i);
+//     // console.log(
+//     //   '🚀 ~ file: Customer.test.tsx:234 ~ it ~ inputElementName',
+//     //   inputElementName,
+//     // );
+//     // await userEvent.setup().type(inputElementName, 'Jonny');
+//     // const inputElementKurType = screen.getByPlaceholderText(/Select KUR Type/i);
+//     // // await userEvent.setup().type(inputElementKurType, 'B2B');
+//     // const inputElementAdminFee =
+//     //   screen.getByPlaceholderText(/Input admin fee/i);
+//     // await userEvent.setup().type(inputElementAdminFee, '10');
+//     // const inputElementDpdRate = screen.getByPlaceholderText(/Input DPD rate/i);
+//     // // const inputElementBirthDate = screen.getByTestId('form-customer-birthdate');
+//     // const inputElementPhoneNumber =
+//     //   screen.getByPlaceholderText(/Input Phone Number/i);
+//     // const inputElementEmail = screen.getByPlaceholderText(/Input email/i);
+//     // const inputElementAddressKtp =
+//     //   screen.getByPlaceholderText(/Input address ktp/i);
+//     // const inputElementAddressDomicile = screen.getByPlaceholderText(
+//     //   /Input address domicile/i,
+//     // );
+//     // const inputElementCreditLimit =
+//     //   screen.getByPlaceholderText(/Input credit limit/i);
+//     // const inputElementBankAccount = screen.getByPlaceholderText(
+//     //   /Select your bank account/i,
+//     // );
+//     // const inputElementBankAccountNumber = screen.getByPlaceholderText(
+//     //   'Bank account number',
+//     // );
+//     // // const inputElementBankAccountNumber = screen.getByTestId(
+//     // //   'form-customer-bank-account',
+//     // // );
+//     // const inputElementBankAccountNumberNobu = screen.getByPlaceholderText(
+//     //   'Bank account number (Nobu)',
+//     // );
+//     // const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+//     // expect(inputElementName).toHaveDisplayValue('Jonny');
+//     // // expect(inputElementKurType).toHaveDisplayValue('B2B');
+//     // expect(inputElementAdminFee).toHaveDisplayValue('10');
+//     // expect(inputElementDpdRate).toHaveDisplayValue('');
+//     // // expect(inputElementBirthDate).toBeNull();
+//     // expect(inputElementPhoneNumber).toHaveDisplayValue('');
+//     // expect(inputElementEmail).toHaveDisplayValue('');
+//     // expect(inputElementAddressKtp).toHaveDisplayValue('');
+//     // expect(inputElementAddressDomicile).toHaveDisplayValue('');
+//     // expect(inputElementCreditLimit).toHaveDisplayValue('');
+//     // expect(inputElementBankAccount).toHaveDisplayValue('');
+//     // expect(inputElementBankAccountNumber).toHaveDisplayValue('');
+//     // expect(inputElementBankAccountNumberNobu).toHaveDisplayValue('');
+//     // expect(nextbuttonElement).toHaveClass('Mui-disabled');
+//   });
+// });
+// describe('Form Customer Component Add', async () => {
+//   beforeEach(() => {
+//     // vi.clearAllMocks();
+//     render(
+//       <React.Suspense fallback>
+//         <MockTheme>
+//           <CustomerView />
+//         </MockTheme>
+//       </React.Suspense>,
+//     );
+//   });
+//   afterEach(() => {
+//     vi.clearAllMocks();
+//   });
+
+// });

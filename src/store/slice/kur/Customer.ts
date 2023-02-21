@@ -5,6 +5,7 @@ import {
   Customer,
   CustomerParams,
   CheckMerchantExistParams,
+  UserCreditScore,
 } from 'models/kur/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
@@ -20,6 +21,7 @@ interface CustomerInitialProps {
   stateFilter?: {
     typeKur?: Type | null;
     areaKur?: Area[] | [];
+    creditScore?: UserCreditScore | null;
   };
   loadingMerchantExist: boolean;
   merchantExistMsg: string;
@@ -40,6 +42,7 @@ const initialState: CustomerInitialProps = {
   stateFilter: {
     typeKur: null,
     areaKur: [],
+    creditScore: null,
   },
   details: null,
   loadingMerchantExist: false,
@@ -112,6 +115,7 @@ const CustomerSlice = createSlice({
       action: PayloadAction<{
         typeKur: Type | null;
         areaKur: Area[] | undefined;
+        creditScore: UserCreditScore | null;
       }>,
     ) {
       state.stateFilter = {

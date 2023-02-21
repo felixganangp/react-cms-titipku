@@ -2,6 +2,7 @@
 import styled from '@emotion/styled';
 import { Typography, Box, Button, Grid } from '@mui/material';
 import { DayPicker } from 'react-day-picker';
+import { getColorCreditScore } from '../../../utils/creditScoreColor';
 
 interface CustomerStatusProps {
   status: number;
@@ -15,18 +16,13 @@ export const InvoiceLabel = styled(Typography)`
   color: #0774d1;
 `;
 export const CustomerStatus = styled.div<Pick<CustomerStatusProps, 'status'>>`
+  width: 8px;
+  height: 8px;
+  flex-grow: 0;
+  transform: rotate(-180deg);
   border-radius: 50%;
-  width: 8px !important;
-  height: 8px !important;
-  background-color: ${(p) =>
-    p.status === 1
-      ? '#008E58'
-      : p.status === 2
-      ? '#0774D1'
-      : p.status === 3
-      ? '#FF8F00'
-      : '#C10000'};
-  margin-right: 5px;
+  background-color: ${(p) => getColorCreditScore(p.status)};
+  margin-right: 10px;
   margin-left: 2px;
 `;
 
@@ -136,17 +132,11 @@ export const CustomerName = styled(Typography)`
 export const CustomerStatusDetail = styled.div<
   Pick<CustomerStatusProps, 'status'>
 >`
+  margin-left: 16px;
   border-radius: 8px;
   padding: 8px 16px;
   color: #fff;
-  background-color: ${(p) =>
-    p.status === 1
-      ? '#008E58'
-      : p.status === 2
-      ? '#0774D1'
-      : p.status === 3
-      ? '#FF8F00'
-      : '#C10000'};
+  background-color: ${(p) => getColorCreditScore(p.status)};
 `;
 
 export const Field = styled(Box)`
@@ -182,37 +172,6 @@ export const Amount = styled(Typography)`
   font-size: 24px;
   color: #17231d;
   margin-bottom: 16px;
-`;
-
-export const RangeDatePicker = styled(DayPicker)`
-  .rdp-day_selected {
-    background-color: #008e58;
-  }
-  .rdp-day_selected:hover {
-    background-color: #008e58;
-  }
-  .rdp {
-    accent-color: #008e58;
-    background-color: #b8e0d1;
-    accent-color-dark: #008e58;
-    background-color-dark: #008e58;
-    outline: 2px solid #008e58;
-    outline-selected: #008e58;
-  }
-`;
-
-export const FooterDatePicker = styled(Box)`
-  display: flex;
-  flex-direction: column;
-  width: inherit;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 10px;
-`;
-
-export const SelectedDate = styled.p`
-  color: #626b79;
-  font-size: 14px;
 `;
 
 export const DateButton = styled(Button)`

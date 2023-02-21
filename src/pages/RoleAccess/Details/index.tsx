@@ -10,9 +10,7 @@ import Button from '@mui/material/Button';
 import MenuList from 'components/MenuList';
 import Table from 'components/Table';
 import { HeadCells } from 'components/Table/types';
-import SubDetailsPagesWrapper, {
-  SubDetail,
-} from 'components/Accordion/SubDetailsPagesWrapper';
+import SubDetailsPagesWrapper from 'components/Accordion/SubDetailsPagesWrapper';
 import DescDetails from 'components/DescDetails';
 import Status from 'components/Status';
 import AccordionOnDetails from 'components/Accordion/Details';
@@ -268,7 +266,7 @@ export default function RoleUserDetails() {
             </Grid>
           </Box>
         </SubDetailsPagesWrapper>
-        <SubDetail title="Menu Access" defaultOpen>
+        <SubDetailsPagesWrapper title="Menu Access" defaultOpen>
           <Box p="20px">
             {listOfMenu.map((parentMenu: any) => (
               <AccordionOnDetails
@@ -370,7 +368,7 @@ export default function RoleUserDetails() {
               </AccordionOnDetails>
             ))}
           </Box>
-        </SubDetail>
+        </SubDetailsPagesWrapper>
         <SubDetailsPagesWrapper title="Role User List" defaultOpen>
           <Box p="20px">
             <Box display="flex" gap="20px" flexWrap="wrap" mb="20px">

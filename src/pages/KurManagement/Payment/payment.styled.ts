@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import styled from '@emotion/styled';
-import { Typography, Box, Button, Grid } from '@mui/material';
+import { Typography, Box, Button, Grid, IconButton } from '@mui/material';
 import { DayPicker } from 'react-day-picker';
 
 interface CustomerStatusProps {
@@ -8,6 +8,10 @@ interface CustomerStatusProps {
 }
 
 interface InvoiceStatusProps {
+  status: string | undefined;
+}
+
+interface CreditScoreProps {
   status: string | undefined;
 }
 
@@ -56,6 +60,29 @@ export const InvoiceStatus = styled(Box)<Pick<InvoiceStatusProps, 'status'>>`
   font-size: 12px;
 `;
 
+export const CreditScore = styled(Box)<Pick<CreditScoreProps, 'status'>>`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 6px 10px;
+  color: #fff;
+  background-color: ${(p) =>
+    p.status === 'Lancar'
+      ? '#008e58'
+      : p.status === 'Dalam perhatian khusus'
+      ? '#0774d1'
+      : p.status === 'Kurang lancar'
+      ? '#ff8f00'
+      : p.status === 'Diragukan'
+      ? '#ec6470'
+      : '#bf370c'};
+  border-radius: 10px;
+  min-width: 80px;
+  width: auto;
+  font-size: 12px;
+`;
+
 export const FilterButton = styled(Button)`
   box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.24);
 `;
@@ -100,8 +127,7 @@ export const Header = styled(Box)`
 `;
 
 export const Content = styled(Box)`
-  padding: 16px 30px;
-  border-radius: 5px;
+  padding: 12px 12px;
   width: 100%;
   height: 100%;
   background-color: #fafafa;
@@ -220,4 +246,18 @@ export const SelectedDate = styled.p`
 
 export const DateButton = styled(Button)`
   width: 150px;
+`;
+
+export const AddButton = styled(IconButton)`
+  border-radius: 4px;
+  width: fit-content;
+  padding: 4px;
+  margin-right: 0;
+  box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.24);
+  background-color: #008e58;
+  color: #fff;
+  '&:hover': {
+    background-color: #008e58;
+    color: #008e58;
+  }
 `;

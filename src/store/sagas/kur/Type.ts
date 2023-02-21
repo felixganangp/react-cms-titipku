@@ -34,6 +34,6 @@ function* fetchData() {
   }
 }
 
-export default function* customerKurSagas() {
+export default function* typeKurSagas() {
   yield takeLatest(typeAction.fetchData.type, fetchData);
 }

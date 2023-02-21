@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import styled from '@emotion/styled';
 import {
   Card,
   Box,
@@ -24,15 +24,22 @@ import moment from 'moment';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { customerAction } from 'store/slice/kur/Customer';
 import { typeAction } from 'store/slice/kur/Type';
+import { creditScoreAction } from 'store/slice/kur/CreditScore';
 import { areaAction } from 'store/slice/Area';
 import useModal from 'hooks/useModal';
 import Table from 'components/Table';
 import Modal from 'components/Modal';
-import { Customer, CustomerParams, CreateCustomer } from 'models/kur/Customer';
+import {
+  Customer,
+  CustomerParams,
+  CreateCustomer,
+  UserCreditScore,
+} from 'models/kur/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
 import { MerchantResp } from 'models/Merchant';
 import debounce from 'utils/debounce';
+import { getColorCreditScore } from 'utils/creditScoreColor';
 import bankData from 'data/list-bank.json';
 
 import FormCustomer from './components/form';
@@ -48,6 +55,7 @@ export default function KurCustomer() {
   const customerKur = useAppSelector((state) => state.customerKur);
   const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
+  const creditScore = useAppSelector((state) => state.creditScore);
 
   useEffect(() => {
     dispatch(customerAction.fetchData(customerKur.params));
@@ -105,6 +113,7 @@ export default function KurCustomer() {
     }
     dispatch(typeAction.fetchData());
     dispatch(areaAction.fetchData());
+    dispatch(creditScoreAction.fetchData());
   }, []);
 
   // const [typeKurFilter, setTypeKurFilter] = useState<Type | null>(null);
@@ -132,6 +141,11 @@ export default function KurCustomer() {
     setFormHead('Edit Customer');
     const birthDate = new Date(0);
     birthDate.setUTCSeconds(val.birth_date);
+    const date = birthDate.getDate();
+    const month = birthDate.getMonth();
+    const year = birthDate.getFullYear();
+    const d = moment({ year, month, day: date });
+    // const convertBirthDate = `${date}/${month + 1}/${year}`;
     const convertBirthDate = moment(birthDate).format('MM/DD/YYYY');
     const findBank = bankData.data.filter((el) => el.name === val.user_bank);
 
@@ -165,7 +179,7 @@ export default function KurCustomer() {
         kurType: val.kur_user_type,
         adminFee: val.admin_fee.toString(),
         dpdRate: val.dpd_rate.toString(),
-        birthDate: convertBirthDate,
+        birthDate: d,
         phoneNumber: val.phone_number,
         email: val.email,
         addressKtp: val.registered_address,
@@ -197,6 +211,16 @@ export default function KurCustomer() {
   const handleOpenAdd = () => {
     setFormHead('Add Customer');
     formModal.openModal();
+  };
+
+  const convertStrCreditScore = (val: string) => {
+    const splitStr = val.split(' ');
+    const firstCharUpperCase = splitStr.map((el) => {
+      return el.charAt(0).toUpperCase() + el.slice(1);
+    });
+
+    const result = firstCharUpperCase.join(' ');
+    return result;
   };
   const headCell = [
     {
@@ -233,7 +257,7 @@ export default function KurCustomer() {
       id: 'merchant',
       label: 'Merchant',
       align: 'left',
-      width: '439px',
+      width: '410px',
       format: (val: Customer) => <div>{val.user.name}</div>,
     },
     {
@@ -242,11 +266,30 @@ export default function KurCustomer() {
       align: 'left',
       format: (val: Customer) => <div>{val.user.area.name}</div>,
     },
-    // {
-    //   id: 'credit_score',
-    //   label: 'Credit Score',
-    //   align: 'left',
-    // },
+    {
+      id: 'kur_user_credit_score',
+      label: 'Credit Score',
+      align: 'left',
+      width: '200px',
+      enableSort: true,
+      format: (val: Customer) => {
+        const bgColor = getColorCreditScore(val.kur_user_credit_score.id);
+        return (
+          <Chip
+            sx={{
+              borderRadius: '8px',
+              paddingX: '16px',
+              paddingY: '8px',
+              color: '#fff',
+              backgroundColor: bgColor,
+              fontSize: '12px',
+              fontWeight: 500,
+            }}
+            label={convertStrCreditScore(val.kur_user_credit_score.name)}
+          />
+        );
+      },
+    },
     {
       id: 'action',
       label: 'Action',
@@ -260,12 +303,14 @@ export default function KurCustomer() {
                 onClick: () => {
                   navigate(`/kur/customer/${val.id}`);
                 },
+                dataId: 'button-details-customer',
               },
               {
                 label: `Edit`,
                 onClick: () => {
                   handleOpenEdit(val);
                 },
+                dataId: 'button-edit-customer',
               },
               // {
               //   label: `Hold`,
@@ -284,23 +329,44 @@ export default function KurCustomer() {
   ];
 
   const handleChangePage = (value: number) => {
-    if (!customerKur.params.kur_user_type_id) {
-      dispatch(
-        customerAction.setFilter({
-          areaKur: customerKur.stateFilter?.areaKur,
-          typeKur: null,
-        }),
-      );
+    let payload: {
+      typeKur?: Type | null;
+      areaKur?: Area[] | [];
+      creditScore?: UserCreditScore | null;
+    } = {
+      areaKur: [],
+      typeKur: null,
+      creditScore: null,
+    };
+
+    if (customerKur.params.kur_user_type_id) {
+      payload = {
+        ...payload,
+        typeKur: customerKur.stateFilter?.typeKur,
+      };
     }
-    if (!customerKur.params.area_ids) {
-      dispatch(
-        customerAction.setFilter({
-          areaKur: [],
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          typeKur: customerKur.stateFilter!.typeKur!,
-        }),
-      );
+    if (customerKur.params.area_ids) {
+      payload = {
+        ...payload,
+        areaKur: customerKur.stateFilter?.areaKur,
+      };
     }
+    if (customerKur.params.credit_score) {
+      payload = {
+        ...payload,
+        creditScore: customerKur.stateFilter?.creditScore,
+      };
+    }
+    dispatch(
+      customerAction.setFilter(
+        payload as {
+          typeKur: Type | null;
+          areaKur: Area[] | [];
+          creditScore: UserCreditScore | null;
+        },
+      ),
+    );
+    // }
     dispatch(
       customerAction.setParams({
         ...customerKur.params,
@@ -314,6 +380,7 @@ export default function KurCustomer() {
       customerAction.setFilter({
         typeKur: value,
         areaKur: customerKur.stateFilter?.areaKur,
+        creditScore: customerKur.stateFilter?.creditScore || null,
       }),
     );
     // dispatch(
@@ -322,6 +389,16 @@ export default function KurCustomer() {
     //     kur_user_type_id: value?.id,
     //   }),
     // );
+  };
+
+  const handleChangeCreditScore = (value: UserCreditScore | null) => {
+    dispatch(
+      customerAction.setFilter({
+        typeKur: customerKur.stateFilter?.typeKur || null,
+        areaKur: customerKur.stateFilter?.areaKur,
+        creditScore: value,
+      }),
+    );
   };
 
   const handleChangeArea = (value: Area[]) => {
@@ -339,6 +416,7 @@ export default function KurCustomer() {
       customerAction.setFilter({
         typeKur: customerKur.stateFilter?.typeKur || null,
         areaKur: value,
+        creditScore: customerKur.stateFilter?.creditScore || null,
       }),
     );
     // dispatch(customerAction.setParams(payload));
@@ -371,6 +449,7 @@ export default function KurCustomer() {
       ...customerKur.params,
       page: 1,
       kur_user_type_id: customerKur.stateFilter?.typeKur?.id,
+      credit_score: customerKur.stateFilter?.creditScore?.id,
     };
     if (
       customerKur.stateFilter?.areaKur &&
@@ -387,10 +466,6 @@ export default function KurCustomer() {
   };
 
   const handleResetFilter = async () => {
-    // setAreaKurFilter([]);
-    // setTypeKurFilter(null);
-    // setSearchKur('');
-
     const params: CustomerParams = {
       ...customerKur.params,
       page: 1,
@@ -398,12 +473,14 @@ export default function KurCustomer() {
       order_by: 'id',
       order_type: 'desc',
       kur_user_type_id: undefined,
+      credit_score: undefined,
       area_ids: undefined,
     };
     await dispatch(
       customerAction.setFilter({
         areaKur: [],
         typeKur: null,
+        creditScore: null,
       }),
     );
     await dispatch(customerAction.setParams(params));
@@ -426,6 +503,7 @@ export default function KurCustomer() {
     setFormData({ isEdit: false, initialData });
     await formModal.closeModal();
   };
+
   return (
     <Box p="20px" bgcolor="#F5F7FA">
       <Grid container spacing={2}>
@@ -488,7 +566,7 @@ export default function KurCustomer() {
 
             <Collapse in={openFilter} data-testid="filter-collapse-customer">
               <Grid container spacing={2} sx={{ marginTop: '2rem' }}>
-                <Grid item xs={6}>
+                <Grid item xs={4}>
                   <Typography
                     sx={{
                       fontSize: '14px',
@@ -520,7 +598,7 @@ export default function KurCustomer() {
                     )}
                   />
                 </Grid>
-                <Grid item xs={6}>
+                <Grid item xs={4}>
                   <Typography
                     sx={{
                       fontSize: '14px',
@@ -538,16 +616,16 @@ export default function KurCustomer() {
                     onChange={(e, value) => {
                       handleChangeArea(value);
                     }}
-                    isOptionEqualToValue={(option: Area) => {
-                      const filtered =
-                        customerKur?.stateFilter?.areaKur?.filter(
-                          (el: Area) => el.id === option.id,
-                        );
-                      if (filtered) {
-                        return option.id === filtered[0]?.id;
-                      }
-                      return false;
-                    }}
+                    // isOptionEqualToValue={(option: Area) => {
+                    //   const filtered =
+                    //     customerKur?.stateFilter?.areaKur?.filter(
+                    //       (el: Area) => el.id === option.id,
+                    //     );
+                    //   if (filtered) {
+                    //     return option.id === filtered[0]?.id;
+                    //   }
+                    //   return false;
+                    // }}
                     getOptionLabel={(option) => {
                       return `${option.title}`;
                     }}
@@ -594,7 +672,7 @@ export default function KurCustomer() {
                     )}
                   />
                 </Grid>
-                {/* <Grid item xs={4}>
+                <Grid item xs={4}>
                   <Typography
                     sx={{
                       fontSize: '14px',
@@ -604,21 +682,30 @@ export default function KurCustomer() {
                   >
                     Credit Score
                   </Typography>
-                  <TextField
+                  <Autocomplete
                     data-testid="filter-credit-score-customer"
-                    placeholder="Credit Score"
-                    size="small"
-                    sx={{ bgcolor: '#fafafa' }}
-                    fullWidth
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
+                    id="type"
+                    options={creditScore.data}
+                    onChange={(e, value) => {
+                      // setTypeKurFilter(value);
+                      handleChangeCreditScore(value);
                     }}
+                    isOptionEqualToValue={(option: UserCreditScore) => {
+                      return (
+                        option.id === customerKur.stateFilter?.creditScore?.id
+                      );
+                    }}
+                    getOptionLabel={(option) => `${option.name}`}
+                    value={customerKur?.stateFilter?.creditScore}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="type"
+                        placeholder="Select Credit Score"
+                      />
+                    )}
                   />
-                </Grid> */}
+                </Grid>
                 <Grid item xs={12}>
                   <Box
                     sx={{
@@ -661,6 +748,7 @@ export default function KurCustomer() {
               onChangePage={(val) => handleChangePage(val)}
               onChangeSort={(val) => handleChangeSort(val)}
               disableNumber
+              loading={customerKur.loading}
             />
           </Box>
         </Grid>

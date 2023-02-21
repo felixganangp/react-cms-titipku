@@ -1,17 +1,18 @@
 import { call, put, select, takeLatest } from 'redux-saga/effects';
 import { uiAction } from 'store/slice/ui';
-// import * as service from 'service/Kur/Request';
 import * as service from 'service/Kur/Payment';
+import * as customerService from 'service/Kur/Customer';
 import { PayloadAction } from '@reduxjs/toolkit';
-import { ListParams, ListResponse, Response } from 'models/fetch';
+import { ListResponse, Response } from 'models/fetch';
 import {
   PaymentKUR,
-  PaymentKURDisplayFilter,
   PaymentKURParams,
   ActionParams,
-  KURPaymentDetail,
+  CreatePayment,
+  BankAccount,
 } from 'models/kur/Payment';
 import { paymentKURAction } from 'store/slice/kur/Payment';
+import { Customer, CustomerParams } from 'models/kur/Customer';
 
 function* fetchData(params: PayloadAction<PaymentKUR>) {
   try {
@@ -46,11 +47,16 @@ function* fetchData(params: PayloadAction<PaymentKUR>) {
 function* fetchDetails(params: PayloadAction<{ id: string | number }>) {
   try {
     const response: Response<PaymentKUR> = yield call(
-      service.getRequestDetails,
+      service.getPaymentDetails,
       params.payload.id,
     );
 
     yield put(paymentKURAction.fetchDetailsSuccess(response));
+    if (response.data.kur_user.id) {
+      yield put(
+        paymentKURAction.fetchCreditBalance({ id: response.data.kur_user.id }),
+      );
+    }
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
@@ -73,40 +79,221 @@ function* fetchDetails(params: PayloadAction<{ id: string | number }>) {
   }
 }
 
-// function* fetchDetailsTable(
-//   params: PayloadAction<{ id: string | number; params: ListParams }>,
-// ) {
-//   try {
-//     const response: ListResponse<KURPaymentDetail> = yield call(
-//       service.getDetailsTable,
-//       params.payload.id,
-//       params.payload.params,
-//     );
-//     yield put(paymentKURAction.fetchDetailsTableSuccess(response));
-//   } catch (err) {
-//     if (typeof err === 'string') {
-//       const error = err as string;
-//       yield put(
-//         uiAction.openToast({
-//           headMsg: 'Error get data',
-//           message: error,
-//           severity: 'error',
-//         }),
-//       );
-//     } else {
-//       yield put(
-//         uiAction.openToast({
-//           headMsg: 'Error get data',
-//           message: 'interval server error',
-//           severity: 'error',
-//         }),
-//       );
-//     }
-//   }
-// }
+function* fetchCreditBalanceById(
+  params: PayloadAction<{ id: string | number }>,
+) {
+  try {
+    const response: Response<number> = yield call(
+      service.getCreditBalanceById,
+      params.payload.id,
+    );
+    yield put(paymentKURAction.fetchCreditBalanceSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
 
-export default function* requestKurSagas() {
+function* approvePayment(params: PayloadAction<ActionParams>) {
+  try {
+    const listParams: PaymentKURParams = yield select(
+      (state) => state.payment.params,
+    );
+    yield call(service.approvePayment, params.payload.id);
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Success',
+        message: 'Successfully approve payment',
+        severity: 'success',
+      }),
+    );
+    // eslint-disable-next-line radix
+    if (params.payload.detailsPage)
+      yield put(paymentKURAction.fetchDetails({ id: params.payload.id }));
+    else yield put(paymentKURAction.fetchData(listParams));
+  } catch (err) {
+    const headMsg = 'Failed to Approve Payment';
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg,
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg,
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* rejectPayment(params: PayloadAction<ActionParams>) {
+  try {
+    const listParams: PaymentKURParams = yield select(
+      (state) => state.payment.params,
+    );
+    yield call(service.rejectPayment, params.payload);
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Success',
+        message: 'Successfully reject payment',
+        severity: 'success',
+      }),
+    );
+    // eslint-disable-next-line radix
+    if (params.payload.detailsPage)
+      yield put(paymentKURAction.fetchDetails({ id: params.payload.id }));
+    else yield put(paymentKURAction.fetchData(listParams));
+  } catch (err) {
+    const headMsg = 'Failed to Reject Payment';
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg,
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg,
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* createPayment(params: PayloadAction<CreatePayment>) {
+  try {
+    const listParams: PaymentKURParams = yield select(
+      (state) => state.payment.params,
+    );
+    yield call(service.createPayment, params.payload);
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Success',
+        message: 'Successfully create payment',
+        severity: 'success',
+      }),
+    );
+    yield put(paymentKURAction.setSelectedCustomer(null));
+    yield put(paymentKURAction.fetchData(listParams));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create payment',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create payment',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* fetchCustomer(params: PayloadAction<CustomerParams>) {
+  try {
+    const response: ListResponse<Customer> = yield call(
+      customerService.getAllCustomers,
+      params.payload,
+    );
+    yield put(paymentKURAction.fetchCustomerDataSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error fetch customer data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error fetch customer data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* fetchBankAccount() {
+  try {
+    const response: Response<{ bank_account: BankAccount[] }> = yield call(
+      service.fetchBankAccount,
+    );
+    yield put(paymentKURAction.fetchBankAccountSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error fetch bank account',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error fetch bank account',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+export default function* paymentKurSagas() {
   yield takeLatest(paymentKURAction.fetchData.type, fetchData);
   yield takeLatest(paymentKURAction.fetchDetails.type, fetchDetails);
-  // yield takeLatest(paymentKURAction.fetchDetailsTable.type, fetchDetailsTable);
+  yield takeLatest(paymentKURAction.approvePayment.type, approvePayment);
+  yield takeLatest(paymentKURAction.rejectPayment.type, rejectPayment);
+  yield takeLatest(
+    paymentKURAction.fetchCreditBalance.type,
+    fetchCreditBalanceById,
+  );
+  yield takeLatest(paymentKURAction.createPayment.type, createPayment);
+  yield takeLatest(paymentKURAction.fetchCustomerData.type, fetchCustomer);
+  yield takeLatest(paymentKURAction.fetchBankAccount.type, fetchBankAccount);
 }

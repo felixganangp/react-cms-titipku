@@ -13,6 +13,7 @@ import {
   Chip,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
 import Table from 'components/Table';
 import useModal from 'hooks/useModal';
 import ArrowDown from '@mui/icons-material/KeyboardArrowDown';
@@ -29,12 +30,14 @@ import { typeAction } from 'store/slice/kur/Type';
 import { paymentKURAction } from 'store/slice/kur/Payment';
 import { Area } from 'models/Area';
 import { Type } from 'models/kur/Type';
+import { Bank } from 'models/kur/Bank';
 import { PaymentKUR } from 'models/kur/Payment';
 import digitFormatter from 'utils/digitFormatter';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-import bankData from 'data/list-bank.json';
+import Modal from 'components/Modal';
+import RefusalReason from './components/InputMessage';
 import {
   FilterButton,
   FilterDataBox,
@@ -42,11 +45,12 @@ import {
   InvoiceStatus,
   LabelText,
 } from './payment.styled';
+import PaymentForm from './components/Form';
 
 export default function PaymentKURPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const request = useAppSelector((state) => state.payment);
+  const payment = useAppSelector((state) => state.payment);
 
   // define filter
   const [openFilter, setOpenFilter] = useState<boolean>(false);
@@ -56,26 +60,27 @@ export default function PaymentKURPage() {
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [paidToBank, setpaidToBank] = useState<Bank | null>(null);
   const [openStartDate, setOpenStartDate] = useState<boolean>(false);
   const [openEndDate, setOpenEndDate] = useState<boolean>(false);
 
   useEffect(() => {
     dispatch(typeAction.fetchData());
     dispatch(areaAction.fetchData());
-    if (request.params.submit_date_start)
-      setStartDate(new Date(request.params.submit_date_start * 1000));
-    if (request.params.submit_date_end)
-      setEndDate(new Date(request.params.submit_date_end * 1000));
+    if (payment.params.submit_date_start)
+      setStartDate(new Date(payment.params.submit_date_start * 1000));
+    if (payment.params.submit_date_end)
+      setEndDate(new Date(payment.params.submit_date_end * 1000));
   }, []);
 
   // table
   useEffect(() => {
-    dispatch(paymentKURAction.fetchData(request.params));
+    dispatch(paymentKURAction.fetchData(payment.params));
   }, [
-    request.params.search,
-    request.params.order_by,
-    request.params.order_type,
-    request.params.page,
+    payment.params.search,
+    payment.params.order_by,
+    payment.params.order_type,
+    payment.params.page,
   ]);
 
   const handleSearch = (value: string) => {
@@ -128,14 +133,10 @@ export default function PaymentKURPage() {
     dispatch(
       paymentKURAction.setParams({
         page: 1,
-        bank: value ? value.name : null,
+        paid_to_bank: value ? value.code : null,
       }),
     );
-    dispatch(
-      paymentKURAction.setDisplayFilter({
-        types: value,
-      }),
-    );
+    setpaidToBank(value);
   };
 
   const handleChangePasar = (value: any) => {
@@ -175,12 +176,13 @@ export default function PaymentKURPage() {
   };
 
   const handleApplyFilter = () => {
-    dispatch(paymentKURAction.fetchData(request.params));
+    dispatch(paymentKURAction.fetchData(payment.params));
   };
 
   const handleResetFilter = async () => {
     setStartDate(null);
     setEndDate(null);
+    setpaidToBank(null);
     await dispatch(
       paymentKURAction.setParams({
         page: 1,
@@ -188,6 +190,7 @@ export default function PaymentKURPage() {
         kur_user_type_id: undefined,
         submit_date_start: undefined,
         submit_date_end: undefined,
+        paid_to_bank: undefined,
       }),
     );
     await dispatch(
@@ -199,11 +202,12 @@ export default function PaymentKURPage() {
     await dispatch(
       paymentKURAction.fetchData({
         page: 1,
-        search: request.params.search,
+        search: payment.params.search,
         area_ids: undefined,
         kur_user_type_id: undefined,
         submit_date_start: undefined,
         submit_date_end: undefined,
+        paid_to_bank: undefined,
       }),
     );
   };
@@ -211,15 +215,15 @@ export default function PaymentKURPage() {
   // action
   const rejectModal = useModal();
   const [selected, setSelected] = useState<PaymentKUR | null>(null);
-  // const handleApproveRequest = (id: number | string) => {
-  //   dispatch(paymentKURAction.approveRequest({ id, detailsPage: false }));
-  // };
-  // const handleRejectRequest = (id: number | string, remarks: string) => {
-  //   dispatch(
-  //     paymentKURAction.rejectRequest({ id, detailsPage: false, remarks }),
-  //   );
-  //   rejectModal.closeModal();
-  // };
+  const handleApprovePayment = (id: number | string) => {
+    dispatch(paymentKURAction.approvePayment({ id, detailsPage: false }));
+  };
+  const handleRejectPayment = (id: number | string, remarks: string) => {
+    dispatch(
+      paymentKURAction.rejectPayment({ id, detailsPage: false, remarks }),
+    );
+    rejectModal.closeModal();
+  };
 
   const headCell: HeadCells<PaymentKUR>[] = [
     {
@@ -239,6 +243,7 @@ export default function PaymentKURPage() {
       label: 'Name',
       align: 'left',
       enableSort: true,
+
       isSticky: true,
       format: (val) => <Typography>{val.kur_user.name}</Typography>,
     },
@@ -271,7 +276,9 @@ export default function PaymentKURPage() {
       label: 'Outstanding Credit',
       align: 'left',
       format: (val) => (
-        <Typography>Rp {digitFormatter.format(val.amount)}</Typography>
+        <Typography>
+          Rp {digitFormatter.format(val.kur_user.total_outstanding_amount)}
+        </Typography>
       ),
     },
     {
@@ -285,7 +292,7 @@ export default function PaymentKURPage() {
       id: 'area_name',
       label: 'Pasar',
       align: 'left',
-      width: '450px',
+      width: '300px !important',
       format: (val) => <Typography>{val.kur_user.user.area.name}</Typography>,
     },
     {
@@ -324,19 +331,19 @@ export default function PaymentKURPage() {
                         navigate(`/kur/payment/${val.id}`);
                       },
                     },
-                    // {
-                    //   label: 'Approve',
-                    //   onClick: () => {
-                    //     handleApproveRequest(val.id);
-                    //   },
-                    // },
-                    // {
-                    //   label: 'Reject',
-                    //   onClick: () => {
-                    //     setSelected(val);
-                    //     rejectModal.openModal();
-                    //   },
-                    // },
+                    {
+                      label: 'Approve',
+                      onClick: () => {
+                        handleApprovePayment(val.id);
+                      },
+                    },
+                    {
+                      label: 'Reject',
+                      onClick: () => {
+                        setSelected(val);
+                        rejectModal.openModal();
+                      },
+                    },
                   ]
                 : [
                     {
@@ -357,6 +364,17 @@ export default function PaymentKURPage() {
     },
   ];
 
+  // form
+  const formModal = useModal();
+
+  useEffect(() => {
+    dispatch(paymentKURAction.setSelectedCustomer(null));
+  }, [formModal.open]);
+
+  useEffect(() => {
+    dispatch(paymentKURAction.fetchBankAccount());
+  }, []);
+
   return (
     <>
       <Box p="20px" bgcolor="#F5F7FA">
@@ -373,31 +391,48 @@ export default function PaymentKURPage() {
                   display="flex"
                   flexDirection="row"
                   width="100%"
-                  justifyContent="space-between"
+                  justifyContent="flex-start"
+                  gap="28px"
                 >
-                  <TextField
-                    placeholder="Search item"
-                    size="small"
-                    sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
-                    fullWidth
-                    defaultValue={request.params.search}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon />
-                        </InputAdornment>
-                      ),
+                  <Button
+                    sx={{ width: '12%' }}
+                    startIcon={<AddIcon />}
+                    onClick={() => {
+                      formModal.openModal();
                     }}
-                    onChange={(event) => {
-                      debounceSearch(event.target.value);
-                    }}
-                  />
-                  <FilterButton
-                    endIcon={<ArrowDown />}
-                    onClick={() => setOpenFilter(!openFilter)}
                   >
-                    Filter
-                  </FilterButton>
+                    Add Payment
+                  </Button>
+                  <Box
+                    display="flex"
+                    flexDirection="row"
+                    width="100%"
+                    justifyContent="space-between"
+                  >
+                    <TextField
+                      placeholder="Search item"
+                      size="small"
+                      sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
+                      fullWidth
+                      defaultValue={payment.params.search}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon />
+                          </InputAdornment>
+                        ),
+                      }}
+                      onChange={(event) => {
+                        debounceSearch(event.target.value);
+                      }}
+                    />
+                    <FilterButton
+                      endIcon={<ArrowDown />}
+                      onClick={() => setOpenFilter(!openFilter)}
+                    >
+                      Filter
+                    </FilterButton>
+                  </Box>
                 </Box>
                 <Box
                   display={openFilter ? 'flex' : 'none'}
@@ -435,7 +470,7 @@ export default function PaymentKURPage() {
                         ))
                       }
                       isOptionEqualToValue={(item: Area) => {
-                        const filtered = request?.displayFilter?.areas?.filter(
+                        const filtered = payment?.displayFilter?.areas?.filter(
                           (el: any) => el.id === item.id,
                         );
                         if (filtered) return item.id === filtered[0]?.id;
@@ -446,7 +481,7 @@ export default function PaymentKURPage() {
                           {item.title}
                         </Box>
                       )}
-                      value={request?.displayFilter?.areas}
+                      value={payment?.displayFilter?.areas}
                       inputValue={inputValueArea}
                       onInputChange={(_, newInput) => {
                         setInputValueArea(newInput);
@@ -461,10 +496,10 @@ export default function PaymentKURPage() {
                         handleChangeType(value);
                       }}
                       isOptionEqualToValue={(item: Type) => {
-                        return item.id === request.displayFilter?.types?.id;
+                        return item.id === payment.displayFilter?.types?.id;
                       }}
                       getOptionLabel={(item) => item.name}
-                      value={request?.displayFilter?.types}
+                      value={payment?.displayFilter?.types}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -477,15 +512,24 @@ export default function PaymentKURPage() {
                   <FormLabel text="Transfer To">
                     <Autocomplete
                       id="filterBank"
-                      options={bankData.data}
-                      // onChange={(e, value) => {
-                      //   handleChangeType(value);
-                      // }}
-                      // isOptionEqualToValue={(item: Type) => {
-                      //   return item.id === request.displayFilter?.types?.id;
-                      // }}
-                      getOptionLabel={(item) => item.name}
-                      // value={request?.displayFilter?.types}
+                      options={[
+                        {
+                          name: 'Bank Nobu',
+                          code: 'nobu',
+                        },
+                        {
+                          name: 'Bank BCA',
+                          code: 'bca',
+                        },
+                      ]}
+                      onChange={(e, value) => {
+                        handleChangeBank(value);
+                      }}
+                      isOptionEqualToValue={(item: Bank) => {
+                        return item.code === paidToBank?.code;
+                      }}
+                      getOptionLabel={(option) => `${option.name}`}
+                      value={paidToBank}
                       renderInput={(params) => (
                         <TextField
                           {...params}
@@ -631,14 +675,14 @@ export default function PaymentKURPage() {
               boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
             >
               <Table
-                data={request.data || []}
+                data={payment.data || []}
                 headCells={headCell}
-                totalData={request.total}
-                loading={request.loading}
-                count={request.params.count}
-                page={request.params.page}
-                orderBy={request.params.order_by}
-                orderType={request.params.order_type}
+                totalData={payment.total}
+                loading={payment.loading}
+                count={payment.params.count}
+                page={payment.params.page}
+                orderBy={payment.params.order_by}
+                orderType={payment.params.order_type}
                 onChangePage={(page) => handleChangePage(page)}
                 onChangeSort={(value) => handleChangeSort(value)}
               />
@@ -646,16 +690,24 @@ export default function PaymentKURPage() {
           </Grid>
         </Grid>
       </Box>
-      {/* <Modal
+
+      <Modal
         open={rejectModal.open}
         title="Refusal Reason"
         onClose={rejectModal.closeModal}
       >
         <RefusalReason
-          onSubmitRefusal={handleRejectRequest}
+          onSubmitRefusal={handleRejectPayment}
           id={selected?.id || 0}
         />
-      </Modal> */}
+      </Modal>
+      <Modal
+        open={formModal.open}
+        title="Create Payment"
+        onClose={formModal.closeModal}
+      >
+        <PaymentForm onClose={formModal.closeModal} />
+      </Modal>
     </>
   );
 }
