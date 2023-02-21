@@ -354,7 +354,8 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       user_account_number: payload.payload.bankNumberPrimary,
       user_bank: payload.payload.bankName?.name,
       nobu_account_number: payload.payload.nobuAccountNumber,
-      kur_user_status_id: 1,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      kur_user_status_id: +payload.payload.kurUserStatus!,
       kur_user_type_id: payload.payload.kurType?.id,
       kur_user_document: [payloadKtp, payloadKK, payloadNpwp, payloadSKU],
     };

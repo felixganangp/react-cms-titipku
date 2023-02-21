@@ -35,6 +35,7 @@ export interface CreateCustomer {
   bankName: BankList | null;
   bankNumberPrimary: string;
   nobuAccountNumber: string;
+  kurUserStatus: string | undefined;
 }
 
 export interface Customer {
