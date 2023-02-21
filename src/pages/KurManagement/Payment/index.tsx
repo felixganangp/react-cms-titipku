@@ -117,22 +117,20 @@ export default function PaymentKURPage() {
 
   const handleChangeType = (value: any) => {
     dispatch(
-      paymentKURAction.setParams({
-        page: 1,
+      paymentKURAction.setStateParams({
         kur_user_type_id: value ? value?.id : null,
       }),
     );
-    // dispatch(
-    //   paymentKURAction.setDisplayFilter({
-    //     types: value,
-    //   }),
-    // );
+    dispatch(
+      paymentKURAction.setDisplayFilter({
+        types: value,
+      }),
+    );
   };
 
   const handleChangeBank = (value: any) => {
     dispatch(
-      paymentKURAction.setParams({
-        page: 1,
+      paymentKURAction.setStateParams({
         paid_to_bank: value ? value.code : null,
       }),
     );
@@ -143,8 +141,7 @@ export default function PaymentKURPage() {
     const areasId: (number | undefined)[] = [];
     if (value.length > 0) value.map((item: Area) => areasId.push(item.id));
     dispatch(
-      paymentKURAction.setParams({
-        page: 1,
+      paymentKURAction.setStateParams({
         area_ids: areasId.length > 0 ? areasId.join(',') : undefined,
       }),
     );
@@ -157,8 +154,13 @@ export default function PaymentKURPage() {
 
   const handleChangeStartDate = (value: any) => {
     dispatch(
-      paymentKURAction.setParams({
-        page: 1,
+      paymentKURAction.setStateParams({
+        submit_date_start: Math.floor(new Date(value).getTime() / 1000),
+      }),
+    );
+
+    dispatch(
+      paymentKURAction.setDisplayFilter({
         submit_date_start: Math.floor(new Date(value).getTime() / 1000),
       }),
     );
@@ -166,8 +168,14 @@ export default function PaymentKURPage() {
 
   const handleChangeEndDate = (value: any) => {
     dispatch(
-      paymentKURAction.setParams({
-        page: 1,
+      paymentKURAction.setStateParams({
+        submit_date_end: Math.floor(
+          new Date(value).setHours(23, 59, 59, 59) / 1000,
+        ),
+      }),
+    );
+    dispatch(
+      paymentKURAction.setDisplayFilter({
         submit_date_end: Math.floor(
           new Date(value).setHours(23, 59, 59, 59) / 1000,
         ),
@@ -176,7 +184,19 @@ export default function PaymentKURPage() {
   };
 
   const handleApplyFilter = () => {
-    dispatch(paymentKURAction.fetchData(payment.params));
+    const payloadParams = {
+      ...payment.params,
+      ...payment.stateParams,
+    };
+
+    dispatch(
+      paymentKURAction.setParams({
+        ...payment.params,
+        ...payment.stateParams,
+        page: 1,
+      }),
+    );
+    dispatch(paymentKURAction.fetchData(payloadParams));
   };
 
   const uppercaseWord = (word: string) => {
@@ -200,6 +220,15 @@ export default function PaymentKURPage() {
       }),
     );
     await dispatch(
+      paymentKURAction.setStateParams({
+        area_ids: undefined,
+        kur_user_type_id: undefined,
+        submit_date_start: undefined,
+        submit_date_end: undefined,
+        paid_to_bank: undefined,
+      }),
+    );
+    await dispatch(
       paymentKURAction.setDisplayFilter({
         areas: [],
         types: null,
@@ -208,6 +237,7 @@ export default function PaymentKURPage() {
     await dispatch(
       paymentKURAction.fetchData({
         page: 1,
+        count: 10,
         search: payment.params.search,
         area_ids: undefined,
         kur_user_type_id: undefined,
