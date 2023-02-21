@@ -48,7 +48,7 @@ export interface InvoiceKur {
   dpd_rate: number;
   paid_status: string;
   paid_date: number;
-  kur_invoice_Detail: InvoiceKurDetail[];
+  kur_invoice_detail: InvoiceKurDetail[];
   kur_user_type: KurUserType;
   condition: string;
 }
@@ -56,6 +56,7 @@ export interface InvoiceKur {
 export interface InvoiceKurDetail {
   id: number;
   created_at: number;
+  is_last: boolean;
   updated_at: number;
   created_by_id: number;
   created_by_type: string;

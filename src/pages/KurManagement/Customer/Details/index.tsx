@@ -38,7 +38,7 @@ import { invoiceKurAction } from 'store/slice/kur/Invoice';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { RequestKUR } from 'models/kur/Request';
 import { PaymentKUR } from 'models/kur/Payment';
-import { InvoiceKur } from 'models/kur/Invoice';
+import { InvoiceKur, InvoiceKurDetail } from 'models/kur/Invoice';
 
 import { TitlePage, BackButton, Menu } from './details.styled';
 
@@ -459,18 +459,20 @@ export default function RoleUserDetails() {
       id: 'last_paid',
       label: 'Last Paid',
       align: 'left',
-      format: (val) => (
-        <Typography>
-          {val.kur_invoice_Detail !== null
-            ? moment
-                .unix(
-                  val.kur_invoice_Detail[val.kur_invoice_Detail.length - 1]
-                    .created_at,
-                )
-                .format('DD/MM/YYYY')
-            : '-'}
-        </Typography>
-      ),
+      format: (val) => {
+        if (val.kur_invoice_detail?.length > 0) {
+          const getLast: InvoiceKurDetail = val.kur_invoice_detail?.filter(
+            (e: InvoiceKurDetail) => e.is_last,
+          )[0];
+          return (
+            <Typography>
+              {moment.unix(getLast.created_at).format('DD/MM/YYYY')}
+            </Typography>
+          );
+        }
+
+        return <span>-</span>;
+      },
     },
     {
       id: 'paid_amount',
