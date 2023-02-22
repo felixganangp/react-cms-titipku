@@ -133,11 +133,7 @@ const PaymentKURSlice = createSlice({
       state.detailsTableData = [action.payload.data];
     },
     setResetParams(state: PaymentKURProps) {
-      state.params = {
-        page: 1,
-        count: 10,
-        search: '',
-      };
+      state.params = initialState.params;
     },
     fetchCreditBalance(
       state: PaymentKURProps,

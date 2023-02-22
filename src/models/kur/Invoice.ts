@@ -18,6 +18,13 @@ export interface PaymentKURParams extends ListParams {
   due_date_end?: number;
 }
 
+export interface DetailInvoiceParams {
+  include_dpd?: boolean;
+  include_payment?: boolean;
+  include_admin_fee?: boolean;
+  include_adjustment?: boolean;
+}
+
 export interface InvoiceKur {
   id: number;
   created_at: number;
@@ -56,7 +63,6 @@ export interface InvoiceKur {
 export interface InvoiceKurDetail {
   id: number;
   created_at: number;
-  is_last: boolean;
   updated_at: number;
   created_by_id: number;
   created_by_type: string;
