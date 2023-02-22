@@ -322,6 +322,7 @@ export default function PaymentKURPage() {
       label: 'Merchant',
       align: 'left',
       enableSort: true,
+      width: '250px',
       format: (val) => <Typography>{val.kur_user.user.name}</Typography>,
     },
     {
