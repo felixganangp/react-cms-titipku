@@ -80,11 +80,7 @@ const RequestKURSlice = createSlice({
       };
     },
     setResetParams(state: RequestKURProps) {
-      state.params = {
-        page: 1,
-        count: 10,
-        search: '',
-      };
+      state.params = initialState.params;
     },
     setDisplayFilter(
       state: RequestKURProps,

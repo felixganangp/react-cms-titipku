@@ -95,11 +95,7 @@ const InvoiceSlice = createSlice({
       };
     },
     setResetParams(state: InvoiceInitialProps) {
-      state.params = {
-        page: 1,
-        count: 10,
-        search: '',
-      };
+      state.params = initialState.params;
     },
     fetchDataDetail(
       state: InvoiceInitialProps,

@@ -47,6 +47,10 @@ function* fetchDataDetail(params: PayloadAction<{ id: string | number }>) {
     const response: Response<InvoiceKur> = yield call(
       InvoiceService.getAllInvoiceKurDetail,
       params.payload.id,
+      {
+        include_adjustment: true,
+        include_payment: true,
+      },
     );
 
     yield put(invoiceKurAction.fetchDataDetailSuccess(response));
