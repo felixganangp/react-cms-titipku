@@ -45,15 +45,18 @@ export default function PaymentKURDetails() {
   const paymentDetails = useAppSelector((state) => state.payment.detailsData);
   const statement = useAppSelector((state) => state.payment.detailsTableData);
   const creditBalance = useAppSelector((state) => state.payment.creditBalance);
-  const uppercaseWord = (word: string) => {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-  };
-  const rejectModal = useModal();
+  const formModal = useModal();
+
+  useEffect(() => {
+    if (id) dispatch(paymentKURAction.fetchDetails({ id }));
+  }, []);
+
   const handleApprovePayment = (paymentId: number | string) => {
     dispatch(
       paymentKURAction.approvePayment({ id: paymentId, detailsPage: true }),
     );
   };
+
   const handleRejectPayment = (paymentId: number | string, remarks: string) => {
     dispatch(
       paymentKURAction.rejectPayment({
@@ -62,7 +65,7 @@ export default function PaymentKURDetails() {
         remarks,
       }),
     );
-    rejectModal.closeModal();
+    formModal.closeModal();
   };
   const [modalImage, setModalImage] = useState<{
     open: boolean;
@@ -71,9 +74,11 @@ export default function PaymentKURDetails() {
     open: false,
     filePath: null,
   });
+
   const handleZoomImage = (open: boolean, filePath: string | null) => {
     setModalImage({ open, filePath });
   };
+
   const headCell = [
     {
       id: 'image',
@@ -126,14 +131,6 @@ export default function PaymentKURDetails() {
       format: (val: any) => <Typography>{val.description || '-'}</Typography>,
     },
   ];
-
-  // get details
-  useEffect(() => {
-    if (id) dispatch(paymentKURAction.fetchDetails({ id }));
-  }, []);
-
-  // action
-  const formModal = useModal();
 
   return (
     <>
@@ -411,7 +408,7 @@ export default function PaymentKURDetails() {
             </Box>
           </Content>
         </SubDetailsPagesWrapper>
-        <SubDetailsPagesWrapper title="Basic Info" defaultOpen>
+        <SubDetailsPagesWrapper title="Statement" defaultOpen>
           <Content>
             <Table
               data={statement || []}
