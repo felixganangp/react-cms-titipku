@@ -130,6 +130,13 @@ export default function DetailsInvoice() {
     }
   }, [invoice]);
 
+  const invoiceDetailList =
+    invoice?.kur_invoice_detail !== null
+      ? invoice?.kur_invoice_detail.filter(
+          (val: InvoiceKurDetail) =>
+            val.type === 'adjustment' || val.type === 'payment',
+        )
+      : [];
   return (
     <div>
       <Box p="20px" bgcolor="#F5F7FA">
@@ -290,10 +297,7 @@ export default function DetailsInvoice() {
         </SubDetailsPagesWrapper>
         <SubDetailsPagesWrapper title="Payment" defaultOpen>
           <Box p="20px">
-            <Table
-              headCells={headCells}
-              data={invoice?.kur_invoice_detail || []}
-            />
+            <Table headCells={headCells} data={invoiceDetailList || []} />
           </Box>
         </SubDetailsPagesWrapper>
       </Box>
