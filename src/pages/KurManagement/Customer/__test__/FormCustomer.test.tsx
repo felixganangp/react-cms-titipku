@@ -14,14 +14,14 @@ import { store } from 'store';
 import { customerAction } from 'store/slice/kur/Customer';
 import { typeAction } from 'store/slice/kur/Type';
 import { areaAction } from 'store/slice/Area';
+import { merchantAction } from 'store/slice/Merchant';
 import { CreateCustomer } from 'models/kur/Customer';
-import { creditScoreAction } from 'store/slice/kur/CreditScore';
 import CustomerView from '../index';
 import {
-  MockLisCustomers,
   MockKurType,
-  MockKurArea,
-  MockCreditScore,
+  MockArea,
+  MockMerchantId1,
+  MockMerchantId2,
 } from './MockCustomer';
 import FormCustomer from '../components/form';
 
@@ -78,10 +78,34 @@ describe('Form Customer Component Add', async () => {
       }),
     ),
   );
+  const mockArea = vi.fn((data) =>
+    store.dispatch(
+      areaAction.fetchDataSuccess({
+        timestamp: 1675755225,
+        status: 'ok',
+        message: 'Retrieved successfully',
+        count: 2,
+        total: 2,
+        data,
+      }),
+    ),
+  );
+  const mockMerchant = vi.fn((data) =>
+    store.dispatch(
+      merchantAction.fetchDataSuccess({
+        timestamp: 1675755225,
+        status: 'ok',
+        message: 'Retrieved successfully',
+        count: 2,
+        total: 2,
+        data,
+      }),
+    ),
+  );
   afterEach(() => {
     vi.clearAllMocks();
   });
-  it('Form initial state first tab, all input have been touched, and leave error with next button disabled', async () => {
+  it('[CREATE CUSTOMER] Form initial state first tab, all input have been touched, and leave error with next button disabled', async () => {
     formData = {
       ...formData,
       initialData: {
@@ -92,14 +116,13 @@ describe('Form Customer Component Add', async () => {
     await act(() => {
       mockKurType(MockKurType);
     });
-    const { debug, queryByText } = render(
+    render(
       <React.Suspense fallback>
         <MockTheme>
           <FormCustomer onClose={() => {}} formData={formData} />
         </MockTheme>
       </React.Suspense>,
     );
-    const allFormText = screen.getByText('All forms must be filled');
     const inputElementName =
       screen.getByPlaceholderText(/Input customer name/i);
     await fireEvent.blur(inputElementName);
@@ -224,57 +247,585 @@ describe('Form Customer Component Add', async () => {
     // BIRTH DATE
     const inputElementKurBirthDate = screen.getByPlaceholderText('dd/mm/yyyy');
     await fireEvent.click(inputElementKurBirthDate);
+    await fireEvent.focus(inputElementKurBirthDate);
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
+      await fireEvent.click(inputElementName);
       const errorMsgKurBirthDate = screen.getByText('Birth date is required');
       expect(errorMsgKurBirthDate).toBeInTheDocument();
     });
-
-    // await userEvent.setup().type(inputElementName, 'Asra');
-    // const inputElementKurType = screen.getByPlaceholderText(/Select KUR Type/i);
-    // const inputElementAdminFee =
-    //   screen.getByPlaceholderText(/Input admin fee/i);
-    // const inputElementDpdRate = screen.getByPlaceholderText(/Input DPD rate/i);
-    // // const inputElementBirthDate = screen.getByTestId('form-customer-birthdate');
-    // const inputElementPhoneNumber =
-    //   screen.getByPlaceholderText(/Input Phone Number/i);
-    // const inputElementEmail = screen.getByPlaceholderText(/Input email/i);
-    // const inputElementAddressKtp =
-    //   screen.getByPlaceholderText(/Input address ktp/i);
-    // const inputElementAddressDomicile = screen.getByPlaceholderText(
-    //   /Input address domicile/i,
-    // );
-    // const inputElementCreditLimit =
-    //   screen.getByPlaceholderText(/Input credit limit/i);
-    // const inputElementBankAccount = screen.getByPlaceholderText(
-    //   /Select your bank account/i,
-    // );
-    // const inputElementBankAccountNumber = screen.getByPlaceholderText(
-    //   'Bank account number',
-    // );
-    // // const inputElementBankAccountNumber = screen.getByTestId(
-    // //   'form-customer-bank-account',
-    // // );
-    // const inputElementBankAccountNumberNobu = screen.getByPlaceholderText(
-    //   'Bank account number (Nobu)',
-    // );
-    // const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
-
-    // expect(errorMsgName).toBeInTheDocument();
-    // expect(inputElementKurType).toHaveDisplayValue('');
-    // expect(inputElementAdminFee).toHaveDisplayValue('');
-    // expect(inputElementDpdRate).toHaveDisplayValue('');
-    // // expect(inputElementBirthDate).toBeNull();
-    // expect(inputElementPhoneNumber).toHaveDisplayValue('');
-    // expect(inputElementEmail).toHaveDisplayValue('');
-    // expect(inputElementAddressKtp).toHaveDisplayValue('');
-    // expect(inputElementAddressDomicile).toHaveDisplayValue('');
-    // expect(inputElementCreditLimit).toHaveDisplayValue('');
-    // expect(inputElementBankAccount).toHaveDisplayValue('');
-    // expect(inputElementBankAccountNumber).toHaveDisplayValue('');
-    // expect(inputElementBankAccountNumberNobu).toHaveDisplayValue('');
-    // expect(nextbuttonElement).toHaveClass('Mui-disabled');
+    const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+    expect(nextbuttonElement).toHaveClass('Mui-disabled');
   });
+  it('[CREATE CUSTOMER] Form first tab, select date', async () => {
+    formData = {
+      ...formData,
+      initialData: {
+        ...formData.initialData,
+        kurType: null,
+      },
+    };
+    render(
+      <React.Suspense fallback>
+        <MockTheme>
+          <FormCustomer onClose={() => {}} formData={formData} />
+        </MockTheme>
+      </React.Suspense>,
+    );
+    const dateToday = new Date();
+    const date = dateToday.getDate() - 1;
+    // const month = dateToday.getMonth() + 1;
+    // const year = dateToday.getFullYear();
+    // const newDate = `${date}/0${month}/${year}`;
+    // const allFormText = screen.getByText('All forms must be filled');
+    // BIRTH DATE
+    const inputElementKurBirthDate = screen.getByPlaceholderText('dd/mm/yyyy');
+    await fireEvent.click(inputElementKurBirthDate);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      screen.getByRole('dialog');
+    });
+    const gridDate = within(screen.getByRole('dialog')).getByRole('grid');
+    const rowGroupDate = within(gridDate).getByRole('rowgroup');
+    const buttonDate = within(rowGroupDate).getByText(date, {
+      selector: 'button',
+    });
+    await fireEvent.click(buttonDate);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    // const getDateChoosen = screen.getByText(newDate);
+    expect(buttonDate).not.toBeInTheDocument();
+    const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+    expect(nextbuttonElement).toHaveClass('Mui-disabled');
+  });
+  it('[CREATE CUSTOMER] All form in the first tab has been filled with admin fee and dpd rate are 0', async () => {
+    formData = {
+      ...formData,
+      initialData: {
+        ...formData.initialData,
+        kurType: null,
+      },
+    };
+    await act(() => {
+      mockKurType(MockKurType);
+    });
+    render(
+      <React.Suspense fallback>
+        <MockTheme>
+          <FormCustomer onClose={() => {}} formData={formData} />
+        </MockTheme>
+      </React.Suspense>,
+    );
+
+    const inputElementName =
+      screen.getByPlaceholderText(/Input customer name/i);
+    fireEvent.change(inputElementName, { target: { value: 'Name testing' } });
+
+    const inputElementFee = screen.getByPlaceholderText(/Input admin fee/i);
+    fireEvent.change(inputElementFee, { target: { value: '0' } });
+
+    const inputElementDpdRate = screen.getByPlaceholderText(/Input DPD rate/i);
+    fireEvent.change(inputElementDpdRate, { target: { value: '0' } });
+
+    const inputElementPhoneNumber =
+      screen.getByPlaceholderText(/Input Phone Number/i);
+    fireEvent.change(inputElementPhoneNumber, {
+      target: { value: '1234567890' },
+    });
+
+    const inputElementEmail = screen.getByPlaceholderText(/Input email/i);
+    fireEvent.change(inputElementEmail, {
+      target: { value: 'test@tset.com' },
+    });
+
+    const inputElementAddressKtp =
+      screen.getByPlaceholderText(/Input address ktp/i);
+    fireEvent.change(inputElementAddressKtp, {
+      target: { value: 'Testing address123' },
+    });
+
+    const inputElementAddressDomicile = screen.getByPlaceholderText(
+      /Input address domicile/i,
+    );
+    fireEvent.change(inputElementAddressDomicile, {
+      target: { value: 'Testing address' },
+    });
+
+    const inputElementCheckBoxAddress = screen.getByTestId(
+      'form-customer-kur-checkbox-address',
+    );
+
+    await fireEvent.click(inputElementCheckBoxAddress);
+    const inputElementCreditLimit =
+      screen.getByPlaceholderText(/Input credit limit/i);
+    fireEvent.change(inputElementCreditLimit, {
+      target: { value: '20000' },
+    });
+
+    const inputElementBankPrimary =
+      screen.getByPlaceholderText(`Bank account number`);
+    fireEvent.change(inputElementBankPrimary, {
+      target: { value: '1111111' },
+    });
+
+    const inputElementBankNobu = screen.getByPlaceholderText(
+      `Bank account number (Nobu)`,
+    );
+    fireEvent.change(inputElementBankNobu, {
+      target: { value: '1111111' },
+    });
+
+    // TYPE KUR
+    const inputElementKurType = screen.getByTestId(`form-customer-kur-type`);
+    fireEvent.click(inputElementKurType);
+    const inputType = within(inputElementKurType).getByRole('combobox');
+    fireEvent.change(inputType, { target: { value: 'b2' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+
+    // LIST BANK KUR
+    const inputElementKurListBank = screen.getByTestId(
+      'form-customer-list-bank',
+    );
+    await fireEvent.blur(inputElementKurListBank);
+    fireEvent.click(inputElementKurListBank);
+    const inputListBank = within(inputElementKurListBank).getByRole('combobox');
+    fireEvent.change(inputListBank, { target: { value: 'Bank Ma' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+
+    // BIRTH DATE
+    const dateToday = new Date();
+    const date = dateToday.getDate() - 1;
+    const inputElementKurBirthDate = screen.getByPlaceholderText('dd/mm/yyyy');
+    await fireEvent.click(inputElementKurBirthDate);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      screen.getByRole('dialog');
+    });
+    const gridDate = within(screen.getByRole('dialog')).getByRole('grid');
+    const rowGroupDate = within(gridDate).getByRole('rowgroup');
+    const buttonDate = within(rowGroupDate).getByText(date, {
+      selector: 'button',
+    });
+    await fireEvent.click(buttonDate);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+    expect(nextbuttonElement).not.toHaveClass('Mui-disabled');
+  });
+  it('[CREATE CUSTOMER] All form in the first tab has been filled and click next button', async () => {
+    formData = {
+      ...formData,
+      initialData: {
+        ...formData.initialData,
+        kurType: null,
+      },
+    };
+    await act(() => {
+      mockKurType(MockKurType);
+    });
+    render(
+      <React.Suspense fallback>
+        <MockTheme>
+          <FormCustomer onClose={() => {}} formData={formData} />
+        </MockTheme>
+      </React.Suspense>,
+    );
+
+    const buttonElementFirstTab = screen.getByText('1. Basic Info');
+    const buttonElementSecondTab = screen.getByText('2. KUR Document');
+    const inputElementName =
+      screen.getByPlaceholderText(/Input customer name/i);
+    fireEvent.change(inputElementName, { target: { value: 'Name testing' } });
+
+    const inputElementFee = screen.getByPlaceholderText(/Input admin fee/i);
+    fireEvent.change(inputElementFee, { target: { value: '0' } });
+
+    const inputElementDpdRate = screen.getByPlaceholderText(/Input DPD rate/i);
+    fireEvent.change(inputElementDpdRate, { target: { value: '0' } });
+
+    const inputElementPhoneNumber =
+      screen.getByPlaceholderText(/Input Phone Number/i);
+    fireEvent.change(inputElementPhoneNumber, {
+      target: { value: '1234567890' },
+    });
+
+    const inputElementEmail = screen.getByPlaceholderText(/Input email/i);
+    fireEvent.change(inputElementEmail, {
+      target: { value: 'test@tset.com' },
+    });
+
+    const inputElementAddressKtp =
+      screen.getByPlaceholderText(/Input address ktp/i);
+    fireEvent.change(inputElementAddressKtp, {
+      target: { value: 'Testing address' },
+    });
+
+    const inputElementAddressDomicile = screen.getByPlaceholderText(
+      /Input address domicile/i,
+    );
+    fireEvent.change(inputElementAddressDomicile, {
+      target: { value: 'Testing address' },
+    });
+
+    const inputElementCreditLimit =
+      screen.getByPlaceholderText(/Input credit limit/i);
+    fireEvent.change(inputElementCreditLimit, {
+      target: { value: '20000' },
+    });
+
+    const inputElementBankPrimary =
+      screen.getByPlaceholderText(`Bank account number`);
+    fireEvent.change(inputElementBankPrimary, {
+      target: { value: '1111111' },
+    });
+
+    const inputElementBankNobu = screen.getByPlaceholderText(
+      `Bank account number (Nobu)`,
+    );
+    fireEvent.change(inputElementBankNobu, {
+      target: { value: '1111111' },
+    });
+
+    // TYPE KUR
+    const inputElementKurType = screen.getByTestId(`form-customer-kur-type`);
+    fireEvent.click(inputElementKurType);
+    const inputType = within(inputElementKurType).getByRole('combobox');
+    fireEvent.change(inputType, { target: { value: 'b2' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+
+    // LIST BANK KUR
+    const inputElementKurListBank = screen.getByTestId(
+      'form-customer-list-bank',
+    );
+    await fireEvent.blur(inputElementKurListBank);
+    fireEvent.click(inputElementKurListBank);
+    const inputListBank = within(inputElementKurListBank).getByRole('combobox');
+    fireEvent.change(inputListBank, { target: { value: 'Bank Ma' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[0]);
+
+    // BIRTH DATE
+    const dateToday = new Date();
+    const date = dateToday.getDate() - 1;
+    const inputElementKurBirthDate = screen.getByPlaceholderText('dd/mm/yyyy');
+    await fireEvent.click(inputElementKurBirthDate);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      screen.getByRole('dialog');
+    });
+    const gridDate = within(screen.getByRole('dialog')).getByRole('grid');
+    const rowGroupDate = within(gridDate).getByRole('rowgroup');
+    const buttonDate = within(rowGroupDate).getByText(date, {
+      selector: 'button',
+    });
+    await fireEvent.click(buttonDate);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+    fireEvent.click(nextbuttonElement);
+    expect(buttonElementFirstTab).not.toHaveClass('Mui-selected');
+    expect(buttonElementSecondTab).toHaveClass('Mui-selected');
+  });
+
+  // SECOND TAB
+  it('[CREATE CUSTOMER] Form initial state second tab, all input have been touched, and leave error with save button disabled', async () => {
+    await act(() => {
+      mockKurType(MockKurType);
+    });
+    formData = {
+      ...formData,
+      initialData: {
+        ...formData.initialData,
+        name: 'Test name',
+        adminFee: '2',
+        dpdRate: '1',
+        phoneNumber: '81287594317',
+        email: 'test@test.com',
+        addressKtp: 'addresssn',
+        addressDomisili: 'addresssn',
+        creditLimit: '100000',
+        bankNumberPrimary: '123453545',
+        nobuAccountNumber: '123453545',
+        bankName: { name: 'Bank Mandiri', code: 'mandiri' },
+        kurType: {
+          id: 1,
+          created_at: 1674441599,
+          updated_at: 0,
+          created_by_id: 1,
+          created_by_type: 'admin',
+          updated_by_id: 0,
+          updated_by_type: '',
+          name: 'B2B',
+          description: 'B2B',
+        },
+      },
+    };
+    render(
+      <React.Suspense fallback>
+        <MockTheme>
+          <FormCustomer onClose={() => {}} formData={formData} />
+        </MockTheme>
+      </React.Suspense>,
+    );
+
+    const buttonElementFirstTab = screen.getByText('1. Basic Info');
+    const buttonElementSecondTab = screen.getByText('2. KUR Document');
+    // BIRTH DATE
+    const dateToday = new Date();
+    const date = dateToday.getDate() - 1;
+    const inputElementKurBirthDate = screen.getByPlaceholderText('dd/mm/yyyy');
+    await fireEvent.click(inputElementKurBirthDate);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      screen.getByRole('dialog');
+    });
+    const gridDate = within(screen.getByRole('dialog')).getByRole('grid');
+    const rowGroupDate = within(gridDate).getByRole('rowgroup');
+    const buttonDate = within(rowGroupDate).getByText(date, {
+      selector: 'button',
+    });
+    await fireEvent.click(buttonDate);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+    await fireEvent.click(nextbuttonElement);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    const inputElementNik = screen.getByPlaceholderText(/Input NIK KTP/i);
+    await fireEvent.blur(inputElementNik);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgNik = screen.getByText('NIK KTP is required');
+      expect(errorMsgNik).toBeInTheDocument();
+    });
+
+    const inputElementKk = screen.getByPlaceholderText(
+      /Input Kartu Keluarga number/i,
+    );
+    await fireEvent.blur(inputElementKk);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgKk = screen.getByText('Kartu Keluarga number is required');
+      expect(errorMsgKk).toBeInTheDocument();
+    });
+    const inputElementNpwp = screen.getByPlaceholderText(/Input NPWP number/i);
+    await fireEvent.blur(inputElementNpwp);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgNpwp = screen.getByText('NPWP number is required');
+      expect(errorMsgNpwp).toBeInTheDocument();
+    });
+    // expect(nextbuttonElement).toHaveClass('Mui-disabled');
+
+    // PASAR KUR
+    const inputElementKurPasar = screen.getByPlaceholderText(/Cari Pasar/i);
+    await fireEvent.blur(inputElementKurPasar);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgKurPasar = screen.getByText('Pasar is required');
+      expect(errorMsgKurPasar).toBeInTheDocument();
+    });
+    expect(buttonElementFirstTab).not.toHaveClass('Mui-selected');
+    expect(buttonElementSecondTab).toHaveClass('Mui-selected');
+  });
+  it('[CREATE CUSTOMER] Form initial state second tab, pasar has been selected and touch lapak and show the error', async () => {
+    await act(() => {
+      mockKurType(MockKurType);
+      mockArea(MockArea);
+    });
+    formData = {
+      ...formData,
+      initialData: {
+        ...formData.initialData,
+        name: 'Test name',
+        adminFee: '2',
+        dpdRate: '1',
+        phoneNumber: '81287594317',
+        email: 'test@test.com',
+        addressKtp: 'addresssn',
+        addressDomisili: 'addresssn',
+        creditLimit: '100000',
+        bankNumberPrimary: '123453545',
+        nobuAccountNumber: '123453545',
+        bankName: { name: 'Bank Mandiri', code: 'mandiri' },
+        kurType: {
+          id: 1,
+          created_at: 1674441599,
+          updated_at: 0,
+          created_by_id: 1,
+          created_by_type: 'admin',
+          updated_by_id: 0,
+          updated_by_type: '',
+          name: 'B2B',
+          description: 'B2B',
+        },
+      },
+    };
+    render(
+      <React.Suspense fallback>
+        <MockTheme>
+          <FormCustomer onClose={() => {}} formData={formData} />
+        </MockTheme>
+      </React.Suspense>,
+    );
+
+    const indexPasar = 0;
+    // BIRTH DATE
+    const dateToday = new Date();
+    const date = dateToday.getDate() - 1;
+    const inputElementKurBirthDate = screen.getByPlaceholderText('dd/mm/yyyy');
+    await fireEvent.click(inputElementKurBirthDate);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      screen.getByRole('dialog');
+    });
+    const gridDate = within(screen.getByRole('dialog')).getByRole('grid');
+    const rowGroupDate = within(gridDate).getByRole('rowgroup');
+    const buttonDate = within(rowGroupDate).getByText(date, {
+      selector: 'button',
+    });
+    await fireEvent.click(buttonDate);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+    await fireEvent.click(nextbuttonElement);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    // PASAR KUR
+    const inputKurPasar = screen.getByTestId('form-customer-kur-pasar');
+    await fireEvent.click(inputKurPasar);
+    const inputPasar = within(inputKurPasar).getByRole('combobox');
+    fireEvent.change(inputPasar, { target: { value: 'Pas' } });
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    fireEvent.click(screen.getAllByRole('option')[indexPasar]);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    await act(() => {
+      mockMerchant(MockMerchantId1);
+    });
+    // LAPAK KUR
+    const inputElementKurLapak = screen.getByPlaceholderText(/Cari Lapak/i);
+    await fireEvent.blur(inputElementKurLapak);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      const errorMsgKurLapak = screen.getByText('Lapak is required');
+      expect(errorMsgKurLapak).toBeInTheDocument();
+    });
+  });
+  it('[CREATE CUSTOMER] Form initial state second tab, previous button clicked', async () => {
+    await act(() => {
+      mockKurType(MockKurType);
+    });
+    formData = {
+      ...formData,
+      initialData: {
+        ...formData.initialData,
+        name: 'Test name',
+        adminFee: '2',
+        dpdRate: '1',
+        phoneNumber: '81287594317',
+        email: 'test@test.com',
+        addressKtp: 'addresssn',
+        addressDomisili: 'addresssn',
+        creditLimit: '100000',
+        bankNumberPrimary: '123453545',
+        nobuAccountNumber: '123453545',
+        bankName: { name: 'Bank Mandiri', code: 'mandiri' },
+        kurType: {
+          id: 1,
+          created_at: 1674441599,
+          updated_at: 0,
+          created_by_id: 1,
+          created_by_type: 'admin',
+          updated_by_id: 0,
+          updated_by_type: '',
+          name: 'B2B',
+          description: 'B2B',
+        },
+      },
+    };
+    render(
+      <React.Suspense fallback>
+        <MockTheme>
+          <FormCustomer onClose={() => {}} formData={formData} />
+        </MockTheme>
+      </React.Suspense>,
+    );
+
+    const buttonElementFirstTab = screen.getByText('1. Basic Info');
+    const buttonElementSecondTab = screen.getByText('2. KUR Document');
+    // BIRTH DATE
+    const dateToday = new Date();
+    const date = dateToday.getDate() - 1;
+    const inputElementKurBirthDate = screen.getByPlaceholderText('dd/mm/yyyy');
+    await fireEvent.click(inputElementKurBirthDate);
+    // await fireEvent.blur(allFormTexts);
+    await waitFor(async () => {
+      screen.getByRole('dialog');
+    });
+    const gridDate = within(screen.getByRole('dialog')).getByRole('grid');
+    const rowGroupDate = within(gridDate).getByRole('rowgroup');
+    const buttonDate = within(rowGroupDate).getByText(date, {
+      selector: 'button',
+    });
+    await fireEvent.click(buttonDate);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+    await fireEvent.click(nextbuttonElement);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    const prevbuttonElement = screen.getByRole('button', { name: 'Previous' });
+    await fireEvent.click(prevbuttonElement);
+    await act(async () => {
+      // eslint-disable-next-line no-promise-executor-return
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    // expect(nextbuttonElement).toHaveClass('Mui-disabled');
+    expect(buttonElementFirstTab).toHaveClass('Mui-selected');
+    expect(buttonElementSecondTab).not.toHaveClass('Mui-selected');
+  });
+
   // it('Form typing input', async () => {
   //   formData = {
   //     ...formData,

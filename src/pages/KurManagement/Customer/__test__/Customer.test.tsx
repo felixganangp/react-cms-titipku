@@ -183,6 +183,7 @@ describe('Customer KUR Page', async () => {
   });
   it('Open filter, then filter customer and change page', async () => {
     await act(() => {
+      mockCustomer(MockLisCustomers);
       mockKurType(MockKurType);
       mockKurArea(MockKurArea);
       mockKurCreditScore(MockCreditScore);

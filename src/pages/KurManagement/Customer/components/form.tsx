@@ -591,7 +591,11 @@ function Form({ onClose, formData }: Props) {
                     // label="Address as shown in ID (KTP)"
                     sx={{ fontSize: '14px' }}
                     control={
-                      <Checkbox checked={disabledAddressDom} size="small" />
+                      <Checkbox
+                        data-testid="form-customer-kur-checkbox-address"
+                        checked={disabledAddressDom}
+                        size="small"
+                      />
                     }
                   />
                 </>
@@ -635,6 +639,7 @@ function Form({ onClose, formData }: Props) {
                       }
                     >
                       <Autocomplete
+                        data-testid="form-customer-list-bank"
                         id="list-bank"
                         options={bankData.data}
                         onChange={(e, value) => {
@@ -783,6 +788,7 @@ function Form({ onClose, formData }: Props) {
                   }
                 >
                   <Autocomplete
+                    data-testid="form-customer-kur-pasar"
                     id="pasar-name"
                     options={areaKur.data}
                     onChange={(e, value) => {
