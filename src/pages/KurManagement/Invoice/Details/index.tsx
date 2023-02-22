@@ -93,7 +93,10 @@ export default function DetailsInvoice() {
       format: (val) => {
         return (
           <Typography fontSize="14px">
-            Rp {digitFormatter.format(val.kur_payment.amount || 0)}
+            Rp{' '}
+            {val.type === 'payment'
+              ? digitFormatter.format(val.kur_payment.amount || 0)
+              : digitFormatter.format(val.amount)}
           </Typography>
         );
       },
