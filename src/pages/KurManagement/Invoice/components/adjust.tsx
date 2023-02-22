@@ -39,7 +39,8 @@ export default function AdjustInvoiceModal({
   const initialValues: AdjustInvoice = {
     kur_user_id: kurUserId,
     kur_invoice_id: id,
-    final_outstanding_amount: outstanding || undefined,
+    final_outstanding_amount:
+      outstanding !== undefined ? outstanding : undefined,
     remarks: '',
   };
 
@@ -85,6 +86,8 @@ export default function AdjustInvoiceModal({
     await handleSubmitForm(values, resetForm);
     await paidOffModal.closeModal();
   };
+
+  console.log('values', values, outstanding);
 
   return (
     <Box>
