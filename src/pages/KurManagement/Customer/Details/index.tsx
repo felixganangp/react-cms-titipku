@@ -208,16 +208,21 @@ export default function RoleUserDetails() {
       id: 'decision_date',
       label: 'Delivery Date',
       align: 'left',
-      format: (val) => (
-        <Box>
-          <Typography>
-            {moment.unix(val.decision_date).format('MMM DD, YYYY')}
-          </Typography>
-          <Typography fontSize="12px">
-            {moment.unix(val.decision_date).format('hh:mm')}
-          </Typography>
-        </Box>
-      ),
+      format: (val) => {
+        if (val.decision_date === 0) {
+          return <span>-</span>;
+        }
+        return (
+          <Box>
+            <Typography>
+              {moment.unix(val.decision_date).format('MMM DD, YYYY')}
+            </Typography>
+            <Typography fontSize="12px">
+              {moment.unix(val.decision_date).format('hh:mm')}
+            </Typography>
+          </Box>
+        );
+      },
     },
     {
       id: 'amount',
@@ -541,7 +546,7 @@ export default function RoleUserDetails() {
                 <DescDetails
                   title="Customer ID"
                   icon={<Person2OutlinedIcon sx={{ color: '#008e58' }} />}
-                  content={customerKur.details?.id}
+                  content={customerKur.details?.user_id}
                 />
                 <DescDetails
                   title="Birth Date"
