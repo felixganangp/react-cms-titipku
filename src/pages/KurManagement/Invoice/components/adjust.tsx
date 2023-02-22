@@ -87,8 +87,6 @@ export default function AdjustInvoiceModal({
     await paidOffModal.closeModal();
   };
 
-  console.log('values', values, outstanding);
-
   return (
     <Box>
       <Box sx={{ margin: 0 }}>
