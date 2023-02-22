@@ -7,7 +7,6 @@ import {
   KURPaymentDetail,
   CreatePayment,
   BankAccount,
-  PaymentKURStateParams,
 } from 'models/kur/Payment';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListParams, ListResponse, Response } from 'models/fetch';
@@ -19,7 +18,7 @@ interface PaymentKURProps {
   loadingForm: boolean;
   total: number | undefined;
   params: PaymentKURParams;
-  stateParams: PaymentKURStateParams;
+  stateParams: PaymentKURParams;
   displayFilter: PaymentKURDisplayFilter;
   detailsData: PaymentKUR | null;
   detailsTableData: PaymentKUR[];
@@ -46,11 +45,9 @@ const initialState: PaymentKURProps = {
     order_type: 'desc',
   },
   stateParams: {
-    area_ids: '',
-    kur_user_type_id: undefined,
-    submit_date_start: 0,
-    submit_date_end: 0,
-    paid_to_bank: '',
+    page: 1,
+    count: 10,
+    search: '',
   },
   displayFilter: {
     areas: [],
@@ -94,10 +91,10 @@ const PaymentKURSlice = createSlice({
     },
     setStateParams(
       state: PaymentKURProps,
-      action: PayloadAction<PaymentKURStateParams>,
+      action: PayloadAction<PaymentKURParams>,
     ) {
       state.stateParams = {
-        ...state.params,
+        ...state.stateParams,
         ...action.payload,
       };
     },
