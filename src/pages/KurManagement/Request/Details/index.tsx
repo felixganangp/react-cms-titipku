@@ -67,7 +67,10 @@ export default function RequestKURDetails() {
       align: 'left',
       width: '130px',
       format: (val: any) => (
-        <Box onClick={() => handleZoomImage(true, val.image_filepath)}>
+        <Box
+          data-testid={`req-dtl-zoom-img-${val.id}`}
+          onClick={() => handleZoomImage(true, val.image_filepath)}
+        >
           <img
             src={val.image_filepath}
             onError={({ currentTarget }) => {
@@ -86,7 +89,7 @@ export default function RequestKURDetails() {
       align: 'left',
       width: '230px',
       format: (val: any) => (
-        <Typography color="#008E58">
+        <Typography color="#008E58" data-testid={`req-dtl-amount-${val.id}`}>
           Rp {digitFormatter.format(val.amount)}
         </Typography>
       ),
@@ -97,7 +100,9 @@ export default function RequestKURDetails() {
       align: 'left',
       format: (val: any) => (
         <Box>
-          <Typography>{val.description || '-'}</Typography>
+          <Typography data-testid={`req-dtl-desc-${val.id}`}>
+            {val.description || '-'}
+          </Typography>
         </Box>
       ),
     },
@@ -178,6 +183,7 @@ export default function RequestKURDetails() {
                   <DetailsHeader>Request</DetailsHeader>
                   {/* <Link style={{ textDecoration: 'none' }} to="/kur/request"> */}
                   <BackButton
+                    data-testid="request-kur-dtl-req-number"
                     sx={{
                       '&:hover': { bgcolor: '#fff' },
                     }}
@@ -438,6 +444,7 @@ export default function RequestKURDetails() {
             <Typography>Total Amount</Typography>
             <Amount>{digitFormatter.format(totalAmount || 0)}</Amount>
             <Table
+              data-testid="req-detail-table"
               data={details.detailsTableData || []}
               selected={[]}
               count={details.detailParams.count}
@@ -463,6 +470,7 @@ export default function RequestKURDetails() {
         onClose={() => setModalImage({ open: false, filePath: null })}
       >
         <Box
+          data-testid="req-dtl-zoom-img"
           position="absolute"
           maxHeight="70vh"
           maxWidth="90vw"

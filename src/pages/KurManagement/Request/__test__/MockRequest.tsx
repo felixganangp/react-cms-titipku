@@ -534,7 +534,7 @@ export const MockReqDetailAccept = {
       updated_by: null,
       kur_request_id: 25,
       amount: 20000,
-      description: 'Nota 2',
+      description: '',
       image_filepath:
         'https://titipku-dev.s3.ap-southeast-1.amazonaws.com/kur_requests/37/25/1675969349_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAXSNW2ORESX4WA3MQ%2F20230221%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230221T053425Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=75cde0e0b64e1cb119b9c1e94220172b1c3c474e6eca73879a2d59e1370d85d5',
     },

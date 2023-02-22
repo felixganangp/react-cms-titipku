@@ -14,6 +14,7 @@ const RefusalReason = ({ onSubmitRefusal, id }: RefusalReasonProps) => {
       <Box sx={{ padding: '24px', margin: 0 }}>
         <FormLabel text="Description">
           <TextField
+            data-testid="input-msg-desc"
             type="text"
             name="description"
             placeholder="Input refusal reason"
