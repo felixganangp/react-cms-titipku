@@ -180,6 +180,8 @@ export default function PaymentKURPage() {
         ...payment.params,
         ...payment.stateParams,
         page: 1,
+        order_by: 'created_at',
+        order_type: 'desc',
       }),
     );
   };
@@ -201,7 +203,7 @@ export default function PaymentKURPage() {
         submit_date_end: undefined,
         paid_to_bank: undefined,
         order_by: 'created_at',
-        order_type: 'asc',
+        order_type: 'desc',
       }),
     );
     await dispatch(
@@ -211,6 +213,8 @@ export default function PaymentKURPage() {
         submit_date_start: undefined,
         submit_date_end: undefined,
         paid_to_bank: undefined,
+        order_by: 'created_at',
+        order_type: 'desc',
       }),
     );
     await dispatch(
@@ -223,6 +227,8 @@ export default function PaymentKURPage() {
       paymentKURAction.fetchData({
         page: 1,
         count: 10,
+        order_by: 'created_at',
+        order_type: 'desc',
         search: payment.params.search,
         area_ids: undefined,
         kur_user_type_id: undefined,
