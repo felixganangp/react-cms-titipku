@@ -102,6 +102,19 @@ describe('Form Customer Component Add', async () => {
       }),
     ),
   );
+  beforeEach(() => {
+    const mockResponse = vi.fn();
+    Object.defineProperty(window, 'location', {
+      value: {
+        hash: {
+          endsWith: mockResponse,
+          includes: mockResponse,
+        },
+        assign: mockResponse,
+      },
+      writable: true,
+    });
+  });
   afterEach(() => {
     vi.clearAllMocks();
   });
@@ -125,7 +138,9 @@ describe('Form Customer Component Add', async () => {
     );
     const inputElementName =
       screen.getByPlaceholderText(/Input customer name/i);
-    await fireEvent.blur(inputElementName);
+    await act(async () => {
+      await fireEvent.blur(inputElementName);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgName = screen.getByText('Name is required');
@@ -133,7 +148,11 @@ describe('Form Customer Component Add', async () => {
     });
 
     const inputElementFee = screen.getByPlaceholderText(/Input admin fee/i);
-    await fireEvent.blur(inputElementFee);
+    // await fireEvent.blur(inputElementFee);
+
+    await act(async () => {
+      await fireEvent.blur(inputElementFee);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgAdminFee = screen.getByText('Admin fee is required');
@@ -141,7 +160,9 @@ describe('Form Customer Component Add', async () => {
     });
 
     const inputElementDpdRate = screen.getByPlaceholderText(/Input DPD rate/i);
-    await fireEvent.blur(inputElementDpdRate);
+    await act(async () => {
+      await fireEvent.blur(inputElementDpdRate);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgAdminDpdRate = screen.getByText('DPD rate is required');
@@ -150,7 +171,9 @@ describe('Form Customer Component Add', async () => {
 
     const inputElementPhoneNumber =
       screen.getByPlaceholderText(/Input Phone Number/i);
-    await fireEvent.blur(inputElementPhoneNumber);
+    await act(async () => {
+      await fireEvent.blur(inputElementPhoneNumber);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgAdminPhoneNumber = screen.getByText(
@@ -160,7 +183,9 @@ describe('Form Customer Component Add', async () => {
     });
 
     const inputElementEmail = screen.getByPlaceholderText(/Input email/i);
-    await fireEvent.blur(inputElementEmail);
+    await act(async () => {
+      await fireEvent.blur(inputElementEmail);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgAdminEmail = screen.getByText('Email is required');
@@ -169,7 +194,9 @@ describe('Form Customer Component Add', async () => {
 
     const inputElementAddressKtp =
       screen.getByPlaceholderText(/Input address ktp/i);
-    await fireEvent.blur(inputElementAddressKtp);
+    await act(async () => {
+      await fireEvent.blur(inputElementAddressKtp);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgAdminAddressKtp = screen.getByText(
@@ -181,7 +208,9 @@ describe('Form Customer Component Add', async () => {
     const inputElementAddressDomicile = screen.getByPlaceholderText(
       /Input address domicile/i,
     );
-    await fireEvent.blur(inputElementAddressDomicile);
+    await act(async () => {
+      await fireEvent.blur(inputElementAddressDomicile);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgAdminAddressDomicile = screen.getByText(
@@ -192,7 +221,9 @@ describe('Form Customer Component Add', async () => {
 
     const inputElementCreditLimit =
       screen.getByPlaceholderText(/Input credit limit/i);
-    await fireEvent.blur(inputElementCreditLimit);
+    await act(async () => {
+      await fireEvent.blur(inputElementCreditLimit);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgAdminCreditLimit = screen.getByText(
@@ -203,7 +234,9 @@ describe('Form Customer Component Add', async () => {
 
     const inputElementBankPrimary =
       screen.getByPlaceholderText(`Bank account number`);
-    await fireEvent.blur(inputElementBankPrimary);
+    await act(async () => {
+      await fireEvent.blur(inputElementBankPrimary);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgAdminBankPrimary = screen.getByText(
@@ -215,7 +248,9 @@ describe('Form Customer Component Add', async () => {
     const inputElementBankNobu = screen.getByPlaceholderText(
       `Bank account number (Nobu)`,
     );
-    await fireEvent.blur(inputElementBankNobu);
+    await act(async () => {
+      await fireEvent.blur(inputElementBankNobu);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgAdminBankNobu = screen.getByText(
@@ -226,7 +261,9 @@ describe('Form Customer Component Add', async () => {
 
     // TYPE KUR
     const inputElementKurType = screen.getByPlaceholderText(/Select KUR Type/i);
-    await fireEvent.blur(inputElementKurType);
+    await act(async () => {
+      await fireEvent.blur(inputElementKurType);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgKurType = screen.getByText('KUR Type is required');
@@ -237,7 +274,9 @@ describe('Form Customer Component Add', async () => {
     const inputElementKurListBank = screen.getByPlaceholderText(
       /Select your bank account/i,
     );
-    await fireEvent.blur(inputElementKurListBank);
+    await act(async () => {
+      await fireEvent.blur(inputElementKurListBank);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgKurListBank = screen.getByText('Bank account is required');
@@ -246,9 +285,10 @@ describe('Form Customer Component Add', async () => {
 
     // BIRTH DATE
     const inputElementKurBirthDate = screen.getByPlaceholderText('dd/mm/yyyy');
-    await fireEvent.click(inputElementKurBirthDate);
-    await fireEvent.focus(inputElementKurBirthDate);
-    // await fireEvent.blur(allFormTexts);
+    await act(async () => {
+      await fireEvent.click(inputElementKurBirthDate);
+      await fireEvent.focus(inputElementKurBirthDate);
+    });
     await waitFor(async () => {
       await fireEvent.click(inputElementName);
       const errorMsgKurBirthDate = screen.getByText('Birth date is required');
@@ -544,6 +584,7 @@ describe('Form Customer Component Add', async () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
     const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+    Element.prototype.scrollIntoView = vi.fn();
     fireEvent.click(nextbuttonElement);
     expect(buttonElementFirstTab).not.toHaveClass('Mui-selected');
     expect(buttonElementSecondTab).toHaveClass('Mui-selected');
@@ -612,6 +653,7 @@ describe('Form Customer Component Add', async () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
     const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+    Element.prototype.scrollIntoView = vi.fn();
     await fireEvent.click(nextbuttonElement);
     await act(async () => {
       // eslint-disable-next-line no-promise-executor-return
@@ -619,7 +661,9 @@ describe('Form Customer Component Add', async () => {
     });
 
     const inputElementNik = screen.getByPlaceholderText(/Input NIK KTP/i);
-    await fireEvent.blur(inputElementNik);
+    await act(async () => {
+      await fireEvent.blur(inputElementNik);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgNik = screen.getByText('NIK KTP is required');
@@ -629,14 +673,18 @@ describe('Form Customer Component Add', async () => {
     const inputElementKk = screen.getByPlaceholderText(
       /Input Kartu Keluarga number/i,
     );
-    await fireEvent.blur(inputElementKk);
+    await act(async () => {
+      await fireEvent.blur(inputElementKk);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgKk = screen.getByText('Kartu Keluarga number is required');
       expect(errorMsgKk).toBeInTheDocument();
     });
     const inputElementNpwp = screen.getByPlaceholderText(/Input NPWP number/i);
-    await fireEvent.blur(inputElementNpwp);
+    await act(async () => {
+      await fireEvent.blur(inputElementNpwp);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgNpwp = screen.getByText('NPWP number is required');
@@ -646,7 +694,9 @@ describe('Form Customer Component Add', async () => {
 
     // PASAR KUR
     const inputElementKurPasar = screen.getByPlaceholderText(/Cari Pasar/i);
-    await fireEvent.blur(inputElementKurPasar);
+    await act(async () => {
+      await fireEvent.blur(inputElementKurPasar);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgKurPasar = screen.getByText('Pasar is required');
@@ -689,7 +739,7 @@ describe('Form Customer Component Add', async () => {
       },
     };
     render(
-      <React.Suspense fallback>
+      <React.Suspense>
         <MockTheme>
           <FormCustomer onClose={() => {}} formData={formData} />
         </MockTheme>
@@ -716,6 +766,7 @@ describe('Form Customer Component Add', async () => {
       // eslint-disable-next-line no-promise-executor-return
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
+    Element.prototype.scrollIntoView = vi.fn();
     const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
     await fireEvent.click(nextbuttonElement);
     await act(async () => {
@@ -724,7 +775,9 @@ describe('Form Customer Component Add', async () => {
     });
     // PASAR KUR
     const inputKurPasar = screen.getByTestId('form-customer-kur-pasar');
-    await fireEvent.click(inputKurPasar);
+    await act(async () => {
+      await fireEvent.click(inputKurPasar);
+    });
     const inputPasar = within(inputKurPasar).getByRole('combobox');
     fireEvent.change(inputPasar, { target: { value: 'Pas' } });
     await act(async () => {
@@ -741,7 +794,9 @@ describe('Form Customer Component Add', async () => {
     });
     // LAPAK KUR
     const inputElementKurLapak = screen.getByPlaceholderText(/Cari Lapak/i);
-    await fireEvent.blur(inputElementKurLapak);
+    await act(async () => {
+      await fireEvent.blur(inputElementKurLapak);
+    });
     // await fireEvent.blur(allFormTexts);
     await waitFor(async () => {
       const errorMsgKurLapak = screen.getByText('Lapak is required');
@@ -810,6 +865,7 @@ describe('Form Customer Component Add', async () => {
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
     const nextbuttonElement = screen.getByRole('button', { name: 'Next' });
+    Element.prototype.scrollIntoView = vi.fn();
     await fireEvent.click(nextbuttonElement);
     await act(async () => {
       // eslint-disable-next-line no-promise-executor-return
