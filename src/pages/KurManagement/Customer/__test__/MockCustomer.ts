@@ -353,3 +353,106 @@ export const MockCreditScore = [
     description: '',
   },
 ];
+
+export const MockArea = [
+  {
+    id: 1,
+    created_at: 1558515788,
+    updated_at: 1676622113,
+    title: 'Pasar BSD Tekno mandiri',
+    description: 'dfsfsf',
+    is_exist: true,
+  },
+  {
+    id: 2,
+    created_at: 1558515788,
+    updated_at: 1676606061,
+    title: 'Pasar Artomoro',
+    description:
+      'Nomor telepon untuk Pasar Bersih Malabar adalah (021) 55656264. Q2. Di manakah lokasi Pasar Bersih Malabar? Pasar Bersih Malabar berlokasi di Jalan Mangga Raya',
+    is_exist: true,
+  },
+];
+
+export const MockMerchantId1 = [
+  {
+    id: 1,
+    created_at: 1586591092,
+    updated_at: 1587882520,
+    merchant_name:
+      'Mantap Pasar Mana Saja Mantap Sekali Sekali Sangat Mantap Mantap Pasar Mana Saja Mantap Sekali Sekal',
+    merchant_description:
+      '\nMaksimal order jam 12 akan di kirim di hari yg sama. Orderan di atas jam 12.00 akan di kirim besok. Trimakasih?\n\nToko Sembako Zaki buka sejak Tahun 2018. Kami menjual berbagai macam kebutuhan pokok. Bumbu masak,aneka snack,minuman dan lain2 nya. Kami berusaha melayani yg terbaik. Selamat berbejanja.. anda puas kami senang?',
+    is_exist: true,
+    is_owner: true,
+    area: {
+      id: 1,
+      created_at: 1558515788,
+      updated_at: 1676622113,
+      title: 'Pasar BSD Tekno mandiri',
+      description: 'dfsfsf',
+      is_exist: true,
+    },
+    area_id: 1,
+  },
+  {
+    id: 152,
+    created_at: 1548082521,
+    updated_at: 2019,
+    merchant_name: 'Asu Juga',
+    merchant_description: 'Vzvbz',
+    is_exist: false,
+    is_owner: false,
+    area: {
+      id: 1,
+      created_at: 1558515788,
+      updated_at: 1676622113,
+      title: 'Pasar BSD Tekno mandiri',
+      description: 'dfsfsf',
+      is_exist: true,
+    },
+    area_id: 1,
+  },
+];
+
+export const MockMerchantId2 = [
+  {
+    id: 155,
+    created_at: 1548141229,
+    updated_at: 1549597445,
+    merchant_name: 'Holver',
+    merchant_description:
+      'Jaket yang sangat trendy bagi anak anak muda jaman now, harus beliii',
+    is_exist: true,
+    is_owner: false,
+    area: {
+      id: 2,
+      created_at: 1558515788,
+      updated_at: 1676606061,
+      title: 'Pasar Artomoro',
+      description:
+        'Nomor telepon untuk Pasar Bersih Malabar adalah (021) 55656264. Q2. Di manakah lokasi Pasar Bersih Malabar? Pasar Bersih Malabar berlokasi di Jalan Mangga Raya',
+      is_exist: true,
+    },
+    area_id: 2,
+  },
+  {
+    id: 162,
+    created_at: 1548228853,
+    updated_at: 1548238994,
+    merchant_name: 'Sate padang jogja jakarta',
+    merchant_description: 'Thanks for',
+    is_exist: true,
+    is_owner: false,
+    area: {
+      id: 2,
+      created_at: 1558515788,
+      updated_at: 1676606061,
+      title: 'Pasar Artomoro',
+      description:
+        'Nomor telepon untuk Pasar Bersih Malabar adalah (021) 55656264. Q2. Di manakah lokasi Pasar Bersih Malabar? Pasar Bersih Malabar berlokasi di Jalan Mangga Raya',
+      is_exist: true,
+    },
+    area_id: 2,
+  },
+];
