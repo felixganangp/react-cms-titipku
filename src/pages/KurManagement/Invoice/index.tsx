@@ -261,9 +261,10 @@ export default function Ivoice() {
       },
     },
     {
-      id: 'status',
+      id: 'paid_status',
       label: 'Status',
       align: 'left',
+      enableSort: true,
       format: (val) => {
         const color = () => {
           let result = '#cecece';
