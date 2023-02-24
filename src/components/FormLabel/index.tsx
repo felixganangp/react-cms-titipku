@@ -25,6 +25,7 @@ const FormControl = (props: FormControlPros) => (
     {props.children}
     {props.helperText && (
       <Typography
+        data-testid="form-label-helpertext"
         sx={{
           mt: '3px',
           display: 'flex',

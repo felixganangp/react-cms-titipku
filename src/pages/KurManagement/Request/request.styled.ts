@@ -34,7 +34,9 @@ export const RowBox = styled(Box)`
   width: fit-content;
 `;
 
-export const InvoiceStatus = styled(Box)<Pick<InvoiceStatusProps, 'status'>>`
+export const InvoiceStatus = styled(Typography)<
+  Pick<InvoiceStatusProps, 'status'>
+>`
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -50,6 +52,7 @@ export const InvoiceStatus = styled(Box)<Pick<InvoiceStatusProps, 'status'>>`
   border-radius: 10px;
   width: 80px;
   font-size: 12px;
+  font-weight: 500;
 `;
 
 export const FilterButton = styled(Button)`

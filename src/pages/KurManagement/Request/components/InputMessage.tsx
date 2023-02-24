@@ -23,7 +23,10 @@ const RefusalReason = ({ onSubmitRefusal, id }: RefusalReasonProps) => {
             onBlur={(e) => setDesc(e.target.value)}
             multiline
             rows={3}
-            inputProps={{ maxLength: 100 }}
+            inputProps={{
+              maxLength: 100,
+              'data-testid': 'input-msg-desc',
+            }}
           />
         </FormLabel>
       </Box>
@@ -38,7 +41,11 @@ const RefusalReason = ({ onSubmitRefusal, id }: RefusalReasonProps) => {
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <Button onClick={() => onSubmitRefusal(id, desc)} disabled={!desc}>
+        <Button
+          data-testid="refusal-request-button"
+          onClick={() => onSubmitRefusal(id, desc)}
+          disabled={!desc}
+        >
           Submit
         </Button>
       </Box>

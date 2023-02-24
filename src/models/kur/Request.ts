@@ -51,8 +51,8 @@ export interface ModifierUser {
 
 export interface KURRequestDetail {
   id: number;
-  created_date: number;
-  updated_date: number;
+  created_at: number;
+  updated_at: number;
   created_by_id: number;
   created_by_type: string;
   created_by: null | ModifierUser;

@@ -50,6 +50,7 @@ function Menu(props: MenuProps) {
       {listOfMenu?.map((menu) =>
         menu?.child?.length === 0 ? (
           <Link
+            data-testid="sidebar-menulist"
             key={menu.id + menu.title}
             style={{
               textDecoration: 'none',
@@ -71,6 +72,7 @@ function Menu(props: MenuProps) {
                 <IconButton>{menu.icon}</IconButton>
               </ListItemIcon>
               <ListItemText
+                data-testid="side-bar-parentmenu"
                 primary={menu.title}
                 primaryTypographyProps={{
                   variant: 'body2',
