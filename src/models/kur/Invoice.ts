@@ -18,7 +18,7 @@ export interface PaymentKURParams extends ListParams {
   due_date_end?: number;
 }
 
-export interface DetailInvoiceParams {
+export interface DetailInvoiceParams extends ListParams {
   include_dpd?: boolean;
   include_payment?: boolean;
   include_admin_fee?: boolean;
