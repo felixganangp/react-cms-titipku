@@ -44,6 +44,7 @@ export default function DetailsInvoice() {
 
   const dispatch = useAppDispatch();
   const invoice = useAppSelector((state) => state.invoice.details);
+  const stateInvoice = useAppSelector((state) => state.invoice);
 
   useEffect(() => {
     if (id) {
@@ -51,28 +52,43 @@ export default function DetailsInvoice() {
     }
   }, []);
 
+  useEffect(() => {
+    if (id) {
+      dispatch(
+        invoiceKurAction.fetchDataDetailList({
+          id,
+          params: stateInvoice.paramsInvoiceDetails,
+        }),
+      );
+    }
+  }, [stateInvoice.paramsInvoiceDetails]);
+
   const headCells: HeadCells<InvoiceKurDetail>[] = [
     {
-      id: 'payment',
+      id: 'id',
       label: 'No. Payment',
       align: 'left',
       width: '150px',
-      // enableSort: true,
+      enableSort: true,
       format: (val) => {
+        if (val.kur_payment_id === 0) {
+          return <span>-</span>;
+        }
         return (
-          <Typography
-            sx={{ color: '#0774d1', cursor: 'pointer' }}
-            onClick={() => navigate(`/kur/payment/${val.id}`)}
+          <Link
+            style={{ color: '#0774d1', textDecoration: 'none' }}
+            to={`/kur/payment/${val.kur_payment_id}`}
           >
             {val.kur_payment.kur_payment_number || '-'}
-          </Typography>
+          </Link>
         );
       },
     },
     {
-      id: 'paid_date',
+      id: 'created_at',
       label: 'Paid Date',
       align: 'left',
+      enableSort: true,
       format: (val) => {
         return (
           <Box>
@@ -107,6 +123,26 @@ export default function DetailsInvoice() {
     return invoice?.kur_invoice_detail.filter((val) => val.is_last)[0];
   };
 
+  const handleChangePage = (value: number) => {
+    dispatch(
+      invoiceKurAction.setParamsDetailList({
+        page: value,
+      }),
+    );
+  };
+
+  const handleChangeSort = (value: {
+    orderBy: string | number;
+    orderType: 'asc' | 'desc';
+  }) => {
+    dispatch(
+      invoiceKurAction.setParamsDetailList({
+        order_by: value.orderBy,
+        page: 1,
+        order_type: value.orderType,
+      }),
+    );
+  };
   // action
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -268,14 +304,16 @@ export default function DetailsInvoice() {
                 <DescDetails
                   title="Request Number"
                   content={
-                    <Box
-                      style={{ color: '#0774d1' }}
-                      onClick={() =>
-                        navigate(`/kur/payment/${invoice?.kur_request.id}`)
-                      }
+                    <Link
+                      style={{
+                        color: '#0774d1',
+                        textDecoration: 'none',
+                      }}
+                      className="link"
+                      to={`/kur/request/${invoice?.kur_request.id}`}
                     >
                       {invoice?.kur_request.kur_request_number}
-                    </Box>
+                    </Link>
                   }
                 />
               </Grid>
@@ -297,7 +335,17 @@ export default function DetailsInvoice() {
         </SubDetailsPagesWrapper>
         <SubDetailsPagesWrapper title="Payment" defaultOpen>
           <Box p="20px">
-            <Table headCells={headCells} data={invoiceDetailList || []} />
+            <Table
+              headCells={headCells}
+              data={stateInvoice.invoiceDetailsList || []}
+              page={stateInvoice.paramsInvoiceDetails.page}
+              totalData={stateInvoice.totalInvoiceDetailList}
+              count={stateInvoice.paramsInvoiceDetails.count}
+              orderBy={stateInvoice.paramsInvoiceDetails.order_by}
+              orderType={stateInvoice.paramsInvoiceDetails.order_type}
+              onChangePage={(val) => handleChangePage(val)}
+              onChangeSort={(val) => handleChangeSort(val)}
+            />
           </Box>
         </SubDetailsPagesWrapper>
       </Box>

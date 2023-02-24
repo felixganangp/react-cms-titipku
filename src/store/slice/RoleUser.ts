@@ -51,12 +51,7 @@ const RoleUserSlice = createSlice({
       };
     },
     setResetParams(state: RoleUserProps) {
-      state.params = {
-        page: 1,
-        count: 10,
-        search: null,
-        account_type: 'cms',
-      };
+      state.params = initialState.params;
     },
     fetchDataSuccess(
       state: RoleUserProps,

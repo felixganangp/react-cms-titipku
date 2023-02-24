@@ -76,12 +76,16 @@ export default function PaymentKURPage() {
   // table
   useEffect(() => {
     dispatch(paymentKURAction.fetchData(payment.params));
-  }, [
-    payment.params.search,
-    payment.params.order_by,
-    payment.params.order_type,
-    payment.params.page,
-  ]);
+  }, [payment.params]);
+
+  const maxDate = () => {
+    const dateToday = new Date();
+    const date = dateToday.getDate();
+    const month = dateToday.getMonth() + 1;
+    const year = dateToday.getFullYear();
+    const newDate = new Date(`${year}-${month}-${date}`);
+    return newDate;
+  };
 
   const handleSearch = (value: string) => {
     dispatch(
@@ -158,12 +162,6 @@ export default function PaymentKURPage() {
         submit_date_start: Math.floor(new Date(value).getTime() / 1000),
       }),
     );
-
-    dispatch(
-      paymentKURAction.setDisplayFilter({
-        submit_date_start: Math.floor(new Date(value).getTime() / 1000),
-      }),
-    );
   };
 
   const handleChangeEndDate = (value: any) => {
@@ -174,29 +172,18 @@ export default function PaymentKURPage() {
         ),
       }),
     );
-    dispatch(
-      paymentKURAction.setDisplayFilter({
-        submit_date_end: Math.floor(
-          new Date(value).setHours(23, 59, 59, 59) / 1000,
-        ),
-      }),
-    );
   };
 
-  const handleApplyFilter = () => {
-    const payloadParams = {
-      ...payment.params,
-      ...payment.stateParams,
-    };
-
-    dispatch(
+  const handleApplyFilter = async () => {
+    await dispatch(
       paymentKURAction.setParams({
         ...payment.params,
         ...payment.stateParams,
         page: 1,
+        order_by: 'created_at',
+        order_type: 'desc',
       }),
     );
-    dispatch(paymentKURAction.fetchData(payloadParams));
   };
 
   const uppercaseWord = (word: string) => {
@@ -216,7 +203,7 @@ export default function PaymentKURPage() {
         submit_date_end: undefined,
         paid_to_bank: undefined,
         order_by: 'created_at',
-        order_type: 'asc',
+        order_type: 'desc',
       }),
     );
     await dispatch(
@@ -226,6 +213,8 @@ export default function PaymentKURPage() {
         submit_date_start: undefined,
         submit_date_end: undefined,
         paid_to_bank: undefined,
+        order_by: 'created_at',
+        order_type: 'desc',
       }),
     );
     await dispatch(
@@ -238,6 +227,8 @@ export default function PaymentKURPage() {
       paymentKURAction.fetchData({
         page: 1,
         count: 10,
+        order_by: 'created_at',
+        order_type: 'desc',
         search: payment.params.search,
         area_ids: undefined,
         kur_user_type_id: undefined,
@@ -627,8 +618,8 @@ export default function PaymentKURPage() {
                               onClick={() => setOpenStartDate(true)}
                             />
                           )}
-                          toolbarPlaceholder="End Date"
-                          maxDate={endDate}
+                          toolbarPlaceholder="Start Date"
+                          maxDate={maxDate()}
                         />
                       </LocalizationProvider>
                     </FormLabel>

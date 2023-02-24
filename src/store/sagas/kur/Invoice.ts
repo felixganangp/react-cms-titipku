@@ -9,6 +9,8 @@ import {
   InvoiceKur,
   PaymentKURParams,
   AdjustInvoice,
+  DetailInvoiceParams,
+  InvoiceKurDetail,
 } from 'models/kur/Invoice';
 
 function* fetchData(params: PayloadAction<PaymentKURParams>) {
@@ -50,6 +52,40 @@ function* fetchDataDetail(params: PayloadAction<{ id: string | number }>) {
     );
 
     yield put(invoiceKurAction.fetchDataDetailSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(invoiceKurAction.failedFetch());
+  }
+}
+
+function* fetchDataDetailList(
+  params: PayloadAction<{ id: string | number; params: DetailInvoiceParams }>,
+) {
+  try {
+    const response: ListResponse<InvoiceKurDetail> = yield call(
+      InvoiceService.getAllInvoiceKurDetailList,
+      params.payload.id,
+      params.payload.params,
+    );
+
+    yield put(invoiceKurAction.fetchDataDetailListSuccess(response));
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
@@ -172,6 +208,10 @@ function* adjustment(body: PayloadAction<AdjustInvoice>) {
 export default function* customerKurSagas() {
   yield takeLatest(invoiceKurAction.fetchData.type, fetchData);
   yield takeLatest(invoiceKurAction.fetchDataDetail.type, fetchDataDetail);
+  yield takeLatest(
+    invoiceKurAction.fetchDataDetailList.type,
+    fetchDataDetailList,
+  );
   yield takeLatest(
     invoiceKurAction.fetchDataConditionInvoice.type,
     fetchDataConditionInvoice,
