@@ -64,7 +64,6 @@ export default function Ivoice() {
   }, [invoice.params]);
 
   useEffect(() => {
-    console.log(invoice.params.search);
     if (invoice.params.search) {
       setSearchValue(invoice.params.search);
     }
@@ -209,9 +208,7 @@ export default function Ivoice() {
       );
     }
 
-    if (searchValue) {
-      newParams.search = searchValue;
-    }
+    newParams.search = searchValue;
     dispatch(invoiceKurAction.setParams(newParams));
   };
 
@@ -255,7 +252,11 @@ export default function Ivoice() {
           return result;
         };
         return (
-          <Status color={color()}>{val.condition.replaceAll('_', ' ')}</Status>
+          <Box display="flex">
+            <Status color={color()}>
+              {val.condition.replaceAll('_', ' ')}
+            </Status>
+          </Box>
         );
       },
     },
@@ -263,7 +264,6 @@ export default function Ivoice() {
       id: 'status',
       label: 'Status',
       align: 'left',
-      width: '160px',
       format: (val) => {
         const color = () => {
           let result = '#cecece';
@@ -277,9 +277,11 @@ export default function Ivoice() {
           return result;
         };
         return (
-          <Status color={color()}>
-            {val.paid_status.replaceAll('_', ' ')}
-          </Status>
+          <Box display="flex">
+            <Status color={color()}>
+              {val.paid_status.replaceAll('_', ' ')}
+            </Status>
+          </Box>
         );
       },
     },
@@ -393,9 +395,14 @@ export default function Ivoice() {
       label: 'Paid Amount',
       align: 'left',
       minWidth: '160px',
-      format: (val) => (
-        <Typography>Rp {digitFormatter.format(val.total_payment)}</Typography>
-      ),
+      format: (val) => {
+        if (val.total_payment === 0) {
+          return <span>-</span>;
+        }
+        return (
+          <Typography>Rp {digitFormatter.format(val.total_payment)}</Typography>
+        );
+      },
     },
     {
       id: 'menu',
@@ -451,6 +458,11 @@ export default function Ivoice() {
                       }}
                       onChange={(event) => {
                         setSearchValue(event.target.value);
+                      }}
+                      onKeyUp={(e) => {
+                        if (e.key === 'Enter') {
+                          handleApplyFilter();
+                        }
                       }}
                     />
                   </Box>
@@ -638,7 +650,10 @@ export default function Ivoice() {
                                 />
                               )}
                               toolbarPlaceholder="Start Date"
-                              maxDate={invoice.displayFilter.delivery_date_end}
+                              maxDate={
+                                invoice.displayFilter.delivery_date_end ||
+                                new Date()
+                              }
                             />
                           </LocalizationProvider>
                         </FormLabel>
@@ -697,6 +712,7 @@ export default function Ivoice() {
                               minDate={
                                 invoice.displayFilter.delivery_date_start
                               }
+                              maxDate={new Date()}
                             />
                           </LocalizationProvider>
                         </FormLabel>
@@ -758,7 +774,10 @@ export default function Ivoice() {
                                 />
                               )}
                               toolbarPlaceholder="Start Date"
-                              maxDate={invoice.displayFilter.invoice_date_end}
+                              maxDate={
+                                invoice.displayFilter.invoice_date_end ||
+                                new Date()
+                              }
                             />
                           </LocalizationProvider>
                         </FormLabel>
@@ -813,6 +832,7 @@ export default function Ivoice() {
                               )}
                               toolbarPlaceholder="End Date"
                               minDate={invoice.displayFilter.invoice_date_start}
+                              maxDate={new Date()}
                             />
                           </LocalizationProvider>
                         </FormLabel>
@@ -874,7 +894,9 @@ export default function Ivoice() {
                                 />
                               )}
                               toolbarPlaceholder="Start Date"
-                              maxDate={invoice.displayFilter.due_date_end}
+                              maxDate={
+                                invoice.displayFilter.due_date_end || new Date()
+                              }
                             />
                           </LocalizationProvider>
                         </FormLabel>
@@ -929,6 +951,7 @@ export default function Ivoice() {
                               )}
                               toolbarPlaceholder="End Date"
                               minDate={invoice.displayFilter.due_date_start}
+                              maxDate={new Date()}
                             />
                           </LocalizationProvider>
                         </FormLabel>

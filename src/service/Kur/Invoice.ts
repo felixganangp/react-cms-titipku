@@ -22,13 +22,10 @@ export const getAllInvoiceKur = (params: PaymentKURParams) =>
     }
   });
 
-export const getAllInvoiceKurDetail = (
-  id: number | string,
-  params: DetailInvoiceParams,
-) =>
+export const getAllInvoiceKurDetail = (id: number | string) =>
   new Promise<PaymentKURParams>(async (resolve, reject) => {
     try {
-      const respon = await http.get(`kur/invoice/${id}`, { params });
+      const respon = await http.get(`kur/invoice/${id}`);
       if (respon.data) {
         resolve(respon.data);
       }
@@ -40,6 +37,23 @@ export const getAllInvoiceKurDetail = (
     }
   });
 
+export const getAllInvoiceKurDetailList = (
+  id: number | string,
+  params: DetailInvoiceParams,
+) =>
+  new Promise<PaymentKURParams>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`kur/invoice/${id}/detail`, { params });
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
 export const getAllStatusInvoice = () =>
   new Promise<PaymentKURParams>(async (resolve, reject) => {
     try {

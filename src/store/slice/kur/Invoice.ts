@@ -5,6 +5,7 @@ import {
   InvoiceKur,
   InvoiceKurDetail,
   PaymentKURParams,
+  DetailInvoiceParams,
 } from 'models/kur/Invoice';
 import { Area } from 'models/Area';
 import { Type } from 'models/kur/Type';
@@ -31,6 +32,9 @@ interface InvoiceInitialProps {
   total?: number;
   params: PaymentKURParams;
   details: InvoiceKur | null;
+  invoiceDetailsList: InvoiceKurDetail[];
+  totalInvoiceDetailList?: number;
+  paramsInvoiceDetails: DetailInvoiceParams;
   displayFilter: DisplayFilter;
   loadingForm: boolean;
 }
@@ -61,6 +65,15 @@ const initialState: InvoiceInitialProps = {
     search: '',
   },
   details: null,
+  invoiceDetailsList: [],
+  totalInvoiceDetailList: 0,
+  paramsInvoiceDetails: {
+    page: 1,
+    count: 5,
+    search: '',
+    include_adjustment: true,
+    include_payment: true,
+  },
   loadingForm: false,
 };
 
@@ -94,8 +107,20 @@ const InvoiceSlice = createSlice({
         ...action.payload,
       };
     },
+    setParamsDetailList(
+      state: InvoiceInitialProps,
+      action: PayloadAction<DetailInvoiceParams>,
+    ) {
+      state.paramsInvoiceDetails = {
+        ...state.paramsInvoiceDetails,
+        ...action.payload,
+      };
+    },
     setResetParams(state: InvoiceInitialProps) {
       state.params = initialState.params;
+    },
+    setResetParamsDetailList(state: InvoiceInitialProps) {
+      state.params = initialState.paramsInvoiceDetails;
     },
     fetchDataDetail(
       state: InvoiceInitialProps,
@@ -109,6 +134,23 @@ const InvoiceSlice = createSlice({
     ) {
       state.loading = false;
       state.details = action.payload.data;
+    },
+    fetchDataDetailList(
+      state: InvoiceInitialProps,
+      action: PayloadAction<{
+        id: string | number;
+        params: DetailInvoiceParams;
+      }>,
+    ) {
+      state.loading = true;
+    },
+    fetchDataDetailListSuccess(
+      state: InvoiceInitialProps,
+      action: PayloadAction<ListResponse<InvoiceKurDetail>>,
+    ) {
+      state.loading = false;
+      state.totalInvoiceDetailList = action.payload.total;
+      state.invoiceDetailsList = action.payload.data || [];
     },
     fetchDataStatusInvoice() {},
     fetchDataConditionInvoice() {},
@@ -134,18 +176,7 @@ const InvoiceSlice = createSlice({
       };
     },
     setResetDisplayFilter(state: InvoiceInitialProps) {
-      state.displayFilter = {
-        areas: [],
-        type: null,
-        condition: null,
-        status: null,
-        delivery_date_start: null,
-        delivery_date_end: null,
-        invoice_date_start: null,
-        invoice_date_end: null,
-        due_date_start: null,
-        due_date_end: null,
-      };
+      state.displayFilter = initialState.displayFilter;
     },
     adjust(state: InvoiceInitialProps, action: PayloadAction<AdjustInvoice>) {
       state.loadingForm = true;
