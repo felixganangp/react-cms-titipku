@@ -32,6 +32,7 @@ export default function MenuList(props: MenuListProps) {
         onClick: (e: React.MouseEvent<HTMLElement>) => handleClick('open', e),
       })}
       <Menu
+        data-testid="basic-menu"
         id="basic-menu"
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}

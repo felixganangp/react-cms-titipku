@@ -66,22 +66,25 @@ export default function RequestKURDetails() {
       label: 'Image',
       align: 'left',
       width: '130px',
-      format: (val: any) => (
-        <Box
-          data-testid={`req-dtl-zoom-img-${val.id}`}
-          onClick={() => handleZoomImage(true, val.image_filepath)}
-        >
-          <img
-            src={val.image_filepath}
-            onError={({ currentTarget }) => {
-              currentTarget.onerror = null;
-              currentTarget.src = noImage;
-            }}
-            alt="statement img"
-            style={{ height: '80px', width: '80px' }}
-          />
-        </Box>
-      ),
+      format: (val: any) => {
+        return (
+          <Box
+            data-testid={`req-dtl-zoom-img-${val.id}`}
+            onClick={() => handleZoomImage(true, val.image_filepath)}
+          >
+            <img
+              data-testid={`req-det-img-${val.id}`}
+              src={val.image_filepath}
+              onError={({ currentTarget }) => {
+                currentTarget.onerror = null;
+                currentTarget.src = noImage;
+              }}
+              alt="statement img"
+              style={{ height: '80px', width: '80px' }}
+            />
+          </Box>
+        );
+      },
     },
     {
       id: 'amount',
@@ -204,6 +207,7 @@ export default function RequestKURDetails() {
                   alignItems="center"
                 >
                   <Button
+                    data-testid="req-dtl-reject-btn"
                     variant="contained"
                     color="error"
                     style={{
@@ -223,6 +227,7 @@ export default function RequestKURDetails() {
                     Reject
                   </Button>
                   <Button
+                    data-testid="req-dtl-approve-btn"
                     style={{
                       padding: '8px 30px',
                     }}
@@ -446,7 +451,6 @@ export default function RequestKURDetails() {
             <Table
               data-testid="req-detail-table"
               data={details.detailsTableData || []}
-              selected={[]}
               count={details.detailParams.count}
               headCells={headCell}
               page={details.detailParams.page}
@@ -470,7 +474,6 @@ export default function RequestKURDetails() {
         onClose={() => setModalImage({ open: false, filePath: null })}
       >
         <Box
-          data-testid="req-dtl-zoom-img"
           position="absolute"
           maxHeight="70vh"
           maxWidth="90vw"

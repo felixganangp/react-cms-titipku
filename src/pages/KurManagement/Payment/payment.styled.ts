@@ -67,6 +67,7 @@ export const CreditScore = styled(Box)<Pick<CreditScoreProps, 'status'>>`
   align-items: center;
   padding: 6px 10px;
   color: #fff;
+  text-transform: capitalize;
   background-color: ${(p) =>
     p.status === 'Lancar'
       ? '#008e58'

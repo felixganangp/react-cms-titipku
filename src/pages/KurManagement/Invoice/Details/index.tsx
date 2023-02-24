@@ -56,7 +56,8 @@ export default function DetailsInvoice() {
       id: 'payment',
       label: 'No. Payment',
       align: 'left',
-      enableSort: true,
+      width: '150px',
+      // enableSort: true,
       format: (val) => {
         return (
           <Typography
@@ -92,12 +93,19 @@ export default function DetailsInvoice() {
       format: (val) => {
         return (
           <Typography fontSize="14px">
-            Rp {digitFormatter.format(val.kur_payment.amount || 0)}
+            Rp{' '}
+            {val.type === 'payment'
+              ? digitFormatter.format(val.kur_payment.amount || 0)
+              : digitFormatter.format(val.amount)}
           </Typography>
         );
       },
     },
   ];
+
+  const getLastInvoiceDetail = () => {
+    return invoice?.kur_invoice_detail.filter((val) => val.is_last)[0];
+  };
 
   // action
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -111,7 +119,24 @@ export default function DetailsInvoice() {
 
   // adjust invoice
   const adjustModal = useModal();
+  const [finalOutstanding, setFinalOutstanding] = useState<number>();
 
+  useEffect(() => {
+    if (invoice) {
+      // eslint-disable-next-line array-callback-return
+      invoice.kur_invoice_detail.map((history) => {
+        if (history.is_last) setFinalOutstanding(history.outstanding_amount);
+      });
+    }
+  }, [invoice]);
+
+  const invoiceDetailList =
+    invoice?.kur_invoice_detail !== null
+      ? invoice?.kur_invoice_detail.filter(
+          (val: InvoiceKurDetail) =>
+            val.type === 'adjustment' || val.type === 'payment',
+        )
+      : [];
   return (
     <div>
       <Box p="20px" bgcolor="#F5F7FA">
@@ -130,7 +155,7 @@ export default function DetailsInvoice() {
                     startIcon={<ArrowBackIosIcon />}
                     onClick={() => navigate(-1)}
                   >
-                    <TitlePage>Details</TitlePage>
+                    <TitlePage>{invoice?.kur_invoice_number}</TitlePage>
                   </BackButton>
                 </Box>
                 <Button
@@ -226,27 +251,53 @@ export default function DetailsInvoice() {
               <Grid item xs={6} md={3}>
                 <DescDetails
                   title="Invoice Amount"
-                  content={`Rp ${digitFormatter.format(
-                    invoice?.total_payment || 0,
-                  )}`}
+                  content={
+                    invoice
+                      ? `Rp ${digitFormatter.format(
+                          invoice.request_amount +
+                            invoice.total_admin_fee +
+                            invoice.total_dpd +
+                            invoice.total_adjustment,
+                        )}`
+                      : 'Rp. 0.00'
+                  }
                 />
               </Grid>
               <Grid item xs={6} md={3} />
               <Grid item xs={6} md={3}>
                 <DescDetails
                   title="Request Number"
-                  content={invoice?.kur_request.kur_request_number}
+                  content={
+                    <Box
+                      style={{ color: '#0774d1' }}
+                      onClick={() =>
+                        navigate(`/kur/payment/${invoice?.kur_request.id}`)
+                      }
+                    >
+                      {invoice?.kur_request.kur_request_number}
+                    </Box>
+                  }
+                />
+              </Grid>
+              <Grid item xs={6} md={3} />
+              <Grid item xs={6} md={3}>
+                <DescDetails
+                  title="Outstanding Amount"
+                  content={
+                    invoice
+                      ? `Rp ${digitFormatter.format(
+                          getLastInvoiceDetail()?.outstanding_amount || 0,
+                        )}`
+                      : 'Rp. 0.00'
+                  }
                 />
               </Grid>
             </Grid>
           </Box>
         </SubDetailsPagesWrapper>
-        <SubDetailsPagesWrapper title="Settlement" defaultOpen>
+        <SubDetailsPagesWrapper title="Payment" defaultOpen>
           <Box p="20px">
-            <Table
-              headCells={headCells}
-              data={invoice?.kur_invoice_Detail || []}
-            />
+            <Table headCells={headCells} data={invoiceDetailList || []} />
           </Box>
         </SubDetailsPagesWrapper>
       </Box>
@@ -258,6 +309,7 @@ export default function DetailsInvoice() {
         <AdjustInvoiceModal
           kurUserId={invoice?.kur_request.kur_user.id || 0}
           id={invoice?.id || 0}
+          outstanding={finalOutstanding || 0}
           invoiceNumber={invoice?.kur_invoice_number || ''}
           onClose={adjustModal.closeModal}
         />

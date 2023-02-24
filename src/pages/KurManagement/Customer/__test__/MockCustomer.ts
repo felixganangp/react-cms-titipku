@@ -176,15 +176,15 @@ export const MockLisCustomers = [
     nobu_account_number: '13123',
     join_date: 1675746654,
     kur_user_status: {
-      id: 1,
+      id: 3,
       created_at: 1674437124,
       updated_at: 0,
       created_by_id: 1,
       created_by_type: 'admin',
       updated_by_id: 1,
       updated_by_type: 'admin',
-      name: 'Active',
-      description: 'Active',
+      name: 'Hold',
+      description: 'Hold',
     },
     kur_user_type: {
       id: 1,

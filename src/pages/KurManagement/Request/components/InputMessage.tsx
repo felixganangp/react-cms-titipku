@@ -14,7 +14,6 @@ const RefusalReason = ({ onSubmitRefusal, id }: RefusalReasonProps) => {
       <Box sx={{ padding: '24px', margin: 0 }}>
         <FormLabel text="Description">
           <TextField
-            data-testid="input-msg-desc"
             type="text"
             name="description"
             placeholder="Input refusal reason"
@@ -24,7 +23,10 @@ const RefusalReason = ({ onSubmitRefusal, id }: RefusalReasonProps) => {
             onBlur={(e) => setDesc(e.target.value)}
             multiline
             rows={3}
-            inputProps={{ maxLength: 100 }}
+            inputProps={{
+              maxLength: 100,
+              'data-testid': 'input-msg-desc',
+            }}
           />
         </FormLabel>
       </Box>

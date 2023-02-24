@@ -1,12 +1,12 @@
+/* eslint-disable no-promise-executor-return */
 import { Suspense } from 'react';
-import { expect, test } from 'vitest';
+import { expect } from 'vitest';
 import {
   cleanup,
-  findAllByTestId,
   fireEvent,
   render,
   screen,
-  waitFor,
+  within,
 } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { act } from 'react-dom/test-utils';
@@ -14,12 +14,16 @@ import { Provider } from 'react-redux';
 import { store } from 'store';
 import { requestKURAction } from 'store/slice/kur/Request';
 import MockTheme from 'utils/MockTheme';
+import noImage from 'assets/no-image.svg';
 import RequestKURDetails from '../Details/index';
 import RefusalReason from '../components/InputMessage';
 import {
   MockReqDetailAccept,
   MockReqDetailPending,
   MockReqDetailRejected,
+  TableDetails,
+  TableDetailsNoImage,
+  TableDetailsPaging,
 } from './MockRequest';
 
 describe('request detail test', async () => {
@@ -30,6 +34,19 @@ describe('request detail test', async () => {
         status: 'ok',
         message: 'Retrieved successfully',
         data,
+      }),
+    ),
+  );
+
+  const mockTable = vi.fn((data) =>
+    store.dispatch(
+      requestKURAction.fetchDetailsTableSuccess({
+        timestamp: 1675988503,
+        status: 'ok',
+        message: 'Retrieved successfully',
+        data,
+        count: 12,
+        total: 12,
       }),
     ),
   );
@@ -45,6 +62,7 @@ describe('request detail test', async () => {
   });
   afterEach(() => {
     cleanup();
+    vi.clearAllMocks();
   });
 
   // header
@@ -52,176 +70,118 @@ describe('request detail test', async () => {
     await act(() => {
       mockRequestDetail(MockReqDetailAccept);
     });
-    const reqNumber = await screen.getByTestId('request-kur-dtl-req-number');
+    const reqNumber = screen.getByTestId('request-kur-dtl-req-number');
     expect(reqNumber).toBeInTheDocument();
   });
-  // table
-  it('show details table', async () => {
-    const table = screen.findByTestId('req-detail-table');
-    waitFor(() => expect(table).toBeInTheDocument());
+  it('reject request', async () => {
+    await act(() => {
+      mockRequestDetail(MockReqDetailPending);
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    // check reject & approve button is shown on the page
+    const actionBox = screen.getByTestId('request-kur-dtl-action-box');
+    expect(actionBox).toBeTruthy();
+    const rejectButton = screen.getByTestId('req-dtl-reject-btn');
+    expect(rejectButton).toBeTruthy();
+    // click reject button
+    fireEvent.click(rejectButton);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    // refusal dialog is shown
+    const refusalFormDialog = screen.findByRole('presentation');
+    expect(refusalFormDialog).toBeTruthy();
+    // check button is disabled if description field is empty
+    const submitButton = screen.getByTestId('refusal-request-button');
+    expect(submitButton).toHaveAttribute('disabled');
+    // fill the form
+    const descField = screen.getByTestId('input-msg-desc');
+    fireEvent.change(descField, { target: { value: 'reject request' } });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    // check button isn't disable anymore, and submit form
+    expect(submitButton).not.toHaveAttribute('disabled');
+    fireEvent.click(submitButton);
   });
+  it('approve request', async () => {
+    await act(() => {
+      mockRequestDetail(MockReqDetailPending);
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    // check reject & approve button is shown on the page
+    const actionBox = screen.getByTestId('request-kur-dtl-action-box');
+    expect(actionBox).toBeTruthy();
+    const approveButton = screen.getByTestId('req-dtl-approve-btn');
+    expect(approveButton).toBeTruthy();
+
+    // click approve button
+    fireEvent.click(approveButton);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    // load newest data
+    await act(() => {
+      mockRequestDetail(MockReqDetailAccept);
+    });
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    expect(actionBox).not.toBeVisible();
+  });
+  // table
   it('show detail table data', async () => {
-    waitFor(() =>
-      expect(screen.findAllByTestId(/list-table-/i).then((a) => a.length)).toBe(
-        3,
-      ),
-    );
+    await act(() => {
+      mockTable(TableDetails);
+    });
+    const table = await screen.findAllByTestId(/list-table-/i);
+    expect(table.length).toBe(1);
   });
   it('show image on table', async () => {
-    waitFor(() =>
-      expect(screen.findByTestId('req-dtl-zoom-img-30')).toBeInTheDocument(),
-    );
+    await act(() => {
+      mockTable(TableDetails);
+    });
+    const image = screen.getByTestId('req-dtl-zoom-img-28');
+    expect(image).toBeInTheDocument();
   });
-  it('show right amount', async () => {
-    waitFor(async () =>
-      expect(await screen.findByTestId('req-dtl-amount-30')).toHaveStyle(
-        'color: #008E58',
-      ),
-    );
-    waitFor(async () =>
-      expect(await screen.findByTestId('req-dtl-amount-30')).toHaveTextContent(
-        'Rp 20,000.00',
-      ),
-    );
+  it('show error image if image is empty', async () => {
+    await act(() => {
+      mockTable(TableDetailsNoImage);
+    });
+    const image = screen.getByRole('img');
+    fireEvent.error(image);
+    expect(image).toHaveAttribute('src', '/src/assets/no-image.svg');
   });
-  it('show - if description is empty', async () => {
-    waitFor(async () =>
-      expect(await screen.findByTestId('req-dtl-desc-30')).toHaveTextContent(
-        '-',
-      ),
-    );
+  it('show zoomed image after image is clicked', async () => {
+    await act(() => {
+      mockTable(TableDetails);
+    });
+    const image = screen.getByTestId('req-dtl-zoom-img-28');
+    fireEvent.click(image);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    const imageModal = screen.getByRole('presentation');
+    expect(imageModal).toBeTruthy();
+
+    fireEvent.click(imageModal);
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+  });
+  it('change page', async () => {
+    await act(() => {
+      mockTable(TableDetails);
+    });
+    const pagination = screen.getByLabelText('pagination navigation');
+    const buttonPage = within(pagination).getByLabelText('page 1');
+
+    fireEvent.click(buttonPage);
+    expect(buttonPage).toHaveClass('Mui-selected');
   });
 });
-
-// it('show accept and reject button when request status is pending', async () => {
-//   await act(() => {
-//     mockRequestDetail(MockReqDetailPending);
-//   });
-//   await act(async () => {
-//     // eslint-disable-next-line no-promise-executor-return
-//     await new Promise((resolve) => setTimeout(resolve, 1000));
-//   });
-//   expect(screen.findByTestId('request-kur-dtl-action-box')).toHaveStyle(
-//     'display: flex',
-//   );
-//   vi.clearAllMocks();
-// });
-// test('didnt show accept and reject button if status is accepted', async () => {
-//   await act(() => {
-//     mockRequestDetail(MockReqDetailAccept);
-//   });
-//   await act(async () => {
-//     // eslint-disable-next-line no-promise-executor-return
-//     await new Promise((resolve) => setTimeout(resolve, 1000));
-//   });
-//   waitFor(() =>
-//     expect(screen.findByTestId('request-kur-dtl-action-box')).toHaveStyle(
-//       'display: none',
-//     ),
-//   );
-//   vi.clearAllMocks();
-// });
-
-// it('display container basic info', async () => {
-//   const basicInfoContent = await screen.findByTestId('requestdtl-basic-info');
-//   expect(basicInfoContent).toBeInTheDocument();
-// });
-// it('show customer name', async () => {
-//   await act(() => {
-//     mockRequestDetail(MockReqDetailAccept);
-//   });
-//   const custName = screen.findByTestId('req-kur-dtl-cust-name');
-//   waitFor(() =>
-//     expect(custName).toHaveTextContent(MockReqDetailAccept.kur_user.name),
-//   );
-//   vi.clearAllMocks();
-// });
-// it('show red request status if status is rejected', async () => {
-//   await act(() => {
-//     mockRequestDetail(MockReqDetailRejected);
-//   });
-//   const statusBox = await screen.getByTestId('request-kur-dtl-status');
-//   waitFor(() => expect(statusBox).toBeInTheDocument());
-//   waitFor(() => expect(statusBox).toHaveStyle("background-color: '#C10000'"));
-//   vi.clearAllMocks();
-// });
-
-// test('show green request status if status is accepted', async () => {
-//   await act(() => {
-//     mockRequestDetail(MockReqDetailAccept);
-//   });
-//   const status = await screen.findByTestId('request-kur-dtl-status');
-//   waitFor(() => expect(status).toBeInTheDocument());
-//   waitFor(() => expect(status).toHaveStyle("background-color: '#008E58'"));
-// });
-// test('show yellow request status if status is pending', async () => {
-//   await act(() => {
-//     mockRequestDetail(MockReqDetailPending);
-//   });
-//   const status = await screen.findByTestId('request-kur-dtl-status');
-//   waitFor(() => expect(status).toBeInTheDocument());
-//   waitFor(() => expect(status).toHaveStyle("background-color: '#FF8F00'"));
-// });
-
-// customer basic info component
-// test('displays customer data component', async () => {
-// const customerData = render(
-//   <Provider store={store}>
-//     <BrowserRouter>
-//       <CustomerData
-//         icon={<Person2Outlined />}
-//         fieldName="unit test name"
-//         fieldContent="unit test content"
-//       />
-//     </BrowserRouter>
-//   </Provider>,
-// );
-// waitFor(() =>
-//   expect(customerData.findByTestId('customer-data-name')).toHaveTextContent(
-//     'unit test name',
-//   ),
-// );
-// waitFor(() =>
-//   expect(
-//     customerData.findByTestId('customer-data-content'),
-//   ).toHaveTextContent('unit test content'),
-// );
-// customerData.unmount();
-// });
-
-// test('modal reject is shown', async () => {
-//   const inputRefusalMessage = render(
-//     <Provider store={store}>
-//       <BrowserRouter>
-//         <RequestKURDetails />
-//       </BrowserRouter>
-//     </Provider>,
-//   );
-//   const rejectButton = await screen.findByTestId('CloseIcon');
-//   expect(rejectButton).toBeInTheDocument();
-//   await beforeAll(() => fireEvent.click(rejectButton));
-//   // const modal = screen.getByTestId('requestdtl-modal-reject');
-//   // expect(modal).toBeInTheDocument();
-//   inputRefusalMessage.unmount();
-// });
-// it('disabled submit reject button', async () => {
-//   const id = 1;
-//   const reason = 'late';
-//   const onSubmit = (rejectid: number, rejectedReason: string) =>
-//     console.log(id, rejectedReason);
-//   const inputRefusalMessage = render(
-//     <Provider store={store}>
-//       <BrowserRouter>
-//         <RefusalReason id={1} onSubmitRefusal={() => onSubmit(id, reason)} />
-//       </BrowserRouter>
-//     </Provider>,
-//   );
-//   const button = await screen.findByTestId('refusal-request-button');
-//   expect(button).toHaveProperty('disabled');
-//   inputRefusalMessage.unmount();
-// });
-
-// refuse request pop up
-// it('description textfield', async () => {
-//   const desc = screen.getByTestId('refusal-req-desc');
-// });
+// yang belum -> click" button

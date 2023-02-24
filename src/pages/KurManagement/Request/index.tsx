@@ -68,17 +68,11 @@ export default function RequestKURPage() {
   // table
   useEffect(() => {
     dispatch(requestKURAction.fetchData(request.params));
-  }, [
-    // request.params.search,
-    request.params.order_by,
-    request.params.order_type,
-    request.params.page,
-    request.params.count,
-  ]);
+  }, [request.params]);
 
   const handleSearch = (value: any) => {
     dispatch(
-      requestKURAction.setParams({
+      requestKURAction.setDisplayParams({
         page: 1,
         search: value.value,
       }),
@@ -108,7 +102,7 @@ export default function RequestKURPage() {
 
   const handleChangeType = (value: any) => {
     dispatch(
-      requestKURAction.setParams({
+      requestKURAction.setDisplayParams({
         page: 1,
         kur_user_type_id: value ? value?.id : null,
       }),
@@ -124,7 +118,7 @@ export default function RequestKURPage() {
     const areasId: (number | undefined)[] = [];
     if (value.length > 0) value.map((item: Area) => areasId.push(item.id));
     dispatch(
-      requestKURAction.setParams({
+      requestKURAction.setDisplayParams({
         page: 1,
         area_ids: areasId.length > 0 ? areasId.join(',') : undefined,
       }),
@@ -138,7 +132,7 @@ export default function RequestKURPage() {
 
   const handleChangeStartDate = (value: any) => {
     dispatch(
-      requestKURAction.setParams({
+      requestKURAction.setDisplayParams({
         page: 1,
         submit_date_start: Math.floor(new Date(value).getTime() / 1000),
       }),
@@ -147,7 +141,7 @@ export default function RequestKURPage() {
 
   const handleChangeEndDate = (value: any) => {
     dispatch(
-      requestKURAction.setParams({
+      requestKURAction.setDisplayParams({
         page: 1,
         submit_date_end: Math.floor(
           new Date(value).setHours(23, 59, 59, 59) / 1000,
@@ -156,8 +150,14 @@ export default function RequestKURPage() {
     );
   };
 
-  const handleApplyFilter = () => {
-    dispatch(requestKURAction.fetchData(request.params));
+  const handleApplyFilter = async () => {
+    await dispatch(
+      requestKURAction.setParams({
+        ...request.params,
+        ...request.displayParams,
+      }),
+    );
+    // await dispatch(requestKURAction.fetchData(request.displayParams));
   };
 
   const handleResetFilter = async () => {
@@ -165,6 +165,16 @@ export default function RequestKURPage() {
     setEndDate(null);
     await dispatch(
       requestKURAction.setParams({
+        page: 1,
+        area_ids: undefined,
+        kur_user_type_id: undefined,
+        submit_date_start: undefined,
+        submit_date_end: undefined,
+        search: '',
+      }),
+    );
+    await dispatch(
+      requestKURAction.setDisplayParams({
         page: 1,
         area_ids: undefined,
         kur_user_type_id: undefined,
@@ -310,12 +320,14 @@ export default function RequestKURPage() {
                       onClick: () => {
                         navigate(`/kur/request/${val.id}`);
                       },
+                      dataId: `req-list-act-details-${val.id}`,
                     },
                     {
                       label: 'Approve',
                       onClick: () => {
                         handleApproveRequest(val.id);
                       },
+                      dataId: `req-list-act-approve-${val.id}`,
                     },
                     {
                       label: 'Reject',
@@ -323,6 +335,7 @@ export default function RequestKURPage() {
                         setSelected(val);
                         rejectModal.openModal();
                       },
+                      dataId: `req-list-act-reject-${val.id}`,
                     },
                   ]
                 : [
@@ -331,6 +344,7 @@ export default function RequestKURPage() {
                       onClick: () => {
                         navigate(`/kur/request/${val.id}`);
                       },
+                      dataId: `req-list-act-details-${val.id}`,
                     },
                   ]
             }
@@ -370,8 +384,8 @@ export default function RequestKURPage() {
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
                     fullWidth
                     data-testid="search-request-kur"
-                    defaultValue={request.params.search}
-                    // value={request.params.search}
+                    defaultValue={request.displayParams.search}
+                    value={request.displayParams.search}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
@@ -503,9 +517,10 @@ export default function RequestKURPage() {
                             setOpenStartDate(true);
                           }}
                           value={
-                            request.params.submit_date_start
+                            request.displayParams.submit_date_start
                               ? new Date(
-                                  request.params.submit_date_start * 1000,
+                                  request.displayParams.submit_date_start *
+                                    1000,
                                 )
                               : null
                           }
@@ -566,8 +581,10 @@ export default function RequestKURPage() {
                             setOpenEndDate(true);
                           }}
                           value={
-                            request.params.submit_date_end
-                              ? new Date(request.params.submit_date_end * 1000)
+                            request.displayParams.submit_date_end
+                              ? new Date(
+                                  request.displayParams.submit_date_end * 1000,
+                                )
                               : null
                           }
                           inputFormat="DD/MM/YYYY"

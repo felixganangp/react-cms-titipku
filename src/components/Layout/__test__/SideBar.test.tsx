@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from 'store';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
+import ManageAccountIcon from '@mui/icons-material/ManageAccountsOutlined';
 import ChildrenMenu from '../SideBar/ChildMenu';
 
 afterEach(() => {
@@ -21,6 +22,44 @@ const menuList = [
         id: 52,
         title: 'Request',
         path: '/kur/request',
+        child: [],
+      },
+      {
+        id: 53,
+        title: 'Payment',
+        path: '/kur/payment',
+        child: [],
+      },
+      {
+        id: 54,
+        title: 'Invoice Management',
+        path: '/kur/invoice',
+        child: [],
+      },
+      {
+        id: 51,
+        title: 'Customer',
+        path: '/kur/customer',
+        child: [],
+      },
+    ],
+  },
+  {
+    id: 47,
+    title: 'Admin Panel',
+    path: '',
+    icon: <ManageAccountIcon />,
+    child: [
+      {
+        id: 49,
+        title: 'Role User',
+        path: '/role-user',
+        child: [],
+      },
+      {
+        id: 50,
+        title: 'Role Access',
+        path: '/role-access',
         child: [],
       },
     ],
