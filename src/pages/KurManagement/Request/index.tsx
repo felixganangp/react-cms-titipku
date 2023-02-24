@@ -320,14 +320,14 @@ export default function RequestKURPage() {
                       onClick: () => {
                         navigate(`/kur/request/${val.id}`);
                       },
-                      dataId: `req-list-act-details-${val.id}`,
+                      dataId: `req-list-act-details`,
                     },
                     {
                       label: 'Approve',
                       onClick: () => {
                         handleApproveRequest(val.id);
                       },
-                      dataId: `req-list-act-approve-${val.id}`,
+                      dataId: `req-list-act-approve`,
                     },
                     {
                       label: 'Reject',
@@ -335,7 +335,7 @@ export default function RequestKURPage() {
                         setSelected(val);
                         rejectModal.openModal();
                       },
-                      dataId: `req-list-act-reject-${val.id}`,
+                      dataId: `req-list-act-reject`,
                     },
                   ]
                 : [
@@ -344,7 +344,7 @@ export default function RequestKURPage() {
                       onClick: () => {
                         navigate(`/kur/request/${val.id}`);
                       },
-                      dataId: `req-list-act-details-${val.id}`,
+                      dataId: `req-list-act-details`,
                     },
                   ]
             }

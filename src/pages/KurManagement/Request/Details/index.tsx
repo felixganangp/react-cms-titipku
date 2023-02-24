@@ -69,11 +69,11 @@ export default function RequestKURDetails() {
       format: (val: any) => {
         return (
           <Box
-            data-testid={`req-dtl-zoom-img-${val.id}`}
+            data-testid="req-dtl-zoom-img"
             onClick={() => handleZoomImage(true, val.image_filepath)}
           >
             <img
-              data-testid={`req-det-img-${val.id}`}
+              data-testid="req-det-img"
               src={val.image_filepath}
               onError={({ currentTarget }) => {
                 currentTarget.onerror = null;
@@ -92,7 +92,7 @@ export default function RequestKURDetails() {
       align: 'left',
       width: '230px',
       format: (val: any) => (
-        <Typography color="#008E58" data-testid={`req-dtl-amount-${val.id}`}>
+        <Typography color="#008E58" data-testid="req-dtl-amount">
           Rp {digitFormatter.format(val.amount)}
         </Typography>
       ),
@@ -103,7 +103,7 @@ export default function RequestKURDetails() {
       align: 'left',
       format: (val: any) => (
         <Box>
-          <Typography data-testid={`req-dtl-desc-${val.id}`}>
+          <Typography data-testid="req-dtl-desc">
             {val.description || '-'}
           </Typography>
         </Box>
