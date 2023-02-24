@@ -361,7 +361,7 @@ export const MockRequestList = [
 
 export const MockRequestListPending = [
   {
-    id: 24,
+    id: 59,
     created_at: 1675968728,
     updated_at: 1676025436,
     created_by_id: 1072,
@@ -722,7 +722,7 @@ export const MockRequestListApproved = [
 ];
 
 export const MockReqDetailAccept = {
-  id: 51,
+  id: 58,
   created_at: 1676600157,
   updated_at: 0,
   created_by_id: 302,

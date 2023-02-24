@@ -11,7 +11,10 @@ const RefusalReason = ({ onSubmitRefusal, id }: RefusalReasonProps) => {
   const [desc, setDesc] = useState<string>('');
   return (
     <div>
-      <Box sx={{ padding: '24px', margin: 0 }}>
+      <Box
+        sx={{ padding: '24px', margin: 0 }}
+        data-testid="request-reject-modal"
+      >
         <FormLabel text="Description">
           <TextField
             type="text"
