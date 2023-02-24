@@ -73,7 +73,6 @@ export default function PaymentKURPage() {
       setEndDate(new Date(payment.params.submit_date_end * 1000));
   }, []);
 
-  // table
   useEffect(() => {
     dispatch(paymentKURAction.fetchData(payment.params));
   }, [payment.params]);
