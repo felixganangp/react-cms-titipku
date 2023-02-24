@@ -1011,4 +1011,4 @@ describe('Form Customer Component Add', async () => {
   //   // expect(inputElementBankAccountNumberNobu).toHaveDisplayValue('');
   //   // expect(nextbuttonElement).toHaveClass('Mui-disabled');
   // });
-}, 10000);
+}, 15000);

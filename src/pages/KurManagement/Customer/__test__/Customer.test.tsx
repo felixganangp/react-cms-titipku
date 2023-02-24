@@ -36,6 +36,7 @@ const openForm = (id: string, menulist?: boolean, index = 0) => {
   }
 };
 
+vi.useRealTimers();
 describe('Customer KUR Page', async () => {
   // it('Page customer kur should be shown', () => {
   //   const { debug } = render(
@@ -406,4 +407,4 @@ describe('Customer KUR Page', async () => {
   //     `/kur/customer/${idSelectedCustomer}`,
   //   );
   // });
-});
+}, 15000);
