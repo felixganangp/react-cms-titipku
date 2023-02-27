@@ -23,8 +23,8 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { roleAccessAction } from 'store/slice/RoleAccess';
 import { RoleAccess } from 'models/RoleAccess';
 
-import RoleAccessForm from './Form/Form';
 import DeleteConfirm from './components/DeleteConfirm';
+import RoleAccessFormPage from './Form/Form';
 
 export default function RoleAccesPage() {
   const navigate = useNavigate();
@@ -142,7 +142,7 @@ export default function RoleAccesPage() {
 
   return (
     <div>
-      <RoleAccessForm
+      <RoleAccessFormPage
         open={open}
         onClose={() => setOpen(!open)}
         editValue={editValue}
