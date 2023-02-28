@@ -5,12 +5,12 @@ name: CMS CI
 
 on:
   push:
-    branches: [ "development" ]
+    branches: [ "master" ]
 
 jobs:
   build:
 
-    runs-on: self-hosted
+    runs-on: [self-hosted, PRODUCTION]
 
     strategy:
       matrix:
