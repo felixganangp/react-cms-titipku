@@ -47,7 +47,6 @@ const initialState: PaymentKURProps = {
   stateParams: {
     page: 1,
     count: 10,
-    search: '',
   },
   displayFilter: {
     areas: [],

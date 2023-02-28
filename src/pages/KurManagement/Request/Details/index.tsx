@@ -66,19 +66,25 @@ export default function RequestKURDetails() {
       label: 'Image',
       align: 'left',
       width: '130px',
-      format: (val: any) => (
-        <Box onClick={() => handleZoomImage(true, val.image_filepath)}>
-          <img
-            src={val.image_filepath}
-            onError={({ currentTarget }) => {
-              currentTarget.onerror = null;
-              currentTarget.src = noImage;
-            }}
-            alt="statement img"
-            style={{ height: '80px', width: '80px' }}
-          />
-        </Box>
-      ),
+      format: (val: any) => {
+        return (
+          <Box
+            data-testid="req-dtl-zoom-img"
+            onClick={() => handleZoomImage(true, val.image_filepath)}
+          >
+            <img
+              data-testid="req-det-img"
+              src={val.image_filepath}
+              onError={({ currentTarget }) => {
+                currentTarget.onerror = null;
+                currentTarget.src = noImage;
+              }}
+              alt="statement img"
+              style={{ height: '80px', width: '80px' }}
+            />
+          </Box>
+        );
+      },
     },
     {
       id: 'amount',
@@ -86,7 +92,7 @@ export default function RequestKURDetails() {
       align: 'left',
       width: '230px',
       format: (val: any) => (
-        <Typography color="#008E58">
+        <Typography color="#008E58" data-testid="req-dtl-amount">
           Rp {digitFormatter.format(val.amount)}
         </Typography>
       ),
@@ -97,7 +103,9 @@ export default function RequestKURDetails() {
       align: 'left',
       format: (val: any) => (
         <Box>
-          <Typography>{val.description || '-'}</Typography>
+          <Typography data-testid="req-dtl-desc">
+            {val.description || '-'}
+          </Typography>
         </Box>
       ),
     },
@@ -178,6 +186,7 @@ export default function RequestKURDetails() {
                   <DetailsHeader>Request</DetailsHeader>
                   {/* <Link style={{ textDecoration: 'none' }} to="/kur/request"> */}
                   <BackButton
+                    data-testid="request-kur-dtl-req-number"
                     sx={{
                       '&:hover': { bgcolor: '#fff' },
                     }}
@@ -188,6 +197,7 @@ export default function RequestKURDetails() {
                   </BackButton>
                 </Box>
                 <Box
+                  data-testid="request-kur-dtl-action-box"
                   display={
                     requestDetails?.status === 'pending' ? 'flex' : 'none'
                   }
@@ -197,6 +207,7 @@ export default function RequestKURDetails() {
                   alignItems="center"
                 >
                   <Button
+                    data-testid="req-dtl-reject-btn"
                     variant="contained"
                     color="error"
                     style={{
@@ -216,6 +227,7 @@ export default function RequestKURDetails() {
                     Reject
                   </Button>
                   <Button
+                    data-testid="req-dtl-approve-btn"
                     style={{
                       padding: '8px 30px',
                     }}
@@ -253,10 +265,7 @@ export default function RequestKURDetails() {
                 </Typography>
                 <CustomerStatusDetail
                   status={
-                    requestDetails &&
-                    requestDetails.kur_user.kur_user_credit_score.id
-                      ? requestDetails.kur_user.kur_user_credit_score.id
-                      : 1
+                    requestDetails?.kur_user.kur_user_credit_score.id || 1
                   }
                 >
                   {requestDetails?.kur_user.kur_user_credit_score.name}
@@ -440,8 +449,8 @@ export default function RequestKURDetails() {
             <Typography>Total Amount</Typography>
             <Amount>{digitFormatter.format(totalAmount || 0)}</Amount>
             <Table
+              data-testid="req-detail-table"
               data={details.detailsTableData || []}
-              selected={[]}
               count={details.detailParams.count}
               headCells={headCell}
               page={details.detailParams.page}
@@ -453,6 +462,7 @@ export default function RequestKURDetails() {
       </Box>
       {/* modals */}
       <Modal
+        data-testid="requestdtl-modal-reject"
         open={formModal.open}
         title="Refusal Reason"
         onClose={formModal.closeModal}

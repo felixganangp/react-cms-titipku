@@ -19,8 +19,10 @@ const CustomerData = ({ icon, fieldName, fieldContent }: CustomerDataProps) => {
       <Field>
         <>{icon}</>
         <DescriptionBox>
-          <FieldName>{fieldName}</FieldName>
-          <FieldContent>{fieldContent}</FieldContent>
+          <FieldName data-testid="customer-data-name">{fieldName}</FieldName>
+          <FieldContent data-testid="customer-data-content">
+            {fieldContent}
+          </FieldContent>
         </DescriptionBox>
       </Field>
     </>

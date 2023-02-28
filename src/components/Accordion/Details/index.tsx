@@ -36,10 +36,16 @@ export default function AccordionOnDetails(props: AccordionOnDetailsProps) {
 
   return (
     <Wrapper>
-      <HeaderBox parent={parent}>
-        <ButtonAccordion onClick={toggleClick} parent={parent} type="button">
+      <HeaderBox data-testid="accordion-parent" parent={parent}>
+        <ButtonAccordion
+          data-testid="accordion-header-button"
+          onClick={toggleClick}
+          parent={parent}
+          type="button"
+        >
           <Icon rotate={isOpen ? 1 : 0}>
             <KeyboardArrowRightIcon
+              data-testid="accordion-arrow"
               sx={{
                 color: parent && havingChild ? '#626b79' : 'transparent',
                 width: '16px',

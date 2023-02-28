@@ -137,6 +137,7 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
         '& .MuiPaper-root': { position: 'relative' },
         backgroundColor: '#fafafa',
       }}
+      data-testid="sidebar"
     >
       <Box
         width={drawerWidthClose}
@@ -149,6 +150,7 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
         boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
       >
         <Drawer
+          data-testid="sidebar-drawer"
           variant="permanent"
           open={open}
           onMouseEnter={() => {

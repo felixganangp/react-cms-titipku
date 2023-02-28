@@ -63,10 +63,6 @@ export default function RequestKURPage() {
   useEffect(() => {
     dispatch(typeAction.fetchData());
     dispatch(areaAction.fetchData());
-    if (request.displayParams.submit_date_start)
-      setStartDate(new Date(request.displayParams.submit_date_start * 1000));
-    if (request.displayParams.submit_date_end)
-      setEndDate(new Date(request.displayParams.submit_date_end * 1000));
   }, []);
 
   // table
@@ -324,12 +320,14 @@ export default function RequestKURPage() {
                       onClick: () => {
                         navigate(`/kur/request/${val.id}`);
                       },
+                      dataId: `req-list-act-details`,
                     },
                     {
                       label: 'Approve',
                       onClick: () => {
                         handleApproveRequest(val.id);
                       },
+                      dataId: `req-list-act-approve`,
                     },
                     {
                       label: 'Reject',
@@ -337,6 +335,7 @@ export default function RequestKURPage() {
                         setSelected(val);
                         rejectModal.openModal();
                       },
+                      dataId: `req-list-act-reject`,
                     },
                   ]
                 : [
@@ -345,6 +344,7 @@ export default function RequestKURPage() {
                       onClick: () => {
                         navigate(`/kur/request/${val.id}`);
                       },
+                      dataId: `req-list-act-details`,
                     },
                   ]
             }
@@ -364,7 +364,9 @@ export default function RequestKURPage() {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Card>
-              <Typography variant="titlePage">Request KUR</Typography>
+              <Typography variant="titlePage" data-testid="request-kur-title">
+                Request KUR
+              </Typography>
             </Card>
           </Grid>
           <Grid item xs={12}>
@@ -381,6 +383,7 @@ export default function RequestKURPage() {
                     size="small"
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
                     fullWidth
+                    data-testid="search-request-kur"
                     defaultValue={request.displayParams.search}
                     value={request.displayParams.search}
                     InputProps={{
@@ -399,6 +402,7 @@ export default function RequestKURPage() {
                   />
                   <FilterButton
                     endIcon={<ArrowDown />}
+                    data-testid="request-kur-show-filter"
                     onClick={() => setOpenFilter(!openFilter)}
                   >
                     Filter
@@ -410,9 +414,11 @@ export default function RequestKURPage() {
                   width="100%"
                   justifyContent="space-between"
                   gap="28px"
+                  data-testid="request-kur-filter-box"
                 >
                   <FormLabel text="Pasar">
                     <Autocomplete
+                      data-testid="request-kur-filterpasar"
                       multiple
                       id="filterPasar"
                       options={areas}
@@ -460,6 +466,7 @@ export default function RequestKURPage() {
                   </FormLabel>
                   <FormLabel text="Type">
                     <Autocomplete
+                      data-testid="request-kur-filtertype"
                       id="filterType"
                       options={types}
                       onChange={(e, value) => {
@@ -488,6 +495,7 @@ export default function RequestKURPage() {
                     gap="14px"
                   >
                     <FormLabel
+                      data-testid="request-kur-range-date"
                       text="Range Date"
                       error={startDate === null && endDate !== null}
                       helperText={
@@ -508,7 +516,14 @@ export default function RequestKURPage() {
                           onOpen={() => {
                             setOpenStartDate(true);
                           }}
-                          value={startDate}
+                          value={
+                            request.displayParams.submit_date_start
+                              ? new Date(
+                                  request.displayParams.submit_date_start *
+                                    1000,
+                                )
+                              : null
+                          }
                           inputFormat="DD/MM/YYYY"
                           onChange={(value) => {
                             setStartDate(value);
@@ -565,7 +580,13 @@ export default function RequestKURPage() {
                           onOpen={() => {
                             setOpenEndDate(true);
                           }}
-                          value={endDate}
+                          value={
+                            request.displayParams.submit_date_end
+                              ? new Date(
+                                  request.displayParams.submit_date_end * 1000,
+                                )
+                              : null
+                          }
                           inputFormat="DD/MM/YYYY"
                           onChange={(value) => {
                             setEndDate(value);
@@ -599,6 +620,7 @@ export default function RequestKURPage() {
                     Reset
                   </Button>
                   <FilterButton
+                    data-testid="request-kur-apply-btn"
                     onClick={() => handleApplyFilter()}
                     disabled={
                       (startDate === null && endDate !== null) ||
@@ -613,6 +635,7 @@ export default function RequestKURPage() {
           </Grid>
           <Grid item xs={12}>
             <Box
+              data-testid="request-kur-table"
               bgcolor="#fff"
               p="7px"
               borderRadius="5px"

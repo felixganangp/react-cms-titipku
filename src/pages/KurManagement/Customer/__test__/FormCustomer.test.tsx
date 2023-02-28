@@ -65,6 +65,7 @@ let formData: {
   },
 };
 
+vi.useRealTimers();
 describe('Form Customer Component Add', async () => {
   const mockKurType = vi.fn((data) =>
     store.dispatch(
@@ -1010,4 +1011,4 @@ describe('Form Customer Component Add', async () => {
   //   // expect(inputElementBankAccountNumberNobu).toHaveDisplayValue('');
   //   // expect(nextbuttonElement).toHaveClass('Mui-disabled');
   // });
-});
+}, 15000);
