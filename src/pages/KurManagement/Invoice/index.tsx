@@ -213,6 +213,7 @@ export default function Ivoice() {
   };
 
   const handleResetFilter = () => {
+    setSearchValue('');
     dispatch(invoiceKurAction.setResetParams());
     dispatch(invoiceKurAction.setResetDisplayFilter());
   };
@@ -709,11 +710,10 @@ export default function Ivoice() {
                                   }
                                 />
                               )}
-                              toolbarPlaceholder="End Date"
+                              // toolbarPlaceholder="End Date"
                               minDate={
                                 invoice.displayFilter.delivery_date_start
                               }
-                              maxDate={new Date()}
                             />
                           </LocalizationProvider>
                         </FormLabel>
@@ -833,7 +833,6 @@ export default function Ivoice() {
                               )}
                               toolbarPlaceholder="End Date"
                               minDate={invoice.displayFilter.invoice_date_start}
-                              maxDate={new Date()}
                             />
                           </LocalizationProvider>
                         </FormLabel>
@@ -952,7 +951,6 @@ export default function Ivoice() {
                               )}
                               toolbarPlaceholder="End Date"
                               minDate={invoice.displayFilter.due_date_start}
-                              maxDate={new Date()}
                             />
                           </LocalizationProvider>
                         </FormLabel>
