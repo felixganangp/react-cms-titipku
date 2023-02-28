@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc & vite build",
+    "build-prod": "tsc & vite build --mode production",
     "preview": "vite preview",
     "lint": "yarn run lint:js && yarn run lint:css",
     "lint:css": "stylelint app/**/*.js",
