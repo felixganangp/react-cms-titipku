@@ -23,14 +23,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: yarn install
-    - run: yarn build 
     - run: yarn test
+    - run: yarn build 
 
-    - name: Slack Notification
-      uses: rtCamp/action-slack-notify@v2
-      env:
-        SLACK_CHANNEL: dev-qa-cms
-        SLACK_ICON: https://titipku.s3.ap-southeast-1.amazonaws.com/product_category/30-11-2021_1638256074055589183.png
-        SLACK_MESSAGE: 'CMS Development Build :rocket:'
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_USERNAME: CMS DEV
