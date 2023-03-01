@@ -438,7 +438,7 @@ export default function Ivoice() {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <Card>
-                <Typography variant="titlePage">Invoice Managemet</Typography>
+                <Typography variant="titlePage">Invoice Management</Typography>
               </Card>
             </Grid>
             <Grid item xs={12}>
