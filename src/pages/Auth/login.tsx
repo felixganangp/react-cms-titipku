@@ -7,6 +7,7 @@ import { Navigate } from 'react-router-dom';
 import GooleIcon from 'components/Icon/Google';
 
 export default function Login() {
+  const { VITE_APP_API_URL } = import.meta.env;
   const [errMessage, setErrMessage] = useState('');
   useEffect(() => {
     if (window.location.search) {
@@ -20,7 +21,7 @@ export default function Login() {
       }
     }
   }, []);
-  const link = `https://cms.titipku.space/api-dev/v2/auth/login/google?account_type=cms&redirect_url=${window.location.origin}/oauth`;
+  const link = `${VITE_APP_API_URL}/auth/login/google?account_type=cms&redirect_url=${window.location.origin}/oauth`;
   const openPopUp = (popUpWidth: number, popUpHeight: number) => {
     // eslint-disable-next-line no-restricted-globals
     const left: number = (screen.width - popUpWidth) / 2;
