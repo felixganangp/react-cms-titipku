@@ -257,7 +257,6 @@ export default function PaymentKURPage() {
       label: 'No. Payment',
       align: 'left',
       enableSort: true,
-      isSticky: true,
       format: (val) => (
         <Link to={`/kur/payment/${val.id}`} style={{ textDecoration: 'none' }}>
           <InvoiceLabel>{val.kur_payment_number}</InvoiceLabel>
@@ -269,15 +268,12 @@ export default function PaymentKURPage() {
       label: 'Name',
       align: 'left',
       enableSort: true,
-
-      isSticky: true,
       format: (val) => <Typography>{val.kur_user.name}</Typography>,
     },
     {
       id: 'kur_type',
       label: 'KUR Type',
       align: 'left',
-      isSticky: true,
       format: (val) => (
         <Typography>{val.kur_user.kur_user_type.name}</Typography>
       ),

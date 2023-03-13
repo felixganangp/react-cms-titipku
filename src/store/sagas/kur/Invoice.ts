@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
+import { call, put, select, takeLatest } from 'redux-saga/effects';
 import { PayloadAction } from '@reduxjs/toolkit';
 import { invoiceKurAction } from 'store/slice/kur/Invoice';
 import { uiAction } from 'store/slice/ui';
@@ -171,6 +171,9 @@ function* fetchDataConditionInvoice() {
 
 function* adjustment(body: PayloadAction<AdjustInvoice>) {
   try {
+    const params: DetailInvoiceParams = yield select(
+      (state) => state.invoice.paramsInvoiceDetails,
+    );
     yield call(InvoiceService.adjust, body.payload);
     yield put(
       uiAction.openToast({
@@ -181,6 +184,12 @@ function* adjustment(body: PayloadAction<AdjustInvoice>) {
     );
     yield put(
       invoiceKurAction.fetchDataDetail({ id: body.payload.kur_invoice_id }),
+    );
+    yield put(
+      invoiceKurAction.fetchDataDetailList({
+        id: body.payload.kur_invoice_id,
+        params,
+      }),
     );
   } catch (err) {
     if (typeof err === 'string') {

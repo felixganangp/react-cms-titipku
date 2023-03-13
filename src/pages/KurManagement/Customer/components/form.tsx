@@ -78,7 +78,8 @@ function Form({ onClose, formData }: Props) {
   const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
   const merchantKur = useAppSelector((state) => state.merchant);
-  const customerKur = useAppSelector((state) => state.customerKur);
+  // const customerKur = useAppSelector((state) => state.customerKur);
+
   const [valueTab, setValueTab] = useState(0);
   const [openCalendaer, setOpenCalendar] = useState({
     open: false,
