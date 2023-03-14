@@ -4,6 +4,7 @@ import SideBar from 'components/Layout/SideBar';
 import TopBar from 'components/Layout/TopBar';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { userDetailsAction } from 'store/slice/UserDetails';
+import { Box } from '@mui/material';
 
 interface PrivateRouteProps {
   redirect: string;
@@ -33,7 +34,6 @@ export default function PrivateRoute({
     setOpen(!open);
   };
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div>
@@ -58,7 +58,7 @@ export default function PrivateRoute({
             zIndex: 20,
           }}
         >
-          <SideBar open={open} setOpen={setOpen} userDetails={userDetails} />
+          <SideBar open={open} setOpen={setOpen} />
         </div>
         <div style={{ flex: 1, overflow: 'auto' }}>{children} </div>
       </div>

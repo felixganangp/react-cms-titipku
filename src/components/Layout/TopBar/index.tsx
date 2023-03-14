@@ -60,27 +60,29 @@ const TopBar = ({ open, onLogoClick, userDetails }: TopBarInterface) => {
 
   return (
     <Box
+      display="flex"
+      flexDirection="row"
+      justifyContent="center"
+      boxShadow="0px 3px 10px rgba(0, 0, 0, 0.1)"
       sx={{
-        // flexGrow: 1,
         '& .MuiPaper-root': {
           borderRadius: '0px',
-          boxShadow: '0 3px 10px 0 rgba(0, 0, 0, 0.1)',
           paddingLeft: '0px',
-          height: '56px',
+          height: '63px',
         },
         '& .MuiToolbar-root': {
-          minHeight: '56px',
+          boxShadow: '0px 3px 10px rgba(0, 0, 0, 0.1)',
+          minHeight: '63px',
           paddingLeft: '0px',
         },
         '& .MuiContainer-root': {
-          paddingLeft: '0px',
+          padding: '0',
         },
       }}
     >
       <AppBar
         style={{
-          backgroundColor: '#232933',
-          boxShadow: '1',
+          backgroundColor: '#ffff',
         }}
         position="static"
       >
@@ -104,95 +106,108 @@ const TopBar = ({ open, onLogoClick, userDetails }: TopBarInterface) => {
                 display: 'flex',
                 flexDirection: 'row',
                 alignItems: 'center',
+                justifyContent: 'flex-end',
+                width: '100%',
               }}
             >
-              <SearchIcon sx={{ color: '#ffff', marginRight: '10px' }} />
+              <SearchIcon sx={{ color: '#303030', marginRight: '10px' }} />
               <NotificationsNoneOutlinedIcon
-                sx={{ color: '#ffff', marginRight: '10px' }}
+                sx={{ color: '#303030', marginRight: '10px' }}
               />
               <FullscreenOutlinedIcon
-                sx={{ color: '#ffff', marginRight: '25px' }}
+                sx={{ color: '#303030', marginRight: '25px' }}
               />
-              <Tooltip title="Open account details">
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <PersonIcon
-                    sx={{
-                      backgroundColor: '#ffff',
-                      borderRadius: '50%',
-                      border: '2px white solid',
-                      color: '#000',
-                      width: '32px',
-                      height: '32px',
-                    }}
-                  />
-
-                  <Stack sx={{ marginLeft: '8px' }}>
-                    <UsernameHeader>
-                      {userDetails ? userDetails.full_name : 'loading...'}
-                    </UsernameHeader>
-                    <EmailHeader>
-                      {userDetails ? userDetails.email : 'loading...'}
-                    </EmailHeader>
-                  </Stack>
-                  <KeyboardArrowDownIcon
-                    sx={{ color: '#ffff', marginLeft: '20px' }}
-                  />
-                </IconButton>
-              </Tooltip>
-              <MenuUnstyled
-                actions={menuActions}
-                open={isOpen}
-                // onClose={close}
-                anchorEl={anchorElUser}
-                components={{ Root: Popper, Listbox: StyledListbox }}
-                componentsProps={{ listbox: { id: 'simple-menu' } }}
-              >
-                <StyledMenuItem
-                  onClick={close}
-                  style={{
-                    float: 'left',
-                  }}
-                >
+              {/* account description on top right */}
+              <Box right={0} marginRight="24px">
+                <Tooltip title="Open account details">
                   <Box
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'row',
+                    display="flex"
+                    flexDirection="row"
+                    alignItems="center"
+                    onClick={handleOpenUserMenu}
+                    sx={{
+                      ':hover': {
+                        backgroundColor: '#fafafa',
+                      },
                     }}
                   >
                     <PersonIcon
                       sx={{
-                        backgroundColor: '#ffff',
+                        backgroundColor: '#303030',
                         borderRadius: '50%',
-                        border: '2px white solid',
-                        color: '#000',
-                        width: '68px',
-                        height: '68px',
-                        marginLeft: '8px',
-                        marginTop: '9.5px',
+                        border: '3px #303030 solid',
+                        color: '#fff',
+                        width: '32px',
+                        height: '32px',
                       }}
                     />
-                    <Stack style={{ marginTop: '5%', paddingLeft: '2%' }}>
-                      <Username>
-                        {userDetails?.full_name || 'loading...'}
-                      </Username>
-                      <EmailDetails ml="7px">
-                        {userDetails?.email || 'loading...'}
-                      </EmailDetails>
-                      <Role>
-                        {userDetails
-                          ? `\u2022  ${userDetails?.administrator_detail[0].administrator_role.name}`
-                          : 'loading...'}
-                      </Role>
+
+                    <Stack sx={{ marginLeft: '8px', gap: '2px' }}>
+                      <UsernameHeader>
+                        {userDetails ? userDetails.full_name : 'loading...'}
+                      </UsernameHeader>
+                      <EmailHeader>
+                        {userDetails ? userDetails.email : 'loading...'}
+                      </EmailHeader>
                     </Stack>
+                    <KeyboardArrowDownIcon
+                      sx={{ color: '#303030', marginLeft: '20px' }}
+                    />
                   </Box>
-                  <Link to="/sign-in" style={{ textDecoration: 'none' }}>
-                    <LogoutButton onClick={() => logout()}>
-                      Sign Out
-                      <PowerSettingsNewOutlinedIcon />
-                    </LogoutButton>
-                  </Link>
-                </StyledMenuItem>
-              </MenuUnstyled>
+                </Tooltip>
+                {/* pop up  */}
+                <MenuUnstyled
+                  actions={menuActions}
+                  open={isOpen}
+                  // onClose={close}
+                  anchorEl={anchorElUser}
+                  components={{ Root: Popper, Listbox: StyledListbox }}
+                  componentsProps={{ listbox: { id: 'simple-menu' } }}
+                >
+                  <StyledMenuItem onClick={close}>
+                    <Box
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                      }}
+                    >
+                      <PersonIcon
+                        sx={{
+                          backgroundColor: '#303030',
+                          borderRadius: '50%',
+                          border: '2px white solid',
+                          color: '#fff',
+                          width: '60px',
+                          height: '60px',
+                          marginLeft: '8px',
+                          marginTop: '9.5px',
+                        }}
+                      />
+                      <Stack style={{ marginTop: '5%', paddingLeft: '2%' }}>
+                        <Username>
+                          {userDetails?.full_name || 'loading...'}
+                        </Username>
+                        <EmailDetails ml="7px">
+                          {userDetails?.email || 'loading...'}
+                        </EmailDetails>
+                        <Role>
+                          {userDetails
+                            ? `\u2022  ${userDetails?.administrator_detail[0].administrator_role.name}`
+                            : 'loading...'}
+                        </Role>
+                      </Stack>
+                    </Box>
+                    <Box style={{ bottom: 0, position: 'absolute' }}>
+                      <Link to="/sign-in" style={{ textDecoration: 'none' }}>
+                        <LogoutButton onClick={() => logout()}>
+                          Sign Out
+                          <PowerSettingsNewOutlinedIcon />
+                        </LogoutButton>
+                      </Link>
+                    </Box>
+                  </StyledMenuItem>
+                </MenuUnstyled>
+              </Box>
             </Box>
           </Toolbar>
         </Container>

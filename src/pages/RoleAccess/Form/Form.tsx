@@ -36,10 +36,12 @@ interface RoleAccessFormProps {
   editValue: RoleAccess | null;
 }
 
-export default function RoleAccessForm(props: RoleAccessFormProps) {
+export default function RoleAccessFormPage(props: RoleAccessFormProps) {
   const { open, onClose, editValue } = props;
   const dispatch = useAppDispatch();
   const selectRoleAccess = useAppSelector((state) => state.roleAccess);
+
+  console.log('edit value', editValue);
 
   // handle form
   const [accessMenu, setAccessMenu] = useState<{ [id: number]: boolean }>({});
@@ -267,6 +269,8 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
     checkingName(value);
   };
 
+  console.log('listOfMenu ->', listOfMenu);
+
   return (
     <Dialog
       data-testid="role-access-modal"
@@ -320,7 +324,10 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
               name="name"
               fullWidth
               placeholder="Input Role Name"
-              inputProps={{ maxLength: 50 }}
+              inputProps={{
+                maxLength: 50,
+                'data-testid': 'role-form-field-name',
+              }}
               value={values.name}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setFieldValue('name', e.target.value);
@@ -351,6 +358,12 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
                     label=""
                     control={
                       <Checkbox
+                        inputProps={
+                          {
+                            'aria-label': `checkbox-parent-${parentMenu.id}`,
+                          }
+                          // as React.InputHTMLAttributes<HTMLInputElement>
+                        }
                         key={parentMenu.id + parentMenu.menu}
                         checked={accessMenu[parentMenu.id]}
                         onChange={(e) => {
@@ -371,6 +384,9 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
                             label=""
                             control={
                               <Checkbox
+                                inputProps={{
+                                  'aria-label': `checkbox-menu-${menu.id}`,
+                                }}
                                 key={menu.id + menu.menu}
                                 checked={accessMenu[menu.id]}
                                 onChange={(e) => {
@@ -396,6 +412,9 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
                                 label=""
                                 control={
                                   <Checkbox
+                                    inputProps={{
+                                      'aria-label': `checkbox-menu-${menu.id}`,
+                                    }}
                                     key={menu.id + menu.menu}
                                     checked={accessMenu[menu.id]}
                                     onChange={(e) => {
@@ -417,6 +436,9 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
                                   label=""
                                   control={
                                     <Checkbox
+                                      inputProps={{
+                                        'aria-label': `checkbox-child-${childMenu.id}`,
+                                      }}
                                       checked={accessMenu[childMenu.id]}
                                       key={childMenu.id + childMenu.menu}
                                       onChange={(e) =>
@@ -448,6 +470,7 @@ export default function RoleAccessForm(props: RoleAccessFormProps) {
             Cancel
           </Button>
           <Button
+            data-testid="role-access-submit-btn"
             color="primary"
             type="submit"
             disabled={
