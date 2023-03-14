@@ -2,14 +2,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
-import LocalAtmIcon from '@mui/icons-material/LocalAtm';
-import ManageAccountIcon from '@mui/icons-material/ManageAccountsOutlined';
+import KurIcon from 'components/Icon/Kur';
+import AdminPanelIcon from 'components/Icon/AdminPanel';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import { useAppSelector } from 'store/hooks';
 import { Child, FilteredMenu } from 'models/Menu';
 import Menu from './Menu';
-import SideBarHeader from './Header';
 
 interface SideBarProps {
   open: boolean;
@@ -28,7 +27,7 @@ const sidebarData: FilteredMenu[] = [
     id: 48,
     title: 'KUR',
     path: '',
-    icon: <LocalAtmIcon />,
+    icon: <KurIcon />,
     child: [
       {
         id: 52,
@@ -60,7 +59,7 @@ const sidebarData: FilteredMenu[] = [
     id: 47,
     title: 'Admin Panel',
     path: '',
-    icon: <ManageAccountIcon />,
+    icon: <AdminPanelIcon />,
     child: [
       {
         id: 49,
@@ -108,11 +107,11 @@ function SideBar({ open, setOpen }: SideBarProps) {
 
   return (
     <Box
+      display="flex"
+      bgcolor="#ffff"
+      zIndex="99"
       sx={{
-        display: 'flex',
         '& .MuiPaper-root': { position: 'relative' },
-        backgroundColor: '#ffff',
-        zIndex: '99',
       }}
       data-testid="sidebar"
     >
