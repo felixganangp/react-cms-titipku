@@ -49,7 +49,12 @@ function SideBarHeader(props: SideBarHeaderProps) {
             flexShrink: 0,
           }}
         >
-          <img src={BaseLogo} alt="logo titipku" height="43px" />
+          <img
+            src={BaseLogo}
+            alt="logo titipku"
+            height="53px"
+            style={{ marginTop: '5px' }}
+          />
         </Box>
       )}
       <Box
@@ -87,9 +92,10 @@ function SideBarHeader(props: SideBarHeaderProps) {
                 padding: 0,
                 paddingLeft: '14px',
                 marginLeft: '7px',
+                marginTop: '5px',
               }}
             >
-              <img src={logo} alt="Titipku" height="36px" />
+              <img src={logo} alt="Titipku" height="43px" />
             </IconButton>
           </Box>
         )}
