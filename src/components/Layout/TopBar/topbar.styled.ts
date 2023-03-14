@@ -1,6 +1,12 @@
 import styled from '@emotion/styled';
 import Typography from '@mui/material/Typography';
 import MenuItemUnstyled from '@mui/base/MenuItemUnstyled';
+import { Box, Stack } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import NotificationIcon from '@mui/icons-material/NotificationsNoneOutlined';
+import FullscreenIcon from '@mui/icons-material/FullscreenOutlined';
+import PersonIcon from '@mui/icons-material/Person';
+import ExpandIcon from '@mui/icons-material/KeyboardArrowDown';
 
 export const UsernameHeader = styled(Typography)`
   text-align: left;
@@ -87,4 +93,68 @@ export const LogoutButton = styled.div`
   background-color: #303030;
   border-radius: 0px 0px 10px 10px;
   color: white;
+`;
+
+export const ContentContainer = styled(Box)`
+  flex-grow: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+`;
+
+export const Search = styled(SearchIcon)`
+  color: #303030;
+  margin-right: 10px;
+`;
+
+export const Notification = styled(NotificationIcon)`
+  color: #303030;
+  margin-right: 10px;
+`;
+
+export const FullScreen = styled(FullscreenIcon)`
+  color: #303030;
+  margin-right: 25px;
+`;
+
+export const UserContainer = styled(Box)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  :hover {
+    background-color: #fafafa;
+  }
+  border-radius: 4px;
+`;
+
+export const UserIcon = styled(PersonIcon)`
+  background-color: #303030;
+  border-radius: 50%;
+  border: 3px #303030 solid;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+`;
+
+export const UserStack = styled(Stack)`
+  margin-left: 8px;
+  gap: 2px;
+`;
+
+export const Expand = styled(ExpandIcon)`
+  color: #303030;
+  margin-left: 20px;
+`;
+
+export const UserIconDetails = styled(PersonIcon)`
+  background-color: #303030;
+  border-radius: 50%;
+  border: 2px white solid;
+  color: #fff;
+  width: 60px;
+  height: 60px;
+  margin-left: 8px;
+  margin-top: 9.5px;
 `;

@@ -1,11 +1,10 @@
+/* eslint-disable no-nested-ternary */
 import React, { useState } from 'react';
 import styled from '@emotion/styled';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import { Link } from 'react-router-dom';
 import Collapse from '@mui/material/Collapse';
 import Box from '@mui/material/Box';
@@ -13,11 +12,12 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { userDetailsAction } from 'store/slice/UserDetails';
 import { FilteredMenu } from 'models/Menu';
 import ChildMenu from './ChildMenu';
+import { ItemButton, ItemText } from './sidebar.styled';
 
 const IconButton = styled.nav`
   background-color: transparent;
   font-size: 20px;
-  color: #626b79;
+  color: #303030;
 `;
 
 interface MenuProps {
@@ -33,8 +33,8 @@ function Menu(props: MenuProps) {
     (state) => state.userDetails.currentActiveMenu,
   );
 
-  const iconOpened = <ExpandMore sx={{ fontSize: '20px', color: '#626b79' }} />;
-  const iconClosed = <ExpandLess sx={{ fontSize: '20px', color: '#626b79' }} />;
+  const iconOpened = <ExpandMore sx={{ fontSize: '20px', color: '#303030' }} />;
+  const iconClosed = <ExpandLess sx={{ fontSize: '20px', color: '#303030' }} />;
 
   const toggleOpenList = (item: { id: number }) => {
     if (item.id !== openList) setOpenList(item.id);
@@ -58,60 +58,32 @@ function Menu(props: MenuProps) {
             to={menu.path}
             onClick={() => handleChangeActiveMenu(menu.id)}
           >
-            <ListItemButton
-              sx={{
-                margin: '6px 14px',
-                padding: '10px',
-                borderRadius: '8px',
-                backgroundColor:
-                  currentActiveMenu === menu.id ? '#ebeff3' : 'transparent',
-              }}
-              key={menu.id + menu.title}
-            >
-              <ListItemIcon sx={{ minWidth: '46px', fontSize: '20px' }}>
-                <IconButton>{menu.icon}</IconButton>
+            <ItemButton key={menu.id + menu.title}>
+              <ListItemIcon>
+                <IconButton style={{ marginTop: '5px' }}>
+                  {menu.icon}
+                </IconButton>
               </ListItemIcon>
-              <ListItemText
+              <ItemText
                 data-testid="side-bar-parentmenu"
                 primary={menu.title}
                 primaryTypographyProps={{
                   variant: 'body2',
                 }}
-                sx={{
-                  display: 'inline',
-                  margin: '0px',
-                  overflowX: 'hidden',
-                  color: '#626b79',
-                  fontSize: '14px',
-                  fontFamily: 'Roboto-Regular',
-                  whiteSpace: 'nowrap',
-                  minWidth: '126px',
-                }}
               />
               <Box position="absolute" top="30%" right="5px">
-                {
-                  // eslint-disable-next-line no-nested-ternary
-                  menu.child.length > 0 && openList !== menu.id && open
-                    ? iconOpened
-                    : menu.child.length > 0 && openList === menu.id && open
-                    ? iconClosed
-                    : null
-                }
+                {menu.child.length > 0 && openList !== menu.id && open
+                  ? iconOpened
+                  : menu.child.length > 0 && openList === menu.id && open
+                  ? iconClosed
+                  : null}
               </Box>
-
-              {/* {item.subNav.length > 0 &&
-              (openList !== item.id ? iconOpened : iconClosed)} */}
-              {/* {item.subNav.length === 0 && null} */}
-            </ListItemButton>
+            </ItemButton>
           </Link>
         ) : (
+          // have child
           <div key={menu.id + menu.title}>
-            <ListItemButton
-              sx={{
-                margin: '6px 14px',
-                padding: '10px',
-                borderRadius: '8px',
-              }}
+            <ItemButton
               onClick={() =>
                 menu.child.length === 0 ? (
                   <Link to={menu.path} />
@@ -121,22 +93,15 @@ function Menu(props: MenuProps) {
               }
               key={menu.id + menu.title}
             >
-              <ListItemIcon sx={{ minWidth: '46px', fontSize: '20px' }}>
-                <IconButton>{menu.icon}</IconButton>
+              <ListItemIcon>
+                <IconButton style={{ marginTop: '5px' }}>
+                  {menu.icon}
+                </IconButton>
               </ListItemIcon>
-              <ListItemText
+              <ItemText
                 primary={menu.title}
                 primaryTypographyProps={{
                   variant: 'body2',
-                }}
-                sx={{
-                  display: 'inline',
-                  margin: '0px',
-                  overflowX: 'hidden',
-                  color: '#626b79',
-                  fontSize: '14px',
-                  whiteSpace: 'nowrap',
-                  minWidth: '126px',
                 }}
               />
               <Box position="absolute" top="30%" right="5px">
@@ -149,14 +114,9 @@ function Menu(props: MenuProps) {
                     : null
                 }
               </Box>
-            </ListItemButton>
+            </ItemButton>
             <Collapse in={openList === menu.id && !open}>
-              <Box
-                sx={{
-                  margin: '-9px',
-                  marginLeft: '0px',
-                }}
-              >
+              <Box margin="-9px" marginLeft="0px">
                 <ChildMenu
                   key={menu.id + menu.title}
                   child={menu.child}

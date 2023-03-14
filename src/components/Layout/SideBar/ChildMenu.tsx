@@ -1,14 +1,21 @@
-import ListItemButton from '@mui/material/ListItemButton';
+/* eslint-disable no-nested-ternary */
 import List from '@mui/material/List';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Collapse from '@mui/material/Collapse';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import Box from '@mui/material/Box';
 import { Child } from 'models/Menu';
+import {
+  ItemButtonChild,
+  ItemButtonChildAsParent,
+  ItemButtonSuperChild,
+  ItemTextChild,
+  ItemTextChildAsParent,
+  ItemTextSuperChild,
+} from './sidebar.styled';
 
 interface ChildMenuProps {
   child: Child[];
@@ -45,47 +52,22 @@ export default function ChildrenMenu({
             key={item.path + item.id}
             onClick={() => onSetCurrentMenu(item.id)}
           >
-            <ListItemButton
-              data-testid="sidebar-childmenu-button"
-              sx={{
-                margin: '6px 20px',
-                padding: '10px',
-                borderRadius: '8px',
-                backgroundColor:
-                  currentActiveMenu === item.id ? '#ebeff3' : 'transparent',
-              }}
-            >
+            <ItemButtonChild data-testid="sidebar-childmenu-button">
               <ListItemIcon sx={{ minWidth: '46px', fontSize: '20px' }} />
-              <ListItemText
+              <ItemTextChild
+                currentActive={currentActiveMenu === item.id}
                 data-testid="side-bar-childmenu"
                 primary={item.title}
                 primaryTypographyProps={{
                   variant: 'body2',
                 }}
-                sx={{
-                  display: 'inline',
-                  margin: '0px',
-                  overflowX: 'hidden',
-                  color: '#626b79',
-                  fontSize: '14px',
-                  fontFamily: 'Roboto-Regular',
-                  whiteSpace: 'nowrap',
-                  minWidth: '126px',
-                }}
                 key={item.id + item.title}
               />
-            </ListItemButton>
+            </ItemButtonChild>
           </Link>
         ) : (
           <div key={item.path + item.id}>
-            <ListItemButton
-              sx={{
-                margin: '6px 14px',
-                padding: '10px',
-                borderRadius: '8px',
-                backgroundColor:
-                  currentActiveMenu === item.id ? '#ebeff3' : 'transparent',
-              }}
+            <ItemButtonChildAsParent
               onClick={() =>
                 item.child?.length === 0 ? (
                   <Link to={item.path} />
@@ -96,35 +78,21 @@ export default function ChildrenMenu({
               key={item.id + item.title}
             >
               <ListItemIcon sx={{ minWidth: '46px', fontSize: '20px' }} />
-              <ListItemText
+              <ItemTextChildAsParent
+                currentActive={currentActiveMenu === item.id}
                 primary={item.title}
                 primaryTypographyProps={{
                   variant: 'body2',
                 }}
-                sx={{
-                  display: 'inline',
-                  margin: '0px',
-                  marginLeft: '7px',
-                  overflowX: 'hidden',
-                  color: '#626b79',
-                  fontSize: '14px',
-                  whiteSpace: 'nowrap',
-                  minWidth: '126px',
-                }}
               />
               <Box position="absolute" top="25%" right="5px">
-                {
-                  // eslint-disable-next-line no-nested-ternary
-                  item.child && item.child?.length > 0 && openList !== item.id
-                    ? iconOpened
-                    : item.child &&
-                      item.child?.length > 0 &&
-                      openList === item.id
-                    ? iconClosed
-                    : null
-                }
+                {item.child && item.child?.length > 0 && openList !== item.id
+                  ? iconOpened
+                  : item.child && item.child?.length > 0 && openList === item.id
+                  ? iconClosed
+                  : null}
               </Box>
-            </ListItemButton>
+            </ItemButtonChildAsParent>
             <Collapse in={openList === item.id && !open}>
               <Box
                 sx={{
@@ -141,37 +109,18 @@ export default function ChildrenMenu({
                       to={superchild.path}
                       onClick={() => onSetCurrentMenu(superchild.id)}
                     >
-                      <ListItemButton
-                        sx={{
-                          margin: '6px 20px',
-                          padding: '10px',
-                          borderRadius: '8px',
-                          backgroundColor:
-                            currentActiveMenu === superchild.id
-                              ? '#ebeff3'
-                              : 'transparent',
-                        }}
-                      >
+                      <ItemButtonSuperChild>
                         <ListItemIcon
                           sx={{ minWidth: '46px', fontSize: '20px' }}
                         />
-                        <ListItemText
+                        <ItemTextSuperChild
+                          currentActive={currentActiveMenu === superchild.id}
                           primary={superchild.title}
                           primaryTypographyProps={{
                             variant: 'body2',
                           }}
-                          sx={{
-                            display: 'inline',
-                            margin: '0px',
-                            marginLeft: '21px',
-                            overflowX: 'hidden',
-                            color: '#626b79',
-                            fontSize: '14px',
-                            whiteSpace: 'nowrap',
-                            minWidth: '126px',
-                          }}
                         />
-                      </ListItemButton>
+                      </ItemButtonSuperChild>
                     </Link>
                   ))}
                 </List>
