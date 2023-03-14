@@ -4,8 +4,8 @@ import MenuItemUnstyled from '@mui/base/MenuItemUnstyled';
 
 export const UsernameHeader = styled(Typography)`
   text-align: left;
-  font-size: 12px;
-  color: #ffff;
+  font-size: 14px;
+  color: #303030;
   margin-left: 7px;
   text-align: left;
   font-family: 'Roboto';
@@ -24,7 +24,6 @@ export const StyledListbox = styled.ul`
   font-size: 0.875rem;
   padding: 5px;
   margin: 10px 0;
-  min-width: 200px;
   overflow: auto;
   outline: 0px;
   border-radius: 10px;
@@ -36,11 +35,13 @@ export const StyledMenuItem = styled(MenuItemUnstyled)`
   border: none !important;
   cursor: default;
   user-select: none;
-  width: 285px;
-  height: 126px;
+  width: 260px;
+  height: 100px;
   border-radius: 10px;
-  background-color: #232933;
+  background-color: #ffff;
   margin-right: 25px;
+  float: left;
+  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
 `;
 
 export const Username = styled(Typography)`
@@ -49,7 +50,7 @@ export const Username = styled(Typography)`
   font-stretch: normal;
   font-style: normal;
   line-height: 15px;
-  color: #ffff;
+  color: #303030;
   margin-left: 7px;
   text-align: left;
 `;
@@ -74,7 +75,7 @@ export const Role = styled.div`
 `;
 
 export const LogoutButton = styled.div`
-  width: 285px;
+  width: 260px;
   height: 35px;
   display: flex;
   flex-direction: row;
@@ -83,7 +84,7 @@ export const LogoutButton = styled.div`
   gap: 4px;
   margin: 15px 0 0;
   padding: 0;
-  background-color: #626b79;
+  background-color: #303030;
   border-radius: 0px 0px 10px 10px;
   color: white;
 `;

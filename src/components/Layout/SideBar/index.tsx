@@ -6,16 +6,14 @@ import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import ManageAccountIcon from '@mui/icons-material/ManageAccountsOutlined';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import { UserDetails } from 'models/UserDetails';
 import { useAppSelector } from 'store/hooks';
 import { Child, FilteredMenu } from 'models/Menu';
-import SideBarProfile from './Profile';
 import Menu from './Menu';
+import SideBarHeader from './Header';
 
 interface SideBarProps {
   open: boolean;
   setOpen(arg0: boolean): void;
-  userDetails: UserDetails | null;
 }
 
 const drawerWidthOpen = 236;
@@ -80,15 +78,10 @@ const sidebarData: FilteredMenu[] = [
   },
 ];
 
-function SideBar({ open, setOpen, userDetails }: SideBarProps) {
+function SideBar({ open, setOpen }: SideBarProps) {
   const theme = useTheme();
   const menuData = useAppSelector((state) => state.userDetails.menuData);
   const [filteredMenu, setFilteredMenu] = useState<FilteredMenu[]>([]);
-
-  const profileData = {
-    name: userDetails?.full_name,
-    email: userDetails?.email,
-  };
 
   useEffect(() => {
     const filtered: FilteredMenu[] = [...sidebarData];
@@ -111,44 +104,19 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
     setFilteredMenu(filtered);
   }, [menuData]);
 
-  const drawerContent = (
-    <>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          alignContents: 'center',
-          margin: '2px 14px 14px',
-          padding: '16px 4px',
-          borderBottom: '1px solid #ebeff3',
-        }}
-      >
-        <SideBarProfile value={profileData} />
-      </Box>
-      <Menu listOfMenu={filteredMenu} open={open} />
-    </>
-  );
+  const drawerContent = <Menu listOfMenu={filteredMenu} open={open} />;
 
   return (
     <Box
       sx={{
         display: 'flex',
         '& .MuiPaper-root': { position: 'relative' },
-        backgroundColor: '#fafafa',
+        backgroundColor: '#ffff',
+        zIndex: '99',
       }}
       data-testid="sidebar"
     >
-      <Box
-        width={drawerWidthClose}
-        height="100%"
-        boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
-      />
-      <Box
-        position="absolute"
-        height="100%"
-        boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
-      >
+      <Box position="absolute" height="100%">
         <Drawer
           data-testid="sidebar-drawer"
           variant="permanent"
@@ -160,7 +128,8 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
             setOpen(true);
           }}
           sx={{
-            height: '100%',
+            boxShadow: '8px 3px 10px -4px rgba(0, 0, 0, 0.1)',
+            height: '100vh',
             width: open
               ? { xs: '0px', sm: drawerWidthClose }
               : { xs: drawerWidthClose, sm: drawerWidthOpen },
@@ -177,8 +146,9 @@ function SideBar({ open, setOpen, userDetails }: SideBarProps) {
                 ? { xs: '0px', sm: drawerWidthClose }
                 : { xs: drawerWidthClose, sm: drawerWidthOpen },
               borderRight: '0px',
+              zIndex: 99,
               boxShadow: theme.shadows[0],
-              backgroundColor: open ? '#fafafa' : '#fafafa',
+              backgroundColor: open ? '#fff' : '#fff',
               transition: theme.transitions.create('width', {
                 easing: theme.transitions.easing.sharp,
                 duration: open

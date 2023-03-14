@@ -4,6 +4,7 @@ import SideBar from 'components/Layout/SideBar';
 import TopBar from 'components/Layout/TopBar';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { userDetailsAction } from 'store/slice/UserDetails';
+import { Box } from '@mui/material';
 
 interface PrivateRouteProps {
   redirect: string;
@@ -58,10 +59,32 @@ export default function PrivateRoute({
             zIndex: 20,
           }}
         >
-          <SideBar open={open} setOpen={setOpen} userDetails={userDetails} />
+          <SideBar open={open} setOpen={setOpen} />
         </div>
         <div style={{ flex: 1, overflow: 'auto' }}>{children} </div>
       </div>
     </div>
+    // <Box display="flex" flexDirection="row" width="100%">
+    //   <Box border="1px solid blue" width="58px" zIndex="2">
+    //     <SideBar open={open} setOpen={setOpen} />
+    //   </Box>
+    //   <Box display="flex" flexDirection="column">
+    //     <TopBar
+    //       userDetails={userDetails}
+    //       onLogoClick={toggleOpen}
+    //       open={open}
+    //     />
+    //     <div
+    //       style={{
+    //         flex: 1,
+    //         overflow: 'auto',
+    //         marginLeft: '68px',
+    //         width: '100%',
+    //       }}
+    //     >
+    //       {children}
+    //     </div>
+    //   </Box>
+    // </Box>
   );
 }
