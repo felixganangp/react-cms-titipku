@@ -34,7 +34,6 @@ export default function PrivateRoute({
     setOpen(!open);
   };
 
-  // eslint-disable-next-line react/jsx-no-useless-fragment
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <div>
@@ -64,27 +63,5 @@ export default function PrivateRoute({
         <div style={{ flex: 1, overflow: 'auto' }}>{children} </div>
       </div>
     </div>
-    // <Box display="flex" flexDirection="row" width="100%">
-    //   <Box border="1px solid blue" width="58px" zIndex="2">
-    //     <SideBar open={open} setOpen={setOpen} />
-    //   </Box>
-    //   <Box display="flex" flexDirection="column">
-    //     <TopBar
-    //       userDetails={userDetails}
-    //       onLogoClick={toggleOpen}
-    //       open={open}
-    //     />
-    //     <div
-    //       style={{
-    //         flex: 1,
-    //         overflow: 'auto',
-    //         marginLeft: '68px',
-    //         width: '100%',
-    //       }}
-    //     >
-    //       {children}
-    //     </div>
-    //   </Box>
-    // </Box>
   );
 }
