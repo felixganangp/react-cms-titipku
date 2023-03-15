@@ -11,6 +11,7 @@ const components = (palette: Palette): ThemeOptions['components'] => ({
         textTransform: 'unset',
       },
       contained: {
+        borderRadius: '32px',
         // boxShadow: "none",
         // "&:hover": {
         //   boxShadow: "none",
