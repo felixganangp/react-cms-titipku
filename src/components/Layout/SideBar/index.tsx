@@ -8,6 +8,7 @@ import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import { useAppSelector } from 'store/hooks';
 import { Child, FilteredMenu } from 'models/Menu';
+import B2B from 'components/Icon/B2B';
 import Menu from './Menu';
 
 interface SideBarProps {
@@ -23,6 +24,20 @@ const drawerWidthClose =
   (paddingIconButton + marginIconButton) * 2 + iconFontSize;
 
 const sidebarData: FilteredMenu[] = [
+  {
+    id: 56,
+    title: 'B2B',
+    path: '',
+    icon: <B2B />,
+    child: [
+      {
+        id: 57,
+        title: 'Inventory Management',
+        path: '/b2b/inventory',
+        child: [],
+      },
+    ],
+  },
   {
     id: 48,
     title: 'KUR',
