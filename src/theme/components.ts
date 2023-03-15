@@ -8,6 +8,7 @@ const components = (palette: Palette): ThemeOptions['components'] => ({
   MuiButton: {
     styleOverrides: {
       root: {
+        borderRadius: '32px',
         textTransform: 'unset',
       },
       contained: {

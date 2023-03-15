@@ -279,7 +279,7 @@ function EnhancedTable<T extends Data>({
                             border: 'none',
                             whiteSpace: 'pre-line',
                             fontSize: '14px',
-                            color: '#626b79',
+                            color: '#232933',
                             bgcolor: '#fff',
                           },
                           val.isSticky
@@ -341,7 +341,7 @@ function EnhancedTable<T extends Data>({
                       sx={{
                         fontWeight: 'normal',
                         fontSize: '14px',
-                        color: '#626b79',
+                        color: '#232933',
                       }}
                     >
                       Try adjusting your keywords and try again
