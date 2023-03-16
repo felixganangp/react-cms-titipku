@@ -270,7 +270,7 @@ function EnhancedTable<T extends Data>({
                             border: 'none',
                             whiteSpace: 'pre-line',
                             fontSize: '14px',
-                            color: '#626b79',
+                            color: '#232933',
                             bgcolor: '#fff',
                           },
                           val.isSticky
