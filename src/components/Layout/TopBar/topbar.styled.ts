@@ -7,6 +7,7 @@ import NotificationIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import FullscreenIcon from '@mui/icons-material/FullscreenOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import ExpandIcon from '@mui/icons-material/KeyboardArrowDown';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 
 export const UsernameHeader = styled(Typography)`
   text-align: left;
@@ -106,17 +107,18 @@ export const ContentContainer = styled(Box)`
 
 export const Search = styled(SearchIcon)`
   color: #303030;
-  margin-right: 10px;
 `;
 
 export const Notification = styled(NotificationIcon)`
   color: #303030;
-  margin-right: 10px;
 `;
 
 export const FullScreen = styled(FullscreenIcon)`
   color: #303030;
-  margin-right: 25px;
+`;
+
+export const FullscreenExit = styled(FullscreenExitIcon)`
+  color: #303030;
 `;
 
 export const UserContainer = styled(Box)`

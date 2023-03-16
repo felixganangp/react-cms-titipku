@@ -5,25 +5,29 @@ import Toolbar from '@mui/material/Toolbar';
 import Container from '@mui/material/Container';
 import Tooltip from '@mui/material/Tooltip';
 import Stack from '@mui/material/Stack';
-import MenuUnstyled from '@mui/base/MenuUnstyled';
-import Popper from '@mui/material/Popper';
+import IconButton from '@mui/material/IconButton';
+import Popover from '@mui/material/Popover';
 import PowerSettingsNewOutlinedIcon from '@mui/icons-material/PowerSettingsNewOutlined';
 import { Link } from 'react-router-dom';
 import { Skeleton } from '@mui/material';
 import SideBarHeader from '../SideBar/Header';
 import { UserDetails } from '../../../models/UserDetails';
+import Notification from './Notification';
+import FullScreen from './FullScreen';
+import Search from './Search';
 import {
   ContentContainer,
   EmailDetails,
   EmailHeader,
   Expand,
-  FullScreen,
+  // FullScreen,
+  // FullscreenExit,
   LogoutButton,
-  Notification,
+  // Notification,
   Role,
-  Search,
-  StyledListbox,
-  StyledMenuItem,
+  // Search,
+  // StyledListbox,
+  // StyledMenuItem,
   UserContainer,
   UserIcon,
   UserIconDetails,
@@ -39,27 +43,18 @@ interface TopBarInterface {
 }
 
 const TopBar = ({ open, onLogoClick, userDetails }: TopBarInterface) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
-  const menuActions = useRef(null);
+  const [openProfile, setOpenProfile] = useState(null);
 
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    if (isOpen) {
-      setAnchorElUser(null);
-      setIsOpen(!isOpen);
-    } else {
-      setIsOpen(!isOpen);
-      setAnchorElUser(event.currentTarget);
-    }
+  const handleOpenProfile = (event: any) => {
+    setOpenProfile(event.currentTarget);
+  };
+
+  const handleCloseProfile = () => {
+    setOpenProfile(null);
   };
 
   const logout = () => {
     localStorage.clear();
-  };
-
-  const close = () => {
-    setAnchorElUser(null);
-    setIsOpen(false);
   };
 
   return (
@@ -104,13 +99,16 @@ const TopBar = ({ open, onLogoClick, userDetails }: TopBarInterface) => {
             </Box>
 
             <ContentContainer>
-              <Search />
-              <Notification />
-              <FullScreen />
+              <Stack direction="row" mr="15px">
+                <Search />
+                <Notification />
+                <FullScreen />
+              </Stack>
+
               {/* account description on top right */}
-              <Box right={0} marginRight="24px">
+              <Box right={0} marginRight="24px" sx={{ cursor: 'pointer' }}>
                 <Tooltip title="Open account details">
-                  <UserContainer onClick={handleOpenUserMenu}>
+                  <UserContainer onClick={handleOpenProfile}>
                     <UserIcon />
                     <UserStack>
                       <UsernameHeader>
@@ -124,14 +122,23 @@ const TopBar = ({ open, onLogoClick, userDetails }: TopBarInterface) => {
                   </UserContainer>
                 </Tooltip>
                 {/* pop up  */}
-                <MenuUnstyled
-                  actions={menuActions}
-                  open={isOpen}
-                  anchorEl={anchorElUser}
-                  components={{ Root: Popper, Listbox: StyledListbox }}
-                  componentsProps={{ listbox: { id: 'simple-menu' } }}
+                <Popover
+                  open={Boolean(openProfile)}
+                  anchorEl={openProfile}
+                  onClose={handleCloseProfile}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                  transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                  PaperProps={{
+                    sx: {
+                      mt: 1.8,
+                      ml: 0.75,
+                      borderRadius: '10px',
+                      boxShadow:
+                        'rgb(145 158 171 / 20%) 0px 5px 5px -3px, rgb(145 158 171 / 14%) 0px 8px 10px 1px, rgb(145 158 171 / 12%) 0px 3px 14px 2px',
+                    },
+                  }}
                 >
-                  <StyledMenuItem onClick={close}>
+                  <Box>
                     <Box display="flex" flexDirection="row">
                       <UserIconDetails />
                       <Stack marginTop="5%" paddingLeft="2%">
@@ -154,7 +161,7 @@ const TopBar = ({ open, onLogoClick, userDetails }: TopBarInterface) => {
                         </Role>
                       </Stack>
                     </Box>
-                    <Box style={{ bottom: 0, position: 'absolute' }}>
+                    <Box>
                       <Link to="/sign-in" style={{ textDecoration: 'none' }}>
                         <LogoutButton onClick={() => logout()}>
                           Sign Out
@@ -162,8 +169,8 @@ const TopBar = ({ open, onLogoClick, userDetails }: TopBarInterface) => {
                         </LogoutButton>
                       </Link>
                     </Box>
-                  </StyledMenuItem>
-                </MenuUnstyled>
+                  </Box>
+                </Popover>
               </Box>
             </ContentContainer>
           </Toolbar>

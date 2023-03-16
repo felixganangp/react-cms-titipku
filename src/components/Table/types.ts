@@ -46,18 +46,17 @@ export interface EnhancedTableProps<T extends { id?: string | number }> {
   loading?: boolean;
   orderType?: Order;
   orderBy?: string | number | null | undefined;
-  // totalPage: number;
   totalData?: number;
   count?: number;
-  onChangeSort?: (order: TableOrder) => void;
   page: number;
-  onChangePage?: (page: number) => void;
-  setSelected?: (array: (string | number | undefined)[]) => void;
   selected?: (string | number)[];
   bgHeader?: string;
   headCells: Array<HeadCells<T>>;
   data: Data<T>;
   disablePagination?: boolean;
+  onChangePage?: (page: number) => void;
+  setSelected?: (array: (string | number | undefined)[]) => void;
+  onChangeSort?: (order: TableOrder) => void;
 }
 
 export type Align = 'inherit' | 'left' | 'center' | 'right' | 'justify';

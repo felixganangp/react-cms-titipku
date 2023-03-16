@@ -3,24 +3,25 @@ import React, { useRef } from 'react';
 import styled from '@emotion/styled';
 
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Checkbox from '@mui/material/Checkbox';
-import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import Skeleton from '@mui/material/Skeleton';
+import PaginationItem from '@mui/material/PaginationItem';
 import Pagination, {
   PaginationRenderItemParams,
 } from '@mui/material/Pagination';
+
 import PrevIcon from '@mui/icons-material/KeyboardDoubleArrowLeftOutlined';
 import NextIcon from '@mui/icons-material/KeyboardDoubleArrowRightOutlined';
 
-import { PaginationItem } from '@mui/material';
 import EnhancedTableHead from './TableHead';
-
 import { EnhancedTableProps, Align } from './types';
+import DefaultNoData from './NoDataView/default';
 
 const PaginationStyle = styled(Pagination)`
   button {
@@ -179,17 +180,7 @@ function EnhancedTable<T extends Data>({
   return (
     <Box width="100%">
       <TableContainer>
-        <Table
-          stickyHeader
-          aria-labelledby="tableTitle"
-          size="medium"
-          sx={
-            {
-              // wordBreak: 'break-all',
-              // tableLayout: 'fixed',
-            }
-          }
-        >
+        <Table stickyHeader aria-labelledby="tableTitle" size="medium">
           <EnhancedTableHead
             numSelected={enableCheckBox ? selected.length : 0}
             orderType={orderType}
@@ -307,45 +298,17 @@ function EnhancedTable<T extends Data>({
               <TableRow>
                 <TableCell
                   colSpan={props.headCells.length + 1}
-                  style={{
-                    height: '200px',
-                    border: 'none',
-                  }}
+                  height="200px"
+                  style={{ border: 'none' }}
                 >
                   <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      flexDirection: 'column',
-                      padding: '50px',
-                    }}
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    p="50px"
                     data-testid="data-table-not-result-found"
                   >
-                    <img
-                      src="/images/no-data.svg"
-                      alt="no-data"
-                      width="133px"
-                    />
-                    <Typography
-                      sx={{
-                        fontWeight: '500',
-                        fontSize: '16px',
-                        color: '#232933',
-                        my: '10px',
-                      }}
-                    >
-                      No Results Found
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontWeight: 'normal',
-                        fontSize: '14px',
-                        color: '#626b79',
-                      }}
-                    >
-                      Try adjusting your keywords and try again
-                    </Typography>
+                    <DefaultNoData />
                   </Box>
                 </TableCell>
               </TableRow>
@@ -376,7 +339,7 @@ function EnhancedTable<T extends Data>({
         </Table>
       </TableContainer>
       {!props.disablePagination && (
-        <Box marginY={3}>
+        <Stack direction="row" marginY={3}>
           <PaginationStyle
             count={totalPage()}
             shape="rounded"
@@ -394,7 +357,7 @@ function EnhancedTable<T extends Data>({
               />
             )}
           />
-        </Box>
+        </Stack>
       )}
     </Box>
   );
