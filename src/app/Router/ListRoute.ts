@@ -28,6 +28,9 @@ const KurInvoiceDetailsManagement = lazy(
   () => import('pages/KurManagement/Invoice/Details'),
 );
 const InventoryManagement = lazy(() => import('pages/B2B/InventoryManagement'));
+const StockManagement = lazy(
+  () => import('pages/B2B/InventoryManagement/WarningStock'),
+);
 
 interface RouteProps {
   path: string;
@@ -148,6 +151,13 @@ const ListRoute: RouteProps[] = [
     comp: InventoryManagement,
     path: '/b2b/inventory',
     index: true,
+    auth: 'Private',
+  },
+  {
+    name: 'Inventory Management',
+    comp: StockManagement,
+    path: '/b2b/inventory/warning-stock/:isEmptyStock',
+    index: false,
     auth: 'Private',
   },
   {

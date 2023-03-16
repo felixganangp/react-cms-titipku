@@ -1,43 +1,43 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState } from 'react';
-import EmptyProduct from 'assets/empty-product.svg';
 import {
+  Box,
   Grid,
   Typography,
-  Box,
-  Card,
   TextField,
   InputAdornment,
   Button,
-  IconButton,
   Menu,
   MenuItem,
   Collapse,
+  IconButton,
 } from '@mui/material';
+import PaperBox from 'components/Icon/PaperBox';
+import { useParams, useNavigate } from 'react-router-dom';
+import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
+import FilterIcon from '@mui/icons-material/FilterAltOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import FilterIcon from '@mui/icons-material/FilterAltOutlined';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIosOutlined';
-import Table from 'components/Table';
-import { Inventory } from 'models/b2b/Inventory';
-import { HeadCells } from 'components/Table/types';
-import NoImage from 'assets/no-image.svg';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import MenuList from 'components/MenuList';
 import FormLabel from 'components/FormLabel';
-import PaperBox from 'components/Icon/PaperBox';
-import { useNavigate } from 'react-router-dom';
+import { HeadCells } from 'components/Table/types';
+import { Inventory } from 'models/b2b/Inventory';
+import NoImage from 'assets/no-image.svg';
+import MenuList from 'components/MenuList';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Table from 'components/Table';
 import {
   CardContainer,
   Category,
   GradingColor,
   StatusColor,
-} from './inventory.styled';
+} from '../inventory.styled';
 
-export default function InventoryPage() {
+export default function WarningStockList() {
+  const { isEmptyStock } = useParams();
   const navigate = useNavigate();
-  // batch action
-  const [selected, setSelected] = useState<number[]>([1, 2]);
+
+  const [selected, setSelected] = useState<number[]>([1]);
+
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -52,7 +52,6 @@ export default function InventoryPage() {
   // filter
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const handleExpandFilter = () => {
-    console.log('click expand');
     setOpenFilter(!openFilter);
   };
 
@@ -232,117 +231,68 @@ export default function InventoryPage() {
       ),
     },
   ];
+
   return (
-    <Box p="20px" bgcolor="#f8f8f8">
+    <Box p="20px" bgcolor="#fff" gap="36px">
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Box
             display="flex"
             flexDirection="row"
-            justifyContent="space-between"
+            justifyContent="flex-start"
             alignItems="center"
+            gap="16px"
+            mb="36px"
           >
-            <Typography
-              fontWeight={600}
-              fontSize="26px"
-              fontFamily="Montserrat"
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="center"
+              alignItems="center"
+              width="66px"
+              height="66px"
+              borderRadius="50%"
+              bgcolor={isEmptyStock === '1' ? '#d9876d' : '#f7bb47'}
             >
-              Inventory Management
-            </Typography>
-            <Button endIcon={<ArrowForwardIcon />}>Add New</Button>
-          </Box>
-        </Grid>
-        <Grid item xs={12}>
-          <CardContainer>
-            <Box display="flex" flexDirection="row" justifyContent="flex-start">
-              {/* low stock */}
-              <Box
-                display="flex"
-                flexDirection="row"
-                justifyContent="flex-start"
-                gap="15px"
-                width="50%"
-                borderRight="1px solid #e4e4e4"
-                padding="10.5px 16px"
-                sx={{
-                  ':hover': {
-                    backgroundColor: '#f8f8f8',
-                  },
-                }}
-                onClick={() => navigate(`/b2b/inventory/warning-stock/${0}`)}
-              >
-                <Box
-                  height="45px"
-                  width="45px"
-                  borderRadius="50%"
-                  bgcolor="#f7bb47"
-                  display="flex"
-                  flexDirection="row"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <PaperBox sx={{ height: '24px', width: '24px' }} />
-                </Box>
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="flex-start"
-                  alignItems="flex-start"
-                >
-                  <Typography fontSize="20px" fontWeight={700} color="#555555">
-                    2 Items
-                  </Typography>
-                  <Typography fontSize="10px" fontWeight="bold" color="#afafaf">
-                    LOW STOCK
-                  </Typography>
-                </Box>
-              </Box>
+              <PaperBox sx={{ height: '32px', width: '32px' }} />
+            </Box>
+            <Box
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="flex-start"
+            >
+              <Typography color="#000000" fontSize="26px" fontWeight="600">
+                {isEmptyStock === '1'
+                  ? 'Empty Stock Products'
+                  : 'Low Stock Products'}
+              </Typography>
 
-              {/* empty stock */}
               <Box
                 display="flex"
                 flexDirection="row"
-                justifyContent="flex-start"
-                gap="15px"
-                width="50%"
-                padding="10.5px 16px"
+                justifyContent="center"
+                alignItems="center"
+                padding="2px 10px 2px 1px"
+                borderRadius="4px"
                 sx={{
                   ':hover': {
                     backgroundColor: '#f8f8f8',
                   },
                 }}
-                onClick={() => navigate(`/b2b/inventory/warning-stock/${1}`)}
+                onClick={() => navigate('/b2b/inventory')}
               >
-                <Box
-                  height="45px"
-                  width="45px"
-                  borderRadius="50%"
-                  bgcolor="#d9876d"
-                  gap="15px"
-                  display="flex"
-                  flexDirection="row"
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <PaperBox sx={{ height: '24px', width: '24px' }} />
-                </Box>
-                <Box
-                  display="flex"
-                  flexDirection="column"
-                  justifyContent="flex-start"
-                  alignItems="flex-start"
-                >
-                  <Typography fontSize="20px" fontWeight={700} color="#555555">
-                    2 Items
-                  </Typography>
-                  <Typography fontSize="10px" fontWeight="bold" color="#afafaf">
-                    EMPTY STOCK
-                  </Typography>
-                </Box>
+                <BackIcon sx={{ color: '#008e58' }} />
+                <Typography color="#008e58" fontSize="16px" fontWeight="bold">
+                  See all List
+                </Typography>
               </Box>
             </Box>
-          </CardContainer>
+          </Box>
         </Grid>
+      </Grid>
+
+      <Grid container spacing={2}>
         <Grid item xs={12}>
           <CardContainer>
             <Box
