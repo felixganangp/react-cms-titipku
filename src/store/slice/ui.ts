@@ -1,9 +1,11 @@
+import { YellowToastProps } from 'components/YellowToast';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ToastProsp } from 'components/Toast';
 import { RootState } from 'store';
 
 interface UIState {
   toast: ToastProsp;
+  yellowToast: YellowToastProps;
 }
 
 const initialState: UIState = {
@@ -14,6 +16,16 @@ const initialState: UIState = {
     headMsg: '',
     message: '',
     deleted: false,
+  },
+  yellowToast: {
+    totalItem: 0,
+    open: false,
+    additionalMsg: '',
+    action: '',
+    error: false,
+    onUndoAction() {
+      console.log(' ');
+    },
   },
 };
 const uiSlice = createSlice({
@@ -32,6 +44,19 @@ const uiSlice = createSlice({
     },
     clearToast(state: UIState) {
       state.toast = initialState.toast;
+    },
+    openYellowToast(state: UIState, action: PayloadAction<YellowToastProps>) {
+      state.yellowToast = {
+        ...state.yellowToast,
+        ...action.payload,
+        open: true,
+      };
+    },
+    closeYellowToast(state: UIState) {
+      state.yellowToast.open = false;
+    },
+    clearYellowToast(state: UIState) {
+      state.yellowToast = initialState.yellowToast;
     },
   },
 });
