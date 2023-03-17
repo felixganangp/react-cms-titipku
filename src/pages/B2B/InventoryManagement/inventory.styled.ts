@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import styled from '@emotion/styled';
-import { Box } from '@mui/material';
+import { Box, Card } from '@mui/material';
 
 interface GradingProps {
   grade: string;
@@ -46,4 +46,11 @@ export const StatusColor = styled(Box)<Pick<StatusProps, 'status'>>`
       : '#269946'};
   border-radius: 4px;
   text-align: center;
+`;
+
+export const CardContainer = styled(Card)`
+  padding: 0;
+  border-radius: 0;
+  box-shadow: 0;
+  border: 1px solid #e4e4e4;
 `;
