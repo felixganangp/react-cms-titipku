@@ -52,7 +52,7 @@ export interface EnhancedTableProps<T extends { id?: string | number }> {
   onChangeSort?: (order: TableOrder) => void;
   page: number;
   onChangePage?: (page: number) => void;
-  setSelected?: (array: (string | number | undefined)[]) => void;
+  setSelected?: (array: (string | number)[]) => void;
   selected?: (string | number)[];
   bgHeader?: string;
   headCells: Array<HeadCells<T>>;

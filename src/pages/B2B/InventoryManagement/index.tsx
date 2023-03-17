@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import EmptyProduct from 'assets/empty-product.svg';
 import {
   Grid,
@@ -17,16 +17,20 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FilterIcon from '@mui/icons-material/FilterAltOutlined';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForwardIosOutlined';
+import CloseIcon from '@mui/icons-material/Close';
 import Table from 'components/Table';
 import { Inventory } from 'models/b2b/Inventory';
 import { HeadCells } from 'components/Table/types';
 import NoImage from 'assets/no-image.svg';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import MenuList from 'components/MenuList';
 import FormLabel from 'components/FormLabel';
 import PaperBox from 'components/Icon/PaperBox';
 import { useNavigate } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { inventoryAction } from 'store/slice/b2b/Inventory';
+import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import {
   CardContainer,
   Category,
@@ -35,9 +39,23 @@ import {
 } from './inventory.styled';
 
 export default function InventoryPage() {
-  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const inventory = useAppSelector((state) => state.inventory);
+
+  // mini dashboard
+  const handleSetActiveDashboard = (activeDashboard: string) => {
+    dispatch(inventoryAction.setActiveDashboard({ activeDashboard }));
+  };
+
+  const getDashboardTitle = () => {
+    if (inventory.activeDashboard === 'all_data') return 'Inventory Management';
+    if (inventory.activeDashboard === 'empty_stock')
+      return 'Empty Stock Products';
+    return 'Low Stock Products';
+  };
+
   // batch action
-  const [selected, setSelected] = useState<number[]>([1, 2]);
+  const [selected, setSelected] = useState<(number | string)[]>([1, 2]);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -52,7 +70,6 @@ export default function InventoryPage() {
   // filter
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const handleExpandFilter = () => {
-    console.log('click expand');
     setOpenFilter(!openFilter);
   };
 
@@ -235,24 +252,142 @@ export default function InventoryPage() {
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <Grid container spacing={2}>
+        {/* header (title, icon, back button) */}
         <Grid item xs={12}>
           <Box
             display="flex"
             flexDirection="row"
-            justifyContent="space-between"
+            justifyContent="flex-start"
             alignItems="center"
+            gap="16px"
+            height="fit-content"
           >
-            <Typography
-              fontWeight={600}
-              fontSize="26px"
-              fontFamily="Montserrat"
+            {/* paper box icon */}
+            <Box
+              display={
+                inventory.activeDashboard !== 'all_data' ? 'flex' : 'none'
+              }
+              flexDirection="row"
+              justifyContent="center"
+              alignItems="center"
+              width="66px"
+              height="66px"
+              borderRadius="50%"
+              bgcolor={
+                inventory.activeDashboard === 'empty_stock'
+                  ? '#d9876d'
+                  : '#f7bb47'
+              }
+              position="relative"
             >
-              Inventory Management
-            </Typography>
-            <Button endIcon={<ArrowForwardIcon />}>Add New</Button>
+              {/* total stock bullet */}
+              <Box
+                display="flex"
+                flexDirection="row"
+                justifyContent="center"
+                alignItems="center"
+                top="-10%"
+                right="-4%"
+                zIndex="5"
+                bgcolor={
+                  inventory.activeDashboard === 'empty_stock'
+                    ? '#bf370c'
+                    : '#a57d2f'
+                }
+                borderRadius="50%"
+                height="24px"
+                minWidth="24px"
+                maxWidth="fit-content"
+                position="absolute"
+                p="4px 2px 2px 2px"
+              >
+                <Typography fontSize="16px" color="#fff">
+                  {10}
+                </Typography>
+              </Box>
+              {/* icon x / arrow down */}
+              <Box
+                display="flex"
+                flexDirection="row"
+                justifyContent="center"
+                alignItems="center"
+                bottom="32%"
+                left="23%"
+                zIndex="5"
+                bgcolor={
+                  inventory.activeDashboard === 'empty_stock'
+                    ? '#bf370c'
+                    : '#a57d2f'
+                }
+                borderRadius="50%"
+                height="10px"
+                width="10px"
+                position="absolute"
+              >
+                {inventory.activeDashboard === 'empty_stock' ? (
+                  <CloseIcon
+                    sx={{
+                      color: '#fff',
+                      height: '10px',
+                      width: '10px',
+                    }}
+                  />
+                ) : (
+                  <ArrowDownwardIcon
+                    sx={{
+                      color: '#fff',
+                      height: '10px',
+                      width: '7px',
+                      mr: '1px',
+                    }}
+                  />
+                )}
+              </Box>
+              <PaperBox sx={{ height: '34px', width: '34px' }} />
+            </Box>
+            {/* back to all list button */}
+            <Box
+              display="flex"
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="flex-start"
+            >
+              <Typography color="#000000" fontSize="26px" fontWeight="600">
+                {getDashboardTitle()}
+              </Typography>
+              <Box
+                display={
+                  inventory.activeDashboard !== 'all_data' ? 'flex' : 'none'
+                }
+                flexDirection="row"
+                justifyContent="center"
+                alignItems="center"
+                padding="2px 10px 2px 1px"
+                borderRadius="4px"
+                sx={{
+                  ':hover': {
+                    backgroundColor: '#e4e4e4',
+                  },
+                }}
+                onClick={() => handleSetActiveDashboard('all_data')}
+              >
+                <BackIcon sx={{ color: '#008e58' }} />
+                <Typography color="#008e58" fontSize="16px" fontWeight="bold">
+                  See all List
+                </Typography>
+              </Box>
+            </Box>
           </Box>
         </Grid>
-        <Grid item xs={12}>
+        {/* mini dashboard */}
+        <Grid
+          item
+          xs={12}
+          sx={{
+            display:
+              inventory.activeDashboard === 'all_data' ? 'inline' : 'none',
+          }}
+        >
           <CardContainer>
             <Box display="flex" flexDirection="row" justifyContent="flex-start">
               {/* low stock */}
@@ -269,7 +404,7 @@ export default function InventoryPage() {
                     backgroundColor: '#f8f8f8',
                   },
                 }}
-                onClick={() => navigate(`/b2b/inventory/warning-stock/${0}`)}
+                onClick={() => handleSetActiveDashboard('low_stock')}
               >
                 <Box
                   height="45px"
@@ -280,7 +415,26 @@ export default function InventoryPage() {
                   flexDirection="row"
                   alignItems="center"
                   justifyContent="center"
+                  position="relative"
                 >
+                  <Box
+                    display="flex"
+                    flexDirection="row"
+                    justifyContent="center"
+                    alignItems="center"
+                    bottom="28%"
+                    left="20%"
+                    zIndex="5"
+                    bgcolor="#a57d2f"
+                    borderRadius="50%"
+                    height="10px"
+                    width="10px"
+                    position="absolute"
+                  >
+                    <ArrowDownwardIcon
+                      sx={{ color: '#fff', height: '8px', width: '5px' }}
+                    />
+                  </Box>
                   <PaperBox sx={{ height: '24px', width: '24px' }} />
                 </Box>
                 <Box
@@ -311,7 +465,7 @@ export default function InventoryPage() {
                     backgroundColor: '#f8f8f8',
                   },
                 }}
-                onClick={() => navigate(`/b2b/inventory/warning-stock/${1}`)}
+                onClick={() => handleSetActiveDashboard('empty_stock')}
               >
                 <Box
                   height="45px"
@@ -323,7 +477,32 @@ export default function InventoryPage() {
                   flexDirection="row"
                   alignItems="center"
                   justifyContent="center"
+                  position="relative"
                 >
+                  <Box
+                    display="flex"
+                    flexDirection="row"
+                    justifyContent="center"
+                    alignItems="center"
+                    bottom="28%"
+                    left="20%"
+                    zIndex="5"
+                    bgcolor="#bf370c"
+                    borderRadius="50%"
+                    height="10px"
+                    width="10px"
+                    position="absolute"
+                  >
+                    <CloseIcon
+                      sx={{
+                        color: '#fff',
+                        height: '7px',
+                        width: '7px',
+                        mr: '1px',
+                        mt: '0.2px',
+                      }}
+                    />
+                  </Box>
                   <PaperBox sx={{ height: '24px', width: '24px' }} />
                 </Box>
                 <Box
@@ -345,6 +524,7 @@ export default function InventoryPage() {
         </Grid>
         <Grid item xs={12}>
           <CardContainer>
+            {/* search, batch action button, filter */}
             <Box
               display="flex"
               flexDirection="row"
@@ -406,6 +586,7 @@ export default function InventoryPage() {
                 </Button>
               </Box>
             </Box>
+            {/* filter detail */}
             <Collapse in={openFilter}>
               <Box display="flex" flexDirection="column" gap="20px">
                 <Box
@@ -441,6 +622,7 @@ export default function InventoryPage() {
                 </Box>
               </Box>
             </Collapse>
+            {/* table */}
             <Box p="16px 12px">
               <Table
                 data={dummyData || []}
@@ -449,7 +631,7 @@ export default function InventoryPage() {
                 loading={false}
                 count={10}
                 selected={selected}
-                setSelected={() => setSelected}
+                setSelected={(array: (string | number)[]) => setSelected(array)}
                 enableCheckBox
               />
             </Box>
