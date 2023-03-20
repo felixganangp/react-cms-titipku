@@ -36,8 +36,14 @@ import { uiAction } from 'store/slice/ui';
 import {
   CardContainer,
   Category,
+  CircleTotalStock,
   GradingColor,
   StatusColor,
+  CircleContainer,
+  MiniCircleOnIcon,
+  DashboardContainer,
+  BackButton,
+  TitleContainer,
 } from './inventory.styled';
 import ChangeStatus from './components/ChangeStatus';
 import Delete from './components/Delete';
@@ -322,67 +328,26 @@ export default function InventoryPage() {
             gap="16px"
             height="fit-content"
           >
-            {/* paper box icon (low/empty) */}
-            <Box
+            {/* circle of paper box icon (on low/empty stock header) */}
+            <CircleContainer
               display={
                 inventory.activeDashboard !== 'all_data' ? 'flex' : 'none'
               }
-              flexDirection="row"
-              justifyContent="center"
-              alignItems="center"
               width="66px"
               height="66px"
-              borderRadius="50%"
-              bgcolor={
-                inventory.activeDashboard === 'empty_stock'
-                  ? '#d9876d'
-                  : '#f7bb47'
-              }
-              position="relative"
+              activeDashboard={inventory.activeDashboard}
             >
               {/* total stock bullet */}
-              <Box
-                display="flex"
-                flexDirection="row"
-                justifyContent="center"
-                alignItems="center"
-                top="-10%"
-                right="-4%"
-                zIndex="5"
-                bgcolor={
-                  inventory.activeDashboard === 'empty_stock'
-                    ? '#bf370c'
-                    : '#a57d2f'
-                }
-                borderRadius="50%"
-                height="24px"
-                minWidth="24px"
-                maxWidth="fit-content"
-                position="absolute"
-                p="4px 2px 2px 2px"
-              >
-                <Typography fontSize="16px" color="#fff">
-                  {10}
-                </Typography>
-              </Box>
+              <CircleTotalStock activeDashboard={inventory.activeDashboard}>
+                {10}
+              </CircleTotalStock>
               {/* icon x / arrow down */}
-              <Box
-                display="flex"
-                flexDirection="row"
-                justifyContent="center"
-                alignItems="center"
-                bottom="32%"
+              <MiniCircleOnIcon
+                activeDashboard={inventory.activeDashboard}
+                bottom="29%"
                 left="23%"
-                zIndex="5"
-                bgcolor={
-                  inventory.activeDashboard === 'empty_stock'
-                    ? '#bf370c'
-                    : '#a57d2f'
-                }
-                borderRadius="50%"
                 height="10px"
                 width="10px"
-                position="absolute"
               >
                 {inventory.activeDashboard === 'empty_stock' ? (
                   <CloseIcon
@@ -402,43 +367,29 @@ export default function InventoryPage() {
                     }}
                   />
                 )}
-              </Box>
+              </MiniCircleOnIcon>
               <PaperBox sx={{ height: '34px', width: '34px' }} />
-            </Box>
-            {/* back to all list button (low/empty) */}
-            <Box
-              display="flex"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="flex-start"
-            >
+            </CircleContainer>
+            {/* all title + back to all list button (for low/empty stock header) */}
+            <TitleContainer>
               <Typography color="#000000" fontSize="26px" fontWeight="600">
                 {getDashboardTitle()}
               </Typography>
-              <Box
+              <BackButton
                 display={
                   inventory.activeDashboard !== 'all_data' ? 'flex' : 'none'
                 }
-                flexDirection="row"
-                justifyContent="center"
-                alignItems="center"
-                padding="2px 10px 2px 1px"
-                borderRadius="4px"
-                sx={{
-                  ':hover': {
-                    backgroundColor: '#e4e4e4',
-                  },
-                }}
                 onClick={() => handleSetActiveDashboard('all_data')}
               >
                 <BackIcon sx={{ color: '#008e58' }} />
                 <Typography color="#008e58" fontSize="16px" fontWeight="bold">
                   See all List
                 </Typography>
-              </Box>
-            </Box>
+              </BackButton>
+            </TitleContainer>
           </Box>
         </Grid>
+
         {/* mini dashboard */}
         <Grid
           item
@@ -451,52 +402,28 @@ export default function InventoryPage() {
           <CardContainer>
             <Box display="flex" flexDirection="row" justifyContent="flex-start">
               {/* low stock */}
-              <Box
-                display="flex"
-                flexDirection="row"
-                justifyContent="flex-start"
-                gap="15px"
-                width="50%"
-                borderRight="1px solid #e4e4e4"
-                padding="10.5px 16px"
-                sx={{
-                  ':hover': {
-                    backgroundColor: '#f8f8f8',
-                  },
-                }}
+              <DashboardContainer
                 onClick={() => handleSetActiveDashboard('low_stock')}
               >
-                <Box
+                <CircleContainer
+                  display="flex"
+                  activeDashboard="low_stock"
                   height="45px"
                   width="45px"
-                  borderRadius="50%"
-                  bgcolor="#f7bb47"
-                  display="flex"
-                  flexDirection="row"
-                  alignItems="center"
-                  justifyContent="center"
-                  position="relative"
                 >
-                  <Box
-                    display="flex"
-                    flexDirection="row"
-                    justifyContent="center"
-                    alignItems="center"
+                  <MiniCircleOnIcon
                     bottom="28%"
                     left="20%"
-                    zIndex="5"
-                    bgcolor="#a57d2f"
-                    borderRadius="50%"
+                    activeDashboard="low_stock"
                     height="10px"
                     width="10px"
-                    position="absolute"
                   >
                     <ArrowDownwardIcon
                       sx={{ color: '#fff', height: '8px', width: '5px' }}
                     />
-                  </Box>
+                  </MiniCircleOnIcon>
                   <PaperBox sx={{ height: '24px', width: '24px' }} />
-                </Box>
+                </CircleContainer>
                 <Box
                   display="flex"
                   flexDirection="column"
@@ -510,48 +437,24 @@ export default function InventoryPage() {
                     LOW STOCK
                   </Typography>
                 </Box>
-              </Box>
+              </DashboardContainer>
 
               {/* empty stock */}
-              <Box
-                display="flex"
-                flexDirection="row"
-                justifyContent="flex-start"
-                gap="15px"
-                width="50%"
-                padding="10.5px 16px"
-                sx={{
-                  ':hover': {
-                    backgroundColor: '#f8f8f8',
-                  },
-                }}
+              <DashboardContainer
                 onClick={() => handleSetActiveDashboard('empty_stock')}
               >
-                <Box
+                <CircleContainer
+                  display="flex"
+                  activeDashboard="empty_stock"
                   height="45px"
                   width="45px"
-                  borderRadius="50%"
-                  bgcolor="#d9876d"
-                  gap="15px"
-                  display="flex"
-                  flexDirection="row"
-                  alignItems="center"
-                  justifyContent="center"
-                  position="relative"
                 >
-                  <Box
-                    display="flex"
-                    flexDirection="row"
-                    justifyContent="center"
-                    alignItems="center"
+                  <MiniCircleOnIcon
                     bottom="28%"
                     left="20%"
-                    zIndex="5"
-                    bgcolor="#bf370c"
-                    borderRadius="50%"
+                    activeDashboard="empty_stock"
                     height="10px"
                     width="10px"
-                    position="absolute"
                   >
                     <CloseIcon
                       sx={{
@@ -562,9 +465,9 @@ export default function InventoryPage() {
                         mt: '0.2px',
                       }}
                     />
-                  </Box>
+                  </MiniCircleOnIcon>
                   <PaperBox sx={{ height: '24px', width: '24px' }} />
-                </Box>
+                </CircleContainer>
                 <Box
                   display="flex"
                   flexDirection="column"
@@ -578,7 +481,7 @@ export default function InventoryPage() {
                     EMPTY STOCK
                   </Typography>
                 </Box>
-              </Box>
+              </DashboardContainer>
             </Box>
           </CardContainer>
         </Grid>

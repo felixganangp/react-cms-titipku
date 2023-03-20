@@ -19,7 +19,7 @@ export default function YellowToast() {
     useAppSelector((state) => state.ui.yellowToast);
 
   useEffect(() => {
-    if (open) setTimeout(() => dispatch(uiAction.closeYellowToast()), 50000);
+    if (open) setTimeout(() => dispatch(uiAction.closeYellowToast()), 5000);
   }, [open]);
 
   return (

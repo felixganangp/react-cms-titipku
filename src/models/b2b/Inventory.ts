@@ -1,3 +1,5 @@
+import { ListParams } from '../fetch';
+
 export interface Inventory {
   id: number;
   product_name: string;
@@ -10,4 +12,10 @@ export interface Inventory {
   };
   weight: number;
   status: boolean;
+}
+
+export interface InventoryParams extends ListParams {
+  grade?: string;
+  category_id?: number;
+  status?: number | string;
 }

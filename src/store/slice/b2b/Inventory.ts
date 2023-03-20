@@ -1,13 +1,24 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { Inventory, InventoryParams } from 'models/b2b/Inventory';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ListResponse } from 'models/fetch';
 
 interface InventoryProps {
   loading: boolean;
   activeDashboard: string;
+  inventories: Inventory[];
+  params: InventoryParams;
 }
 
 const initialState: InventoryProps = {
   loading: false,
   activeDashboard: 'all_data',
+  inventories: [],
+  params: {
+    page: 1,
+    count: 10,
+    search: '',
+  },
 };
 
 const InventorySlice = createSlice({
@@ -19,6 +30,19 @@ const InventorySlice = createSlice({
       action: PayloadAction<{ activeDashboard: string }>,
     ) {
       state.activeDashboard = action.payload.activeDashboard;
+    },
+    fetchData(state: InventoryProps, action: PayloadAction<InventoryParams>) {
+      state.loading = true;
+    },
+    fetchDataSuccess(
+      state: InventoryProps,
+      action: PayloadAction<ListResponse<Inventory>>,
+    ) {
+      state.loading = false;
+      state.inventories = action.payload.data || [];
+    },
+    fetchDataFailed(state: InventoryProps) {
+      state.loading = false;
     },
   },
 });
