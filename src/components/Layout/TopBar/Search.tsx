@@ -15,10 +15,6 @@ import {
   createFilterOptions,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-// utils
-// import { bgBlur } from 'utils/cssStyles';
-// component
-// import Iconify from 'components/iconify';
 import SearchIcon from '@mui/icons-material/Search';
 import { useAppSelector } from 'store/hooks';
 import { sidebarData } from 'components/Layout/SideBar';
@@ -107,7 +103,7 @@ export default function Searchbar() {
       <div>
         {!open && (
           <IconButton onClick={handleOpen}>
-            <SearchIcon />
+            <SearchIcon sx={{ color: '#303030' }} />
           </IconButton>
         )}
 
@@ -115,6 +111,7 @@ export default function Searchbar() {
           <StyledSearchbar>
             <Autocomplete
               disablePortal
+              popupIcon={<></>}
               id="combo-box-demo"
               options={getOption()}
               filterOptions={createFilterOptions({

@@ -55,7 +55,9 @@ export interface EnhancedTableProps<T extends { id?: string | number }> {
   data: Data<T>;
   disablePagination?: boolean;
   disableRowPerPage?: boolean;
+  rowsPerPageOptions?: number[];
   onChangePage?: (page: number) => void;
+  onChangeRowPerpage?: (page: number) => void;
   setSelected?: (array: (string | number | undefined)[]) => void;
   onChangeSort?: (order: TableOrder) => void;
 }

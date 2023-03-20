@@ -11,11 +11,16 @@ import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import Skeleton from '@mui/material/Skeleton';
+import MenuItem from '@mui/material/MenuItem';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+
 import PaginationItem from '@mui/material/PaginationItem';
 import Pagination, {
   PaginationRenderItemParams,
 } from '@mui/material/Pagination';
 
+import CodeIcon from '@mui/icons-material/Code';
+import ArrowTopDown from 'components/Icon/ArrowTopDown';
 import PrevIcon from '@mui/icons-material/KeyboardDoubleArrowLeftOutlined';
 import NextIcon from '@mui/icons-material/KeyboardDoubleArrowRightOutlined';
 
@@ -339,7 +344,7 @@ function EnhancedTable<T extends Data>({
         </Table>
       </TableContainer>
       {!props.disablePagination && (
-        <Stack direction="row" marginY={3}>
+        <Stack direction="row" marginY={3} justifyContent="space-between">
           <PaginationStyle
             count={totalPage()}
             shape="rounded"
@@ -357,6 +362,52 @@ function EnhancedTable<T extends Data>({
               />
             )}
           />
+          {props.onChangeRowPerpage && (
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              value={count}
+              onChange={(e) => {
+                const newValue = e.target.value as number;
+                if (props.onChangeRowPerpage)
+                  props.onChangeRowPerpage(newValue);
+              }}
+              IconComponent={() => (
+                <Box position="absolute" right="13px" top="10px">
+                  <CodeIcon
+                    sx={{ transform: 'rotate(90deg)', fontSize: '15px' }}
+                  />
+                </Box>
+              )}
+              sx={{
+                mr: '20px',
+                fontSize: '14px',
+                borderRadius: '8px',
+                width: '160px',
+                '.MuiSelect-select': {
+                  padding: '8px 18px',
+                  paddingRight: '0 !important',
+                },
+                '&.MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    border: '#626B79 solid 1px',
+                  },
+                  '&:hover fieldset': {
+                    border: '#626B79 solid 1px',
+                  },
+                  '&.Mui-focused fieldset': {
+                    border: '#626B79 solid 1px',
+                  },
+                },
+              }}
+            >
+              {props.rowsPerPageOptions?.map((val) => (
+                <MenuItem key={val} value={val}>
+                  {val} Row per page
+                </MenuItem>
+              ))}
+            </Select>
+          )}
         </Stack>
       )}
     </Box>
@@ -365,5 +416,6 @@ function EnhancedTable<T extends Data>({
 
 EnhancedTable.defaultProps = {
   page: 1,
+  rowsPerPageOptions: [10, 25, 50, 100],
 };
 export default EnhancedTable;
