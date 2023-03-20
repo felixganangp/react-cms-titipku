@@ -31,7 +31,7 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { inventoryAction } from 'store/slice/b2b/Inventory';
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import useModal from 'hooks/useModal';
-import Modal from 'components/Modal';
+import ModalComp from 'components/Modal';
 import YellowToast from 'components/YellowToast';
 import { uiAction } from 'store/slice/ui';
 import {
@@ -753,7 +753,7 @@ export default function InventoryPage() {
           />
         </Modal>
       </Grid>
-      <Modal
+      <ModalComp
         open={stockOpnameModal.open}
         title="Stock Opname"
         onClose={stockOpnameModal.closeModal}
@@ -776,7 +776,7 @@ export default function InventoryPage() {
             },
           ]}
         />
-      </Modal>
+      </ModalComp>
     </Box>
   );
 }

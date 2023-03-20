@@ -15,7 +15,6 @@ interface Props {
 }
 
 function StockOpname({ items }: Props) {
-  console.log('🚀 ~ file: StockOpname.tsx:22 ~ StockOpname ~ items:', items);
   return (
     <Box>
       <form>
