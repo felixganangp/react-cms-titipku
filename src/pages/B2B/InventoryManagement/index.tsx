@@ -31,17 +31,21 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { inventoryAction } from 'store/slice/b2b/Inventory';
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
+import useModal from 'hooks/useModal';
+import Modal from 'components/Modal';
 import {
   CardContainer,
   Category,
   GradingColor,
   StatusColor,
 } from './inventory.styled';
+import StockOpname from './components/StockOpname';
 
 export default function InventoryPage() {
   const dispatch = useAppDispatch();
   const inventory = useAppSelector((state) => state.inventory);
 
+  const stockOpnameModal = useModal();
   // mini dashboard
   const handleSetActiveDashboard = (activeDashboard: string) => {
     dispatch(inventoryAction.setActiveDashboard({ activeDashboard }));
@@ -221,7 +225,7 @@ export default function InventoryPage() {
             menu={[
               {
                 label: 'Stock Opname',
-                onClick: () => console.log('Stock Opname'),
+                onClick: () => stockOpnameModal.openModal(),
               },
               {
                 label: 'Edit',
@@ -638,6 +642,30 @@ export default function InventoryPage() {
           </CardContainer>
         </Grid>
       </Grid>
+      <Modal
+        open={stockOpnameModal.open}
+        title="Stock Opname"
+        onClose={stockOpnameModal.closeModal}
+      >
+        <StockOpname
+          items={[
+            {
+              id: 1,
+              product_name: 'Sayap Ayam',
+              grade: 'A',
+              low_stock_limit: 50,
+              image_path:
+                'https://titipku-dev.s3.ap-southeast-1.amazonaws.com/kur_user_documents/kk/7-02-2023-1675759857351723921_pexels-ekaterina-bolovtsova-6979271%20%281%29.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAXSNW2ORESX4WA3MQ%2F20230315%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230315T064307Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=6b75fac343f5e24c5fd4fafe4e930cd1b26faf8d388a569f8c392861d0a89f41',
+              category: {
+                id: 1,
+                category_name: 'Daging, Ikan, Telur',
+              },
+              weight: 0,
+              status: true,
+            },
+          ]}
+        />
+      </Modal>
     </Box>
   );
 }
