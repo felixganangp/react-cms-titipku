@@ -62,6 +62,15 @@ export default function RoleAccesPage() {
       }),
     );
   };
+  const handleChangeRowPerpage = (value: number) => {
+    dispatch(
+      roleAccessAction.setParams({
+        account_type: 'cms',
+        page: 1,
+        count: value,
+      }),
+    );
+  };
 
   const handleChangeSort = (value: {
     orderBy: string | number;
@@ -208,6 +217,7 @@ export default function RoleAccesPage() {
                 orderBy={roleAccesses.params.order_by}
                 orderType={roleAccesses.params.order_type}
                 onChangePage={(page) => handleChangePage(page)}
+                onChangeRowPerpage={(page) => handleChangeRowPerpage(page)}
                 onChangeSort={(value) => handleChangeSort(value)}
               />
             </Box>

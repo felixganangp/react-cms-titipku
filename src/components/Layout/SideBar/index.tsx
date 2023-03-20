@@ -23,7 +23,7 @@ const iconFontSize = 20;
 const drawerWidthClose =
   (paddingIconButton + marginIconButton) * 2 + iconFontSize;
 
-const sidebarData: FilteredMenu[] = [
+export const sidebarData: FilteredMenu[] = [
   {
     id: 56,
     title: 'B2B',
