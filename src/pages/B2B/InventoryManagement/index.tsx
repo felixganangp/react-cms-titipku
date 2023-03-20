@@ -1,11 +1,10 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable no-nested-ternary */
-import React, { useState, useEffect } from 'react';
-import EmptyProduct from 'assets/empty-product.svg';
+import React, { useState } from 'react';
 import {
   Grid,
   Typography,
   Box,
-  Card,
   TextField,
   InputAdornment,
   Button,
@@ -13,6 +12,7 @@ import {
   Menu,
   MenuItem,
   Collapse,
+  Modal,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -27,12 +27,13 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import MenuList from 'components/MenuList';
 import FormLabel from 'components/FormLabel';
 import PaperBox from 'components/Icon/PaperBox';
-import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { inventoryAction } from 'store/slice/b2b/Inventory';
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import useModal from 'hooks/useModal';
 import Modal from 'components/Modal';
+import YellowToast from 'components/YellowToast';
+import { uiAction } from 'store/slice/ui';
 import {
   CardContainer,
   Category,
@@ -40,6 +41,8 @@ import {
   StatusColor,
 } from './inventory.styled';
 import StockOpname from './components/StockOpname';
+import ChangeStatus from './components/ChangeStatus';
+import Delete from './components/Delete';
 
 export default function InventoryPage() {
   const dispatch = useAppDispatch();
@@ -59,9 +62,13 @@ export default function InventoryPage() {
   };
 
   // batch action
-  const [selected, setSelected] = useState<(number | string)[]>([1, 2]);
+  const [selected, setSelected] = useState<(number | string)[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Inventory[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const changeStatusModal = useModal();
+  const deleteModal = useModal();
+  const [newStatus, setNewStatus] = useState<boolean>(false);
 
   const handleOpenBatchAction = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(e.currentTarget);
@@ -70,6 +77,47 @@ export default function InventoryPage() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleChangeStatus = () => {
+    setSelected([]);
+    handleClose();
+    changeStatusModal.closeModal();
+    dispatch(
+      uiAction.openYellowToast({
+        totalItem: selectedProduct.length,
+        onUndoAction() {
+          console.log('undo action');
+        },
+        additionalMsg: 'marked',
+        action: newStatus ? 'active' : 'inactive',
+        error: !newStatus,
+      }),
+    );
+  };
+
+  const handleDelete = () => {
+    setSelected([]);
+    handleClose();
+    deleteModal.closeModal();
+    dispatch(
+      uiAction.openYellowToast({
+        totalItem: selectedProduct.length,
+        onUndoAction() {
+          console.log('undo action');
+        },
+        additionalMsg: '',
+        action: 'delete',
+        error: true,
+      }),
+    );
+  };
+
+  const getBatchProductDesc = () =>
+    selectedProduct.length > 0
+      ? selectedProduct
+          .map((item) => `${item.product_name} Grade ${item.grade}`)
+          .join(',')
+      : '';
 
   // filter
   const [openFilter, setOpenFilter] = useState<boolean>(false);
@@ -219,7 +267,7 @@ export default function InventoryPage() {
       label: '',
       align: 'left',
       width: '20px',
-      format: (val) => (
+      format: (val: Inventory) => (
         <>
           <MenuList
             menu={[
@@ -236,12 +284,22 @@ export default function InventoryPage() {
                 onClick: () => console.log('See Details'),
               },
               {
-                label: 'Make Inactive',
-                onClick: () => console.log('Make Inactive'),
+                label: val.status ? 'Make Inactive' : 'Make Active',
+                onClick: () => {
+                  changeStatusModal.openModal();
+                  setSelected([val.id]);
+                  setSelectedProduct([val]);
+                  if (val.status) setNewStatus(false);
+                  else setNewStatus(true);
+                },
               },
               {
                 label: 'Delete',
-                onClick: () => console.log('Delete'),
+                onClick: () => {
+                  deleteModal.openModal();
+                  setSelected([val.id]);
+                  setSelectedProduct([val]);
+                },
               },
             ]}
           >
@@ -253,6 +311,7 @@ export default function InventoryPage() {
       ),
     },
   ];
+
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <Grid container spacing={2}>
@@ -266,7 +325,7 @@ export default function InventoryPage() {
             gap="16px"
             height="fit-content"
           >
-            {/* paper box icon */}
+            {/* paper box icon (low/empty) */}
             <Box
               display={
                 inventory.activeDashboard !== 'all_data' ? 'flex' : 'none'
@@ -349,7 +408,7 @@ export default function InventoryPage() {
               </Box>
               <PaperBox sx={{ height: '34px', width: '34px' }} />
             </Box>
-            {/* back to all list button */}
+            {/* back to all list button (low/empty) */}
             <Box
               display="flex"
               flexDirection="column"
@@ -527,6 +586,7 @@ export default function InventoryPage() {
           </CardContainer>
         </Grid>
         <Grid item xs={12}>
+          <YellowToast />
           <CardContainer>
             {/* search, batch action button, filter */}
             <Box
@@ -558,7 +618,7 @@ export default function InventoryPage() {
                 gap="10px"
               >
                 <Button
-                  disabled={selected.length <= 0}
+                  disabled={selected.length <= 1}
                   endIcon={<ArrowDownIcon />}
                   aria-controls={open ? 'basic-menu' : undefined}
                   aria-haspopup="true"
@@ -576,10 +636,29 @@ export default function InventoryPage() {
                   }}
                 >
                   <MenuItem onClick={handleClose}>Stock Opname</MenuItem>
-                  <MenuItem onClick={handleClose}>Edit</MenuItem>
-                  <MenuItem onClick={handleClose}>See Details</MenuItem>
-                  <MenuItem onClick={handleClose}>Make Inactive</MenuItem>
-                  <MenuItem onClick={handleClose}>Delete</MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setNewStatus(false);
+                      changeStatusModal.openModal();
+                    }}
+                  >
+                    Make Inactive
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setNewStatus(true);
+                      changeStatusModal.openModal();
+                    }}
+                  >
+                    Make Active
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      deleteModal.openModal();
+                    }}
+                  >
+                    Delete
+                  </MenuItem>
                 </Menu>
                 <Button
                   variant="outlined"
@@ -635,12 +714,44 @@ export default function InventoryPage() {
                 loading={false}
                 count={10}
                 selected={selected}
-                setSelected={(array: (string | number)[]) => setSelected(array)}
+                setSelected={(array: (string | number)[]) => {
+                  setSelected(array);
+                  setSelectedProduct(() => {
+                    const newArr: Inventory[] = [];
+                    array.map((id) => {
+                      const obj: Inventory | undefined = dummyData.find(
+                        (item) => item.id === id,
+                      );
+                      if (obj) return newArr.push(obj);
+                    });
+                    return [...newArr];
+                  });
+                }}
                 enableCheckBox
               />
             </Box>
           </CardContainer>
         </Grid>
+        <Modal
+          open={changeStatusModal.open}
+          onClose={changeStatusModal.closeModal}
+        >
+          <ChangeStatus
+            totalItem={selected.length}
+            selectedProduct={getBatchProductDesc()}
+            onSubmit={handleChangeStatus}
+            onClose={changeStatusModal.closeModal}
+            newStatus={newStatus}
+          />
+        </Modal>
+        <Modal open={deleteModal.open} onClose={deleteModal.closeModal}>
+          <Delete
+            totalItem={selected.length}
+            selectedProduct={getBatchProductDesc()}
+            onSubmit={handleDelete}
+            onClose={deleteModal.closeModal}
+          />
+        </Modal>
       </Grid>
       <Modal
         open={stockOpnameModal.open}
