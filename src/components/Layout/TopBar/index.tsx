@@ -100,7 +100,7 @@ const TopBar = ({ open, onLogoClick, userDetails }: TopBarInterface) => {
 
             <ContentContainer>
               <Stack direction="row" mr="15px">
-                <Search />
+                <Search openSidebar={open} />
                 <Notification />
                 <FullScreen />
               </Stack>

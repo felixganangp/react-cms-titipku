@@ -550,7 +550,7 @@ export default function KurCustomer() {
               >
                 <Button
                   data-testid="button-add-customer"
-                  sx={{ width: '12%' }}
+                  sx={{ width: '180px' }}
                   startIcon={<AddIcon />}
                   onClick={() => {
                     handleOpenAdd();
@@ -560,13 +560,15 @@ export default function KurCustomer() {
                 </Button>
                 <Box
                   width="90%"
-                  sx={{ display: 'flex', justifyContent: 'space-between' }}
+                  display="flex"
+                  justifyContent="space-between"
+                  gap="20px"
                 >
                   <TextField
                     data-testid="search-customer"
                     placeholder="Search item"
                     size="small"
-                    sx={{ bgcolor: '#fafafa', maxWidth: '560px', width: '60%' }}
+                    sx={{ bgcolor: '#fafafa', maxWidth: '560px', flex: 1 }}
                     fullWidth
                     InputProps={{
                       startAdornment: (

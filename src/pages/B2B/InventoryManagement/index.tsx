@@ -1,6 +1,6 @@
 /* eslint-disable array-callback-return */
 /* eslint-disable no-nested-ternary */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Grid,
   Typography,
@@ -19,7 +19,7 @@ import ArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FilterIcon from '@mui/icons-material/FilterAltOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import Table from 'components/Table';
-import { Inventory } from 'models/b2b/Inventory';
+import { Product } from 'models/b2b/Product';
 import { HeadCells } from 'components/Table/types';
 import NoImage from 'assets/no-image.svg';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -28,7 +28,7 @@ import MenuList from 'components/MenuList';
 import FormLabel from 'components/FormLabel';
 import PaperBox from 'components/Icon/PaperBox';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { inventoryAction } from 'store/slice/b2b/Inventory';
+import { productAction } from 'store/slice/b2b/Product';
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import useModal from 'hooks/useModal';
 import YellowToast from 'components/YellowToast';
@@ -47,26 +47,27 @@ import {
 } from './inventory.styled';
 import ChangeStatus from './components/ChangeStatus';
 import Delete from './components/Delete';
+import NoDataInventory from './components/NoData';
 
 export default function InventoryPage() {
   const dispatch = useAppDispatch();
-  const inventory = useAppSelector((state) => state.inventory);
+  const product = useAppSelector((state) => state.product);
 
   // mini dashboard
   const handleSetActiveDashboard = (activeDashboard: string) => {
-    dispatch(inventoryAction.setActiveDashboard({ activeDashboard }));
+    dispatch(productAction.setActiveDashboard({ activeDashboard }));
   };
 
   const getDashboardTitle = () => {
-    if (inventory.activeDashboard === 'all_data') return 'Inventory Management';
-    if (inventory.activeDashboard === 'empty_stock')
+    if (product.activeDashboard === 'all_data') return 'Inventory Management';
+    if (product.activeDashboard === 'empty_stock')
       return 'Empty Stock Products';
     return 'Low Stock Products';
   };
 
   // batch action
   const [selected, setSelected] = useState<(number | string)[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<Inventory[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const changeStatusModal = useModal();
@@ -118,7 +119,10 @@ export default function InventoryPage() {
   const getBatchProductDesc = () =>
     selectedProduct.length > 0
       ? selectedProduct
-          .map((item) => `${item.product_name} Grade ${item.grade}`)
+          .map(
+            (item) =>
+              `${item.product_parent.name} Grade ${item.product_grade.name}`,
+          )
           .join(',')
       : '';
 
@@ -128,72 +132,27 @@ export default function InventoryPage() {
     setOpenFilter(!openFilter);
   };
 
-  const dummyData: Inventory[] = [
-    {
-      id: 1,
-      product_name: 'Sayap Ayam',
-      grade: 'A',
-      low_stock_limit: 50,
-      image_path:
-        'https://titipku-dev.s3.ap-southeast-1.amazonaws.com/kur_user_documents/kk/7-02-2023-1675759857351723921_pexels-ekaterina-bolovtsova-6979271%20%281%29.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAXSNW2ORESX4WA3MQ%2F20230315%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230315T064307Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=6b75fac343f5e24c5fd4fafe4e930cd1b26faf8d388a569f8c392861d0a89f41',
-      category: {
-        id: 1,
-        category_name: 'Daging, Ikan, Telur',
-      },
-      weight: 0,
-      status: true,
-    },
-    {
-      id: 2,
-      product_name: 'Sayap Ayam',
-      grade: 'B',
-      low_stock_limit: 100,
-      image_path:
-        'https://titipku-dev.s3.ap-southeast-1.amazonaws.com/kur_user_documents/kk/7-02-2023-1675759857351723921_pexels-ekaterina-bolovtsova-6979271%20%281%29.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAXSNW2ORESX4WA3MQ%2F20230315%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230315T064307Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=6b75fac343f5e24c5fd4fafe4e930cd1b26faf8d388a569f8c392861d0a89f41',
-      category: {
-        id: 1,
-        category_name: 'Daging, Ikan, Telur',
-      },
-      weight: 50,
-      status: true,
-    },
-    {
-      id: 3,
-      product_name: 'Sayap Ayam',
-      grade: 'C',
-      low_stock_limit: 210,
-      image_path:
-        'https://titipku-dev.s3.ap-southeast-1.amazonaws.com/kur_user_documents/kk/7-02-2023-1675759857351723921_pexels-ekaterina-bolovtsova-6979271%20%281%29.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAXSNW2ORESX4WA3MQ%2F20230315%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230315T064307Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=6b75fac343f5e24c5fd4fafe4e930cd1b26faf8d388a569f8c392861d0a89f41',
-      category: {
-        id: 1,
-        category_name: 'Daging, Ikan, Telur',
-      },
-      weight: 200,
-      status: false,
-    },
-    {
-      id: 4,
-      product_name: 'Beras Rojo Lele',
-      grade: null,
-      low_stock_limit: 1000,
-      image_path:
-        'https://titipku-dev.s3.ap-southeast-1.amazonaws.com/kur_user_documents/kk/7-02-2023-1675759857351723921_pexels-ekaterina-bolovtsova-6979271%20%281%29.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAXSNW2ORESX4WA3MQ%2F20230315%2Fap-southeast-1%2Fs3%2Faws4_request&X-Amz-Date=20230315T064307Z&X-Amz-Expires=300&X-Amz-SignedHeaders=host&X-Amz-Signature=6b75fac343f5e24c5fd4fafe4e930cd1b26faf8d388a569f8c392861d0a89f41',
-      category: {
-        id: 1,
-        category_name: 'Sembako',
-      },
-      weight: 2000000,
-      status: true,
-    },
-  ];
+  // Table
+  useEffect(() => {
+    dispatch(productAction.fetchData(product.params));
+  }, [product.params]);
 
-  const headCell: HeadCells<Inventory>[] = [
+  const handleChangeRowPerPage = (value: number) => {
+    dispatch(
+      productAction.setParams({
+        page: 1,
+        count: value,
+      }),
+    );
+  };
+
+  const headCell: HeadCells<Product>[] = [
     {
       id: 'product_name',
       label: 'Product / SKU',
       align: 'left',
       enableSort: false,
-      format: (val: Inventory) => (
+      format: (val: Product) => (
         <Box
           display="flex"
           flexDirection="row"
@@ -206,9 +165,9 @@ export default function InventoryPage() {
               currentTarget.onerror = null;
               currentTarget.src = NoImage;
             }}
-            src={val.image_path}
+            src={val.product_parent.image_filepath}
             style={{ height: '48px', width: '48px', borderRadius: '50%' }}
-            alt={val.product_name}
+            alt={val.product_parent.name}
           />
           <Box
             display="flex"
@@ -216,12 +175,12 @@ export default function InventoryPage() {
             justifyContent="flex-start"
             gap="8px"
           >
-            {val.grade && (
+            {val.product_grade.id !== 1 && (
               <GradingColor
-                grade={val.grade}
-              >{`Grade ${val.grade}`}</GradingColor>
+                grade={val.product_grade.name}
+              >{`Grade ${val.product_grade.name}`}</GradingColor>
             )}
-            <Typography>{val.product_name}</Typography>
+            <Typography>{val.product_parent.name}</Typography>
           </Box>
         </Box>
       ),
@@ -231,8 +190,10 @@ export default function InventoryPage() {
       label: 'Category',
       align: 'left',
       enableSort: false,
-      format: (val: Inventory) => (
-        <Category>{val.category.category_name}</Category>
+      format: (val: Product) => (
+        <Category>
+          {val.product_parent.product_parent_category?.name || '-'}
+        </Category>
       ),
     },
     {
@@ -240,17 +201,18 @@ export default function InventoryPage() {
       label: 'Weight ( Gram )',
       align: 'left',
       enableSort: false,
+      format: (val: Product) => <Typography>{val.stock}</Typography>,
     },
     {
       id: 'status',
       label: 'Status',
       align: 'left',
       enableSort: false,
-      format: (val: Inventory) => {
+      format: (val: Product) => {
         let status = 0;
-        if (!val.status) status = 0;
-        else if (val.weight === 0) status = 1;
-        else if (val.weight <= val.low_stock_limit) status = 2;
+        if (!val.is_active) status = 0;
+        else if (val.stock === 0) status = 1;
+        else if (val.stock <= val.low_stock_limit) status = 2;
         else status = 3;
         return (
           <StatusColor status={status}>
@@ -270,7 +232,7 @@ export default function InventoryPage() {
       label: '',
       align: 'left',
       width: '20px',
-      format: (val: Inventory) => (
+      format: (val: Product) => (
         <>
           <MenuList
             menu={[
@@ -287,12 +249,12 @@ export default function InventoryPage() {
                 onClick: () => console.log('See Details'),
               },
               {
-                label: val.status ? 'Make Inactive' : 'Make Active',
+                label: val.is_active ? 'Make Inactive' : 'Make Active',
                 onClick: () => {
                   changeStatusModal.openModal();
                   setSelected([val.id]);
                   setSelectedProduct([val]);
-                  if (val.status) setNewStatus(false);
+                  if (val.is_active) setNewStatus(false);
                   else setNewStatus(true);
                 },
               },
@@ -330,26 +292,24 @@ export default function InventoryPage() {
           >
             {/* circle of paper box icon (on low/empty stock header) */}
             <CircleContainer
-              display={
-                inventory.activeDashboard !== 'all_data' ? 'flex' : 'none'
-              }
+              display={product.activeDashboard !== 'all_data' ? 'flex' : 'none'}
               width="66px"
               height="66px"
-              activeDashboard={inventory.activeDashboard}
+              activeDashboard={product.activeDashboard}
             >
               {/* total stock bullet */}
-              <CircleTotalStock activeDashboard={inventory.activeDashboard}>
+              <CircleTotalStock activeDashboard={product.activeDashboard}>
                 {10}
               </CircleTotalStock>
               {/* icon x / arrow down */}
               <MiniCircleOnIcon
-                activeDashboard={inventory.activeDashboard}
+                activeDashboard={product.activeDashboard}
                 bottom="29%"
                 left="23%"
                 height="10px"
                 width="10px"
               >
-                {inventory.activeDashboard === 'empty_stock' ? (
+                {product.activeDashboard === 'empty_stock' ? (
                   <CloseIcon
                     sx={{
                       color: '#fff',
@@ -363,7 +323,6 @@ export default function InventoryPage() {
                       color: '#fff',
                       height: '10px',
                       width: '7px',
-                      mr: '1px',
                     }}
                   />
                 )}
@@ -377,7 +336,7 @@ export default function InventoryPage() {
               </Typography>
               <BackButton
                 display={
-                  inventory.activeDashboard !== 'all_data' ? 'flex' : 'none'
+                  product.activeDashboard !== 'all_data' ? 'flex' : 'none'
                 }
                 onClick={() => handleSetActiveDashboard('all_data')}
               >
@@ -395,8 +354,7 @@ export default function InventoryPage() {
           item
           xs={12}
           sx={{
-            display:
-              inventory.activeDashboard === 'all_data' ? 'inline' : 'none',
+            display: product.activeDashboard === 'all_data' ? 'inline' : 'none',
           }}
         >
           <CardContainer>
@@ -608,18 +566,18 @@ export default function InventoryPage() {
             {/* table */}
             <Box p="16px 12px">
               <Table
-                data={dummyData || []}
+                data={product.products || []}
                 headCells={headCell}
-                totalData={dummyData.length}
+                totalData={product.totalProducts}
                 loading={false}
-                count={10}
+                count={product.params.count}
                 selected={selected}
                 setSelected={(array: (string | number)[]) => {
                   setSelected(array);
                   setSelectedProduct(() => {
-                    const newArr: Inventory[] = [];
+                    const newArr: Product[] = [];
                     array.map((id) => {
-                      const obj: Inventory | undefined = dummyData.find(
+                      const obj: Product | undefined = product.products.find(
                         (item) => item.id === id,
                       );
                       if (obj) return newArr.push(obj);
@@ -627,7 +585,11 @@ export default function InventoryPage() {
                     return [...newArr];
                   });
                 }}
+                onChangeRowPerpage={handleChangeRowPerPage}
                 enableCheckBox
+                noDataComponent={
+                  <NoDataInventory onAdd={() => console.log('add')} />
+                }
               />
             </Box>
           </CardContainer>

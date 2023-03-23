@@ -1,18 +1,18 @@
 import { PayloadAction } from '@reduxjs/toolkit';
-import { Inventory, InventoryParams } from 'models/b2b/Inventory';
+import { Product, ProductParams } from 'models/b2b/Product';
 import { ListResponse } from 'models/fetch';
 import { call, put, takeLatest } from 'redux-saga/effects';
-import * as service from 'service/B2B/Inventory';
-import { inventoryAction } from 'store/slice/b2b/Inventory';
+import * as service from 'service/B2B/Product';
+import { productAction } from 'store/slice/b2b/Product';
 import { uiAction } from 'store/slice/ui';
 
-function* fetchData(params: PayloadAction<InventoryParams>) {
+function* fetchData(params: PayloadAction<ProductParams>) {
   try {
-    const response: ListResponse<Inventory> = yield call(
-      service.fetchInventory,
+    const response: ListResponse<Product> = yield call(
+      service.fetchProduct,
       params.payload,
     );
-    yield put(inventoryAction.fetchDataSuccess(response));
+    yield put(productAction.fetchDataSuccess(response));
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
@@ -35,6 +35,6 @@ function* fetchData(params: PayloadAction<InventoryParams>) {
   }
 }
 
-export default function* inventorySaga() {
-  yield takeLatest(inventoryAction.fetchData, fetchData);
+export default function* productSagas() {
+  yield takeLatest(productAction.fetchData, fetchData);
 }

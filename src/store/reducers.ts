@@ -11,7 +11,7 @@ import paymentKURReducer from './slice/kur/Payment';
 import merchantReducer from './slice/Merchant';
 import creditScoreKurReducer from './slice/kur/CreditScore';
 import invoiceReducer from './slice/kur/Invoice';
-import InventoryReducer from './slice/b2b/Inventory';
+import productsReducer from './slice/b2b/Product';
 
 const reducers = {
   ui: uiReducer,
@@ -27,7 +27,7 @@ const reducers = {
   merchant: merchantReducer,
   creditScore: creditScoreKurReducer,
   invoice: invoiceReducer,
-  inventory: InventoryReducer,
+  product: productsReducer,
 };
 
 export default reducers;

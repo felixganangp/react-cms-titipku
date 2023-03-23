@@ -27,3 +27,9 @@ export interface AdministratorStatus {
   name: string;
   description: string;
 }
+
+export interface ModifiedUser {
+  id: number;
+  name: string;
+  type: string;
+}

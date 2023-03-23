@@ -10,7 +10,7 @@ export interface YellowToastProps {
   additionalMsg?: string;
   action: string;
   error: boolean;
-  onUndoAction: () => void | undefined;
+  onUndoAction?: () => void | undefined;
 }
 
 export default function YellowToast() {
@@ -50,9 +50,11 @@ export default function YellowToast() {
         >
           &nbsp;{action.charAt(0).toUpperCase() + action.slice(1)}
         </Typography>
-        <Typography onClick={onUndoAction}>
-          &nbsp;<u>Undo</u>
-        </Typography>
+        {onUndoAction && (
+          <Typography onClick={onUndoAction}>
+            &nbsp;<u>Undo</u>
+          </Typography>
+        )}
       </Box>
       <IconButton>
         <CloseIcon onClick={() => dispatch(uiAction.closeYellowToast())} />

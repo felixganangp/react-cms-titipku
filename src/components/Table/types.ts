@@ -60,6 +60,7 @@ export interface EnhancedTableProps<T extends { id?: string | number }> {
   onChangeRowPerpage?: (page: number) => void;
   setSelected?: (array: (string | number)[]) => void;
   onChangeSort?: (order: TableOrder) => void;
+  noDataComponent?: JSX.Element;
 }
 
 export type Align = 'inherit' | 'left' | 'center' | 'right' | 'justify';

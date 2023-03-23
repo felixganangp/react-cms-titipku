@@ -24,22 +24,28 @@ import { Child, FilteredMenu } from 'models/Menu';
 
 const HEADER_MOBILE = 64;
 
-const StyledSearchbar = styled('div')(({ theme }) => ({
-  backdropFilter: `blur(6px)`,
-  WebkitBackdropFilter: `blur(6px)`,
-  //   backgroundColor: alpha(color, opacity),
-  backgroundColor: 'rgba(255,255,255, 0.5)',
-  top: 0,
-  right: 0,
-  zIndex: 99,
-  width: 'calc(100vw - 68px)',
-  display: 'flex',
-  position: 'absolute',
-  alignItems: 'center',
-  height: HEADER_MOBILE,
-  padding: theme.spacing(0, 3),
-  color: '#626b79',
-}));
+const StyledSearchbar = styled('div')<{ openSidebar: boolean }>(
+  ({ theme }) => ({
+    backdropFilter: `blur(6px)`,
+    WebkitBackdropFilter: `blur(6px)`,
+    //   backgroundColor: alpha(color, opacity),
+    backgroundColor: 'rgba(255,255,255, 0.5)',
+    top: 0,
+    right: 0,
+    zIndex: 99,
+    width: `${(props: { openSidebar: boolean }) =>
+      props.openSidebar ? 'calc(100vw - 100px)' : 'calc(100vw - 236px)'}`,
+    display: 'flex',
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    height: HEADER_MOBILE,
+    padding: theme.spacing(0, 3),
+    color: '#626b79',
+    border: `${(props: SearchProps) =>
+      props.openSidebar ? `1px solid red` : `1px solid brown`}`,
+  }),
+);
 
 // ----------------------------------------------------------------------
 interface Option {
@@ -48,7 +54,11 @@ interface Option {
   path: string;
 }
 
-export default function Searchbar() {
+interface SearchProps {
+  openSidebar: boolean;
+}
+
+export default function Searchbar({ openSidebar }: SearchProps) {
   const navigate = useNavigate();
   const menuData = useAppSelector((state) => state.userDetails.menuData);
   const [searchValue, setSearchValue] = useState('');
@@ -108,7 +118,7 @@ export default function Searchbar() {
         )}
 
         <Slide direction="down" in={open} mountOnEnter unmountOnExit>
-          <StyledSearchbar>
+          <StyledSearchbar openSidebar={openSidebar}>
             <Autocomplete
               disablePortal
               popupIcon={<></>}
@@ -121,6 +131,12 @@ export default function Searchbar() {
               groupBy={(option) => option.parent}
               onChange={(_, value) => {
                 navigate(value?.path || '');
+              }}
+              fullWidth
+              sx={{
+                width: openSidebar
+                  ? `calc(100vw - 100px)`
+                  : `calc(100vw - 266px)`,
               }}
               noOptionsText={
                 <Stack
@@ -157,7 +173,6 @@ export default function Searchbar() {
                   <Box>{params.children}</Box>
                 </li>
               )}
-              fullWidth
               renderOption={(props, option) => (
                 <Box
                   component="li"

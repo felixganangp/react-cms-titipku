@@ -1,10 +1,10 @@
 import http from 'utils/request';
-import { InventoryParams } from 'models/b2b/Inventory';
+import { ProductParams } from 'models/b2b/Product';
 
-export const fetchInventory = (params: InventoryParams) =>
+export const fetchProduct = (params: ProductParams) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await http.get('/b2b/inventory', { params });
+      const response = await http.get('/inventory/b2b/product', { params });
       if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response
@@ -14,12 +14,12 @@ export const fetchInventory = (params: InventoryParams) =>
     }
   });
 
-export const deleteInventory = (id: number | string) =>
+export const deleteProduct = (ids: number[]) =>
   new Promise(async (resolve, reject) => {
     try {
       //   const response = await http.delete(`/b2b/inventory/${id}`);
       //   if (response.data) resolve(response.data);
-      console.log('delete inventories');
+      console.log('delete product');
     } catch (err: any) {
       const message: string = err.response
         ? `${err.response.data.message}`

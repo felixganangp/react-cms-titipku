@@ -313,7 +313,11 @@ function EnhancedTable<T extends Data>({
                     p="50px"
                     data-testid="data-table-not-result-found"
                   >
-                    <DefaultNoData />
+                    {!props.noDataComponent ? (
+                      <DefaultNoData />
+                    ) : (
+                      props.noDataComponent
+                    )}
                   </Box>
                 </TableCell>
               </TableRow>
@@ -416,6 +420,6 @@ function EnhancedTable<T extends Data>({
 
 EnhancedTable.defaultProps = {
   page: 1,
-  rowsPerPageOptions: [10, 25, 50, 100],
+  rowsPerPageOptions: [5, 10, 15],
 };
 export default EnhancedTable;

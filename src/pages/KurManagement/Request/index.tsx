@@ -377,11 +377,12 @@ export default function RequestKURPage() {
                   flexDirection="row"
                   width="100%"
                   justifyContent="space-between"
+                  gap="20px"
                 >
                   <TextField
                     placeholder="Search item"
                     size="small"
-                    sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
+                    sx={{ bgcolor: '#fafafa', maxWidth: '560px', flex: 1 }}
                     fullWidth
                     data-testid="search-request-kur"
                     defaultValue={request.displayParams.search}
