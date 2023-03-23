@@ -420,7 +420,7 @@ export default function PaymentKURPage() {
                   gap="28px"
                 >
                   <Button
-                    sx={{ width: '12%' }}
+                    sx={{ width: '180px' }}
                     startIcon={<AddIcon />}
                     onClick={() => {
                       formModal.openModal();
@@ -433,11 +433,12 @@ export default function PaymentKURPage() {
                     flexDirection="row"
                     width="100%"
                     justifyContent="space-between"
+                    gap="20px"
                   >
                     <TextField
                       placeholder="Search item"
                       size="small"
-                      sx={{ bgcolor: '#fafafa', maxWidth: '560px' }}
+                      sx={{ bgcolor: '#fafafa', maxWidth: '560px', flex: 1 }}
                       fullWidth
                       defaultValue={payment.params.search}
                       InputProps={{

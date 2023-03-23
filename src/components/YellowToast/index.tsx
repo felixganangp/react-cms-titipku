@@ -10,7 +10,7 @@ export interface YellowToastProps {
   additionalMsg?: string;
   action: string;
   error: boolean;
-  onUndoAction: () => void | undefined;
+  onUndoAction?: () => void | undefined;
 }
 
 export default function YellowToast() {
@@ -19,7 +19,7 @@ export default function YellowToast() {
     useAppSelector((state) => state.ui.yellowToast);
 
   useEffect(() => {
-    if (open) setTimeout(() => dispatch(uiAction.closeYellowToast()), 50000);
+    if (open) setTimeout(() => dispatch(uiAction.closeYellowToast()), 5000);
   }, [open]);
 
   return (
@@ -50,9 +50,11 @@ export default function YellowToast() {
         >
           &nbsp;{action.charAt(0).toUpperCase() + action.slice(1)}
         </Typography>
-        <Typography onClick={onUndoAction}>
-          &nbsp;<u>Undo</u>
-        </Typography>
+        {onUndoAction && (
+          <Typography onClick={onUndoAction}>
+            &nbsp;<u>Undo</u>
+          </Typography>
+        )}
       </Box>
       <IconButton>
         <CloseIcon onClick={() => dispatch(uiAction.closeYellowToast())} />

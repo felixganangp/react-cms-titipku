@@ -23,9 +23,6 @@ const initialState: UIState = {
     additionalMsg: '',
     action: '',
     error: false,
-    onUndoAction() {
-      console.log(' ');
-    },
   },
 };
 const uiSlice = createSlice({
