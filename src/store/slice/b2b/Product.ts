@@ -9,6 +9,7 @@ interface ProductProps {
   totalProducts: number;
   products: Product[];
   params: ProductParams;
+  loadingStockOpname: boolean;
 }
 
 const initialState: ProductProps = {
@@ -21,6 +22,7 @@ const initialState: ProductProps = {
     count: 10,
     search: '',
   },
+  loadingStockOpname: false,
 };
 
 const ProductSlice = createSlice({
@@ -52,6 +54,12 @@ const ProductSlice = createSlice({
     },
     fetchDataFailed(state: ProductProps) {
       state.loading = false;
+    },
+    stockOpname(state: ProductProps, action: PayloadAction<any>) {
+      state.loadingStockOpname = true;
+    },
+    stockOpnameSuccess(state: ProductProps) {
+      state.loadingStockOpname = false;
     },
   },
 });

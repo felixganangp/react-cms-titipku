@@ -642,7 +642,10 @@ export default function InventoryPage() {
         title="Stock Opname"
         onClose={stockOpnameModal.closeModal}
       >
-        <StockOpname items={selectedProduct} />
+        <StockOpname
+          items={selectedProduct}
+          onClose={stockOpnameModal.closeModal}
+        />
       </ModalComp>
     </Box>
   );

@@ -6,46 +6,62 @@ import {
   Button,
   FormControlLabel,
 } from '@mui/material';
+import ReportIcon from '@mui/icons-material/Report';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { useAppSelector, useAppDispatch } from 'store/hooks';
+import { productAction } from 'store/slice/b2b/Product';
 import { Product } from 'models/b2b/Product';
 import NoImage from 'assets/no-image.svg';
 import { GradingColor } from '../inventory.styled';
 
 interface Props {
   items: Product[];
+  onClose: () => void;
 }
 
-function StockOpname({ items }: Props) {
+function StockOpname({ items, onClose }: Props) {
+  const dispatch = useAppDispatch();
+
   const initData: any = {};
   items.forEach((el) => {
     initData[`product_${el.id}`] = el.stock;
   });
+  const SchemaObjectTeset = Object.fromEntries(
+    items.map((el) => [
+      `product_${el.id}`,
+      yup
+        .number()
+        .required('Field is required')
+        .min(0, 'Please input valid value')
+        .max(100000000, 'Max value is 100.000.000'),
+    ]),
+  );
   const [initialValues, setInitialValues] = React.useState(initData);
   const formik = useFormik({
     initialValues,
     onSubmit: async (value, { resetForm }) => {
       console.log('teset');
     },
-    validationSchema: yup.object({
-      name: yup.string().required('Name is required'),
-    }),
+    validationSchema: yup.object().shape(SchemaObjectTeset),
     enableReinitialize: true,
   });
 
-  const {
-    handleSubmit,
-    values,
-    handleBlur,
-    handleChange,
-    errors,
-    touched,
-    setFieldValue,
-    isValid,
-    dirty,
-  } = formik;
-  const handleOnSubmit = () => {
-    console.log(values);
+  const { values, handleBlur, handleChange, errors, isValid } = formik;
+  const handleOnSubmit = async () => {
+    const payload: any = [];
+    // eslint-disable-next-line guard-for-in, no-restricted-syntax
+    for (const prop in values) {
+      const splitProp = prop.split('_');
+      const result = {
+        stock: +values[prop],
+        id: +splitProp[1],
+      };
+      payload.push(result);
+    }
+    console.log(payload);
+    await dispatch(productAction.stockOpname(payload));
+    await onClose();
   };
   return (
     <Box>
@@ -138,6 +154,20 @@ function StockOpname({ items }: Props) {
                   value={values[`product_${item.id}`]}
                   sx={{ width: '135px' }}
                 />
+                {Boolean(errors[`product_${item.id}`]) && (
+                  <Typography
+                    sx={{
+                      mt: '3px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      fontSize: '0.7rem',
+                      color: '#c10000',
+                    }}
+                  >
+                    <ReportIcon sx={{ fontSize: '0.9rem', mr: 0.5 }} />
+                    {errors[`product_${item.id}`]?.toString()}
+                  </Typography>
+                )}
               </Box>
             </Box>
           </Box>
@@ -154,10 +184,12 @@ function StockOpname({ items }: Props) {
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <Button variant="text" color="error">
+        <Button onClick={onClose} variant="text" color="error">
           Cancel
         </Button>
-        <Button onClick={handleOnSubmit}>Save Changes</Button>
+        <Button disabled={!isValid} onClick={handleOnSubmit}>
+          Save Changes
+        </Button>
       </Box>
       {/* </form> */}
     </Box>
