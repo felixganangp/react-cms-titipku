@@ -6,12 +6,12 @@ import {
   Button,
   FormControlLabel,
 } from '@mui/material';
-import { Inventory } from 'models/b2b/Inventory';
+import { Product } from 'models/b2b/Product';
 import NoImage from 'assets/no-image.svg';
 import { GradingColor } from '../inventory.styled';
 
 interface Props {
-  items: Inventory[];
+  items: Product[];
 }
 
 function StockOpname({ items }: Props) {
@@ -37,9 +37,9 @@ function StockOpname({ items }: Props) {
                   currentTarget.onerror = null;
                   currentTarget.src = NoImage;
                 }}
-                src={item.image_path}
+                src={item.product_parent.image_filepath}
                 style={{ height: '48px', width: '48px', borderRadius: '50%' }}
-                alt={item.product_name}
+                alt={item.product_parent.name}
               />
               <Box
                 sx={{
@@ -68,12 +68,18 @@ function StockOpname({ items }: Props) {
                   >
                     <GradingColor
                       sx={{ padding: '2px !important' }}
-                      grade={item.grade as string}
-                    >{`Grade ${item.grade}`}</GradingColor>
-                    <Typography fontSize="17px">{item.product_name}</Typography>
+                      grade={item.product_grade.id}
+                    >{`Grade ${item.product_grade.name}`}</GradingColor>
+                    <Typography fontSize="17px">
+                      {item.product_parent.name}
+                    </Typography>
                   </Box>
                   <Box sx={{ backgroundColor: '#e4e4e4', paddingX: '1em' }}>
-                    <Typography>{item.category.category_name}</Typography>
+                    <Typography>
+                      {item.product_parent.product_parent_category
+                        ? item.product_parent.product_parent_category[0].name
+                        : '-'}
+                    </Typography>
                   </Box>
                 </Box>
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
@@ -84,7 +90,7 @@ function StockOpname({ items }: Props) {
                     type="number"
                     name="stockWeight"
                     placeholder="Stock Weight"
-                    value={item.weight}
+                    value={item.stock}
                     fullWidth
                   />
                 </Box>
