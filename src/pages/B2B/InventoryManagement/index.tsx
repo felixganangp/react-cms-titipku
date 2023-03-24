@@ -13,6 +13,8 @@ import {
   MenuItem,
   Collapse,
   Modal,
+  Autocomplete,
+  Skeleton,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -36,7 +38,7 @@ import YellowToast from 'components/YellowToast';
 import { uiAction } from 'store/slice/ui';
 import {
   CardContainer,
-  Category,
+  CategoryStyle,
   CircleTotalStock,
   GradingColor,
   StatusColor,
@@ -54,21 +56,15 @@ import NoDataInventory from './components/NoData';
 export default function InventoryPage() {
   const dispatch = useAppDispatch();
   const product = useAppSelector((state) => state.product);
-
+  const activeDashboard = useAppSelector(
+    (state) => state.product.activeDashboard,
+  );
+  const { search, grade, category, status } = useAppSelector(
+    (state) => state.product.displayFilter,
+  );
   const stockOpnameModal = useModal();
-  // mini dashboard
-  const handleSetActiveDashboard = (activeDashboard: string) => {
-    dispatch(productAction.setActiveDashboard({ activeDashboard }));
-  };
 
-  const getDashboardTitle = () => {
-    if (product.activeDashboard === 'all_data') return 'Inventory Management';
-    if (product.activeDashboard === 'empty_stock')
-      return 'Empty Stock Products';
-    return 'Low Stock Products';
-  };
-
-  // batch action
+  // BATCH ACTION
   const [selected, setSelected] = useState<(number | string)[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -140,15 +136,125 @@ export default function InventoryPage() {
           .join(',')
       : '';
 
-  // filter
+  // SEARCH & FILTER
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const handleExpandFilter = () => {
     setOpenFilter(!openFilter);
   };
 
-  // Table
+  useEffect(() => {
+    dispatch(productAction.fetchGrade());
+    dispatch(productAction.fetchCategory());
+  }, []);
+
+  const handleSearch = (value: string) => {
+    dispatch(
+      productAction.setDisplayFilter({
+        search: value,
+      }),
+    );
+  };
+
+  const handleChangeGrade = (value: any) => {
+    dispatch(
+      productAction.setDisplayFilter({
+        grade: value,
+      }),
+    );
+  };
+
+  const handleChangeCategory = (value: any) => {
+    dispatch(
+      productAction.setDisplayFilter({
+        category: value,
+      }),
+    );
+  };
+
+  const handleChangeFilterStatus = (value: any) => {
+    dispatch(
+      productAction.setDisplayFilter({
+        status: value,
+      }),
+    );
+  };
+
+  const handleApplyFilter = () => {
+    dispatch(
+      productAction.setParams({
+        ...product.params,
+        page: 1,
+        search: search || '',
+        product_grade_id: grade ? grade.id : undefined,
+        product_parent_category_id: category ? category.id : undefined,
+        status: status ? status.value : undefined,
+      }),
+    );
+  };
+
+  const handleResetFilter = () => {
+    dispatch(
+      productAction.setParams({
+        page: 1,
+        search: '',
+        product_type_id: undefined,
+        product_grade_id: undefined,
+        product_parent_category_id: undefined,
+        status: undefined,
+      }),
+    );
+    dispatch(
+      productAction.setDisplayFilter({
+        search: '',
+        grade: null,
+        category: null,
+        status: null,
+      }),
+    );
+    dispatch(
+      productAction.fetchData({
+        page: 1,
+        count: product.params.count,
+        search: '',
+        product_type_id: undefined,
+        product_grade_id: undefined,
+        product_parent_category_id: undefined,
+        status: undefined,
+      }),
+    );
+  };
+
+  // MINI DASHBOARD
+  const handleSetActiveDashboard = (value: string | undefined) => {
+    dispatch(
+      productAction.setParams({
+        page: 1,
+        count: 10,
+        status: value,
+      }),
+    );
+    dispatch(
+      productAction.setActiveDashboard(
+        value === undefined ? 'all_stock' : value,
+      ),
+    );
+  };
+
+  const getDashboardTitle = () => {
+    if (activeDashboard === 'all_stock') return 'Inventory Management';
+    if (activeDashboard === 'empty_stock') return 'Empty Stock Products';
+    return 'Low Stock Products';
+  };
+
+  useEffect(() => {
+    handleResetFilter();
+  }, [activeDashboard]);
+
+  // TABLE
   useEffect(() => {
     dispatch(productAction.fetchData(product.params));
+    dispatch(productAction.fetchTotalEmptyStock());
+    dispatch(productAction.fetchTotalLowStock());
   }, [product.params]);
 
   const handleChangeRowPerPage = (value: number) => {
@@ -156,6 +262,14 @@ export default function InventoryPage() {
       productAction.setParams({
         page: 1,
         count: value,
+      }),
+    );
+  };
+
+  const handleChangePage = (value: number) => {
+    dispatch(
+      productAction.setParams({
+        page: value,
       }),
     );
   };
@@ -191,8 +305,8 @@ export default function InventoryPage() {
           >
             {val.product_grade.id !== 1 && (
               <GradingColor
-                grade={val.product_grade.name}
-              >{`Grade ${val.product_grade.name}`}</GradingColor>
+                grade={val.product_grade.id}
+              >{`${val.product_grade.name}`}</GradingColor>
             )}
             <Typography>{val.product_parent.name}</Typography>
           </Box>
@@ -205,9 +319,11 @@ export default function InventoryPage() {
       align: 'left',
       enableSort: false,
       format: (val: Product) => (
-        <Category>
-          {val.product_parent.product_parent_category?.name || '-'}
-        </Category>
+        <CategoryStyle>
+          {val.product_parent.product_parent_category
+            ? val.product_parent.product_parent_category[0].name
+            : '-'}
+        </CategoryStyle>
       ),
     },
     {
@@ -223,18 +339,18 @@ export default function InventoryPage() {
       align: 'left',
       enableSort: false,
       format: (val: Product) => {
-        let status = 0;
-        if (!val.is_active) status = 0;
-        else if (val.stock === 0) status = 1;
-        else if (val.stock <= val.low_stock_limit) status = 2;
-        else status = 3;
+        let productStatus = 0;
+        if (!val.is_active) productStatus = 0;
+        else if (val.stock === 0) productStatus = 1;
+        else if (val.stock <= val.low_stock_limit) productStatus = 2;
+        else productStatus = 3;
         return (
-          <StatusColor status={status}>
-            {status === 0
+          <StatusColor status={productStatus}>
+            {productStatus === 0
               ? 'Inactive'
-              : status === 1
+              : productStatus === 1
               ? 'Habis'
-              : status === 2
+              : productStatus === 2
               ? 'Hampir Habis'
               : 'Tersedia'}
           </StatusColor>
@@ -308,24 +424,26 @@ export default function InventoryPage() {
           >
             {/* circle of paper box icon (on low/empty stock header) */}
             <CircleContainer
-              display={product.activeDashboard !== 'all_data' ? 'flex' : 'none'}
+              display={activeDashboard !== 'all_stock' ? 'flex' : 'none'}
               width="66px"
               height="66px"
-              activeDashboard={product.activeDashboard}
+              activeDashboard={activeDashboard}
             >
               {/* total stock bullet */}
-              <CircleTotalStock activeDashboard={product.activeDashboard}>
-                {10}
+              <CircleTotalStock activeDashboard={activeDashboard}>
+                {activeDashboard === 'low_stock'
+                  ? product.totalLowStock
+                  : product.totalEmptyStock}
               </CircleTotalStock>
               {/* icon x / arrow down */}
               <MiniCircleOnIcon
-                activeDashboard={product.activeDashboard}
+                activeDashboard={activeDashboard}
                 bottom="29%"
                 left="23%"
                 height="10px"
                 width="10px"
               >
-                {product.activeDashboard === 'empty_stock' ? (
+                {activeDashboard === 'empty_stock' ? (
                   <CloseIcon
                     sx={{
                       color: '#fff',
@@ -351,10 +469,8 @@ export default function InventoryPage() {
                 {getDashboardTitle()}
               </Typography>
               <BackButton
-                display={
-                  product.activeDashboard !== 'all_data' ? 'flex' : 'none'
-                }
-                onClick={() => handleSetActiveDashboard('all_data')}
+                display={activeDashboard !== 'all_stock' ? 'flex' : 'none'}
+                onClick={() => handleSetActiveDashboard(undefined)}
               >
                 <BackIcon sx={{ color: '#008e58' }} />
                 <Typography color="#008e58" fontSize="16px" fontWeight="bold">
@@ -370,7 +486,7 @@ export default function InventoryPage() {
           item
           xs={12}
           sx={{
-            display: product.activeDashboard === 'all_data' ? 'inline' : 'none',
+            display: activeDashboard === 'all_stock' ? 'inline' : 'none',
           }}
         >
           <CardContainer>
@@ -405,7 +521,12 @@ export default function InventoryPage() {
                   alignItems="flex-start"
                 >
                   <Typography fontSize="20px" fontWeight={700} color="#555555">
-                    2 Items
+                    {product.loadingLowStock ? (
+                      <Skeleton width={20} height={30} />
+                    ) : (
+                      product.totalLowStock
+                    )}{' '}
+                    Items
                   </Typography>
                   <Typography fontSize="10px" fontWeight="bold" color="#afafaf">
                     LOW STOCK
@@ -449,7 +570,12 @@ export default function InventoryPage() {
                   alignItems="flex-start"
                 >
                   <Typography fontSize="20px" fontWeight={700} color="#555555">
-                    2 Items
+                    {product.loadingEmptyStock ? (
+                      <Skeleton width={20} height={30} />
+                    ) : (
+                      product.totalEmptyStock
+                    )}{' '}
+                    Items
                   </Typography>
                   <Typography fontSize="10px" fontWeight="bold" color="#afafaf">
                     EMPTY STOCK
@@ -476,6 +602,12 @@ export default function InventoryPage() {
                 size="small"
                 sx={{ flex: 1, bgcolor: '#f8f8f8', maxWidth: '560px' }}
                 fullWidth
+                defaultValue={product.displayFilter.search}
+                value={product.displayFilter.search}
+                onChange={(e) => handleSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleApplyFilter();
+                }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -561,14 +693,73 @@ export default function InventoryPage() {
                   p="8px 12px 0 12px"
                 >
                   <FormLabel text="Grade">
-                    <TextField fullWidth />
+                    <Autocomplete
+                      id="filterGrade"
+                      value={grade}
+                      options={product.grades || []}
+                      onChange={(e, value) => {
+                        handleChangeGrade(value);
+                      }}
+                      getOptionLabel={(option) => `${option.name}`}
+                      renderInput={(params) => {
+                        return (
+                          <TextField
+                            {...params}
+                            name="grade"
+                            placeholder="Select Grade"
+                            variant="outlined"
+                          />
+                        );
+                      }}
+                    />
                   </FormLabel>
                   <FormLabel text="Product Category">
-                    <TextField fullWidth />
+                    <Autocomplete
+                      id="filterCategory"
+                      value={category}
+                      options={product.categories || []}
+                      onChange={(e, value) => {
+                        handleChangeCategory(value);
+                      }}
+                      getOptionLabel={(option) => `${option.name}`}
+                      renderInput={(params) => {
+                        return (
+                          <TextField
+                            {...params}
+                            name="category"
+                            placeholder="Select Category"
+                            variant="outlined"
+                          />
+                        );
+                      }}
+                    />
                   </FormLabel>
-                  <FormLabel text="Status">
-                    <TextField fullWidth />
-                  </FormLabel>
+                  <Box
+                    display={activeDashboard === 'all_stock' ? 'flex' : 'none'}
+                    width="100%"
+                  >
+                    <FormLabel text="Status">
+                      <Autocomplete
+                        id="filterStatus"
+                        value={status}
+                        options={product.status || []}
+                        onChange={(e, value) => {
+                          handleChangeFilterStatus(value);
+                        }}
+                        getOptionLabel={(option) => `${option.label}`}
+                        renderInput={(params) => {
+                          return (
+                            <TextField
+                              {...params}
+                              name="category"
+                              placeholder="Select Status"
+                              variant="outlined"
+                            />
+                          );
+                        }}
+                      />
+                    </FormLabel>
+                  </Box>
                 </Box>
                 <Box
                   display="flex"
@@ -578,10 +769,16 @@ export default function InventoryPage() {
                   gap="8px"
                   pr="12px"
                 >
-                  <Button sx={{ width: '90px' }} variant="text">
+                  <Button
+                    sx={{ width: '90px' }}
+                    variant="text"
+                    onClick={handleResetFilter}
+                  >
                     Reset
                   </Button>
-                  <Button sx={{ width: '90px' }}>Apply</Button>
+                  <Button sx={{ width: '90px' }} onClick={handleApplyFilter}>
+                    Apply
+                  </Button>
                 </Box>
               </Box>
             </Collapse>
@@ -591,7 +788,7 @@ export default function InventoryPage() {
                 data={product.products || []}
                 headCells={headCell}
                 totalData={product.totalProducts}
-                loading={false}
+                loading={product.loading}
                 count={product.params.count}
                 selected={selected}
                 setSelected={(array: (string | number)[]) => {
@@ -609,6 +806,8 @@ export default function InventoryPage() {
                 }}
                 onChangeRowPerpage={handleChangeRowPerPage}
                 enableCheckBox
+                onChangePage={handleChangePage}
+                page={product.params.page}
                 noDataComponent={
                   <NoDataInventory onAdd={() => console.log('add')} />
                 }

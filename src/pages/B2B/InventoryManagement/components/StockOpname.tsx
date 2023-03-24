@@ -98,6 +98,15 @@ function StockOpname({ items, onClose }: Props) {
                 justifyContent: 'space-between',
               }}
             >
+              <img
+                onError={({ currentTarget }) => {
+                  currentTarget.onerror = null;
+                  currentTarget.src = NoImage;
+                }}
+                src={item.product_parent.image_filepath}
+                style={{ height: '48px', width: '48px', borderRadius: '50%' }}
+                alt={item.product_parent.name}
+              />
               <Box
                 sx={{
                   display: 'flex',
