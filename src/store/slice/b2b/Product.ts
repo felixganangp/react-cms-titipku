@@ -111,6 +111,7 @@ const ProductSlice = createSlice({
     },
     stockOpnameSuccess(state: ProductProps) {
       state.loadingStockOpname = false;
+    },
     fetchTotalLowStock(state: ProductProps) {
       state.loadingLowStock = true;
     },

@@ -21,6 +21,7 @@ interface Props {
 }
 
 function StockOpname({ items, onClose }: Props) {
+  console.log('🚀 ~ file: StockOpname.tsx:24 ~ StockOpname ~ items:', items);
   const dispatch = useAppDispatch();
 
   const initData: any = {};
@@ -98,15 +99,6 @@ function StockOpname({ items, onClose }: Props) {
                 justifyContent: 'space-between',
               }}
             >
-              <img
-                onError={({ currentTarget }) => {
-                  currentTarget.onerror = null;
-                  currentTarget.src = NoImage;
-                }}
-                src={item.product_parent.image_filepath}
-                style={{ height: '48px', width: '48px', borderRadius: '50%' }}
-                alt={item.product_parent.name}
-              />
               <Box
                 sx={{
                   display: 'flex',
@@ -126,7 +118,7 @@ function StockOpname({ items, onClose }: Props) {
                 >
                   <GradingColor
                     sx={{ padding: '2px !important' }}
-                    grade={item.product_grade.name as string}
+                    grade={item.product_grade.id}
                   >
                     {item.product_grade.name}
                   </GradingColor>
@@ -134,9 +126,13 @@ function StockOpname({ items, onClose }: Props) {
                     {item.product_parent.name}
                   </Typography>
                 </Box>
-                <Box sx={{ backgroundColor: '#e4e4e4', paddingX: '1em' }}>
-                  <Typography>
-                    {item.product_parent.product_parent_category?.name || '-'}
+                <Box sx={{ display: 'flex' }}>
+                  <Typography
+                    sx={{ paddingX: '1em', backgroundColor: '#e4e4e4' }}
+                  >
+                    {(item.product_parent.product_parent_category &&
+                      item.product_parent.product_parent_category[0].name) ||
+                      '-'}
                   </Typography>
                 </Box>
               </Box>
