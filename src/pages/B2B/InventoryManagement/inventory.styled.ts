@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { Box, Card } from '@mui/material';
 
 interface GradingProps {
-  grade: string;
+  grade: number;
 }
 
 interface StatusProps {
@@ -12,13 +12,13 @@ interface StatusProps {
 
 interface CircleBoxProps {
   display: string;
-  activeDashboard: string;
+  activeDashboard: string | undefined;
   width: string;
   height: string;
 }
 
 interface TotalStockProps {
-  activeDashboard: string;
+  activeDashboard: string | undefined;
   bottom?: string;
   left?: string;
   height?: string;
@@ -35,12 +35,12 @@ export const GradingColor = styled(Box)<Pick<GradingProps, 'grade'>>`
   height: fit-content;
   padding: 4px;
   background-color: ${(p) =>
-    p.grade === 'A' ? '#aad9c7' : p.grade === 'B' ? '#ffeeac' : '#f9ebe7'};
+    p.grade === 2 ? '#aad9c7' : p.grade === 3 ? '#ffeeac' : '#f9ebe7'};
   color: ${(p) =>
-    p.grade === 'A' ? '#005f3b' : p.grade === 'B' ? '#aa8803' : '#d27355'};
+    p.grade === 2 ? '#005f3b' : p.grade === 3 ? '#aa8803' : '#d27355'};
 `;
 
-export const Category = styled(Box)`
+export const CategoryStyle = styled(Box)`
   width: fit-content;
   height: fit-content;
   padding: 4px 10px;

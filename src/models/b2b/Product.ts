@@ -3,6 +3,7 @@ import { ModifiedUser } from '../UserDetails';
 import { ProductGrade } from './Grade';
 import { ProductParent } from './ProductParent';
 import { ProductType } from './Type';
+import { Category } from './Category';
 
 export interface Product {
   id: number;
@@ -32,4 +33,16 @@ export interface ProductParams extends ListParams {
   product_type_id?: number;
   product_parent_category_id?: number;
   status?: string;
+}
+
+export interface Status {
+  value: string;
+  label: string;
+}
+
+export interface ProductDisplayFilter {
+  search?: string;
+  grade?: ProductGrade | null;
+  category?: Category | null;
+  status?: Status | null;
 }

@@ -4,7 +4,7 @@ import { Category } from './Category';
 export interface ProductParent {
   id: number;
   name: string;
-  product_parent_category: null | Category;
+  product_parent_category: null | Category[];
   image_filepath: string;
   is_exist: boolean;
   is_active: boolean;
