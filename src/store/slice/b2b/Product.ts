@@ -20,6 +20,7 @@ interface ProductProps {
   totalEmptyStock: number;
   products: Product[];
   params: ProductParams;
+  loadingStockOpname: boolean;
   displayFilter: ProductDisplayFilter;
   grades: ProductGrade[];
   categories: Category[];
@@ -40,6 +41,7 @@ const initialState: ProductProps = {
     count: 10,
     search: '',
   },
+  loadingStockOpname: false,
   displayFilter: {
     search: '',
     grade: null,
@@ -103,6 +105,12 @@ const ProductSlice = createSlice({
     },
     fetchDataFailed(state: ProductProps) {
       state.loading = false;
+    },
+    stockOpname(state: ProductProps, action: PayloadAction<any>) {
+      state.loadingStockOpname = true;
+    },
+    stockOpnameSuccess(state: ProductProps) {
+      state.loadingStockOpname = false;
     },
     fetchTotalLowStock(state: ProductProps) {
       state.loadingLowStock = true;
