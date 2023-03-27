@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+  ChangeStatusParams,
+  IsActiveType,
   Product,
   ProductDisplayFilter,
   ProductParams,
@@ -15,6 +17,8 @@ interface ProductProps {
   loading: boolean;
   loadingLowStock: boolean;
   loadingEmptyStock: boolean;
+  loadingDelete: boolean;
+  loadingChangeStatus: boolean;
   totalProducts: number;
   totalLowStock: number;
   totalEmptyStock: number;
@@ -25,6 +29,8 @@ interface ProductProps {
   grades: ProductGrade[];
   categories: Category[];
   status: Status[];
+  tempIds: (number | string)[];
+  tempChangeStatus: IsActiveType[];
 }
 
 const initialState: ProductProps = {
@@ -32,6 +38,8 @@ const initialState: ProductProps = {
   loading: false,
   loadingLowStock: false,
   loadingEmptyStock: false,
+  loadingDelete: false,
+  loadingChangeStatus: false,
   totalProducts: 0,
   totalLowStock: 0,
   totalEmptyStock: 0,
@@ -68,6 +76,8 @@ const initialState: ProductProps = {
       label: 'Inactive',
     },
   ],
+  tempIds: [],
+  tempChangeStatus: [],
 };
 
 const ProductSlice = createSlice({
@@ -163,6 +173,33 @@ const ProductSlice = createSlice({
     },
     fetchCategoryFailed(state: ProductProps) {
       state.loading = false;
+    },
+    emptyTempIds(state: ProductProps) {
+      state.tempIds = [];
+      state.tempChangeStatus = [];
+    },
+    delete(state: ProductProps, action: PayloadAction<(number | string)[]>) {
+      state.loadingDelete = true;
+      state.tempIds = action.payload;
+    },
+    deleteDone(state: ProductProps) {
+      state.loadingDelete = false;
+    },
+    undoDelete(state: ProductProps) {
+      state.loadingDelete = true;
+    },
+    changeStatus(
+      state: ProductProps,
+      action: PayloadAction<ChangeStatusParams>,
+    ) {
+      state.loadingChangeStatus = true;
+      state.tempChangeStatus = action.payload.existingStatus;
+    },
+    changeStatusDone(state: ProductProps) {
+      state.loadingChangeStatus = false;
+    },
+    undoChangeStatus(state: ProductProps) {
+      state.loadingChangeStatus = true;
     },
   },
 });

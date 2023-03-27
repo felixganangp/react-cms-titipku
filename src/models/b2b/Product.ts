@@ -46,3 +46,13 @@ export interface ProductDisplayFilter {
   category?: Category | null;
   status?: Status | null;
 }
+
+export interface ChangeStatusParams {
+  existingStatus: IsActiveType[];
+  newStatus: IsActiveType;
+}
+
+export interface IsActiveType {
+  is_active: boolean;
+  ids: (number | string)[];
+}
