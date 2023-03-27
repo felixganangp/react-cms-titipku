@@ -15,7 +15,7 @@ export default function Delete({
   onClose,
 }: ChangeStatusProps) {
   const getHeader = () =>
-    totalItem > 1 ? `Delete ${totalItem} Items?` : `Delete ${selectedProduct}`;
+    totalItem > 1 ? `Delete ${totalItem} Items?` : `Delete ${selectedProduct}?`;
 
   const getDescription = () =>
     totalItem > 1 ? (
