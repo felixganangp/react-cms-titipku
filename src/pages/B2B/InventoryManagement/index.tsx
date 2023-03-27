@@ -126,7 +126,6 @@ export default function InventoryPage() {
         error: !newStatus,
       }),
     );
-    setTimeout(() => dispatch(productAction.emptyTempIds()), 9000);
   };
 
   const handleDelete = () => {
@@ -146,7 +145,6 @@ export default function InventoryPage() {
         error: true,
       }),
     );
-    setTimeout(() => dispatch(productAction.emptyTempIds()), 9000);
   };
 
   const getBatchProductDesc = () =>
