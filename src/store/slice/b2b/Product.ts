@@ -19,6 +19,7 @@ interface ProductProps {
   loadingEmptyStock: boolean;
   loadingDelete: boolean;
   loadingChangeStatus: boolean;
+  loadingFilter: boolean;
   totalProducts: number;
   totalLowStock: number;
   totalEmptyStock: number;
@@ -40,6 +41,7 @@ const initialState: ProductProps = {
   loadingEmptyStock: false,
   loadingDelete: false,
   loadingChangeStatus: false,
+  loadingFilter: false,
   totalProducts: 0,
   totalLowStock: 0,
   totalEmptyStock: 0,
@@ -75,6 +77,10 @@ const initialState: ProductProps = {
       value: 'inactive',
       label: 'Inactive',
     },
+    {
+      value: 'nonexist',
+      label: 'Deleted',
+    },
   ],
   tempIds: [],
   tempChangeStatus: [],
@@ -109,9 +115,9 @@ const ProductSlice = createSlice({
       state: ProductProps,
       action: PayloadAction<ListResponse<Product>>,
     ) {
-      state.loading = false;
       state.products = action.payload.data || [];
       state.totalProducts = action.payload.total || 0;
+      state.loading = false;
     },
     fetchDataFailed(state: ProductProps) {
       state.loading = false;
@@ -129,8 +135,8 @@ const ProductSlice = createSlice({
       state: ProductProps,
       action: PayloadAction<ListResponse<Product>>,
     ) {
-      state.loadingLowStock = false;
       state.totalLowStock = action.payload.total || 0;
+      state.loadingLowStock = false;
     },
     fetchTotalLowStockFailed(state: ProductProps) {
       state.loadingLowStock = false;
@@ -142,37 +148,37 @@ const ProductSlice = createSlice({
       state: ProductProps,
       action: PayloadAction<ListResponse<Product>>,
     ) {
-      state.loadingEmptyStock = false;
       state.totalEmptyStock = action.payload.total || 0;
+      state.loadingEmptyStock = false;
     },
     fetchTotalEmptyStockFailed(state: ProductProps) {
       state.loadingEmptyStock = false;
     },
     fetchGrade(state: ProductProps) {
-      state.loading = true;
+      state.loadingFilter = true;
     },
     fetchGradeSuccess(
       state: ProductProps,
       action: PayloadAction<ListResponse<ProductGrade>>,
     ) {
-      state.loading = false;
+      state.loadingFilter = false;
       state.grades = action.payload.data || [];
     },
     fetchGradeFailed(state: ProductProps) {
-      state.loading = false;
+      state.loadingFilter = false;
     },
     fetchCategory(state: ProductProps) {
-      state.loading = true;
+      state.loadingFilter = true;
     },
     fetchCategorySuccess(
       state: ProductProps,
       action: PayloadAction<ListResponse<Category>>,
     ) {
-      state.loading = false;
+      state.loadingFilter = false;
       state.categories = action.payload.data || [];
     },
     fetchCategoryFailed(state: ProductProps) {
-      state.loading = false;
+      state.loadingFilter = false;
     },
     emptyTempIds(state: ProductProps) {
       state.tempIds = [];

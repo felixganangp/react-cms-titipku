@@ -155,6 +155,7 @@ export const DashboardContainer = styled(Box)`
   :hover {
     background-color: #f8f8f8;
   }
+  cursor: pointer;
 `;
 
 export const TitleContainer = styled(Box)`
