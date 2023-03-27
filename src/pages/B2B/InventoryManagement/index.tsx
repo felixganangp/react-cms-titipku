@@ -15,6 +15,7 @@ import {
   Modal,
   Autocomplete,
   Skeleton,
+  Stack,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -26,6 +27,7 @@ import { HeadCells } from 'components/Table/types';
 import NoImage from 'assets/no-image.svg';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowIcon from '@mui/icons-material/ArrowForwardIos';
 import MenuList from 'components/MenuList';
 import FormLabel from 'components/FormLabel';
 import PaperBox from 'components/Icon/PaperBox';
@@ -52,6 +54,7 @@ import StockOpname from './components/StockOpname';
 import ChangeStatus from './components/ChangeStatus';
 import Delete from './components/Delete';
 import NoDataInventory from './components/NoData';
+import Form from './components/Form';
 
 export default function InventoryPage() {
   const dispatch = useAppDispatch();
@@ -63,6 +66,7 @@ export default function InventoryPage() {
     (state) => state.product.displayFilter,
   );
   const stockOpnameModal = useModal();
+  const formProductModal = useModal();
 
   // BATCH ACTION
   const [selected, setSelected] = useState<(number | string)[]>([]);
@@ -414,71 +418,88 @@ export default function InventoryPage() {
       <Grid container spacing={2}>
         {/* header (title, icon, back button) */}
         <Grid item xs={12}>
-          <Box
-            display="flex"
-            flexDirection="row"
-            justifyContent="flex-start"
+          <Stack
+            direction="row"
             alignItems="center"
-            gap="16px"
-            height="fit-content"
+            justifyContent="space-between"
           >
-            {/* circle of paper box icon (on low/empty stock header) */}
-            <CircleContainer
-              display={activeDashboard !== 'all_stock' ? 'flex' : 'none'}
-              width="66px"
-              height="66px"
-              activeDashboard={activeDashboard}
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="flex-start"
+              alignItems="center"
+              gap="16px"
+              height="fit-content"
             >
-              {/* total stock bullet */}
-              <CircleTotalStock activeDashboard={activeDashboard}>
-                {activeDashboard === 'low_stock'
-                  ? product.totalLowStock
-                  : product.totalEmptyStock}
-              </CircleTotalStock>
-              {/* icon x / arrow down */}
-              <MiniCircleOnIcon
-                activeDashboard={activeDashboard}
-                bottom="29%"
-                left="23%"
-                height="10px"
-                width="10px"
-              >
-                {activeDashboard === 'empty_stock' ? (
-                  <CloseIcon
-                    sx={{
-                      color: '#fff',
-                      height: '10px',
-                      width: '10px',
-                    }}
-                  />
-                ) : (
-                  <ArrowDownwardIcon
-                    sx={{
-                      color: '#fff',
-                      height: '10px',
-                      width: '7px',
-                    }}
-                  />
-                )}
-              </MiniCircleOnIcon>
-              <PaperBox sx={{ height: '34px', width: '34px' }} />
-            </CircleContainer>
-            {/* all title + back to all list button (for low/empty stock header) */}
-            <TitleContainer>
-              <Typography color="#000000" fontSize="26px" fontWeight="600">
-                {getDashboardTitle()}
-              </Typography>
-              <BackButton
+              {/* circle of paper box icon (on low/empty stock header) */}
+              <CircleContainer
                 display={activeDashboard !== 'all_stock' ? 'flex' : 'none'}
-                onClick={() => handleSetActiveDashboard(undefined)}
+                width="66px"
+                height="66px"
+                activeDashboard={activeDashboard}
               >
-                <BackIcon sx={{ color: '#008e58' }} />
-                <Typography color="#008e58" fontSize="16px" fontWeight="bold">
-                  See all List
+                {/* total stock bullet */}
+                <CircleTotalStock activeDashboard={activeDashboard}>
+                  {activeDashboard === 'low_stock'
+                    ? product.totalLowStock
+                    : product.totalEmptyStock}
+                </CircleTotalStock>
+                {/* icon x / arrow down */}
+                <MiniCircleOnIcon
+                  activeDashboard={activeDashboard}
+                  bottom="29%"
+                  left="23%"
+                  height="10px"
+                  width="10px"
+                >
+                  {activeDashboard === 'empty_stock' ? (
+                    <CloseIcon
+                      sx={{
+                        color: '#fff',
+                        height: '10px',
+                        width: '10px',
+                      }}
+                    />
+                  ) : (
+                    <ArrowDownwardIcon
+                      sx={{
+                        color: '#fff',
+                        height: '10px',
+                        width: '7px',
+                      }}
+                    />
+                  )}
+                </MiniCircleOnIcon>
+                <PaperBox sx={{ height: '34px', width: '34px' }} />
+              </CircleContainer>
+              {/* all title + back to all list button (for low/empty stock header) */}
+              <TitleContainer>
+                <Typography color="#000000" fontSize="26px" fontWeight="600">
+                  {getDashboardTitle()}
                 </Typography>
-              </BackButton>
-            </TitleContainer>
-          </Box>
+                <BackButton
+                  display={activeDashboard !== 'all_stock' ? 'flex' : 'none'}
+                  onClick={() => handleSetActiveDashboard(undefined)}
+                >
+                  <BackIcon sx={{ color: '#008e58' }} />
+                  <Typography color="#008e58" fontSize="16px" fontWeight="bold">
+                    See all List
+                  </Typography>
+                </BackButton>
+              </TitleContainer>
+            </Box>
+            {activeDashboard === 'all_stock' ? (
+              <Button
+                endIcon={<ArrowIcon />}
+                onClick={formProductModal.openModal}
+                size="large"
+              >
+                Add New
+              </Button>
+            ) : (
+              false
+            )}
+          </Stack>
         </Grid>
 
         {/* mini dashboard */}
@@ -845,6 +866,13 @@ export default function InventoryPage() {
           items={selectedProduct}
           onClose={stockOpnameModal.closeModal}
         />
+      </ModalComp>
+      <ModalComp
+        open={formProductModal.open}
+        title="Add Product"
+        onClose={formProductModal.closeModal}
+      >
+        <Form onClose={formProductModal.closeModal} />
       </ModalComp>
     </Box>
   );

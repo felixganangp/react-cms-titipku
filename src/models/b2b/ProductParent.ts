@@ -17,3 +17,9 @@ export interface ProductParent {
   updated_by_type: null | string;
   updated_by: null | ModifiedUser;
 }
+
+export interface CreateProduct {
+  name: string;
+  image_filepath: string;
+  product_parent_category_id: number[];
+}

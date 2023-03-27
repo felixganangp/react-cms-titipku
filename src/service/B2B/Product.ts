@@ -1,10 +1,36 @@
 import http from 'utils/request';
-import { ProductParams } from 'models/b2b/Product';
+import { ProductParams, CreateProduct } from 'models/b2b/Product';
 
 export const fetchProduct = (params: ProductParams) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await http.get('/inventory/b2b/product', { params });
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const createProduct = (data: CreateProduct) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.post('/inventory/b2b/product', data);
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const updateProduct = (id: number, data: CreateProduct) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.put(`/inventory/b2b/product/${id}`, data);
       if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response

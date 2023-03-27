@@ -1,14 +1,26 @@
+// store
 import { PayloadAction } from '@reduxjs/toolkit';
-import { Product, ProductParams } from 'models/b2b/Product';
-import { ListResponse } from 'models/fetch';
-import { call, put, takeLatest, select } from 'redux-saga/effects';
-import * as service from 'service/B2B/Product';
+import { call, put, takeLatest, select, all } from 'redux-saga/effects';
 import { productAction } from 'store/slice/b2b/Product';
 import { uiAction } from 'store/slice/ui';
+// models
+import { ListResponse, Response } from 'models/fetch';
+import {
+  Product,
+  ProductParams,
+  FormInventoryTypes,
+  CreateProduct,
+} from 'models/b2b/Product';
 import { ProductGrade } from 'models/b2b/Grade';
-import { fetchGrade } from 'service/B2B/Grade';
 import { Category } from 'models/b2b/Category';
+import { ProductType } from 'models/b2b/Type';
+import { ProductParent } from 'models/b2b/ProductParent';
+// service
+import * as service from 'service/B2B/Product';
+import * as serviceProductPerrant from 'service/B2B/ProductParent';
+import { fetchGrade } from 'service/B2B/Grade';
 import { fetchCategory } from 'service/B2B/Category';
+import { fetchTypes } from 'service/B2B/Types';
 
 function* fetchData(params: PayloadAction<ProductParams>) {
   try {
@@ -152,6 +164,33 @@ function* fetchCategories() {
   }
 }
 
+function* fetchTypesList() {
+  try {
+    const response: ListResponse<ProductType> = yield call(fetchTypes, {});
+    yield put(productAction.fetchTypesSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get types data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get types data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(productAction.fetchTypesFailed());
+  }
+}
+
 function* stockOpname(payload: PayloadAction<any>) {
   try {
     const paramsState: ProductParams = yield select((state) => {
@@ -195,6 +234,80 @@ function* stockOpname(payload: PayloadAction<any>) {
   }
 }
 
+function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
+  try {
+    const dataForm = payload.payload;
+    // console.log('from saga', payload.payload);
+    // Step 1. upload image
+    const payloadImage = {
+      image: dataForm.image,
+    };
+    const responUploadImage: Response<string> = yield call(
+      serviceProductPerrant.uploadImage,
+      payloadImage,
+    );
+    // console.log(responUploadImage);
+    // Step 2. Create Product Perent
+    const payloadProductPerant = {
+      name: dataForm.name,
+      image_filepath: responUploadImage.data,
+      product_parent_category_id: dataForm.category.map((val) => val.id),
+    };
+
+    yield call(serviceProductPerrant.createProduct, payloadProductPerant);
+
+    // get id
+    const getIdProductParent: ListResponse<ProductParent> = yield call(
+      serviceProductPerrant.fetchProduct,
+      { page: 1, count: 1, order_by: 'id', order_type: 'desc' },
+    );
+
+    // Step 3. upload product List
+    const callPromise: any = call;
+    yield all(
+      dataForm.productList.map((val) =>
+        callPromise(service.createProduct, {
+          product_type_id: dataForm.type?.id || 0,
+          product_parent_id: getIdProductParent.data[0].id,
+          product_grade_id: val.grade?.id || 0,
+          description: val.description,
+          stock: val.stock,
+          low_stock_limit: val.lowStock,
+          is_exist: val.is_exist,
+          is_active: val.is_active,
+        }),
+      ),
+    );
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Success create product',
+        // message: error,
+        severity: 'success',
+      }),
+    );
+    yield put(productAction.createProductSuccess());
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create product',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create product',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(productAction.createProductFailed());
+  }
+}
 export default function* productSagas() {
   yield takeLatest(productAction.fetchData, fetchData);
   yield takeLatest(productAction.stockOpname, stockOpname);
@@ -202,4 +315,6 @@ export default function* productSagas() {
   yield takeLatest(productAction.fetchTotalLowStock, fetchTotalLowStock);
   yield takeLatest(productAction.fetchGrade, fetchGrades);
   yield takeLatest(productAction.fetchCategory, fetchCategories);
+  yield takeLatest(productAction.fetchTypes, fetchTypesList);
+  yield takeLatest(productAction.createProduct, createProduct);
 }

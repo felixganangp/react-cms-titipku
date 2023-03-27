@@ -1,9 +1,9 @@
-import { ListParams } from '../fetch';
-import { ModifiedUser } from '../UserDetails';
-import { ProductGrade } from './Grade';
-import { ProductParent } from './ProductParent';
-import { ProductType } from './Type';
-import { Category } from './Category';
+import { ListParams } from 'models/fetch';
+import { ModifiedUser } from 'models/UserDetails';
+import { ProductGrade } from 'models/b2b/Grade';
+import { ProductParent } from 'models/b2b/ProductParent';
+import { ProductType } from 'models/b2b/Type';
+import { Category } from 'models/b2b/Category';
 
 export interface Product {
   id: number;
@@ -45,4 +45,30 @@ export interface ProductDisplayFilter {
   grade?: ProductGrade | null;
   category?: Category | null;
   status?: Status | null;
+}
+
+export interface CreateProduct {
+  product_parent_id: number;
+  product_grade_id: number;
+  product_type_id: number;
+  description: string;
+  stock: number;
+  low_stock_limit: number;
+  is_exist?: boolean;
+  is_active?: boolean;
+}
+
+export interface FormInventoryTypes {
+  image: string | Blob;
+  name: string;
+  category: Category[];
+  type: null | ProductType;
+  productList: {
+    grade: { id: number; name: string } | ProductGrade;
+    description: string;
+    stock: string | number;
+    lowStock: string | number;
+    is_exist: boolean;
+    is_active: boolean;
+  }[];
 }

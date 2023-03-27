@@ -4,17 +4,21 @@ import {
   ProductDisplayFilter,
   ProductParams,
   Status,
+  FormInventoryTypes,
 } from 'models/b2b/Product';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse } from 'models/fetch';
 import { ProductGrade } from 'models/b2b/Grade';
 import { Category } from 'models/b2b/Category';
+import { ProductType } from 'models/b2b/Type';
 
 interface ProductProps {
   activeDashboard: string;
   loading: boolean;
   loadingLowStock: boolean;
   loadingEmptyStock: boolean;
+  loadingForm: boolean;
+  isSuccessCreate: boolean;
   totalProducts: number;
   totalLowStock: number;
   totalEmptyStock: number;
@@ -23,6 +27,7 @@ interface ProductProps {
   loadingStockOpname: boolean;
   displayFilter: ProductDisplayFilter;
   grades: ProductGrade[];
+  types: ProductType[];
   categories: Category[];
   status: Status[];
 }
@@ -32,6 +37,8 @@ const initialState: ProductProps = {
   loading: false,
   loadingLowStock: false,
   loadingEmptyStock: false,
+  loadingForm: false,
+  isSuccessCreate: false,
   totalProducts: 0,
   totalLowStock: 0,
   totalEmptyStock: 0,
@@ -50,6 +57,7 @@ const initialState: ProductProps = {
   },
   grades: [],
   categories: [],
+  types: [],
   status: [
     {
       value: 'ready_stock',
@@ -163,6 +171,34 @@ const ProductSlice = createSlice({
     },
     fetchCategoryFailed(state: ProductProps) {
       state.loading = false;
+    },
+    fetchTypes(state: ProductProps) {
+      // state.loading = true;
+    },
+    fetchTypesSuccess(
+      state: ProductProps,
+      action: PayloadAction<ListResponse<ProductType>>,
+    ) {
+      // state.loading = false;
+      state.types = action.payload.data || [];
+    },
+    fetchTypesFailed(state: ProductProps) {
+      state.loading = false;
+    },
+    createProduct(
+      state: ProductProps,
+      action: PayloadAction<FormInventoryTypes>,
+    ) {
+      state.loadingForm = true;
+      state.isSuccessCreate = false;
+    },
+    createProductSuccess(state: ProductProps) {
+      state.loadingForm = false;
+      state.isSuccessCreate = true;
+    },
+    createProductFailed(state: ProductProps) {
+      state.loadingForm = false;
+      state.isSuccessCreate = false;
     },
   },
 });
