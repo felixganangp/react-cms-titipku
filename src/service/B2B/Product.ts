@@ -52,6 +52,21 @@ export const changeStatusProduct = (body: {
     }
   });
 
+export const stockOpnameProduct = (payload: any) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.put(`/inventory/b2b/product/batch-stock`, {
+        body: payload,
+      });
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
 export const batchUndoChangeStatus = async (body: IsActiveType[]) => {
   const callBatchChangeStatus = [];
   for (let i = 0; i < body.length; i += 1) {

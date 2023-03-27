@@ -77,6 +77,17 @@ export default function InventoryPage() {
     setAnchorEl(e.currentTarget);
   };
 
+  // STOCK OPNAME
+  const handleStockOpnameBatchAction = () => {
+    stockOpnameModal.openModal();
+  };
+  const handleStockOpnameAction = (val: Product) => {
+    const payload = [val];
+    setSelected([val.id]);
+    setSelectedProduct(payload);
+    stockOpnameModal.openModal();
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -394,7 +405,9 @@ export default function InventoryPage() {
             menu={[
               {
                 label: 'Stock Opname',
-                onClick: () => stockOpnameModal.openModal(),
+                onClick: () => {
+                  handleStockOpnameAction(val);
+                },
               },
               {
                 label: 'Edit',
@@ -665,7 +678,13 @@ export default function InventoryPage() {
                     'aria-labelledby': 'basic-button',
                   }}
                 >
-                  <MenuItem onClick={handleClose}>Stock Opname</MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      handleStockOpnameBatchAction();
+                    }}
+                  >
+                    Stock Opname
+                  </MenuItem>
                   <MenuItem
                     onClick={() => {
                       setNewStatus(false);
@@ -862,7 +881,10 @@ export default function InventoryPage() {
         title="Stock Opname"
         onClose={stockOpnameModal.closeModal}
       >
-        <StockOpname items={selectedProduct} />
+        <StockOpname
+          items={selectedProduct}
+          onClose={stockOpnameModal.closeModal}
+        />
       </ModalComp>
     </Box>
   );
