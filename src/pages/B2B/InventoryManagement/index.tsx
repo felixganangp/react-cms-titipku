@@ -22,7 +22,7 @@ import ArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import FilterIcon from '@mui/icons-material/FilterAltOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import Table from 'components/Table';
-import { Product } from 'models/b2b/Product';
+import { IsActiveType, Product } from 'models/b2b/Product';
 import { HeadCells } from 'components/Table/types';
 import NoImage from 'assets/no-image.svg';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -97,6 +97,19 @@ export default function InventoryPage() {
   };
 
   const handleChangeStatus = () => {
+    const existingStatus: IsActiveType[] = selectedProduct.map((item) => ({
+      is_active: item.is_active,
+      ids: [item.id],
+    }));
+    dispatch(
+      productAction.changeStatus({
+        existingStatus,
+        newStatus: {
+          is_active: newStatus || false,
+          ids: selected,
+        },
+      }),
+    );
     setSelected([]);
     handleClose();
     changeStatusModal.closeModal();
@@ -104,40 +117,53 @@ export default function InventoryPage() {
       uiAction.openYellowToast({
         totalItem: selectedProduct.length,
         onUndoAction() {
-          console.log('undo action');
+          dispatch(productAction.undoChangeStatus());
+          dispatch(uiAction.closeYellowToast());
         },
         additionalMsg: 'marked',
         action: newStatus ? 'active' : 'inactive',
         error: !newStatus,
       }),
     );
+    setTimeout(() => dispatch(productAction.emptyTempIds()), 9000);
   };
 
   const handleDelete = () => {
     setSelected([]);
     handleClose();
     deleteModal.closeModal();
+    dispatch(productAction.delete(selected));
     dispatch(
       uiAction.openYellowToast({
         totalItem: selectedProduct.length,
         onUndoAction() {
-          console.log('undo action');
+          dispatch(productAction.undoDelete());
+          dispatch(uiAction.closeYellowToast());
         },
         additionalMsg: '',
         action: 'delete',
         error: true,
       }),
     );
+    setTimeout(() => dispatch(productAction.emptyTempIds()), 9000);
   };
 
   const getBatchProductDesc = () =>
     selectedProduct.length > 0
-      ? selectedProduct
-          .map(
-            (item) =>
-              `${item.product_parent.name} Grade ${item.product_grade.name}`,
-          )
-          .join(',')
+      ? selectedProduct.length > 3
+        ? `${selectedProduct
+            .slice(0, 3)
+            .map(
+              (item) =>
+                `${item.product_parent.name} ${item.product_grade.name}`,
+            )
+            .join(',')} ... and ${selectedProduct.length - 3} others`
+        : selectedProduct
+            .map(
+              (item) =>
+                `${item.product_parent.name} ${item.product_grade.name}`,
+            )
+            .join(',')
       : '';
 
   // SEARCH & FILTER
@@ -204,7 +230,8 @@ export default function InventoryPage() {
         product_type_id: undefined,
         product_grade_id: undefined,
         product_parent_category_id: undefined,
-        status: undefined,
+        status:
+          activeDashboard === 'all_stock' ? undefined : product.params.status,
       }),
     );
     dispatch(
@@ -212,7 +239,8 @@ export default function InventoryPage() {
         search: '',
         grade: null,
         category: null,
-        status: null,
+        status:
+          activeDashboard === 'all_stock' ? null : product.displayFilter.status,
       }),
     );
     dispatch(
@@ -223,7 +251,8 @@ export default function InventoryPage() {
         product_type_id: undefined,
         product_grade_id: undefined,
         product_parent_category_id: undefined,
-        status: undefined,
+        status:
+          activeDashboard === 'all_stock' ? undefined : product.params.status,
       }),
     );
   };
@@ -241,6 +270,14 @@ export default function InventoryPage() {
       productAction.setActiveDashboard(
         value === undefined ? 'all_stock' : value,
       ),
+    );
+    dispatch(
+      productAction.setDisplayFilter({
+        status:
+          value !== undefined
+            ? product.status.filter((item) => item.value === value)[0]
+            : null,
+      }),
     );
   };
 
@@ -844,7 +881,10 @@ export default function InventoryPage() {
             totalItem={selected.length}
             selectedProduct={getBatchProductDesc()}
             onSubmit={handleChangeStatus}
-            onClose={changeStatusModal.closeModal}
+            onClose={() => {
+              setSelectedProduct([]);
+              changeStatusModal.closeModal();
+            }}
             newStatus={newStatus}
           />
         </Modal>

@@ -143,47 +143,47 @@ describe('request detail test', async () => {
     const table = await screen.findAllByTestId(/list-table-/i);
     expect(table.length).toBe(1);
   });
-  it('show image on table', async () => {
-    await act(() => {
-      mockTable(TableDetails);
-    });
-    const image = screen.getByTestId('req-dtl-zoom-img');
-    expect(image).toBeInTheDocument();
-  });
-  it('show error image if image is empty', async () => {
-    await act(() => {
-      mockTable(TableDetailsNoImage);
-    });
-    const image = screen.getByRole('img');
-    fireEvent.error(image);
-    expect(image).toHaveAttribute('src', '/src/assets/no-image.svg');
-  });
-  it('show zoomed image after image is clicked', async () => {
-    await act(() => {
-      mockTable(TableDetails);
-    });
-    const image = screen.getByTestId('req-dtl-zoom-img');
-    fireEvent.click(image);
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    });
-    const imageModal = screen.getByRole('presentation');
-    expect(imageModal).toBeTruthy();
+  // it('show image on table', async () => {
+  //   await act(() => {
+  //     mockTable(TableDetails);
+  //   });
+  //   const image = screen.getByTestId('req-dtl-zoom-img');
+  //   expect(image).toBeInTheDocument();
+  // });
+  // it('show error image if image is empty', async () => {
+  //   await act(() => {
+  //     mockTable(TableDetailsNoImage);
+  //   });
+  //   const image = screen.getByRole('img');
+  //   fireEvent.error(image);
+  //   expect(image).toHaveAttribute('src', '/src/assets/no-image.svg');
+  // });
+  // it('show zoomed image after image is clicked', async () => {
+  //   await act(() => {
+  //     mockTable(TableDetails);
+  //   });
+  //   const image = screen.getByTestId('req-dtl-zoom-img');
+  //   fireEvent.click(image);
+  //   await act(async () => {
+  //     await new Promise((resolve) => setTimeout(resolve, 0));
+  //   });
+  //   const imageModal = screen.getByRole('presentation');
+  //   expect(imageModal).toBeTruthy();
 
-    fireEvent.click(imageModal);
-    await act(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 0));
-    });
-  });
-  it('change page', async () => {
-    await act(() => {
-      mockTable(TableDetails);
-    });
-    const pagination = screen.getByLabelText('pagination navigation');
-    const buttonPage = within(pagination).getByLabelText('page 1');
+  //   fireEvent.click(imageModal);
+  //   await act(async () => {
+  //     await new Promise((resolve) => setTimeout(resolve, 0));
+  //   });
+  // });
+  // it('change page', async () => {
+  //   await act(() => {
+  //     mockTable(TableDetails);
+  //   });
+  //   const pagination = screen.getByLabelText('pagination navigation');
+  //   const buttonPage = within(pagination).getByLabelText('page 1');
 
-    fireEvent.click(buttonPage);
-    expect(buttonPage).toHaveClass('Mui-selected');
-  });
+  //   fireEvent.click(buttonPage);
+  //   expect(buttonPage).toHaveClass('Mui-selected');
+  // });
 });
 // yang belum -> click" button

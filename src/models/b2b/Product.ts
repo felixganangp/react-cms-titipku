@@ -72,3 +72,12 @@ export interface FormInventoryTypes {
     is_active: boolean;
   }[];
 }
+export interface ChangeStatusParams {
+  existingStatus: IsActiveType[];
+  newStatus: IsActiveType;
+}
+
+export interface IsActiveType {
+  is_active: boolean;
+  ids: (number | string)[];
+}
