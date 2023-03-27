@@ -85,10 +85,6 @@ const initialState: ProductProps = {
       value: 'inactive',
       label: 'Inactive',
     },
-    {
-      value: 'nonexist',
-      label: 'Deleted',
-    },
   ],
   tempIds: [],
   tempChangeStatus: [],
