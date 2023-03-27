@@ -23,7 +23,6 @@ import FormLabel from 'components/FormLabel';
 import Status from 'components/Status';
 import digitFormatter from 'utils/digitFormatter';
 import moment from 'moment';
-import debounce from 'utils/debounce';
 import { getColorCreditScore } from 'utils/creditScoreColor';
 
 import SearchIcon from '@mui/icons-material/Search';

@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import styled from '@emotion/styled';
-import { Box, Card } from '@mui/material';
+import { styled as styledMui } from '@mui/material/styles';
+import { Box, Card, Switch } from '@mui/material';
 
 interface GradingProps {
   grade: number;
@@ -164,3 +165,44 @@ export const TitleContainer = styled(Box)`
   justify-content: center;
   align-items: flex-start;
 `;
+
+export const SwitchStyle = styledMui(Switch)(({ theme }) => ({
+  width: '38px',
+  height: 20,
+  padding: 0,
+  display: 'flex',
+  '&:active': {
+    '& .MuiSwitch-thumb': {
+      width: 15,
+    },
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      transform: 'translateX(9px)',
+    },
+  },
+  '& .MuiSwitch-switchBase': {
+    padding: 2,
+    '&.Mui-checked': {
+      transform: 'translateX(18px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        opacity: 1,
+        backgroundColor: theme.palette.primary.main,
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+    width: '16px',
+    height: '16px',
+    borderRadius: '100%',
+    transition: theme.transitions.create(['width'], {
+      duration: 200,
+    }),
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: '16px',
+    opacity: 1,
+    backgroundColor: 'rgba(0,0,0,.25)',
+    boxSizing: 'border-box',
+  },
+}));

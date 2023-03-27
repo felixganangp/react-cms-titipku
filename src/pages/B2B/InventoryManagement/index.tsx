@@ -16,6 +16,7 @@ import {
   Modal,
   Autocomplete,
   Skeleton,
+  Stack,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -27,7 +28,7 @@ import { HeadCells } from 'components/Table/types';
 import NoImage from 'assets/no-image.svg';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import ArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import ArrowIcon from '@mui/icons-material/ArrowForwardIos';
 import MenuList from 'components/MenuList';
 import FormLabel from 'components/FormLabel';
 import PaperBox from 'components/Icon/PaperBox';
@@ -54,6 +55,7 @@ import StockOpname from './components/StockOpname';
 import ChangeStatus from './components/ChangeStatus';
 import Delete from './components/Delete';
 import NoDataInventory from './components/NoData';
+import Form from './components/Form';
 
 export default function InventoryPage() {
   const dispatch = useAppDispatch();
@@ -65,6 +67,7 @@ export default function InventoryPage() {
     (state) => state.product.displayFilter,
   );
   const stockOpnameModal = useModal();
+  const formProductModal = useModal();
 
   // BATCH ACTION
   const [selected, setSelected] = useState<(number | string)[]>([]);
@@ -481,20 +484,17 @@ export default function InventoryPage() {
     },
   ];
 
-  console.log('selectedproduct', selectedProduct);
-
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <Grid container spacing={2}>
         {/* header (title, icon, back button, add button) */}
         <Grid item xs={12}>
-          <Box
-            display="flex"
-            flexDirection="row"
-            justifyContent="space-between"
+          {/* title, icon, back button */}
+          <Stack
+            direction="row"
             alignItems="center"
+            justifyContent="space-between"
           >
-            {/* title, icon, back button */}
             <Box
               display="flex"
               flexDirection="row"
@@ -561,11 +561,18 @@ export default function InventoryPage() {
                 </BackButton>
               </TitleContainer>
             </Box>
-            {/* add button */}
-            <Button endIcon={<ArrowRightIcon />} sx={{ width: '120px' }}>
-              Add New
-            </Button>
-          </Box>
+            {activeDashboard === 'all_stock' ? (
+              <Button
+                endIcon={<ArrowIcon />}
+                onClick={formProductModal.openModal}
+                size="large"
+              >
+                Add New
+              </Button>
+            ) : (
+              false
+            )}
+          </Stack>
         </Grid>
 
         {/* mini dashboard */}
@@ -959,6 +966,13 @@ export default function InventoryPage() {
           items={selectedProduct}
           onClose={stockOpnameModal.closeModal}
         />
+      </ModalComp>
+      <ModalComp
+        open={formProductModal.open}
+        title="Add Product"
+        onClose={formProductModal.closeModal}
+      >
+        <Form onClose={formProductModal.closeModal} />
       </ModalComp>
     </Box>
   );
