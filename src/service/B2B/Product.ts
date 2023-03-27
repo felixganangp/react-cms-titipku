@@ -1,5 +1,5 @@
 import http from 'utils/request';
-import { ProductParams } from 'models/b2b/Product';
+import { ProductParams, IsActiveType } from 'models/b2b/Product';
 
 export const fetchProduct = (params: ProductParams) =>
   new Promise(async (resolve, reject) => {
@@ -14,12 +14,17 @@ export const fetchProduct = (params: ProductParams) =>
     }
   });
 
-export const deleteProduct = (ids: number[]) =>
+export const deleteProduct = (body: {
+  is_exist: boolean;
+  ids: (string | number)[];
+}) =>
   new Promise(async (resolve, reject) => {
     try {
-      //   const response = await http.delete(`/b2b/inventory/${id}`);
-      //   if (response.data) resolve(response.data);
-      console.log('delete product');
+      const response = await http.put(
+        `/inventory/b2b/product/batch-is-exist`,
+        body,
+      );
+      if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response
         ? `${err.response.data.message}`
@@ -27,3 +32,47 @@ export const deleteProduct = (ids: number[]) =>
       reject(message);
     }
   });
+
+export const changeStatusProduct = (body: {
+  is_active: boolean;
+  ids: (string | number)[] | number[];
+}) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.put(
+        `/inventory/b2b/product/batch-is-active`,
+        body,
+      );
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const batchUndoChangeStatus = async (body: IsActiveType[]) => {
+  const callBatchChangeStatus = [];
+  for (let i = 0; i < body.length; i += 1) {
+    callBatchChangeStatus.push(
+      http.put(`/inventory/b2b/product/batch-is-active`, body[i]),
+    );
+  }
+
+  const result = await Promise.allSettled(callBatchChangeStatus);
+  const response = (
+    result.find((res) => res.status === 'fulfilled') as
+      | PromiseFulfilledResult<string>
+      | undefined
+  )?.value;
+
+  if (!response) {
+    const error = (
+      result.find((res) => res.status === 'rejected') as
+        | PromiseRejectedResult
+        | undefined
+    )?.reason;
+    return error;
+  }
+};

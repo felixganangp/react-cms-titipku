@@ -1,7 +1,13 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { PayloadAction } from '@reduxjs/toolkit';
-import { Product, ProductParams } from 'models/b2b/Product';
+import {
+  ChangeStatusParams,
+  IsActiveType,
+  Product,
+  ProductParams,
+} from 'models/b2b/Product';
 import { ListResponse } from 'models/fetch';
-import { call, put, takeLatest } from 'redux-saga/effects';
+import { call, put, select, takeLatest } from 'redux-saga/effects';
 import * as service from 'service/B2B/Product';
 import { productAction } from 'store/slice/b2b/Product';
 import { uiAction } from 'store/slice/ui';
@@ -152,10 +158,143 @@ function* fetchCategories() {
   }
 }
 
+function* undoDelete() {
+  try {
+    const ids: (string | number)[] = yield select(
+      (state) => state.product.tempIds,
+    );
+    const params: ProductParams = yield select((state) => state.product.params);
+    yield call(service.deleteProduct, { is_exist: true, ids });
+    yield put(productAction.deleteDone());
+    yield put(productAction.fetchData(params));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error undo delete products',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error undo delete products',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(productAction.deleteDone());
+  }
+}
+
+function* deleteProduct(params: PayloadAction<(number | string)[]>) {
+  try {
+    const filter: ProductParams = yield select((state) => state.product.params);
+    yield call(service.deleteProduct, {
+      is_exist: false,
+      ids: params.payload,
+    });
+    yield put(productAction.deleteDone());
+    yield put(productAction.fetchData(filter));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error delete products',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error delete products',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(productAction.deleteDone());
+  }
+}
+
+function* changeStatus(params: PayloadAction<ChangeStatusParams>) {
+  try {
+    const filter: ProductParams = yield select((state) => state.product.params);
+    const { is_active, ids } = params.payload.newStatus;
+    yield call(service.changeStatusProduct, { is_active, ids });
+    yield put(productAction.changeStatusDone());
+    yield put(productAction.fetchData(filter));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error change status products',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error change status products',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(productAction.changeStatusDone());
+  }
+}
+
+function* undoChangeStatus() {
+  try {
+    const temps: IsActiveType[] = yield select(
+      (state) => state.product.tempChangeStatus,
+    );
+    const filter: ProductParams = yield select((state) => state.product.params);
+    yield call(service.batchUndoChangeStatus, temps);
+    yield put(productAction.changeStatusDone());
+    yield put(productAction.fetchData(filter));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error undo change status products',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error undo change status products',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(productAction.changeStatusDone());
+  }
+}
+
 export default function* productSagas() {
-  yield takeLatest(productAction.fetchData, fetchData);
-  yield takeLatest(productAction.fetchTotalEmptyStock, fetchTotalEmptyStock);
-  yield takeLatest(productAction.fetchTotalLowStock, fetchTotalLowStock);
-  yield takeLatest(productAction.fetchGrade, fetchGrades);
-  yield takeLatest(productAction.fetchCategory, fetchCategories);
+  yield takeLatest(productAction.fetchData.type, fetchData);
+  yield takeLatest(
+    productAction.fetchTotalEmptyStock.type,
+    fetchTotalEmptyStock,
+  );
+  yield takeLatest(productAction.fetchTotalLowStock.type, fetchTotalLowStock);
+  yield takeLatest(productAction.fetchGrade.type, fetchGrades);
+  yield takeLatest(productAction.fetchCategory.type, fetchCategories);
+  yield takeLatest(productAction.delete.type, deleteProduct);
+  yield takeLatest(productAction.undoDelete.type, undoDelete);
+  yield takeLatest(productAction.changeStatus.type, changeStatus);
+  yield takeLatest(productAction.undoChangeStatus.type, undoChangeStatus);
 }

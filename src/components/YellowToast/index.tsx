@@ -11,15 +11,24 @@ export interface YellowToastProps {
   action: string;
   error: boolean;
   onUndoAction?: () => void | undefined;
+  timeout?: number;
 }
 
 export default function YellowToast() {
   const dispatch = useAppDispatch();
-  const { open, totalItem, additionalMsg, action, error, onUndoAction } =
-    useAppSelector((state) => state.ui.yellowToast);
+  const {
+    open,
+    totalItem,
+    additionalMsg,
+    action,
+    error,
+    onUndoAction,
+    timeout,
+  } = useAppSelector((state) => state.ui.yellowToast);
 
   useEffect(() => {
-    if (open) setTimeout(() => dispatch(uiAction.closeYellowToast()), 5000);
+    if (open)
+      setTimeout(() => dispatch(uiAction.closeYellowToast()), timeout || 7000);
   }, [open]);
 
   return (
