@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useAppSelector, useAppDispatch } from 'store/hooks';
@@ -11,25 +11,12 @@ export interface YellowToastProps {
   action: string;
   error: boolean;
   onUndoAction?: () => void | undefined;
-  timeout?: number;
 }
 
 export default function YellowToast() {
   const dispatch = useAppDispatch();
-  const {
-    open,
-    totalItem,
-    additionalMsg,
-    action,
-    error,
-    onUndoAction,
-    timeout,
-  } = useAppSelector((state) => state.ui.yellowToast);
-
-  useEffect(() => {
-    if (open)
-      setTimeout(() => dispatch(uiAction.closeYellowToast()), timeout || 7000);
-  }, [open]);
+  const { open, totalItem, additionalMsg, action, error, onUndoAction } =
+    useAppSelector((state) => state.ui.yellowToast);
 
   return (
     <Box
@@ -60,7 +47,7 @@ export default function YellowToast() {
           &nbsp;{action.charAt(0).toUpperCase() + action.slice(1)}
         </Typography>
         {onUndoAction && (
-          <Typography onClick={onUndoAction}>
+          <Typography onClick={onUndoAction} sx={{ cursor: 'pointer' }}>
             &nbsp;<u>Undo</u>
           </Typography>
         )}

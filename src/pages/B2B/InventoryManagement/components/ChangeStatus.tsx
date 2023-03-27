@@ -61,7 +61,7 @@ export default function ChangeStatus({
         transform: 'translate(-50%, -50%)',
       }}
     >
-      <Box p="32px 24px" gap="16px">
+      <Box p="32px 24px" display="flex" flexDirection="column" gap="16px">
         <Typography fontSize="20px" fontWeight="bold" color="#303030">
           {getHeader()}
         </Typography>

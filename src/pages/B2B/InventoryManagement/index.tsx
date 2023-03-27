@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 /* eslint-disable array-callback-return */
 /* eslint-disable no-nested-ternary */
 import React, { useState, useEffect } from 'react';
@@ -15,6 +16,7 @@ import {
   Modal,
   Autocomplete,
   Skeleton,
+  Stack,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -26,6 +28,7 @@ import { HeadCells } from 'components/Table/types';
 import NoImage from 'assets/no-image.svg';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowIcon from '@mui/icons-material/ArrowForwardIos';
 import MenuList from 'components/MenuList';
 import FormLabel from 'components/FormLabel';
 import PaperBox from 'components/Icon/PaperBox';
@@ -52,6 +55,7 @@ import StockOpname from './components/StockOpname';
 import ChangeStatus from './components/ChangeStatus';
 import Delete from './components/Delete';
 import NoDataInventory from './components/NoData';
+import Form from './components/Form';
 
 export default function InventoryPage() {
   const dispatch = useAppDispatch();
@@ -63,6 +67,7 @@ export default function InventoryPage() {
     (state) => state.product.displayFilter,
   );
   const stockOpnameModal = useModal();
+  const formProductModal = useModal();
 
   // BATCH ACTION
   const [selected, setSelected] = useState<(number | string)[]>([]);
@@ -222,7 +227,6 @@ export default function InventoryPage() {
     dispatch(
       productAction.setParams({
         page: 1,
-        search: '',
         product_type_id: undefined,
         product_grade_id: undefined,
         product_parent_category_id: undefined,
@@ -232,7 +236,6 @@ export default function InventoryPage() {
     );
     dispatch(
       productAction.setDisplayFilter({
-        search: '',
         grade: null,
         category: null,
         status:
@@ -243,7 +246,7 @@ export default function InventoryPage() {
       productAction.fetchData({
         page: 1,
         count: product.params.count,
-        search: '',
+        search: product.params.search,
         product_type_id: undefined,
         product_grade_id: undefined,
         product_parent_category_id: undefined,
@@ -285,6 +288,16 @@ export default function InventoryPage() {
 
   useEffect(() => {
     handleResetFilter();
+    dispatch(
+      productAction.setParams({
+        search: '',
+      }),
+    );
+    dispatch(
+      productAction.setDisplayFilter({
+        search: '',
+      }),
+    );
   }, [activeDashboard]);
 
   // TABLE
@@ -402,40 +415,65 @@ export default function InventoryPage() {
       format: (val: Product) => (
         <>
           <MenuList
-            menu={[
-              {
-                label: 'Stock Opname',
-                onClick: () => {
-                  handleStockOpnameAction(val);
-                },
-              },
-              {
-                label: 'Edit',
-                onClick: () => console.log('Edit'),
-              },
-              {
-                label: 'See Details',
-                onClick: () => console.log('See Details'),
-              },
-              {
-                label: val.is_active ? 'Make Inactive' : 'Make Active',
-                onClick: () => {
-                  changeStatusModal.openModal();
-                  setSelected([val.id]);
-                  setSelectedProduct([val]);
-                  if (val.is_active) setNewStatus(false);
-                  else setNewStatus(true);
-                },
-              },
-              {
-                label: 'Delete',
-                onClick: () => {
-                  deleteModal.openModal();
-                  setSelected([val.id]);
-                  setSelectedProduct([val]);
-                },
-              },
-            ]}
+            menu={
+              val.is_active
+                ? [
+                    {
+                      label: 'Stock Opname',
+                      onClick: () => {
+                        handleStockOpnameAction(val);
+                      },
+                    },
+                    {
+                      label: 'Edit',
+                      onClick: () => console.log('Edit'),
+                    },
+                    {
+                      label: 'See Details',
+                      onClick: () => console.log('See Details'),
+                    },
+                    {
+                      label: 'Make Inactive',
+                      onClick: () => {
+                        changeStatusModal.openModal();
+                        setSelected([val.id]);
+                        setSelectedProduct([val]);
+                        setNewStatus(false);
+                      },
+                    },
+                    {
+                      label: 'Delete',
+                      onClick: () => {
+                        deleteModal.openModal();
+                        setSelected([val.id]);
+                        setSelectedProduct([val]);
+                      },
+                    },
+                  ]
+                : [
+                    {
+                      label: 'See Details',
+                      onClick: () => console.log('See Details'),
+                    },
+                    {
+                      label: 'Make Active',
+                      onClick: () => {
+                        changeStatusModal.openModal();
+                        setSelected([val.id]);
+                        setSelectedProduct([val]);
+                        setNewStatus(true);
+                      },
+                    },
+                    {
+                      label: 'Delete',
+                      onClick: () => {
+                        deleteModal.openModal();
+                        setSelected([val.id]);
+                        setSelectedProduct([val]);
+                      },
+                    },
+                  ]
+            }
           >
             <IconButton>
               <MoreVertIcon />
@@ -449,73 +487,92 @@ export default function InventoryPage() {
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <Grid container spacing={2}>
-        {/* header (title, icon, back button) */}
+        {/* header (title, icon, back button, add button) */}
         <Grid item xs={12}>
-          <Box
-            display="flex"
-            flexDirection="row"
-            justifyContent="flex-start"
+          {/* title, icon, back button */}
+          <Stack
+            direction="row"
             alignItems="center"
-            gap="16px"
-            height="fit-content"
+            justifyContent="space-between"
           >
-            {/* circle of paper box icon (on low/empty stock header) */}
-            <CircleContainer
-              display={activeDashboard !== 'all_stock' ? 'flex' : 'none'}
-              width="66px"
-              height="66px"
-              activeDashboard={activeDashboard}
+            <Box
+              display="flex"
+              flexDirection="row"
+              justifyContent="flex-start"
+              alignItems="center"
+              gap="16px"
+              height="fit-content"
             >
-              {/* total stock bullet */}
-              <CircleTotalStock activeDashboard={activeDashboard}>
-                {activeDashboard === 'low_stock'
-                  ? product.totalLowStock
-                  : product.totalEmptyStock}
-              </CircleTotalStock>
-              {/* icon x / arrow down */}
-              <MiniCircleOnIcon
-                activeDashboard={activeDashboard}
-                bottom="29%"
-                left="23%"
-                height="10px"
-                width="10px"
-              >
-                {activeDashboard === 'empty_stock' ? (
-                  <CloseIcon
-                    sx={{
-                      color: '#fff',
-                      height: '10px',
-                      width: '10px',
-                    }}
-                  />
-                ) : (
-                  <ArrowDownwardIcon
-                    sx={{
-                      color: '#fff',
-                      height: '10px',
-                      width: '7px',
-                    }}
-                  />
-                )}
-              </MiniCircleOnIcon>
-              <PaperBox sx={{ height: '34px', width: '34px' }} />
-            </CircleContainer>
-            {/* all title + back to all list button (for low/empty stock header) */}
-            <TitleContainer>
-              <Typography color="#000000" fontSize="26px" fontWeight="600">
-                {getDashboardTitle()}
-              </Typography>
-              <BackButton
+              {/* circle of paper box icon (on low/empty stock header) */}
+              <CircleContainer
                 display={activeDashboard !== 'all_stock' ? 'flex' : 'none'}
-                onClick={() => handleSetActiveDashboard(undefined)}
+                width="66px"
+                height="66px"
+                activeDashboard={activeDashboard}
               >
-                <BackIcon sx={{ color: '#008e58' }} />
-                <Typography color="#008e58" fontSize="16px" fontWeight="bold">
-                  See all List
+                {/* total stock bullet */}
+                <CircleTotalStock activeDashboard={activeDashboard}>
+                  {activeDashboard === 'low_stock'
+                    ? product.totalLowStock
+                    : product.totalEmptyStock}
+                </CircleTotalStock>
+                {/* icon x / arrow down */}
+                <MiniCircleOnIcon
+                  activeDashboard={activeDashboard}
+                  bottom="29%"
+                  left="23%"
+                  height="10px"
+                  width="10px"
+                >
+                  {activeDashboard === 'empty_stock' ? (
+                    <CloseIcon
+                      sx={{
+                        color: '#fff',
+                        height: '10px',
+                        width: '10px',
+                      }}
+                    />
+                  ) : (
+                    <ArrowDownwardIcon
+                      sx={{
+                        color: '#fff',
+                        height: '10px',
+                        width: '7px',
+                      }}
+                    />
+                  )}
+                </MiniCircleOnIcon>
+                <PaperBox sx={{ height: '34px', width: '34px' }} />
+              </CircleContainer>
+              {/* all title + back to all list button (for low/empty stock header) */}
+              <TitleContainer>
+                <Typography color="#000000" fontSize="26px" fontWeight="600">
+                  {getDashboardTitle()}
                 </Typography>
-              </BackButton>
-            </TitleContainer>
-          </Box>
+                <BackButton
+                  display={activeDashboard !== 'all_stock' ? 'flex' : 'none'}
+                  onClick={() => handleSetActiveDashboard(undefined)}
+                  sx={{ cursor: 'pointer' }}
+                >
+                  <BackIcon sx={{ color: '#008e58' }} />
+                  <Typography color="#008e58" fontSize="16px" fontWeight="bold">
+                    See all List
+                  </Typography>
+                </BackButton>
+              </TitleContainer>
+            </Box>
+            {activeDashboard === 'all_stock' ? (
+              <Button
+                endIcon={<ArrowIcon />}
+                onClick={formProductModal.openModal}
+                size="large"
+              >
+                Add New
+              </Button>
+            ) : (
+              false
+            )}
+          </Stack>
         </Grid>
 
         {/* mini dashboard */}
@@ -557,14 +614,18 @@ export default function InventoryPage() {
                   justifyContent="flex-start"
                   alignItems="flex-start"
                 >
-                  <Typography fontSize="20px" fontWeight={700} color="#555555">
-                    {product.loadingLowStock ? (
-                      <Skeleton width={20} height={30} />
-                    ) : (
-                      product.totalLowStock
-                    )}{' '}
-                    Items
-                  </Typography>
+                  {product.loadingLowStock ? (
+                    <Skeleton width={70} height={30} />
+                  ) : (
+                    <Typography
+                      fontSize="20px"
+                      fontWeight={700}
+                      color="#555555"
+                    >
+                      {product.totalLowStock} Items
+                    </Typography>
+                  )}
+
                   <Typography fontSize="10px" fontWeight="bold" color="#afafaf">
                     LOW STOCK
                   </Typography>
@@ -606,14 +667,18 @@ export default function InventoryPage() {
                   justifyContent="flex-start"
                   alignItems="flex-start"
                 >
-                  <Typography fontSize="20px" fontWeight={700} color="#555555">
-                    {product.loadingEmptyStock ? (
-                      <Skeleton width={20} height={30} />
-                    ) : (
-                      product.totalEmptyStock
-                    )}{' '}
-                    Items
-                  </Typography>
+                  {product.loadingEmptyStock ? (
+                    <Skeleton width={70} height={30} />
+                  ) : (
+                    <Typography
+                      fontSize="20px"
+                      fontWeight={700}
+                      color="#555555"
+                    >
+                      {product.totalEmptyStock} Items
+                    </Typography>
+                  )}
+
                   <Typography fontSize="10px" fontWeight="bold" color="#afafaf">
                     EMPTY STOCK
                   </Typography>
@@ -661,12 +726,19 @@ export default function InventoryPage() {
                 gap="10px"
               >
                 <Button
-                  disabled={selected.length <= 1}
+                  disabled={selected.length === 0}
                   endIcon={<ArrowDownIcon />}
                   aria-controls={open ? 'basic-menu' : undefined}
                   aria-haspopup="true"
                   aria-expanded={open ? 'true' : undefined}
                   onClick={handleOpenBatchAction}
+                  sx={{
+                    '&:disabled': {
+                      bgcolor: '#e4e4e4',
+                      color: '#797979',
+                    },
+                    fontWeight: 'bold',
+                  }}
                 >
                   Batch Action
                 </Button>
@@ -713,6 +785,7 @@ export default function InventoryPage() {
                   variant="outlined"
                   endIcon={<FilterIcon />}
                   onClick={handleExpandFilter}
+                  disabled={product.loadingFilter}
                 >
                   Filter
                 </Button>
@@ -831,14 +904,22 @@ export default function InventoryPage() {
                 setSelected={(array: (string | number)[]) => {
                   setSelected(array);
                   setSelectedProduct(() => {
-                    const newArr: Product[] = [];
+                    const addition: Product[] = [];
                     array.map((id) => {
                       const obj: Product | undefined = product.products.find(
                         (item) => item.id === id,
                       );
-                      if (obj) return newArr.push(obj);
+                      if (
+                        obj &&
+                        selectedProduct.findIndex((item) => item.id === id) ===
+                          -1
+                      )
+                        return addition.push(obj);
                     });
-                    return [...newArr];
+                    const existing = selectedProduct.filter(
+                      (item) => array.indexOf(item.id) !== -1,
+                    );
+                    return [...existing, ...addition];
                   });
                 }}
                 onChangeRowPerpage={handleChangeRowPerPage}
@@ -885,6 +966,13 @@ export default function InventoryPage() {
           items={selectedProduct}
           onClose={stockOpnameModal.closeModal}
         />
+      </ModalComp>
+      <ModalComp
+        open={formProductModal.open}
+        title="Add Product"
+        onClose={formProductModal.closeModal}
+      >
+        <Form onClose={formProductModal.closeModal} />
       </ModalComp>
     </Box>
   );
