@@ -14,6 +14,7 @@ import { ListParams, ListResponse, Response } from 'models/fetch';
 import { ProductGrade } from 'models/b2b/Grade';
 import { Category } from 'models/b2b/Category';
 import { ProductType } from 'models/b2b/Type';
+import { LogParams } from '../../../models/b2b/Product';
 
 interface ProductProps {
   activeDashboard: string;
@@ -268,7 +269,7 @@ const ProductSlice = createSlice({
     fetchDetailsFailed(state: ProductProps) {
       state.loadingDetails = false;
     },
-    fetchLog(state: ProductProps, action: PayloadAction<number | string>) {
+    fetchLog(state: ProductProps, action: PayloadAction<LogParams>) {
       state.loadingLog = true;
     },
     fetchLogSuccess(
@@ -282,7 +283,7 @@ const ProductSlice = createSlice({
     fetchLogFailed(state: ProductProps) {
       state.loadingLog = false;
     },
-    setLogParams(state: ProductProps, action: PayloadAction<ListParams>) {
+    setLogParams(state: ProductProps, action: PayloadAction<LogParams>) {
       state.paramsLog = {
         ...state.paramsLog,
         ...action.payload,

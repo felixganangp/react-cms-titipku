@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
 import React, { useEffect } from 'react';
@@ -21,10 +22,25 @@ export default function InvoiceDetail() {
   const details = useAppSelector((state) => state.product.details);
   const { id } = useParams();
 
+  console.log('id', id);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(
+        productAction.setLogParams({
+          product_id: parseInt(id),
+        }),
+      );
+    }
+  }, [id]);
+
+  useEffect(() => {
+    dispatch(productAction.fetchLog(product.paramsLog));
+  }, [product.paramsLog]);
+
   useEffect(() => {
     if (id) {
       dispatch(productAction.fetchDetails(id));
-      dispatch(productAction.fetchLog(id));
     }
   }, []);
 
@@ -226,6 +242,7 @@ export default function InvoiceDetail() {
             loading={product.loadingLog}
             count={product.paramsLog.count}
             page={product.paramsLog.page}
+            onChangePage={handleChangePage}
           />
         </Box>
       </CardContainer>

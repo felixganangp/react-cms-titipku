@@ -35,6 +35,10 @@ export interface ProductParams extends ListParams {
   status?: string;
 }
 
+export interface LogParams extends ListParams {
+  product_id?: number | string;
+}
+
 export interface Status {
   value: string;
   label: string;

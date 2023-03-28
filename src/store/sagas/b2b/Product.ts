@@ -13,6 +13,7 @@ import {
   FormInventoryTypes,
   CreateProduct,
   Log,
+  LogParams,
 } from 'models/b2b/Product';
 import { ProductGrade } from 'models/b2b/Grade';
 import { Category } from 'models/b2b/Category';
@@ -446,7 +447,7 @@ function* fetchDetails(params: PayloadAction<string | number>) {
   }
 }
 
-function* fetchLog(params: PayloadAction<string | number>) {
+function* fetchLog(params: PayloadAction<LogParams>) {
   try {
     const response: ListResponse<Log> = yield call(
       service.fetchLog,
