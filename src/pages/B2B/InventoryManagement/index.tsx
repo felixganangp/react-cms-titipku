@@ -396,7 +396,7 @@ export default function InventoryPage() {
     },
     {
       id: 'status',
-      label: activeDashboard !== 'empty_stock' ? 'Status' : '',
+      label: activeDashboard === 'all_stock' ? 'Status' : '',
       align: 'left',
       enableSort: false,
       format: (val: Product) => {
@@ -407,7 +407,7 @@ export default function InventoryPage() {
         else productStatus = 3;
         return (
           <>
-            <Box display={activeDashboard !== 'empty_stock' ? 'flex' : 'none'}>
+            <Box display={activeDashboard !== 'all_stock' ? 'none' : 'flex'}>
               <StatusColor status={productStatus}>
                 {productStatus === 0
                   ? 'Inactive'
@@ -436,13 +436,16 @@ export default function InventoryPage() {
           gap="10px"
         >
           <Box
-            display={activeDashboard === 'empty_stock' ? 'flex' : 'none'}
+            display={activeDashboard !== 'all_stock' ? 'flex' : 'none'}
             width="200px"
           >
             <Button
               variant="outlined"
               startIcon={<PaperBoxGreen />}
               fullWidth
+              sx={{
+                boxShadow: '0 2px 3px 0 rgba(0, 0, 0, 0.24)',
+              }}
               onClick={() => {
                 setSelected([val.id]);
                 setSelectedProduct([val]);
@@ -452,7 +455,7 @@ export default function InventoryPage() {
               Stock Opname
             </Button>
           </Box>
-          <Box display={activeDashboard !== 'empty_stock' ? 'flex' : 'none'}>
+          <Box display={activeDashboard !== 'all_stock' ? 'none' : 'flex'}>
             <MenuList
               menu={
                 val.is_active
