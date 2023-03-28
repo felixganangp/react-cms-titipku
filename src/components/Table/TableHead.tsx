@@ -3,7 +3,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
-import Checkbox from '@mui/material/Checkbox';
+import Checkbox, { checkboxClasses } from '@mui/material/Checkbox';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 
 import { EnhancedTableHeadProps, Align } from './types';
@@ -42,7 +42,7 @@ export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
             ]}
           >
             <Checkbox
-              color="primary"
+              sx={{ color: '#e5e5e5' }}
               indeterminate={numSelected > 0 && numSelected < rowCount}
               checked={rowCount > 0 && numSelected === rowCount}
               onChange={onSelectAllClick}

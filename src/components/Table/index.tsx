@@ -13,7 +13,6 @@ import TableBody from '@mui/material/TableBody';
 import Skeleton from '@mui/material/Skeleton';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-
 import PaginationItem from '@mui/material/PaginationItem';
 import Pagination, {
   PaginationRenderItemParams,
@@ -232,7 +231,7 @@ function EnhancedTable<T extends Data>({
                         ]}
                       >
                         <Checkbox
-                          color="primary"
+                          sx={{ color: '#e5e5e5' }}
                           checked={isItemSelected}
                           inputProps={{
                             'aria-labelledby': labelId,
