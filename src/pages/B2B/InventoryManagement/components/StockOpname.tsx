@@ -124,14 +124,16 @@ function StockOpname({ items, onClose, totalItem }: Props) {
                     width: '280px',
                   }}
                 >
-                  <GradingColor
-                    sx={{ padding: '2px !important' }}
-                    grade={item.product_grade.id}
-                  >
-                    {item.product_grade.name}
-                  </GradingColor>
+                  {item.product_grade.id !== 1 && (
+                    <GradingColor
+                      sx={{ padding: '2px !important' }}
+                      grade={item.product_grade.id}
+                    >
+                      {item.product_grade.name}
+                    </GradingColor>
+                  )}
                   <Typography fontSize="17px">
-                    {item.product_parent.name}
+                    {item.product_parent.name} |{item.product_grade.id}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex' }}>
