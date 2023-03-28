@@ -19,7 +19,7 @@ import { ProductType } from 'models/b2b/Type';
 import { ProductParent } from 'models/b2b/ProductParent';
 // service
 import * as service from 'service/B2B/Product';
-import * as serviceProductPerrant from 'service/B2B/ProductParent';
+import * as serviceProductParent from 'service/B2B/ProductParent';
 import { fetchGrade } from 'service/B2B/Grade';
 import { fetchCategory } from 'service/B2B/Category';
 import { fetchTypes } from 'service/B2B/Types';
@@ -237,7 +237,7 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
       image: dataForm.image,
     };
     const responUploadImage: Response<string> = yield call(
-      serviceProductPerrant.uploadImage,
+      serviceProductParent.uploadImage,
       payloadImage,
     );
     // console.log(responUploadImage);
@@ -248,12 +248,9 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
       product_parent_category_id: dataForm.category.map((val) => val.id),
     };
 
-    yield call(serviceProductPerrant.createProduct, payloadProductPerant);
-
-    // get id
-    const getIdProductParent: ListResponse<ProductParent> = yield call(
-      serviceProductPerrant.fetchProduct,
-      { page: 1, count: 1, order_by: 'id', order_type: 'desc' },
+    const responProductParent: Response<ProductParent> = yield call(
+      serviceProductParent.createProduct,
+      payloadProductPerant,
     );
 
     // Step 3. upload product List
@@ -262,11 +259,11 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
       dataForm.productList.map((val) =>
         callPromise(service.createProduct, {
           product_type_id: dataForm.type?.id || 0,
-          product_parent_id: getIdProductParent.data[0].id,
+          product_parent_id: responProductParent.data.id,
           product_grade_id: val.grade?.id || 0,
           description: val.description,
-          stock: val.stock,
-          low_stock_limit: val.lowStock,
+          stock: val.stock || 0,
+          low_stock_limit: val.lowStock || 0,
           is_exist: val.is_exist,
           is_active: val.is_active,
         }),
@@ -280,6 +277,8 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
       }),
     );
     yield put(productAction.createProductSuccess());
+    const filter: ProductParams = yield select((state) => state.product.params);
+    yield put(productAction.fetchData(filter));
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;

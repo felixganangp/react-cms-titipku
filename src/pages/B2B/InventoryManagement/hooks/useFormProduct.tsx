@@ -37,7 +37,6 @@ export default function FormProduct({ onClose }: FormTypes) {
   });
 
   useEffect(() => {
-    console.log(isSuccessCreate, loadingForm);
     if (isSuccessCreate && !loadingForm) {
       onClose();
     }
@@ -47,30 +46,56 @@ export default function FormProduct({ onClose }: FormTypes) {
     dispatch(productAction.fetchTypes());
   }, []);
 
+  const handleSubmit = (value: FormInventoryTypes) => {
+    if (currentGrade.isCostume) {
+      dispatch(
+        productAction.createProduct({
+          ...value,
+          productList: value.productList.filter((val) => val.grade.id !== 1),
+        }),
+      );
+    } else {
+      dispatch(
+        productAction.createProduct({
+          ...value,
+          productList: value.productList.filter((val) => val.grade.id === 1),
+        }),
+      );
+    }
+  };
+
   const formik = useFormik({
     initialValues,
-    onSubmit: (value) => {
-      if (currentGrade.isCostume) {
-        dispatch(
-          productAction.createProduct({
-            ...value,
-            productList: value.productList.filter((val) => val.grade.id !== 1),
-          }),
-        );
-      } else {
-        dispatch(
-          productAction.createProduct({
-            ...value,
-            productList: value.productList.filter((val) => val.grade.id === 1),
-          }),
-        );
-      }
+    onSubmit: () => {
+      // handleSubmit(value);
     },
     validationSchema: yup.object({
       name: yup.string().required('Name is required'),
       image: yup.mixed().required('Image is required'),
-      category: yup.mixed().required('Category is required'),
+      category: yup
+        .array()
+        .required('Category is required')
+        .min(1, 'Category is required'),
       type: yup.mixed().required('Type is required'),
+      productList: yup
+        .array()
+        .of(
+          yup.object().shape({
+            stock: yup
+              .number()
+              .typeError('stock is required')
+              .required('stock is required')
+              .min(0, 'Please input positive value stock')
+              .max(2147483647, 'Maximal stock is 2.147.483.647'),
+            lowStock: yup
+              .number()
+              .typeError('stock is required')
+              .required('Low stock is required')
+              .min(0, 'Please input positive value  low stock')
+              .max(2147483647, 'Maximal low stock is 2.147.483.647'),
+          }),
+        )
+        .required('Company is required'),
     }),
   });
 
@@ -101,5 +126,6 @@ export default function FormProduct({ onClose }: FormTypes) {
     currentGrade,
     setCurrentGrade,
     loadingForm,
+    handleSubmit,
   };
 }
