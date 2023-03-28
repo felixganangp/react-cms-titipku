@@ -5,6 +5,7 @@ import { Box, Card, Switch } from '@mui/material';
 
 interface GradingProps {
   grade: number;
+  fontSize?: string;
 }
 
 interface StatusProps {
@@ -30,11 +31,14 @@ interface BackButtonProps {
   display: string;
 }
 
-export const GradingColor = styled(Box)<Pick<GradingProps, 'grade'>>`
+export const GradingColor = styled(Box)<
+  Pick<GradingProps, 'grade' | 'fontSize'>
+>`
   border-radius: 4px;
   width: fit-content;
   height: fit-content;
   padding: 4px;
+  font-size: ${(p) => p.fontSize || '14px'};
   background-color: ${(p) =>
     p.grade === 2 ? '#aad9c7' : p.grade === 3 ? '#ffeeac' : '#f9ebe7'};
   color: ${(p) =>
@@ -51,8 +55,12 @@ export const CategoryStyle = styled(Box)`
 
 export const StatusColor = styled(Box)<Pick<StatusProps, 'status'>>`
   width: 115px;
-  height: fit-content;
-  text-align: center;
+  height: 35px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
   font-weight: 500;
   color: #fff;
   padding: 10px 0;
@@ -65,7 +73,6 @@ export const StatusColor = styled(Box)<Pick<StatusProps, 'status'>>`
       ? '#f7bb47'
       : '#269946'};
   border-radius: 4px;
-  text-align: center;
 `;
 
 export const CardContainer = styled(Card)`

@@ -11,12 +11,20 @@ export interface YellowToastProps {
   action: string;
   error: boolean;
   onUndoAction?: () => void | undefined;
+  noUndo?: boolean;
 }
 
 export default function YellowToast() {
   const dispatch = useAppDispatch();
-  const { open, totalItem, additionalMsg, action, error, onUndoAction } =
-    useAppSelector((state) => state.ui.yellowToast);
+  const {
+    open,
+    totalItem,
+    additionalMsg,
+    action,
+    error,
+    onUndoAction,
+    noUndo,
+  } = useAppSelector((state) => state.ui.yellowToast);
 
   return (
     <Box
@@ -46,7 +54,7 @@ export default function YellowToast() {
         >
           &nbsp;{action.charAt(0).toUpperCase() + action.slice(1)}
         </Typography>
-        {onUndoAction && (
+        {!noUndo && (
           <Typography onClick={onUndoAction} sx={{ cursor: 'pointer' }}>
             &nbsp;<u>Undo</u>
           </Typography>

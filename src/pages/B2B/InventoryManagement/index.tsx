@@ -39,6 +39,7 @@ import useModal from 'hooks/useModal';
 import ModalComp from 'components/Modal';
 import YellowToast from 'components/YellowToast';
 import { uiAction } from 'store/slice/ui';
+import { useNavigate } from 'react-router-dom';
 import {
   CardContainer,
   CategoryStyle,
@@ -59,6 +60,7 @@ import Form from './components/Form';
 
 export default function InventoryPage() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const product = useAppSelector((state) => state.product);
   const activeDashboard = useAppSelector(
     (state) => state.product.activeDashboard,
@@ -341,6 +343,10 @@ export default function InventoryPage() {
           justifyContent="flex-start"
           alignItems="center"
           gap="24px"
+          onClick={() => navigate(`/b2b/inventory/${val.id}`)}
+          sx={{
+            cursor: 'pointer',
+          }}
         >
           <img
             onError={({ currentTarget }) => {
@@ -434,7 +440,7 @@ export default function InventoryPage() {
                     },
                     {
                       label: 'See Details',
-                      onClick: () => console.log('See Details'),
+                      onClick: () => navigate(`/b2b/inventory/${val.id}`),
                     },
                     {
                       label: 'Make Inactive',
