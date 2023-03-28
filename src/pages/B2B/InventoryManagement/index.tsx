@@ -940,7 +940,6 @@ export default function InventoryPage() {
             selectedProduct={getBatchProductDesc()}
             onSubmit={handleChangeStatus}
             onClose={() => {
-              setSelectedProduct([]);
               changeStatusModal.closeModal();
             }}
             newStatus={newStatus}
