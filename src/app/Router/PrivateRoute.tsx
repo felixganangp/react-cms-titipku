@@ -27,6 +27,7 @@ export default function PrivateRoute({
   }, []);
 
   if (!isAuth) {
+    console.log('not auth');
     return <Navigate to={redirect} />;
   }
 
