@@ -11,6 +11,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useAppSelector, useAppDispatch } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
+import { uiAction } from 'store/slice/ui';
 import { Product } from 'models/b2b/Product';
 import NoImage from 'assets/no-image.svg';
 import { GradingColor } from '../inventory.styled';
@@ -18,10 +19,10 @@ import { GradingColor } from '../inventory.styled';
 interface Props {
   items: Product[];
   onClose: () => void;
+  totalItem: number;
 }
 
-function StockOpname({ items, onClose }: Props) {
-  console.log('🚀 ~ file: StockOpname.tsx:24 ~ StockOpname ~ items:', items);
+function StockOpname({ items, onClose, totalItem }: Props) {
   const dispatch = useAppDispatch();
 
   const initData: any = {};
@@ -60,8 +61,15 @@ function StockOpname({ items, onClose }: Props) {
       };
       payload.push(result);
     }
-    console.log(payload);
     await dispatch(productAction.stockOpname(payload));
+    await dispatch(
+      uiAction.openYellowToast({
+        totalItem,
+        additionalMsg: 'in stock opname',
+        action: 'successfully updated',
+        error: false,
+      }),
+    );
     await onClose();
   };
   return (

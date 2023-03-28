@@ -195,25 +195,13 @@ function* fetchTypesList() {
 
 function* stockOpname(payload: PayloadAction<any>) {
   try {
-    const paramsState: ProductParams = yield select((state) => {
-      return state.product.params;
-    });
+    const filter: ProductParams = yield select((state) => state.product.params);
     const response: ListResponse<any> = yield call(
       service.stockOpnameProduct,
       payload.payload,
     );
     yield put(productAction.stockOpnameSuccess());
-    yield call(fetchData, {
-      type: productAction.fetchData.type,
-      payload: paramsState,
-    });
-    yield put(
-      uiAction.openToast({
-        headMsg: 'Success stock opname product',
-        // message: 'Succes Fetch data',
-        severity: 'success',
-      }),
-    );
+    yield put(productAction.fetchData(filter));
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;

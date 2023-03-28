@@ -93,6 +93,12 @@ export default function InventoryPage() {
     stockOpnameModal.openModal();
   };
 
+  const handleCloseStockOpname = () => {
+    setSelected([]);
+    setSelectedProduct([]);
+    stockOpnameModal.closeModal();
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -957,11 +963,12 @@ export default function InventoryPage() {
       <ModalComp
         open={stockOpnameModal.open}
         title="Stock Opname"
-        onClose={stockOpnameModal.closeModal}
+        onClose={handleCloseStockOpname}
       >
         <StockOpname
+          totalItem={selectedProduct.length}
           items={selectedProduct}
-          onClose={stockOpnameModal.closeModal}
+          onClose={handleCloseStockOpname}
         />
       </ModalComp>
       <ModalComp
