@@ -1,4 +1,4 @@
-import React from 'react';
+import { useCallback, useState } from 'react';
 import {
   Box,
   TextField,
@@ -11,17 +11,25 @@ import {
 } from '@mui/material';
 import FormLabel from 'components/FormLabel';
 import InputImage from 'components/InputImage';
+import debounce from 'utils/debounce';
+import { IsExistName } from 'service/B2B/ProductParent';
+import { Response } from 'models/fetch';
 // icon
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import useFormProduct from '../hooks/useFormProduct';
 import { SwitchStyle } from '../inventory.styled';
 
+interface TypesError {
+  lowStock: string | number;
+  stock: string | number;
+}
 interface FormTypes {
   onClose: () => void;
 }
 
 export default function Form(props: FormTypes) {
+  const [isNameExist, setIsNameExist] = useState(false);
   const {
     formik,
     categories,
@@ -29,6 +37,7 @@ export default function Form(props: FormTypes) {
     currentGrade,
     setCurrentGrade,
     loadingForm,
+    handleSubmit,
   } = useFormProduct(props);
 
   const indexGrade = formik.values.productList.findIndex(
@@ -50,8 +59,52 @@ export default function Form(props: FormTypes) {
     }
   };
 
+  const handleCheckIsNameExist = async (value: {
+    name: string;
+    exclude_id?: number | string;
+  }) => {
+    const respon = (await IsExistName(value)) as Response<boolean>;
+    setIsNameExist(respon.data);
+  };
+  const debounceCheckIsName = useCallback(
+    debounce(handleCheckIsNameExist, 1000),
+    [],
+  );
+
+  const typesProductList = (formik.touched?.productList ?? [])[indexGrade];
+  const errorProductList = formik.errors?.productList as TypesError[];
+  const isValid = () => {
+    let valid = false;
+    // check valid product parent
+    const data = Object.values(formik.errors).filter(
+      (val) => typeof val === 'string',
+    );
+    // check is valid product
+    if (!currentGrade.isCostume) {
+      valid =
+        (errorProductList ?? [])[0] === undefined &&
+        data.length === 0 &&
+        !isNameExist;
+    } else {
+      const listGradeActiveIndex = formik.values.productList
+        .filter((val) => val.grade.id !== 1)
+        .map((val, index) => {
+          if (val.is_active !== true) {
+            return true;
+          }
+          return (errorProductList ?? [])[index + 1] === undefined;
+        });
+
+      valid =
+        listGradeActiveIndex.findIndex((val) => val === false) === -1 &&
+        data.length === 0 &&
+        !isNameExist;
+    }
+
+    return valid;
+  };
   return (
-    <form onSubmit={formik.handleSubmit}>
+    <>
       <Box p="24px">
         <FormLabel
           text="Input Image"
@@ -72,9 +125,15 @@ export default function Form(props: FormTypes) {
         </FormLabel>
         <FormLabel
           text="Product Name (SKU)"
-          error={formik.touched.name && Boolean(formik.errors.name)}
+          error={
+            (formik.touched.name && Boolean(formik.errors.name)) ||
+            (formik.touched.name && Boolean(isNameExist))
+          }
           helperText={
-            formik.touched.name && formik.errors.name && `${formik.errors.name}`
+            (formik.touched.name &&
+              formik.errors.name &&
+              `${formik.errors.name}`) ||
+            (formik.touched.name && isNameExist && `Name is exist`)
           }
         >
           <TextField
@@ -82,7 +141,12 @@ export default function Form(props: FormTypes) {
             name="name"
             placeholder="Insert Name"
             value={formik.values.name}
-            onChange={formik.handleChange}
+            onChange={(e) => {
+              formik.handleChange(e);
+              if (e.target.value) {
+                debounceCheckIsName({ name: e.target.value });
+              }
+            }}
             onBlur={formik.handleBlur}
             fullWidth
           />
@@ -195,8 +259,14 @@ export default function Form(props: FormTypes) {
         </Collapse>
         <FormLabel
           text="Low Stock (Gram)"
-          // error={touched.name && Boolean(errors.name)}
-          // helperText={touched.name && errors.name && `${errors.name}`}
+          error={
+            (typesProductList?.lowStock || false) &&
+            Boolean((errorProductList ?? [])[indexGrade]?.lowStock)
+          }
+          helperText={
+            (typesProductList?.lowStock || false) &&
+            `${(errorProductList ?? [])[indexGrade]?.lowStock || ''}`
+          }
         >
           <TextField
             type="number"
@@ -221,8 +291,14 @@ export default function Form(props: FormTypes) {
         </FormLabel>
         <FormLabel
           text="In Stock (Gram)"
-          // error={touched.name && Boolean(errors.name)}
-          // helperText={touched.name && errors.name && `${errors.name}`}
+          error={
+            (typesProductList?.stock || false) &&
+            Boolean((errorProductList ?? [])[indexGrade]?.stock)
+          }
+          helperText={
+            (typesProductList?.stock || false) &&
+            `${(errorProductList ?? [])[indexGrade]?.stock || ''}`
+          }
         >
           <TextField
             type="number"
@@ -247,8 +323,15 @@ export default function Form(props: FormTypes) {
         </FormLabel>
         <FormLabel
           text="Description"
-          // error={touched.name && Boolean(errors.name)}
-          // helperText={touched.name && errors.name && `${errors.name}`}
+          // error={
+          //   (formik.touched?.productList ?? [])[indexGrade]?.description &&
+          //   Boolean((formik.errors?.productList ?? [])[indexGrade]?.description)
+          // }
+          // helperText={
+          //   (formik.touched?.productList ?? [])[indexGrade]?.description &&
+          //   (formik.errors?.productList ?? [])[indexGrade]?.description &&
+          //   `${(formik.errors?.productList ?? [])[indexGrade]?.description}`
+          // }
         >
           <TextField
             type="text"
@@ -309,10 +392,20 @@ export default function Form(props: FormTypes) {
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <Button type="submit" size="medium" disabled={loadingForm}>
+        <Button
+          type="submit"
+          size="medium"
+          disabled={loadingForm || (formik.submitCount > 0 && !isValid())}
+          onClick={() => {
+            formik.handleSubmit();
+            if (isValid()) {
+              handleSubmit(formik.values);
+            }
+          }}
+        >
           {!loadingForm ? 'Create' : 'Loading...'}
         </Button>
       </Box>
-    </form>
+    </>
   );
 }

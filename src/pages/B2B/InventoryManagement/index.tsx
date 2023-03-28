@@ -430,7 +430,7 @@ export default function InventoryPage() {
                     },
                     {
                       label: 'Edit',
-                      onClick: () => console.log('Edit'),
+                      onClick: () => console.log(val),
                     },
                     {
                       label: 'See Details',
