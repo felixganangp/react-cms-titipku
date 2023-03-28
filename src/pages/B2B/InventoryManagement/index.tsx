@@ -925,7 +925,7 @@ export default function InventoryPage() {
                 onChangePage={handleChangePage}
                 page={product.params.page}
                 noDataComponent={
-                  <NoDataInventory onAdd={() => console.log('add')} />
+                  <NoDataInventory onAdd={formProductModal.openModal} />
                 }
               />
             </Box>
