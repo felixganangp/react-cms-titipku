@@ -443,12 +443,8 @@ export default function* productSagas() {
     productAction.fetchTotalEmptyStock.type,
     fetchTotalEmptyStock,
   );
-  yield takeLatest(productAction.fetchTotalLowStock.type, fetchTotalLowStock);
-  yield takeLatest(productAction.fetchGrade.type, fetchGrades);
-  yield takeLatest(productAction.fetchCategory.type, fetchCategories);
   yield takeLatest(productAction.delete.type, deleteProduct);
   yield takeLatest(productAction.undoDelete.type, undoDelete);
   yield takeLatest(productAction.changeStatus.type, changeStatus);
   yield takeLatest(productAction.undoChangeStatus.type, undoChangeStatus);
-  yield takeLatest(productAction.stockOpname.type, stockOpname);
 }
