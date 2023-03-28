@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import {
   Box,
   TextField,
@@ -29,6 +29,7 @@ interface FormTypes {
 }
 
 export default function Form(props: FormTypes) {
+  const [isNameExist, setIsNameExist] = useState(false);
   const {
     formik,
     categories,
@@ -63,9 +64,7 @@ export default function Form(props: FormTypes) {
     exclude_id?: number | string;
   }) => {
     const respon = (await IsExistName(value)) as Response<boolean>;
-    if (respon.data) {
-      formik.setFieldError('name', 'Name is exist');
-    }
+    setIsNameExist(respon.data);
   };
   const debounceCheckIsName = useCallback(
     debounce(handleCheckIsNameExist, 1000),
@@ -82,7 +81,10 @@ export default function Form(props: FormTypes) {
     );
     // check is valid product
     if (!currentGrade.isCostume) {
-      valid = (errorProductList ?? [])[0] === undefined && data.length === 0;
+      valid =
+        (errorProductList ?? [])[0] === undefined &&
+        data.length === 0 &&
+        !isNameExist;
     } else {
       const listGradeActiveIndex = formik.values.productList
         .filter((val) => val.grade.id !== 1)
@@ -95,7 +97,8 @@ export default function Form(props: FormTypes) {
 
       valid =
         listGradeActiveIndex.findIndex((val) => val === false) === -1 &&
-        data.length === 0;
+        data.length === 0 &&
+        !isNameExist;
     }
 
     return valid;
@@ -122,9 +125,15 @@ export default function Form(props: FormTypes) {
         </FormLabel>
         <FormLabel
           text="Product Name (SKU)"
-          error={formik.touched.name && Boolean(formik.errors.name)}
+          error={
+            (formik.touched.name && Boolean(formik.errors.name)) ||
+            (formik.touched.name && Boolean(isNameExist))
+          }
           helperText={
-            formik.touched.name && formik.errors.name && `${formik.errors.name}`
+            (formik.touched.name &&
+              formik.errors.name &&
+              `${formik.errors.name}`) ||
+            (formik.touched.name && isNameExist && `Name is exist`)
           }
         >
           <TextField
