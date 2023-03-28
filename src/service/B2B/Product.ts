@@ -117,3 +117,31 @@ export const batchUndoChangeStatus = async (body: IsActiveType[]) => {
     return error;
   }
 };
+
+export const fetchDetails = (id: number | string) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.get(`/inventory/b2b/product/${id}`);
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const fetchLog = (id: number | string) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.get(
+        `/inventory/b2b/product/log?product_id=${id}`,
+      );
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });

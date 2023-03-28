@@ -81,3 +81,28 @@ export interface IsActiveType {
   is_active: boolean;
   ids: (number | string)[];
 }
+
+export interface Log {
+  id: number;
+  product_id: number;
+  changes: ChangesLog;
+  created_at: number;
+  updated_at: number;
+  created_by_id: number;
+  created_by_type: string;
+  created_by: ModifiedUser;
+  updated_by_id: number | null;
+  updated_by_type: string | null;
+  updated_by: ModifiedUser | null;
+}
+
+export interface ChangesLog {
+  action_type: string;
+  columns: ColumnLog[];
+}
+
+export interface ColumnLog {
+  name: string;
+  old_value: number;
+  new_value: number;
+}

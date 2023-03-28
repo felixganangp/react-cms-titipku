@@ -1,25 +1,98 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Stack, Box, Typography, Button, Grid } from '@mui/material';
+/* eslint-disable no-unsafe-optional-chaining */
+/* eslint-disable no-nested-ternary */
+import React, { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Stack, Box, Typography, Button, Grid, Skeleton } from '@mui/material';
 import Table from 'components/Table';
 
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { productAction } from 'store/slice/b2b/Product';
+import { Log } from 'models/b2b/Product';
 import { CardContainer, GradingColor, StatusColor } from '../inventory.styled';
 
 export default function InvoiceDetail() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const product = useAppSelector((state) => state.product);
+  const log = useAppSelector((state) => state.product.log);
+  const details = useAppSelector((state) => state.product.details);
+  const { id } = useParams();
+
+  useEffect(() => {
+    if (id) {
+      dispatch(productAction.fetchDetails(id));
+      dispatch(productAction.fetchLog(id));
+    }
+  }, []);
+
+  const handleChangePage = (value: number) => {
+    dispatch(
+      productAction.setLogParams({
+        page: value,
+      }),
+    );
+  };
+
   const headCell = [
     {
       id: 'Editor',
       label: 'Editor',
       align: 'left',
+      format: (val: Log) => (
+        <Typography color="#0774d1">{val.created_by.name}</Typography>
+      ),
     },
     {
-      id: 'Editor',
+      id: 'Action',
       label: 'Editor',
       align: 'left',
+      format: (val: Log) => (
+        <Box
+          display="flex"
+          flexDirection="row"
+          justifyContent="flex-start"
+          alignItems="center"
+          height="min-content"
+          margin={0}
+          padding={0}
+        >
+          <p>
+            {val.changes.action_type === 'create'
+              ? 'Created this product'
+              : val.changes.action_type === 'update'
+              ? 'Editing'
+              : val.changes.action_type === 'delete'
+              ? 'Delete this product'
+              : 'set to'}{' '}
+          </p>
+          &nbsp;
+          <p style={{ height: 'fit-content' }}>
+            <b>
+              {val.changes.action_type === 'create' ? (
+                ''
+              ) : val.changes.action_type === 'update' ? (
+                `${val.changes.columns[0].name.replace(
+                  /^./,
+                  val.changes.columns[0].name[0].toUpperCase(),
+                )}`
+              ) : val.changes.action_type === 'delete' ? (
+                ''
+              ) : val.changes.action_type === 'set_to_active' ? (
+                <p style={{ color: '#008e58', margin: 0, padding: 0 }}>
+                  Make Active
+                </p>
+              ) : (
+                <p style={{ color: '#bf370c', margin: 0, padding: 0 }}>
+                  Make Inactive
+                </p>
+              )}
+            </b>
+          </p>
+        </Box>
+      ),
     },
   ];
   return (
@@ -42,9 +115,14 @@ export default function InvoiceDetail() {
                 sx={{ objectFit: 'cover' }}
               />
               <Box>
-                <Typography color="#000000" fontSize="24px" fontWeight="600">
-                  Sayap Ayam
-                </Typography>
+                {product.loadingDetails ? (
+                  <Skeleton width={120} height={40} />
+                ) : (
+                  <Typography color="#000000" fontSize="24px" fontWeight="600">
+                    {details?.product_parent.name}
+                  </Typography>
+                )}
+
                 <Button
                   variant="text"
                   startIcon={<BackIcon />}
@@ -54,41 +132,85 @@ export default function InvoiceDetail() {
                 </Button>
               </Box>
             </Stack>
-            <Button size="large" endIcon={<ArrowForwardIosIcon />}>
+            <Button sx={{ width: '110px' }} endIcon={<ArrowForwardIosIcon />}>
               Edit
             </Button>
           </Stack>
 
-          <Grid container mt="20px" mx="10px    ">
+          <Grid container mt="30px" mx="10px" mb="10px">
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 Product Name (SKU)
               </Typography>
-              <Typography fontSize="14px">Sayap Ayam</Typography>
+              {product.loadingDetails ? (
+                <Skeleton width={50} height={25} />
+              ) : (
+                <Typography fontSize="14px">
+                  {details?.product_parent.name}
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 Grade
               </Typography>
-              <GradingColor grade={1}>Grade A</GradingColor>
+              {product.loadingDetails ? (
+                <Skeleton width={50} height={25} />
+              ) : (
+                <GradingColor grade={details ? details?.product_grade.id : 1}>
+                  {details?.product_grade.name}
+                </GradingColor>
+              )}
             </Grid>
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 Category
               </Typography>
-              <Typography fontSize="14px">Daging, Ikan & Telur</Typography>
+              {product.loadingDetails ? (
+                <Skeleton width={50} height={25} />
+              ) : (
+                <Typography fontSize="14px">
+                  {details?.product_parent?.product_parent_category
+                    ? details?.product_parent?.product_parent_category[0].name
+                    : '-'}
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 Weight
               </Typography>
-              <Typography fontSize="14px">1289 Kg</Typography>
+              {product.loadingDetails ? (
+                <Skeleton width={50} height={25} />
+              ) : (
+                <Typography fontSize="14px">
+                  {details ? details?.stock / 1000 : 0} Kg
+                </Typography>
+              )}
             </Grid>
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 Status
               </Typography>
-              <StatusColor status={5}>Tersedia</StatusColor>
+              <StatusColor
+                status={
+                  !details?.is_active
+                    ? 0
+                    : details?.stock === 0
+                    ? 1
+                    : details?.stock <= details?.low_stock_limit
+                    ? 2
+                    : 3
+                }
+              >
+                {!details?.is_active
+                  ? 'Inactive'
+                  : details?.stock === 0
+                  ? 'Habis'
+                  : details?.stock <= details?.low_stock_limit
+                  ? 'Hampir Habis'
+                  : 'Tersedia'}
+              </StatusColor>
             </Grid>
           </Grid>
         </Box>
@@ -96,7 +218,15 @@ export default function InvoiceDetail() {
       <Box my="10px" />
       <CardContainer>
         <Box p="16px">
-          <Table data={[]} bgHeader="#cde3f6" headCells={headCell} />
+          <Table
+            data={log}
+            bgHeader="#cde3f6"
+            headCells={headCell}
+            totalData={product.totalLog}
+            loading={product.loadingLog}
+            count={product.paramsLog.count}
+            page={product.paramsLog.page}
+          />
         </Box>
       </CardContainer>
     </Box>

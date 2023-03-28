@@ -7,9 +7,10 @@ import {
   ProductParams,
   Status,
   FormInventoryTypes,
+  Log,
 } from 'models/b2b/Product';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ListResponse } from 'models/fetch';
+import { ListParams, ListResponse, Response } from 'models/fetch';
 import { ProductGrade } from 'models/b2b/Grade';
 import { Category } from 'models/b2b/Category';
 import { ProductType } from 'models/b2b/Type';
@@ -24,6 +25,8 @@ interface ProductProps {
   loadingDelete: boolean;
   loadingChangeStatus: boolean;
   loadingFilter: boolean;
+  loadingDetails: boolean;
+  loadingLog: boolean;
   totalProducts: number;
   totalLowStock: number;
   totalEmptyStock: number;
@@ -37,6 +40,10 @@ interface ProductProps {
   status: Status[];
   tempIds: (number | string)[];
   tempChangeStatus: IsActiveType[];
+  details: Product | null;
+  log: Log[];
+  totalLog: number;
+  paramsLog: ListParams;
 }
 
 const initialState: ProductProps = {
@@ -49,6 +56,8 @@ const initialState: ProductProps = {
   loadingDelete: false,
   loadingChangeStatus: false,
   loadingFilter: false,
+  loadingDetails: false,
+  loadingLog: false,
   totalProducts: 0,
   totalLowStock: 0,
   totalEmptyStock: 0,
@@ -88,6 +97,13 @@ const initialState: ProductProps = {
   ],
   tempIds: [],
   tempChangeStatus: [],
+  details: null,
+  log: [],
+  totalLog: 0,
+  paramsLog: {
+    page: 1,
+    count: 5,
+  },
 };
 
 const ProductSlice = createSlice({
@@ -238,6 +254,39 @@ const ProductSlice = createSlice({
     },
     undoChangeStatus(state: ProductProps) {
       state.loadingChangeStatus = true;
+    },
+    fetchDetails(state: ProductProps, action: PayloadAction<number | string>) {
+      state.loadingDetails = true;
+    },
+    fetchDetailsSuccess(
+      state: ProductProps,
+      action: PayloadAction<Response<Product>>,
+    ) {
+      state.loadingDetails = false;
+      state.details = action.payload.data;
+    },
+    fetchDetailsFailed(state: ProductProps) {
+      state.loadingDetails = false;
+    },
+    fetchLog(state: ProductProps, action: PayloadAction<number | string>) {
+      state.loadingLog = true;
+    },
+    fetchLogSuccess(
+      state: ProductProps,
+      action: PayloadAction<ListResponse<Log>>,
+    ) {
+      state.loadingLog = false;
+      state.log = action.payload.data || [];
+      state.totalLog = action.payload.total || 0;
+    },
+    fetchLogFailed(state: ProductProps) {
+      state.loadingLog = false;
+    },
+    setLogParams(state: ProductProps, action: PayloadAction<ListParams>) {
+      state.paramsLog = {
+        ...state.paramsLog,
+        ...action.payload,
+      };
     },
   },
 });

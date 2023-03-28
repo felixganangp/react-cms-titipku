@@ -12,6 +12,7 @@ import {
   ProductParams,
   FormInventoryTypes,
   CreateProduct,
+  Log,
 } from 'models/b2b/Product';
 import { ProductGrade } from 'models/b2b/Grade';
 import { Category } from 'models/b2b/Category';
@@ -429,6 +430,64 @@ function* undoChangeStatus() {
   }
 }
 
+function* fetchDetails(params: PayloadAction<string | number>) {
+  try {
+    const response: Response<Product> = yield call(
+      service.fetchDetails,
+      params.payload,
+    );
+    yield put(productAction.fetchDetailsSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get details data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get details data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* fetchLog(params: PayloadAction<string | number>) {
+  try {
+    const response: ListResponse<Log> = yield call(
+      service.fetchLog,
+      params.payload,
+    );
+    yield put(productAction.fetchLogSuccess(response));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get log data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get log data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
 export default function* productSagas() {
   yield takeLatest(productAction.fetchData, fetchData);
   yield takeLatest(productAction.stockOpname, stockOpname);
@@ -447,4 +506,6 @@ export default function* productSagas() {
   yield takeLatest(productAction.undoDelete.type, undoDelete);
   yield takeLatest(productAction.changeStatus.type, changeStatus);
   yield takeLatest(productAction.undoChangeStatus.type, undoChangeStatus);
+  yield takeLatest(productAction.fetchDetails.type, fetchDetails);
+  yield takeLatest(productAction.fetchLog.type, fetchLog);
 }
