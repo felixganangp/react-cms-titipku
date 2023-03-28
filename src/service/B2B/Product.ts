@@ -1,5 +1,10 @@
 import http from 'utils/request';
-import { ProductParams, CreateProduct, IsActiveType } from 'models/b2b/Product';
+import {
+  ProductParams,
+  CreateProduct,
+  IsActiveType,
+  LogParams,
+} from 'models/b2b/Product';
 
 export const fetchProduct = (params: ProductParams) =>
   new Promise(async (resolve, reject) => {
@@ -131,12 +136,10 @@ export const fetchDetails = (id: number | string) =>
     }
   });
 
-export const fetchLog = (id: number | string) =>
+export const fetchLog = (params: LogParams) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await http.get(
-        `/inventory/b2b/product/log?product_id=${id}`,
-      );
+      const response = await http.get('/inventory/b2b/product/log', { params });
       if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response
