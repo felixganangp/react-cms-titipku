@@ -12,6 +12,7 @@ import {
 import FormLabel from 'components/FormLabel';
 import InputImage from 'components/InputImage';
 import debounce from 'utils/debounce';
+import { Product } from 'models/b2b/Product';
 import { IsExistName } from 'service/B2B/ProductParent';
 import { Response } from 'models/fetch';
 // icon
@@ -26,6 +27,7 @@ interface TypesError {
 }
 interface FormTypes {
   onClose: () => void;
+  EditProductParent: Product;
 }
 
 export default function Form(props: FormTypes) {
@@ -38,6 +40,8 @@ export default function Form(props: FormTypes) {
     setCurrentGrade,
     loadingForm,
     handleSubmit,
+    isEdit,
+    setTypeUpdate,
   } = useFormProduct(props);
 
   const indexGrade = formik.values.productList.findIndex(
@@ -54,8 +58,14 @@ export default function Form(props: FormTypes) {
         isCostume: true,
         currentID: formik.values.productList[1].grade.id,
       });
+      if (isEdit) {
+        setTypeUpdate('to-costume');
+      }
     } else {
       setCurrentGrade({ isCostume: false, currentID: 1 });
+      if (isEdit) {
+        setTypeUpdate('to-default');
+      }
     }
   };
 
@@ -403,7 +413,7 @@ export default function Form(props: FormTypes) {
             }
           }}
         >
-          {!loadingForm ? 'Create' : 'Loading...'}
+          {!loadingForm ? `${isEdit ? 'Update' : 'Create'}` : 'Loading...'}
         </Button>
       </Box>
     </>

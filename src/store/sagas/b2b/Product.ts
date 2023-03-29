@@ -18,7 +18,10 @@ import {
 import { ProductGrade } from 'models/b2b/Grade';
 import { Category } from 'models/b2b/Category';
 import { ProductType } from 'models/b2b/Type';
-import { ProductParent } from 'models/b2b/ProductParent';
+import {
+  ProductParent,
+  CreateProduct as CreateProductParent,
+} from 'models/b2b/ProductParent';
 // service
 import * as service from 'service/B2B/Product';
 import * as serviceProductParent from 'service/B2B/ProductParent';
@@ -476,6 +479,159 @@ function* fetchLog(params: PayloadAction<LogParams>) {
   }
 }
 
+function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
+  try {
+    const dataForm = payload.payload;
+
+    // Step 2. Create Product Perent
+    const payloadProductPerant: CreateProductParent = {
+      name: dataForm.name,
+      image_filepath: '',
+      product_parent_category_id: dataForm.category.map((val) => val.id),
+    };
+
+    if (typeof dataForm.image !== 'string') {
+      const payloadImage = {
+        image: dataForm.image,
+      };
+      const responUploadImage: Response<string> = yield call(
+        serviceProductParent.uploadImage,
+        payloadImage,
+      );
+      payloadProductPerant.image_filepath = responUploadImage.data;
+    }
+
+    yield call(serviceProductParent.updateProduct, {
+      id: dataForm?.idParent || 0,
+      payload: payloadProductPerant,
+    });
+
+    if (dataForm.typeEdit === 'normal') {
+      const callPromise: any = call;
+      yield all(
+        dataForm.productList.map((val) => {
+          if (val.id) {
+            return callPromise(service.updateProduct, {
+              id: val.id,
+              data: {
+                product_type_id: dataForm.type?.id || 0,
+                product_parent_id: dataForm.idParent,
+                product_grade_id: val.grade?.id || 0,
+                description: val.description,
+                stock: val.stock || 0,
+                low_stock_limit: val.lowStock || 0,
+                is_exist: val.is_exist,
+                is_active: val.is_active,
+              },
+            });
+          }
+          return () => {};
+        }),
+      );
+    }
+    if (dataForm.typeEdit === 'to-costume') {
+      const callPromise: any = call;
+      yield all(
+        dataForm.productList.map((val) => {
+          if (val.grade.id === 1 && val.id) {
+            return callPromise(service.deleteProduct, {
+              is_exist: false,
+              ids: [val.id],
+            });
+          }
+          if (val.id) {
+            return callPromise(service.updateProduct, {
+              id: val.id,
+              data: {
+                product_type_id: dataForm.type?.id || 0,
+                product_parent_id: dataForm.idParent,
+                product_grade_id: val.grade?.id || 0,
+                description: val.description,
+                stock: val.stock || 0,
+                low_stock_limit: val.lowStock || 0,
+                is_exist: val.is_exist,
+                is_active: val.is_active,
+              },
+            });
+          }
+          return callPromise(service.createProduct, {
+            product_type_id: dataForm.type?.id || 0,
+            product_parent_id: dataForm.idParent,
+            product_grade_id: val.grade?.id || 0,
+            description: val.description,
+            stock: val.stock || 0,
+            low_stock_limit: val.lowStock || 0,
+            is_exist: val.is_exist,
+            is_active: val.is_active,
+          });
+        }),
+      );
+    }
+    // if (dataForm.typeEdit === 'to-default') {
+    //   const callPromise: any = call;
+    //   const deleteDataCostumeF =
+    //   yield all(
+    //     dataForm.productList.map((val) => {
+    //       if (val.grade.id === 1 && val.id) {
+    //         return callPromise(service.deleteProduct, {
+    //           is_exist: false,
+    //           ids: [val.id],
+    //         });
+    //       }
+    //       if (val.id) {
+    //         return callPromise(service.updateProduct, {
+    //           id: val.id,
+    //           data: {
+    //             product_type_id: dataForm.type?.id || 0,
+    //             product_parent_id: dataForm.idParent,
+    //             product_grade_id: val.grade?.id || 0,
+    //             description: val.description,
+    //             stock: val.stock || 0,
+    //             low_stock_limit: val.lowStock || 0,
+    //             is_exist: val.is_exist,
+    //             is_active: val.is_active,
+    //           },
+    //         });
+    //       }
+    //       return callPromise(service.createProduct, {
+    //         product_type_id: dataForm.type?.id || 0,
+    //         product_parent_id: dataForm.idParent,
+    //         product_grade_id: val.grade?.id || 0,
+    //         description: val.description,
+    //         stock: val.stock || 0,
+    //         low_stock_limit: val.lowStock || 0,
+    //         is_exist: val.is_exist,
+    //         is_active: val.is_active,
+    //       });
+    //     }),
+    //   );
+    // }
+
+    yield put(productAction.updateProductSuccess());
+  } catch (err) {
+    console.log(err);
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create product',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create product',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(productAction.updateProductFailed());
+  }
+}
+
 export default function* productSagas() {
   yield takeLatest(productAction.fetchData, fetchData);
   yield takeLatest(productAction.stockOpname, stockOpname);
@@ -496,4 +652,5 @@ export default function* productSagas() {
   yield takeLatest(productAction.undoChangeStatus.type, undoChangeStatus);
   yield takeLatest(productAction.fetchDetails.type, fetchDetails);
   yield takeLatest(productAction.fetchLog.type, fetchLog);
+  yield takeLatest(productAction.updateProduct.type, updateProduct);
 }

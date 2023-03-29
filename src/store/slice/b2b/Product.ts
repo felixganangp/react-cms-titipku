@@ -229,6 +229,21 @@ const ProductSlice = createSlice({
       state.loadingForm = false;
       state.isSuccessCreate = false;
     },
+    updateProduct(
+      state: ProductProps,
+      action: PayloadAction<FormInventoryTypes>,
+    ) {
+      state.loadingForm = true;
+      state.isSuccessCreate = false;
+    },
+    updateProductSuccess(state: ProductProps) {
+      state.loadingForm = false;
+      state.isSuccessCreate = true;
+    },
+    updateProductFailed(state: ProductProps) {
+      state.loadingForm = false;
+      state.isSuccessCreate = false;
+    },
     emptyTempIds(state: ProductProps) {
       state.tempIds = [];
       state.tempChangeStatus = [];

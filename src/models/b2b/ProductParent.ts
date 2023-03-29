@@ -20,6 +20,6 @@ export interface ProductParent {
 
 export interface CreateProduct {
   name: string;
-  image_filepath: string;
+  image_filepath?: string;
   product_parent_category_id: number[];
 }

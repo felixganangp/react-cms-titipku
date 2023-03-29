@@ -42,7 +42,21 @@ export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
             ]}
           >
             <Checkbox
-              sx={{ color: '#e5e5e5' }}
+              sx={{
+                color: '#e5e5e5',
+                position: 'relative',
+                '&:after': {
+                  content: '""',
+                  left: 0,
+                  right: 0,
+                  m: 'auto',
+                  height: 15,
+                  width: 15,
+                  position: 'absolute',
+                  backgroundColor: 'white',
+                  zIndex: -1,
+                },
+              }}
               indeterminate={numSelected > 0 && numSelected < rowCount}
               checked={rowCount > 0 && numSelected === rowCount}
               onChange={onSelectAllClick}

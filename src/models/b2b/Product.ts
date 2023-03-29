@@ -33,6 +33,7 @@ export interface ProductParams extends ListParams {
   product_type_id?: number;
   product_parent_category_id?: number;
   status?: string;
+  product_parent_id?: number;
 }
 
 export interface LogParams extends ListParams {
@@ -63,11 +64,13 @@ export interface CreateProduct {
 }
 
 export interface FormInventoryTypes {
+  idParent?: number;
   image: string | Blob;
   name: string;
   category: Category[];
   type: null | ProductType;
   productList: {
+    id?: number;
     grade: { id: number; name: string } | ProductGrade;
     description: string;
     stock: string | number;
@@ -75,6 +78,7 @@ export interface FormInventoryTypes {
     is_exist: boolean;
     is_active: boolean;
   }[];
+  typeEdit?: 'normal' | 'to-costume' | 'to-default';
 }
 export interface ChangeStatusParams {
   existingStatus: IsActiveType[];

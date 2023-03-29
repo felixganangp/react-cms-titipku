@@ -68,6 +68,9 @@ export default function InventoryPage() {
   const { search, grade, category, status } = useAppSelector(
     (state) => state.product.displayFilter,
   );
+  const [EditProductParent, setEditProductParent] = useState<Product | null>(
+    null,
+  );
   const stockOpnameModal = useModal();
   const formProductModal = useModal();
 
@@ -436,7 +439,10 @@ export default function InventoryPage() {
                     },
                     {
                       label: 'Edit',
-                      onClick: () => console.log(val),
+                      onClick: () => {
+                        formProductModal.openModal();
+                        setEditProductParent(val);
+                      },
                     },
                     {
                       label: 'See Details',
@@ -980,9 +986,18 @@ export default function InventoryPage() {
       <ModalComp
         open={formProductModal.open}
         title="Add Product"
-        onClose={formProductModal.closeModal}
+        onClose={() => {
+          formProductModal.closeModal();
+          setEditProductParent(null);
+        }}
       >
-        <Form onClose={formProductModal.closeModal} />
+        <Form
+          onClose={() => {
+            formProductModal.closeModal();
+            setEditProductParent(null);
+          }}
+          EditProductParent={EditProductParent}
+        />
       </ModalComp>
     </Box>
   );
