@@ -62,8 +62,8 @@ export default function InvoiceDetail() {
       ),
     },
     {
-      id: 'Action',
-      label: 'Editor',
+      id: 'action',
+      label: 'Action',
       align: 'left',
       format: (val: Log) => (
         <Box

@@ -233,6 +233,7 @@ export default function InventoryPage() {
     dispatch(
       productAction.setParams({
         page: 1,
+        // search: '',
         product_type_id: undefined,
         product_grade_id: undefined,
         product_parent_category_id: undefined,
@@ -244,6 +245,7 @@ export default function InventoryPage() {
       productAction.setDisplayFilter({
         grade: null,
         category: null,
+        // search: '',
         status:
           activeDashboard === 'all_stock' ? null : product.displayFilter.status,
       }),
@@ -292,8 +294,7 @@ export default function InventoryPage() {
     return 'Low Stock Products';
   };
 
-  useEffect(() => {
-    handleResetFilter();
+  const cleanSearch = () => {
     dispatch(
       productAction.setParams({
         search: '',
@@ -304,7 +305,7 @@ export default function InventoryPage() {
         search: '',
       }),
     );
-  }, [activeDashboard]);
+  };
 
   // TABLE
   useEffect(() => {
@@ -323,11 +324,13 @@ export default function InventoryPage() {
   };
 
   const handleChangePage = (value: number) => {
-    dispatch(
-      productAction.setParams({
-        page: value,
-      }),
-    );
+    if (activeDashboard === 'all_stock') {
+      dispatch(
+        productAction.setParams({
+          page: value,
+        }),
+      );
+    }
   };
 
   const headCell: HeadCells<Product>[] = [
@@ -343,7 +346,10 @@ export default function InventoryPage() {
           justifyContent="flex-start"
           alignItems="center"
           gap="24px"
-          onClick={() => navigate(`/b2b/inventory/${val.id}`)}
+          onClick={() => {
+            navigate(`/b2b/inventory/${val.id}`);
+            dispatch(uiAction.closeYellowToast());
+          }}
           sx={{
             cursor: 'pointer',
           }}
@@ -431,20 +437,28 @@ export default function InventoryPage() {
                     {
                       label: 'Stock Opname',
                       onClick: () => {
+                        dispatch(uiAction.closeYellowToast());
                         handleStockOpnameAction(val);
                       },
                     },
                     {
                       label: 'Edit',
-                      onClick: () => console.log(val),
+                      onClick: () => {
+                        dispatch(uiAction.closeYellowToast());
+                        console.log(val);
+                      },
                     },
                     {
                       label: 'See Details',
-                      onClick: () => navigate(`/b2b/inventory/${val.id}`),
+                      onClick: () => {
+                        dispatch(uiAction.closeYellowToast());
+                        navigate(`/b2b/inventory/${val.id}`);
+                      },
                     },
                     {
                       label: 'Make Inactive',
                       onClick: () => {
+                        dispatch(uiAction.closeYellowToast());
                         changeStatusModal.openModal();
                         setSelected([val.id]);
                         setSelectedProduct([val]);
@@ -454,6 +468,7 @@ export default function InventoryPage() {
                     {
                       label: 'Delete',
                       onClick: () => {
+                        dispatch(uiAction.closeYellowToast());
                         deleteModal.openModal();
                         setSelected([val.id]);
                         setSelectedProduct([val]);
@@ -463,11 +478,15 @@ export default function InventoryPage() {
                 : [
                     {
                       label: 'See Details',
-                      onClick: () => console.log('See Details'),
+                      onClick: () => {
+                        dispatch(uiAction.closeYellowToast());
+                        navigate(`/b2b/inventory/${val.id}`);
+                      },
                     },
                     {
                       label: 'Make Active',
                       onClick: () => {
+                        dispatch(uiAction.closeYellowToast());
                         changeStatusModal.openModal();
                         setSelected([val.id]);
                         setSelectedProduct([val]);
@@ -477,6 +496,8 @@ export default function InventoryPage() {
                     {
                       label: 'Delete',
                       onClick: () => {
+                        dispatch(uiAction.closeYellowToast());
+                        navigate(`/b2b/inventory/${val.id}`);
                         deleteModal.openModal();
                         setSelected([val.id]);
                         setSelectedProduct([val]);
@@ -493,6 +514,8 @@ export default function InventoryPage() {
       ),
     },
   ];
+
+  setTimeout(() => dispatch(uiAction.closeYellowToast()), 70000);
 
   return (
     <Box p="20px" bgcolor="#f8f8f8">
@@ -561,7 +584,11 @@ export default function InventoryPage() {
                 </Typography>
                 <BackButton
                   display={activeDashboard !== 'all_stock' ? 'flex' : 'none'}
-                  onClick={() => handleSetActiveDashboard(undefined)}
+                  onClick={() => {
+                    cleanSearch();
+                    handleResetFilter();
+                    handleSetActiveDashboard(undefined);
+                  }}
                   sx={{ cursor: 'pointer' }}
                 >
                   <BackIcon sx={{ color: '#008e58' }} />
@@ -597,7 +624,11 @@ export default function InventoryPage() {
             <Box display="flex" flexDirection="row" justifyContent="flex-start">
               {/* low stock */}
               <DashboardContainer
-                onClick={() => handleSetActiveDashboard('low_stock')}
+                onClick={() => {
+                  cleanSearch();
+                  handleResetFilter();
+                  handleSetActiveDashboard('low_stock');
+                }}
               >
                 <CircleContainer
                   display="flex"
@@ -644,7 +675,11 @@ export default function InventoryPage() {
 
               {/* empty stock */}
               <DashboardContainer
-                onClick={() => handleSetActiveDashboard('empty_stock')}
+                onClick={() => {
+                  cleanSearch();
+                  handleResetFilter();
+                  handleSetActiveDashboard('empty_stock');
+                }}
               >
                 <CircleContainer
                   display="flex"
