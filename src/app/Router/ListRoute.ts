@@ -164,7 +164,7 @@ const ListRoute: RouteProps[] = [
     auth: 'Private',
   },
   {
-    name: 'RAW Management',
+    name: 'Raw Management',
     comp: RawManagement,
     path: '/b2b/raw',
     index: true,
