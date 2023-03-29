@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  FormControlLabel,
-} from '@mui/material';
+import { Box, Typography, TextField, Button } from '@mui/material';
 import ReportIcon from '@mui/icons-material/Report';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -23,9 +17,15 @@ interface Props {
   items: Product[];
   onClose: () => void;
   totalItem: number;
+  selectPopupOpenFunc: () => void;
 }
 
-function StockOpname({ items, onClose, totalItem }: Props) {
+function StockOpname({
+  items,
+  onClose,
+  totalItem,
+  selectPopupOpenFunc,
+}: Props) {
   const dispatch = useAppDispatch();
   const listProductModal = useModal();
   const moveStockModal = useModal();
@@ -210,7 +210,9 @@ function StockOpname({ items, onClose, totalItem }: Props) {
                         height: '28px',
                         '&:hover': { backgroundColor: '#f8f8f8' },
                       }}
-                      onClick={listProductModal.openModal}
+                      onClick={() => {
+                        selectPopupOpenFunc();
+                      }}
                     >
                       Move Stock
                     </Button>
@@ -240,33 +242,6 @@ function StockOpname({ items, onClose, totalItem }: Props) {
         </Button>
       </Box>
       {/* </form> */}
-      <PopupAddSelected
-        items={[]}
-        menuName="Move stock"
-        parentMenu="Move stock parent"
-        data={[
-          {
-            id: 1,
-            product_name: 'test nama data',
-            product_type: 'B2B',
-            product_stock: '50.000',
-            product_image:
-              'https://id-test-11.slatic.net/p/6a78913c131cfcd539813bd4b7c42459.png',
-          },
-        ]}
-        currentData={[]}
-        open={listProductModal.open}
-        onClose={listProductModal.closeModal}
-        singleSelect
-        onConfirm={() => {
-          console.log('test');
-        }}
-        moreData={() => {}}
-        currentItems={5}
-        total={5}
-        product={false}
-        confirmButton="Confirm Button"
-      />
     </Box>
   );
 }

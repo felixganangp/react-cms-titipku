@@ -58,6 +58,7 @@ import ChangeStatus from './components/ChangeStatus';
 import Delete from './components/Delete';
 import NoDataInventory from './components/NoData';
 import Form from './components/Form';
+import PopupAddSelected from './components/PopupSelected';
 
 export default function InventoryPage() {
   const dispatch = useAppDispatch();
@@ -71,6 +72,7 @@ export default function InventoryPage() {
   );
   const stockOpnameModal = useModal();
   const formProductModal = useModal();
+  const listProductModal = useModal();
 
   // BATCH ACTION
   const [selected, setSelected] = useState<(number | string)[]>([]);
@@ -547,6 +549,16 @@ export default function InventoryPage() {
 
   setTimeout(() => dispatch(uiAction.closeYellowToast()), 70000);
 
+  const handleClosePopupSelectproduct = () => {
+    // modalFunc.openFunc();
+    stockOpnameModal.openModal();
+    listProductModal.closeModal();
+  };
+  const handleOpenPopupSelectproduct = () => {
+    // modalFunc.closeFunc();
+    stockOpnameModal.closeModal();
+    listProductModal.openModal();
+  };
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <Grid container spacing={2}>
@@ -1040,6 +1052,7 @@ export default function InventoryPage() {
           totalItem={selectedProduct.length}
           items={selectedProduct}
           onClose={handleCloseStockOpname}
+          selectPopupOpenFunc={handleOpenPopupSelectproduct}
         />
       </ModalComp>
       <ModalComp
@@ -1049,6 +1062,35 @@ export default function InventoryPage() {
       >
         <Form onClose={formProductModal.closeModal} />
       </ModalComp>
+      <PopupAddSelected
+        items={[]}
+        menuName="Move stock"
+        parentMenu="Move stock parent"
+        data={[
+          {
+            id: 1,
+            product_name: 'test nama data',
+            product_type: 'B2B',
+            product_stock: '50.000',
+            product_image:
+              'https://id-test-11.slatic.net/p/6a78913c131cfcd539813bd4b7c42459.png',
+          },
+        ]}
+        currentData={[]}
+        open={listProductModal.open}
+        onClose={() => {
+          handleClosePopupSelectproduct();
+        }}
+        singleSelect
+        onConfirm={() => {
+          console.log('test');
+        }}
+        moreData={() => {}}
+        currentItems={5}
+        total={5}
+        product={false}
+        confirmButton="Confirm Button"
+      />
     </Box>
   );
 }

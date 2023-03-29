@@ -12,8 +12,6 @@ import {
 import { RadioButton } from './RadioButton';
 // import { SearchNotFound } from './SearchNotFound';
 // import { SearchBar } from './SearchBar';
-import { CheckBox } from './CheckBox';
-
 interface Props {
   items: [];
   menuName: string;
@@ -24,11 +22,9 @@ interface Props {
   singleSelect: boolean;
   onConfirm: () => void;
   moreData: () => void;
-  // onSearch: any;
   currentItems: number;
   total: number;
   product: boolean;
-  // searchMenuName: any;
   confirmButton: string;
 }
 
