@@ -133,7 +133,7 @@ function StockOpname({ items, onClose, totalItem }: Props) {
                     </GradingColor>
                   )}
                   <Typography fontSize="17px">
-                    {item.product_parent.name} |{item.product_grade.id}
+                    {item.product_parent.name}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex' }}>
