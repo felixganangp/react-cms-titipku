@@ -477,9 +477,7 @@ function* fetchLog(params: PayloadAction<LogParams>) {
 }
 
 export default function* productSagas() {
-  yield takeLatest(productAction.fetchData, fetchData);
   yield takeLatest(productAction.stockOpname, stockOpname);
-  yield takeLatest(productAction.fetchTotalEmptyStock, fetchTotalEmptyStock);
   yield takeLatest(productAction.fetchTotalLowStock, fetchTotalLowStock);
   yield takeLatest(productAction.fetchGrade, fetchGrades);
   yield takeLatest(productAction.fetchCategory, fetchCategories);

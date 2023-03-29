@@ -32,6 +32,7 @@ import ArrowIcon from '@mui/icons-material/ArrowForwardIos';
 import MenuList from 'components/MenuList';
 import FormLabel from 'components/FormLabel';
 import PaperBox from 'components/Icon/PaperBox';
+import PaperBoxGreen from 'components/Icon/PaperBoxGreen';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
@@ -401,7 +402,7 @@ export default function InventoryPage() {
     },
     {
       id: 'status',
-      label: 'Status',
+      label: activeDashboard === 'all_stock' ? 'Status' : '',
       align: 'left',
       enableSort: false,
       format: (val: Product) => {
@@ -411,15 +412,19 @@ export default function InventoryPage() {
         else if (val.stock <= val.low_stock_limit) productStatus = 2;
         else productStatus = 3;
         return (
-          <StatusColor status={productStatus}>
-            {productStatus === 0
-              ? 'Inactive'
-              : productStatus === 1
-              ? 'Habis'
-              : productStatus === 2
-              ? 'Hampir Habis'
-              : 'Tersedia'}
-          </StatusColor>
+          <>
+            <Box display={activeDashboard !== 'all_stock' ? 'none' : 'flex'}>
+              <StatusColor status={productStatus}>
+                {productStatus === 0
+                  ? 'Inactive'
+                  : productStatus === 1
+                  ? 'Habis'
+                  : productStatus === 2
+                  ? 'Hampir Habis'
+                  : 'Tersedia'}
+              </StatusColor>
+            </Box>
+          </>
         );
       },
     },
@@ -429,88 +434,113 @@ export default function InventoryPage() {
       align: 'left',
       width: '20px',
       format: (val: Product) => (
-        <>
-          <MenuList
-            menu={
-              val.is_active
-                ? [
-                    {
-                      label: 'Stock Opname',
-                      onClick: () => {
-                        dispatch(uiAction.closeYellowToast());
-                        handleStockOpnameAction(val);
-                      },
-                    },
-                    {
-                      label: 'Edit',
-                      onClick: () => {
-                        dispatch(uiAction.closeYellowToast());
-                        console.log(val);
-                      },
-                    },
-                    {
-                      label: 'See Details',
-                      onClick: () => {
-                        dispatch(uiAction.closeYellowToast());
-                        navigate(`/b2b/inventory/${val.id}`);
-                      },
-                    },
-                    {
-                      label: 'Make Inactive',
-                      onClick: () => {
-                        dispatch(uiAction.closeYellowToast());
-                        changeStatusModal.openModal();
-                        setSelected([val.id]);
-                        setSelectedProduct([val]);
-                        setNewStatus(false);
-                      },
-                    },
-                    {
-                      label: 'Delete',
-                      onClick: () => {
-                        dispatch(uiAction.closeYellowToast());
-                        deleteModal.openModal();
-                        setSelected([val.id]);
-                        setSelectedProduct([val]);
-                      },
-                    },
-                  ]
-                : [
-                    {
-                      label: 'See Details',
-                      onClick: () => {
-                        dispatch(uiAction.closeYellowToast());
-                        navigate(`/b2b/inventory/${val.id}`);
-                      },
-                    },
-                    {
-                      label: 'Make Active',
-                      onClick: () => {
-                        dispatch(uiAction.closeYellowToast());
-                        changeStatusModal.openModal();
-                        setSelected([val.id]);
-                        setSelectedProduct([val]);
-                        setNewStatus(true);
-                      },
-                    },
-                    {
-                      label: 'Delete',
-                      onClick: () => {
-                        dispatch(uiAction.closeYellowToast());
-                        navigate(`/b2b/inventory/${val.id}`);
-                        deleteModal.openModal();
-                        setSelected([val.id]);
-                        setSelectedProduct([val]);
-                      },
-                    },
-                  ]
-            }
+        <Box
+          display="flex"
+          flexDirection="row"
+          justifyContent="flex-end"
+          alignItems="center"
+          gap="10px"
+        >
+          <Box
+            display={activeDashboard !== 'all_stock' ? 'flex' : 'none'}
+            width="200px"
           >
-            <IconButton>
-              <MoreVertIcon />
-            </IconButton>
-          </MenuList>
-        </>
+            <Button
+              variant="outlined"
+              startIcon={<PaperBoxGreen />}
+              fullWidth
+              sx={{
+                boxShadow: '0 2px 3px 0 rgba(0, 0, 0, 0.24)',
+              }}
+              onClick={() => {
+                dispatch(uiAction.closeYellowToast());
+                setSelected([val.id]);
+                setSelectedProduct([val]);
+                handleStockOpnameAction(val);
+              }}
+            >
+              Stock Opname
+            </Button>
+          </Box>
+          <Box display={activeDashboard !== 'all_stock' ? 'none' : 'flex'}>
+            <MenuList
+              menu={
+                val.is_active
+                  ? [
+                      {
+                        label: 'Stock Opname',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          handleStockOpnameAction(val);
+                        },
+                      },
+                      {
+                        label: 'Edit',
+                        onClick: () => dispatch(uiAction.closeYellowToast()),
+                      },
+                      {
+                        label: 'See Details',
+                        onClick: () => {
+                          navigate(`/b2b/inventory/${val.id}`);
+                          dispatch(uiAction.closeYellowToast());
+                        },
+                      },
+                      {
+                        label: 'Make Inactive',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          changeStatusModal.openModal();
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
+                          setNewStatus(false);
+                        },
+                      },
+                      {
+                        label: 'Delete',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          deleteModal.openModal();
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
+                        },
+                      },
+                    ]
+                  : [
+                      {
+                        label: 'See Details',
+                        onClick: () => {
+                          navigate(`/b2b/inventory/${val.id}`);
+                          dispatch(uiAction.closeYellowToast());
+                        },
+                      },
+                      {
+                        label: 'Make Active',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          changeStatusModal.openModal();
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
+                          setNewStatus(true);
+                        },
+                      },
+                      {
+                        label: 'Delete',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          deleteModal.openModal();
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
+                        },
+                      },
+                    ]
+              }
+            >
+              <IconButton>
+                <MoreVertIcon />
+              </IconButton>
+            </MenuList>
+          </Box>
+        </Box>
       ),
     },
   ];
