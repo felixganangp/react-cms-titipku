@@ -153,9 +153,11 @@ export default function InvoiceDetail() {
                 </Button>
               </Box>
             </Stack>
-            <Button sx={{ width: '110px' }} endIcon={<ArrowForwardIosIcon />}>
-              Edit
-            </Button>
+            <Box display={details?.is_active ? 'flex' : 'none'}>
+              <Button sx={{ width: '110px' }} endIcon={<ArrowForwardIosIcon />}>
+                Edit
+              </Button>
+            </Box>
           </Stack>
 
           <Grid container mt="30px" mx="10px" mb="10px">
