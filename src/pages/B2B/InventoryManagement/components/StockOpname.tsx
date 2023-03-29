@@ -14,6 +14,9 @@ import { productAction } from 'store/slice/b2b/Product';
 import { uiAction } from 'store/slice/ui';
 import { Product } from 'models/b2b/Product';
 import NoImage from 'assets/no-image.svg';
+import useModal from 'hooks/useModal';
+import Modal from 'components/Modal';
+import PopupAddSelected from './PopupSelected';
 import { GradingColor } from '../inventory.styled';
 
 interface Props {
@@ -24,6 +27,8 @@ interface Props {
 
 function StockOpname({ items, onClose, totalItem }: Props) {
   const dispatch = useAppDispatch();
+  const listProductModal = useModal();
+  const moveStockModal = useModal();
 
   const initData: any = {};
   items.forEach((el) => {
@@ -121,24 +126,27 @@ function StockOpname({ items, onClose, totalItem }: Props) {
                     flexDirection: 'row',
                     fontSize: '12px',
                     gap: 0.8,
-                    width: '280px',
+                    width: '200px',
+                    alignItems: 'center',
                   }}
                 >
                   {item.product_grade.id !== 1 && (
                     <GradingColor
                       sx={{ padding: '2px !important' }}
                       grade={item.product_grade.id}
+                      fontSize="12px"
                     >
                       {item.product_grade.name}
                     </GradingColor>
                   )}
-                  <Typography fontSize="17px">
-                    {item.product_parent.name} |{item.product_grade.id}
+                  <Typography fontSize="14px" sx={{ width: '70%' }}>
+                    {item.product_parent.name}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex' }}>
                   <Typography
                     sx={{ paddingX: '1em', backgroundColor: '#e4e4e4' }}
+                    fontSize="14px"
                   >
                     {(item.product_parent.product_parent_category &&
                       item.product_parent.product_parent_category[0].name) ||
@@ -156,33 +164,58 @@ function StockOpname({ items, onClose, totalItem }: Props) {
                 <Typography
                   fontSize="14px"
                   fontWeight="500"
-                  sx={{ width: '135px' }}
+                  sx={{ width: '120px' }}
                 >
-                  Stock Weight (Gram)
+                  in Stock (Gram)
                 </Typography>
-                <TextField
-                  type="number"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  name={`product_${item.id}`}
-                  placeholder="Stock Weight"
-                  value={values[`product_${item.id}`]}
-                  sx={{ width: '135px' }}
-                />
-                {Boolean(errors[`product_${item.id}`]) && (
-                  <Typography
-                    sx={{
-                      mt: '3px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      fontSize: '0.7rem',
-                      color: '#c10000',
-                    }}
-                  >
-                    <ReportIcon sx={{ fontSize: '0.9rem', mr: 0.5 }} />
-                    {errors[`product_${item.id}`]?.toString()}
-                  </Typography>
-                )}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: 1,
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <TextField
+                    type="number"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    name={`product_${item.id}`}
+                    placeholder="Stock Weight"
+                    value={values[`product_${item.id}`]}
+                    sx={{ width: '120px' }}
+                  />
+                  {Boolean(errors[`product_${item.id}`]) && (
+                    <Typography
+                      sx={{
+                        mt: '3px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        fontSize: '0.7rem',
+                        color: '#c10000',
+                      }}
+                    >
+                      <ReportIcon sx={{ fontSize: '0.9rem', mr: 0.5 }} />
+                      {errors[`product_${item.id}`]?.toString()}
+                    </Typography>
+                  )}
+                  <Box>
+                    <Button
+                      sx={{
+                        backgroundColor: '#f8f8f8',
+                        color: '#008e58',
+                        borderRadius: '32px',
+                        border: 'solid 1px #008e58',
+                        height: '28px',
+                        '&:hover': { backgroundColor: '#f8f8f8' },
+                      }}
+                      onClick={listProductModal.openModal}
+                    >
+                      Move Stock
+                    </Button>
+                  </Box>
+                </Box>
               </Box>
             </Box>
           </Box>
@@ -207,6 +240,33 @@ function StockOpname({ items, onClose, totalItem }: Props) {
         </Button>
       </Box>
       {/* </form> */}
+      <PopupAddSelected
+        items={[]}
+        menuName="Move stock"
+        parentMenu="Move stock parent"
+        data={[
+          {
+            id: 1,
+            product_name: 'test nama data',
+            product_type: 'B2B',
+            product_stock: '50.000',
+            product_image:
+              'https://id-test-11.slatic.net/p/6a78913c131cfcd539813bd4b7c42459.png',
+          },
+        ]}
+        currentData={[]}
+        open={listProductModal.open}
+        onClose={listProductModal.closeModal}
+        singleSelect
+        onConfirm={() => {
+          console.log('test');
+        }}
+        moreData={() => {}}
+        currentItems={5}
+        total={5}
+        product={false}
+        confirmButton="Confirm Button"
+      />
     </Box>
   );
 }
