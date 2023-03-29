@@ -43,7 +43,7 @@ export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
           >
             <Checkbox
               sx={{
-                color: '#e5e5e5',
+                color: '#E5E5E5',
                 position: 'relative',
                 '&:after': {
                   content: '""',

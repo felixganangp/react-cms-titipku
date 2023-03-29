@@ -32,6 +32,7 @@ import ArrowIcon from '@mui/icons-material/ArrowForwardIos';
 import MenuList from 'components/MenuList';
 import FormLabel from 'components/FormLabel';
 import PaperBox from 'components/Icon/PaperBox';
+import PaperBoxGreen from 'components/Icon/PaperBoxGreen';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
@@ -236,6 +237,7 @@ export default function InventoryPage() {
     dispatch(
       productAction.setParams({
         page: 1,
+        // search: '',
         product_type_id: undefined,
         product_grade_id: undefined,
         product_parent_category_id: undefined,
@@ -247,6 +249,7 @@ export default function InventoryPage() {
       productAction.setDisplayFilter({
         grade: null,
         category: null,
+        // search: '',
         status:
           activeDashboard === 'all_stock' ? null : product.displayFilter.status,
       }),
@@ -295,8 +298,7 @@ export default function InventoryPage() {
     return 'Low Stock Products';
   };
 
-  useEffect(() => {
-    handleResetFilter();
+  const cleanSearch = () => {
     dispatch(
       productAction.setParams({
         search: '',
@@ -307,7 +309,7 @@ export default function InventoryPage() {
         search: '',
       }),
     );
-  }, [activeDashboard]);
+  };
 
   // TABLE
   useEffect(() => {
@@ -326,11 +328,13 @@ export default function InventoryPage() {
   };
 
   const handleChangePage = (value: number) => {
-    dispatch(
-      productAction.setParams({
-        page: value,
-      }),
-    );
+    if (activeDashboard === 'all_stock') {
+      dispatch(
+        productAction.setParams({
+          page: value,
+        }),
+      );
+    }
   };
 
   const headCell: HeadCells<Product>[] = [
@@ -346,7 +350,10 @@ export default function InventoryPage() {
           justifyContent="flex-start"
           alignItems="center"
           gap="24px"
-          onClick={() => navigate(`/b2b/inventory/${val.id}`)}
+          onClick={() => {
+            navigate(`/b2b/inventory/${val.id}`);
+            dispatch(uiAction.closeYellowToast());
+          }}
           sx={{
             cursor: 'pointer',
           }}
@@ -398,7 +405,7 @@ export default function InventoryPage() {
     },
     {
       id: 'status',
-      label: 'Status',
+      label: activeDashboard === 'all_stock' ? 'Status' : '',
       align: 'left',
       enableSort: false,
       format: (val: Product) => {
@@ -408,15 +415,19 @@ export default function InventoryPage() {
         else if (val.stock <= val.low_stock_limit) productStatus = 2;
         else productStatus = 3;
         return (
-          <StatusColor status={productStatus}>
-            {productStatus === 0
-              ? 'Inactive'
-              : productStatus === 1
-              ? 'Habis'
-              : productStatus === 2
-              ? 'Hampir Habis'
-              : 'Tersedia'}
-          </StatusColor>
+          <>
+            <Box display={activeDashboard !== 'all_stock' ? 'none' : 'flex'}>
+              <StatusColor status={productStatus}>
+                {productStatus === 0
+                  ? 'Inactive'
+                  : productStatus === 1
+                  ? 'Habis'
+                  : productStatus === 2
+                  ? 'Hampir Habis'
+                  : 'Tersedia'}
+              </StatusColor>
+            </Box>
+          </>
         );
       },
     },
@@ -426,79 +437,122 @@ export default function InventoryPage() {
       align: 'left',
       width: '20px',
       format: (val: Product) => (
-        <>
-          <MenuList
-            menu={
-              val.is_active
-                ? [
-                    {
-                      label: 'Stock Opname',
-                      onClick: () => {
-                        handleStockOpnameAction(val);
-                      },
-                    },
-                    {
-                      label: 'Edit',
-                      onClick: () => {
-                        formProductModal.openModal();
-                        setEditProductParent(val);
-                      },
-                    },
-                    {
-                      label: 'See Details',
-                      onClick: () => navigate(`/b2b/inventory/${val.id}`),
-                    },
-                    {
-                      label: 'Make Inactive',
-                      onClick: () => {
-                        changeStatusModal.openModal();
-                        setSelected([val.id]);
-                        setSelectedProduct([val]);
-                        setNewStatus(false);
-                      },
-                    },
-                    {
-                      label: 'Delete',
-                      onClick: () => {
-                        deleteModal.openModal();
-                        setSelected([val.id]);
-                        setSelectedProduct([val]);
-                      },
-                    },
-                  ]
-                : [
-                    {
-                      label: 'See Details',
-                      onClick: () => console.log('See Details'),
-                    },
-                    {
-                      label: 'Make Active',
-                      onClick: () => {
-                        changeStatusModal.openModal();
-                        setSelected([val.id]);
-                        setSelectedProduct([val]);
-                        setNewStatus(true);
-                      },
-                    },
-                    {
-                      label: 'Delete',
-                      onClick: () => {
-                        deleteModal.openModal();
-                        setSelected([val.id]);
-                        setSelectedProduct([val]);
-                      },
-                    },
-                  ]
-            }
+        <Box
+          display="flex"
+          flexDirection="row"
+          justifyContent="flex-end"
+          alignItems="center"
+          gap="10px"
+        >
+          <Box
+            display={activeDashboard !== 'all_stock' ? 'flex' : 'none'}
+            width="200px"
           >
-            <IconButton>
-              <MoreVertIcon />
-            </IconButton>
-          </MenuList>
-        </>
+            <Button
+              variant="outlined"
+              startIcon={<PaperBoxGreen />}
+              fullWidth
+              sx={{
+                boxShadow: '0 2px 3px 0 rgba(0, 0, 0, 0.24)',
+              }}
+              onClick={() => {
+                dispatch(uiAction.closeYellowToast());
+                setSelected([val.id]);
+                setSelectedProduct([val]);
+                handleStockOpnameAction(val);
+              }}
+            >
+              Stock Opname
+            </Button>
+          </Box>
+          <Box display={activeDashboard !== 'all_stock' ? 'none' : 'flex'}>
+            <MenuList
+              menu={
+                val.is_active
+                  ? [
+                      {
+                        label: 'Stock Opname',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          handleStockOpnameAction(val);
+                        },
+                      },
+                      {
+                        label: 'Edit',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          formProductModal.openModal();
+                          setEditProductParent(val);
+                        },
+                      },
+                      {
+                        label: 'See Details',
+                        onClick: () => {
+                          navigate(`/b2b/inventory/${val.id}`);
+                          dispatch(uiAction.closeYellowToast());
+                        },
+                      },
+                      {
+                        label: 'Make Inactive',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          changeStatusModal.openModal();
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
+                          setNewStatus(false);
+                        },
+                      },
+                      {
+                        label: 'Delete',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          deleteModal.openModal();
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
+                        },
+                      },
+                    ]
+                  : [
+                      {
+                        label: 'See Details',
+                        onClick: () => {
+                          navigate(`/b2b/inventory/${val.id}`);
+                          dispatch(uiAction.closeYellowToast());
+                        },
+                      },
+                      {
+                        label: 'Make Active',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          changeStatusModal.openModal();
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
+                          setNewStatus(true);
+                        },
+                      },
+                      {
+                        label: 'Delete',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          deleteModal.openModal();
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
+                        },
+                      },
+                    ]
+              }
+            >
+              <IconButton>
+                <MoreVertIcon />
+              </IconButton>
+            </MenuList>
+          </Box>
+        </Box>
       ),
     },
   ];
+
+  setTimeout(() => dispatch(uiAction.closeYellowToast()), 70000);
 
   return (
     <Box p="20px" bgcolor="#f8f8f8">
@@ -567,7 +621,11 @@ export default function InventoryPage() {
                 </Typography>
                 <BackButton
                   display={activeDashboard !== 'all_stock' ? 'flex' : 'none'}
-                  onClick={() => handleSetActiveDashboard(undefined)}
+                  onClick={() => {
+                    cleanSearch();
+                    handleResetFilter();
+                    handleSetActiveDashboard(undefined);
+                  }}
                   sx={{ cursor: 'pointer' }}
                 >
                   <BackIcon sx={{ color: '#008e58' }} />
@@ -603,7 +661,11 @@ export default function InventoryPage() {
             <Box display="flex" flexDirection="row" justifyContent="flex-start">
               {/* low stock */}
               <DashboardContainer
-                onClick={() => handleSetActiveDashboard('low_stock')}
+                onClick={() => {
+                  cleanSearch();
+                  handleResetFilter();
+                  handleSetActiveDashboard('low_stock');
+                }}
               >
                 <CircleContainer
                   display="flex"
@@ -650,7 +712,11 @@ export default function InventoryPage() {
 
               {/* empty stock */}
               <DashboardContainer
-                onClick={() => handleSetActiveDashboard('empty_stock')}
+                onClick={() => {
+                  cleanSearch();
+                  handleResetFilter();
+                  handleSetActiveDashboard('empty_stock');
+                }}
               >
                 <CircleContainer
                   display="flex"
