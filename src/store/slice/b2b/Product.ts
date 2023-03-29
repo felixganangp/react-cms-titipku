@@ -254,6 +254,9 @@ const ProductSlice = createSlice({
     createProductSuccess(state: ProductProps) {
       state.loadingForm = false;
       state.isSuccessCreate = true;
+      setTimeout(() => {
+        state.isSuccessCreate = false;
+      }, 1000);
     },
     createProductFailed(state: ProductProps) {
       state.loadingForm = false;
@@ -269,8 +272,11 @@ const ProductSlice = createSlice({
     updateProductSuccess(state: ProductProps) {
       state.loadingForm = false;
       state.isSuccessCreate = true;
+      setTimeout(() => {
+        state.isSuccessCreate = false;
+      }, 1000);
     },
-    updateProductFailed(state: ProductProps) {
+    resetProductForm(state: ProductProps) {
       state.loadingForm = false;
       state.isSuccessCreate = false;
     },

@@ -272,6 +272,7 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
     yield put(productAction.createProductSuccess());
     const filter: ProductParams = yield select((state) => state.product.params);
     yield put(productAction.fetchData(filter));
+    // yield put(productAction.resetProductForm());
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
@@ -486,7 +487,7 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
     // Step 2. Create Product Perent
     const payloadProductPerant: CreateProductParent = {
       name: dataForm.name,
-      image_filepath: '',
+      image_filepath: dataForm.image as string,
       product_parent_category_id: dataForm.category.map((val) => val.id),
     };
 
@@ -608,6 +609,9 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
     // }
 
     yield put(productAction.updateProductSuccess());
+    const filter: ProductParams = yield select((state) => state.product.params);
+    yield put(productAction.fetchData(filter));
+    // yield put(productAction.resetProductForm());
   } catch (err) {
     console.log(err);
     if (typeof err === 'string') {
@@ -628,7 +632,7 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
         }),
       );
     }
-    yield put(productAction.updateProductFailed());
+    yield put(productAction.resetProductForm());
   }
 }
 
