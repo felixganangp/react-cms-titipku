@@ -35,7 +35,8 @@ export default function InvoiceDetail() {
   }, [id]);
 
   useEffect(() => {
-    dispatch(productAction.fetchLog(product.paramsLog));
+    if (product.paramsLog.product_id)
+      dispatch(productAction.fetchLog(product.paramsLog));
   }, [product.paramsLog]);
 
   useEffect(() => {
@@ -90,10 +91,14 @@ export default function InvoiceDetail() {
               {val.changes.action_type === 'create' ? (
                 ''
               ) : val.changes.action_type === 'update' ? (
-                `${val.changes.columns[0].name.replace(
-                  /^./,
-                  val.changes.columns[0].name[0].toUpperCase(),
-                )}`
+                `${
+                  val.changes.columns
+                    ? val.changes.columns[0].name.replace(
+                        /^./,
+                        val.changes.columns[0].name[0].toUpperCase(),
+                      )
+                    : 'But No Changes'
+                }`
               ) : val.changes.action_type === 'delete' ? (
                 ''
               ) : val.changes.action_type === 'set_to_active' ? (
@@ -235,7 +240,7 @@ export default function InvoiceDetail() {
       <CardContainer>
         <Box p="16px">
           <Table
-            data={log}
+            data={log || []}
             bgHeader="#cde3f6"
             headCells={headCell}
             totalData={product.totalLog}
