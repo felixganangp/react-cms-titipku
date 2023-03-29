@@ -12,6 +12,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
 import { Log } from 'models/b2b/Product';
+import NoImage from 'assets/no-image.svg';
 import { CardContainer, GradingColor, StatusColor } from '../inventory.styled';
 
 export default function InvoiceDetail() {
@@ -21,8 +22,6 @@ export default function InvoiceDetail() {
   const log = useAppSelector((state) => state.product.log);
   const details = useAppSelector((state) => state.product.details);
   const { id } = useParams();
-
-  console.log('id', id);
 
   useEffect(() => {
     if (id) {
@@ -128,7 +127,11 @@ export default function InvoiceDetail() {
             <Stack direction="row" alignItems="center" spacing="16px">
               <Box
                 component="img"
-                src="https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full//90/MTA-70146323/ayam_potong_segar_ayam_potong_frozen_food_full01_4e8623f5.jpg"
+                src={details?.product_parent.image_filepath}
+                onError={({ currentTarget }) => {
+                  currentTarget.onerror = null;
+                  currentTarget.src = NoImage;
+                }}
                 alt="ayam"
                 width="54px"
                 height="54px"
