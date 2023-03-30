@@ -515,7 +515,11 @@ export default function InventoryPage() {
                   : [
                       {
                         label: 'Edit',
-                        onClick: () => dispatch(uiAction.closeYellowToast()),
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          formProductModal.openModal();
+                          setEditProductParent(val);
+                        },
                       },
                       {
                         label: 'See Details',

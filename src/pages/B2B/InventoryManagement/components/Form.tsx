@@ -27,7 +27,7 @@ interface TypesError {
 }
 interface FormTypes {
   onClose: () => void;
-  EditProductParent: Product;
+  EditProductParent: Product | null;
 }
 
 export default function Form(props: FormTypes) {
@@ -299,12 +299,14 @@ export default function Form(props: FormTypes) {
               ),
             }}
             helperText={
-              formik.values.productList[indexGrade].lowStock && (
+              formik.values.productList[indexGrade].lowStock ? (
                 <Typography
                   sx={{ fontSize: '12px', color: '#797979', ml: '-12px' }}
                 >
                   The quantity at which you will be notified about low stock
                 </Typography>
+              ) : (
+                false
               )
             }
           />
@@ -333,6 +335,7 @@ export default function Form(props: FormTypes) {
               formik.setFieldValue('productList', product);
             }}
             // onBlur={handleBlur}
+            disabled={!formik.values.productList[indexGrade].is_active}
             fullWidth
             InputProps={{
               endAdornment: (
@@ -416,7 +419,9 @@ export default function Form(props: FormTypes) {
             }}
           >
             <DeleteIcon sx={{ fontSize: '19px' }} />
-            <Typography fontSize="14px">Delete Grade</Typography>
+            <Typography fontSize="14px">
+              Clear {formik.values.productList[indexGrade].grade.name}
+            </Typography>
           </Box>
         ) : (
           false
