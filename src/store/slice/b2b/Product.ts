@@ -46,7 +46,7 @@ interface ProductProps {
   details: Product | null;
   log: Log[];
   totalLog: number;
-  paramsLog: ListParams;
+  paramsLog: LogParams;
 }
 
 const initialState: ProductProps = {

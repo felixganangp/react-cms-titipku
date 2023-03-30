@@ -514,6 +514,10 @@ export default function InventoryPage() {
                     ]
                   : [
                       {
+                        label: 'Edit',
+                        onClick: () => dispatch(uiAction.closeYellowToast()),
+                      },
+                      {
                         label: 'See Details',
                         onClick: () => {
                           navigate(`/b2b/inventory/${val.id}`);

@@ -142,6 +142,7 @@ export const fetchDetails = (id: number | string) =>
 export const fetchLog = (params: LogParams) =>
   new Promise(async (resolve, reject) => {
     try {
+      console.log('params service', params);
       const response = await http.get('/inventory/b2b/product/log', { params });
       if (response.data) resolve(response.data);
     } catch (err: any) {
