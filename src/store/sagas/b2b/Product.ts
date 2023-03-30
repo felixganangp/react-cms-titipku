@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { PayloadAction } from '@reduxjs/toolkit';
 import { call, put, select, takeLatest, all } from 'redux-saga/effects';
@@ -11,7 +12,6 @@ import {
   Product,
   ProductParams,
   FormInventoryTypes,
-  CreateProduct,
   Log,
   LogParams,
 } from 'models/b2b/Product';
@@ -255,25 +255,28 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
           product_parent_id: responProductParent.data.id,
           product_grade_id: val.grade?.id || 0,
           description: val.description,
-          stock: val.stock || 0,
-          low_stock_limit: val.lowStock || 0,
+          stock: parseInt(val.stock as string),
+          low_stock_limit: parseInt(val.lowStock as string),
           is_exist: val.is_exist,
           is_active: val.is_active,
         }),
       ),
     );
     yield put(
-      uiAction.openToast({
-        headMsg: 'Success create product',
-        // message: error,
-        severity: 'success',
+      uiAction.openYellowToast({
+        totalItem: dataForm.productList.length,
+        additionalMsg: '',
+        action: 'successfully created!',
+        error: false,
+        noUndo: true,
       }),
     );
     yield put(productAction.createProductSuccess());
     const filter: ProductParams = yield select((state) => state.product.params);
     yield put(productAction.fetchData(filter));
-    // yield put(productAction.resetProductForm());
   } catch (err) {
+    yield put(productAction.resetProductForm());
+
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
@@ -533,9 +536,27 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
           return () => {};
         }),
       );
+      yield put(
+        uiAction.openYellowToast({
+          totalItem: dataForm.productList.length,
+          additionalMsg: '',
+          action: 'successfully updated!',
+          error: false,
+          noUndo: true,
+        }),
+      );
     }
 
     if (dataForm.typeEdit === 'to-costume') {
+      yield put(
+        uiAction.openYellowToast({
+          totalItem: 1,
+          additionalMsg: '',
+          action: 'successfully updated!',
+          error: false,
+          noUndo: true,
+        }),
+      );
       yield all(
         dataForm.productList.map((val) => {
           if (val.grade.id === 1 && val.id) {
@@ -576,6 +597,15 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
       );
     }
     if (dataForm.typeEdit === 'to-default') {
+      yield put(
+        uiAction.openYellowToast({
+          totalItem: 1,
+          additionalMsg: '',
+          action: 'successfully updated!',
+          error: false,
+          noUndo: true,
+        }),
+      );
       const idTodelete = dataForm.productList
         .filter((val) => val.grade.id !== 1 && val.id)
         .map((val) => val.id) as number[];
