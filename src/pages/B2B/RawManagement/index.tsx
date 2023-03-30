@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+/* eslint-disable array-callback-return */
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -12,24 +13,36 @@ import {
   Collapse,
   Autocomplete,
   Divider,
-  Avatar,
+  IconButton,
 } from '@mui/material';
 import ArrowIcon from '@mui/icons-material/ArrowForwardIos';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterIcon from '@mui/icons-material/FilterAltOutlined';
 import ArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { useAppDispatch } from 'store/hooks';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { useNavigate } from 'react-router-dom';
 import FormLabel from 'components/FormLabel';
 import Table from 'components/Table';
-import { CardContainer } from './raw.styled';
+import { HeadCells } from 'components/Table/types';
+import { ProductRaw } from 'models/b2b/ProductRaw';
+import NoImage from 'assets/no-image.svg';
+import { rawAction } from 'store/slice/b2b/ProductRaw';
+import MenuList from 'components/MenuList';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Modal from 'components/Modal';
+import useModal from 'hooks/useModal';
+import { CardContainer, CategoryStyle } from './raw.styled';
+import RawForm from './components/form';
 
 export default function RawPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const raws = useAppSelector((state) => state.raw.raws);
+  const raw = useAppSelector((state) => state.raw);
 
   // BATCH ACTION
   const [selected, setSelected] = useState<(number | string)[]>([]);
+  const [selectedRaw, setSelectedRaw] = useState<ProductRaw[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -43,25 +56,112 @@ export default function RawPage() {
 
   // search & filter
   const [openFilter, setOpenFilter] = useState<boolean>(false);
+  const { search, category } = useAppSelector(
+    (state) => state.raw.displayFilter,
+  );
+
+  useEffect(() => {
+    dispatch(rawAction.fetchCategory());
+  }, []);
 
   const handleExpandFilter = () => {
     setOpenFilter(!openFilter);
   };
 
+  const handleSearch = (value: string) => {
+    dispatch(
+      rawAction.setDisplayFilter({
+        search: value,
+      }),
+    );
+  };
+
+  const handleChangeCategory = (value: any) => {
+    dispatch(
+      rawAction.setDisplayFilter({
+        category: value,
+      }),
+    );
+  };
+
+  const handleApplyFilter = () => {
+    dispatch(
+      rawAction.setParams({
+        ...raw.params,
+        page: 1,
+        search,
+        product_parent_category_id: category ? category.id : undefined,
+      }),
+    );
+  };
+
+  const handleResetFilter = () => {
+    dispatch(
+      rawAction.setParams({
+        page: 1,
+        product_parent_category_id: undefined,
+      }),
+    );
+    dispatch(
+      rawAction.setDisplayFilter({
+        category: null,
+      }),
+    );
+  };
+
   // table
-  const headCell = [
+  useEffect(() => {
+    dispatch(rawAction.fetchData(raw.params));
+  }, [raw.params]);
+
+  const handleChangeRowPerPage = (value: number) => {
+    dispatch(
+      rawAction.setParams({
+        page: 1,
+        count: value,
+      }),
+    );
+  };
+
+  const handleChangePage = (value: number) => {
+    dispatch(
+      rawAction.setParams({
+        page: value,
+      }),
+    );
+  };
+
+  const handleChangeSort = (value: {
+    orderBy: string | number;
+    orderType: 'asc' | 'desc';
+  }) => {
+    dispatch(
+      rawAction.setParams({
+        page: 1,
+        order_by: value.orderBy,
+        order_type: value.orderType,
+      }),
+    );
+  };
+
+  const numberWithCommas = (x: number) => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
+  const headCell: HeadCells<ProductRaw>[] = [
     {
-      id: 'raw_id',
+      id: 'id',
       label: 'Raw ID',
       align: 'left',
       enableSort: true,
+      format: (val: ProductRaw) => <Typography>{`RAW-${val.id}`}</Typography>,
     },
     {
       id: 'product',
       label: 'Product / SKU',
       align: 'left',
-      enableSort: true,
-      format: (val) => (
+      // enableSort: true,
+      format: (val: ProductRaw) => (
         <Box
           display="flex"
           flexDirection="row"
@@ -72,11 +172,72 @@ export default function RawPage() {
             cursor: 'pointer',
           }}
         >
+          <img
+            src={val.product_parent.image_filepath}
+            alt={val.product_parent.name}
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null;
+              currentTarget.src = NoImage;
+            }}
+          />
           <Typography>Product Name</Typography>
         </Box>
       ),
     },
+    {
+      id: 'category',
+      label: 'Category',
+      align: 'left',
+      format: (val: ProductRaw) => (
+        <CategoryStyle>
+          {val.product_parent.product_parent_category
+            ? val.product_parent.product_parent_category[0].name
+            : '-'}
+        </CategoryStyle>
+      ),
+    },
+    {
+      id: 'stock',
+      label: 'In Stock (gram)',
+      align: 'left',
+      format: (val: ProductRaw) => (
+        <Typography>{numberWithCommas(val.stock)}</Typography>
+      ),
+    },
+    {
+      id: 'action_menu',
+      label: '',
+      align: 'left',
+      width: '20px',
+      format: (val: ProductRaw) => (
+        <MenuList
+          menu={[
+            {
+              label: 'Edit',
+              onClick: () => console.log('edit'),
+            },
+            {
+              label: 'See Details',
+              onClick: () => console.log('see details'),
+            },
+            {
+              label: 'Delete',
+              onClick: () => console.log('delete'),
+            },
+          ]}
+        >
+          <IconButton>
+            <MoreVertIcon />
+          </IconButton>
+        </MenuList>
+      ),
+    },
   ];
+
+  console.log('selected', selectedRaw);
+
+  // form
+  const formModal = useModal();
 
   return (
     <Box p="20px" bgcolor="#f8f8f8">
@@ -91,7 +252,9 @@ export default function RawPage() {
             <Typography color="#303030" fontSize="26px" fontWeight="600">
               Raw Management
             </Typography>
-            <Button endIcon={<ArrowIcon />}>Add New</Button>
+            <Button endIcon={<ArrowIcon />} onClick={formModal.openModal}>
+              Add New
+            </Button>
           </Stack>
         </Grid>
         {/* search & filter */}
@@ -110,12 +273,12 @@ export default function RawPage() {
                 size="small"
                 sx={{ flex: 1, bgcolor: '#f8f8f8', maxWidth: '560px' }}
                 fullWidth
-                // defaultValue={product.displayFilter.search}
-                // value={product.displayFilter.search}
-                // onChange={(e) => handleSearch(e.target.value)}
-                // onKeyDown={(e) => {
-                //   if (e.key === 'Enter') handleApplyFilter();
-                // }}
+                defaultValue={raw.displayFilter.search}
+                value={raw.displayFilter.search}
+                onChange={(e) => handleSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleApplyFilter();
+                }}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -178,13 +341,13 @@ export default function RawPage() {
               <Box p="20px">
                 <FormLabel text="Category">
                   <Autocomplete
-                    id="filterGrade"
-                    value={null}
-                    options={[]}
-                    // onChange={(e, value) => {
-                    //   handleChangeGrade(value);
-                    // }}
-                    // getOptionLabel={(option) => `${option.name}`}
+                    id="filterCategory"
+                    value={category}
+                    options={raw.categories}
+                    onChange={(e, value) => {
+                      handleChangeCategory(value);
+                    }}
+                    getOptionLabel={(option) => `${option.name}`}
                     renderInput={(params) => {
                       return (
                         <TextField
@@ -204,18 +367,63 @@ export default function RawPage() {
                   alignItems="center"
                   gap="8px"
                 >
-                  <Button sx={{ width: '90px' }} variant="text">
+                  <Button
+                    sx={{ width: '90px' }}
+                    variant="text"
+                    onClick={handleResetFilter}
+                  >
                     Reset
                   </Button>
-                  <Button sx={{ width: '90px' }}>Apply</Button>
+                  <Button sx={{ width: '90px' }} onClick={handleApplyFilter}>
+                    Apply
+                  </Button>
                 </Box>
               </Box>
             </Collapse>
 
-            <Table data={[]} />
+            <Table
+              data={raws}
+              headCells={headCell}
+              totalData={raw.total}
+              count={raw.params.count}
+              loading={raw.loading}
+              selected={selected}
+              setSelected={(arr: (string | number)[]) => {
+                setSelected(arr);
+                setSelectedRaw(() => {
+                  const addition: ProductRaw[] = [];
+                  arr.map((id) => {
+                    const obj: ProductRaw | undefined = raws.find(
+                      (item) => item.id === id,
+                    );
+                    if (
+                      obj &&
+                      selectedRaw.findIndex((item) => item.id === id) === -1
+                    )
+                      return addition.push(obj);
+                  });
+                  const existing = selectedRaw.filter(
+                    (item) => arr.indexOf(item.id) !== -1,
+                  );
+                  return [...existing, ...addition];
+                });
+              }}
+              onChangeRowPerpage={handleChangeRowPerPage}
+              enableCheckBox
+              page={raw.params.page}
+              onChangePage={handleChangePage}
+              onChangeSort={handleChangeSort}
+            />
           </CardContainer>
         </Grid>
       </Grid>
+      <Modal
+        open={formModal.open}
+        title="Add Raw Product"
+        onClose={formModal.closeModal}
+      >
+        <RawForm onClose={formModal.closeModal} />
+      </Modal>
     </Box>
   );
 }
