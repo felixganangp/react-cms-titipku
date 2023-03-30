@@ -8,9 +8,6 @@ import { productAction } from 'store/slice/b2b/Product';
 import { uiAction } from 'store/slice/ui';
 import { Product } from 'models/b2b/Product';
 import NoImage from 'assets/no-image.svg';
-import useModal from 'hooks/useModal';
-import Modal from 'components/Modal';
-import PopupAddSelected from './PopupSelected';
 import { GradingColor } from '../inventory.styled';
 
 interface Props {
@@ -27,8 +24,6 @@ function StockOpname({
   selectPopupOpenFunc,
 }: Props) {
   const dispatch = useAppDispatch();
-  const listProductModal = useModal();
-  const moveStockModal = useModal();
 
   const initData: any = {};
   items.forEach((el) => {

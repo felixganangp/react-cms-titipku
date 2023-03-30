@@ -1,36 +1,28 @@
 import React, { useEffect } from 'react';
-import { Box, Dialog, IconButton, DialogTitle } from '@mui/material';
+import { Box, Dialog, IconButton, DialogTitle, Button } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 // import close from '../../images/icons/close.svg';
-import {
-  CancelButton,
-  ConfirmButton,
-  ContentAction,
-  Contents,
-  MoreContent,
-} from './popupselected.styled';
+import { ContentAction, Contents, MoreContent } from './popupselected.styled';
 import { RadioButton } from './RadioButton';
 // import { SearchNotFound } from './SearchNotFound';
 // import { SearchBar } from './SearchBar';
 interface Props {
-  items: [];
-  menuName: string;
+  selectedItem: any;
   data: [];
   currentData: [];
   open: boolean;
   onClose: () => void;
   singleSelect: boolean;
-  onConfirm: () => void;
+  onConfirm: React.Dispatch<React.SetStateAction<never[]>>;
   moreData: () => void;
   currentItems: number;
   total: number;
   product: boolean;
-  confirmButton: string;
+  onApply: () => void;
 }
 
 function PopupAddSelected({
-  items: selectedItems,
-  menuName,
+  selectedItem,
   data,
   currentData,
   open,
@@ -42,15 +34,13 @@ function PopupAddSelected({
   currentItems,
   total,
   product,
-  // searchMenuName,
-  confirmButton,
+  onApply,
 }: Props) {
   const [confirm, setConfirm] = React.useState(false);
   const [items, setItems] = React.useState({});
   const [existingItems, setExistingItems] = React.useState([]);
   const [newItems, setNewItems] = React.useState({});
   const [uncheckedItems, setUncheckedItems] = React.useState({});
-  const selectedMessage = `${selectedItems.length} ${menuName}(s) selected`;
 
   const collectItems = () => Object.keys(items).filter((k: any) => items[k]);
   const collect = (datas: any) => Object.keys(datas).filter((k) => datas[k]);
@@ -155,7 +145,9 @@ function PopupAddSelected({
     setUncheckedItems({});
     setNewItems({});
     // setExistingItems([]);
-    onConfirm(submittedItems);
+    const selected = data.filter((el) => el.id === +submittedItems[0]);
+    onConfirm(selected);
+    onApply();
   };
 
   useEffect(() => {
@@ -213,7 +205,8 @@ function PopupAddSelected({
       </DialogTitle>
       {/* {!hasData ? (
             <SearchNotFound />
-          ) : ( */}
+          ) : (
+       )}  */}
       <Contents>
         <Box
           style={{
@@ -229,16 +222,17 @@ function PopupAddSelected({
           )}
         </Box>
       </Contents>
-      {/* )} */}
       <ContentAction>
-        <CancelButton onClick={() => handleCancel()}>Cancel</CancelButton>
-        <ConfirmButton
+        <Button variant="text" color="error" onClick={() => handleCancel()}>
+          Cancel
+        </Button>
+        <Button
           disabled={isDisabled}
-          onClick={() => handleConfirm()}
+          onClick={() => handleConfirm() /* onApply() */}
           autoFocus
         >
-          {confirmButton}
-        </ConfirmButton>
+          Apply
+        </Button>
       </ContentAction>
     </Dialog>
   );

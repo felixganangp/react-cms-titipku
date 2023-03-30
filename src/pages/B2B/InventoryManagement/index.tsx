@@ -59,6 +59,8 @@ import Delete from './components/Delete';
 import NoDataInventory from './components/NoData';
 import Form from './components/Form';
 import PopupAddSelected from './components/PopupSelected';
+import MoveStockForm from './components/MoveStockForm';
+import ConfirmMoveStock from './components/ConfirmMoveStock';
 
 export default function InventoryPage() {
   const dispatch = useAppDispatch();
@@ -73,6 +75,8 @@ export default function InventoryPage() {
   const stockOpnameModal = useModal();
   const formProductModal = useModal();
   const listProductModal = useModal();
+  const moveStockFormModal = useModal();
+  const moveStockConfirmationModal = useModal();
 
   // BATCH ACTION
   const [selected, setSelected] = useState<(number | string)[]>([]);
@@ -549,15 +553,34 @@ export default function InventoryPage() {
 
   setTimeout(() => dispatch(uiAction.closeYellowToast()), 70000);
 
+  // MOVE STOCK
+  const [selectedProductMoveStock, setSelectedProductMoveStock] = useState([]);
   const handleClosePopupSelectproduct = () => {
     // modalFunc.openFunc();
     stockOpnameModal.openModal();
     listProductModal.closeModal();
+    setSelectedProductMoveStock([]);
   };
   const handleOpenPopupSelectproduct = () => {
     // modalFunc.closeFunc();
     stockOpnameModal.closeModal();
     listProductModal.openModal();
+  };
+  const handleOnApplySelectProduct = () => {
+    listProductModal.closeModal();
+    moveStockFormModal.openModal();
+  };
+  const handleCloseFormMoveStock = () => {
+    listProductModal.openModal();
+    moveStockFormModal.closeModal();
+  };
+  const handleOnSubmitMoveStock = () => {
+    moveStockFormModal.closeModal();
+    moveStockConfirmationModal.openModal();
+  };
+  const handleCloseConfirmationMoveStock = () => {
+    moveStockFormModal.openModal();
+    moveStockConfirmationModal.closeModal();
   };
   return (
     <Box p="20px" bgcolor="#f8f8f8">
@@ -1063,8 +1086,7 @@ export default function InventoryPage() {
         <Form onClose={formProductModal.closeModal} />
       </ModalComp>
       <PopupAddSelected
-        items={[]}
-        menuName="Move stock"
+        selectedItem={selectedProductMoveStock}
         parentMenu="Move stock parent"
         data={[
           {
@@ -1075,6 +1097,14 @@ export default function InventoryPage() {
             product_image:
               'https://id-test-11.slatic.net/p/6a78913c131cfcd539813bd4b7c42459.png',
           },
+          {
+            id: 2,
+            product_name: 'test nama data2',
+            product_type: 'B2B - Horeca',
+            product_stock: '10.000',
+            product_image:
+              'https://id-test-11.slatic.net/p/6a78913c131cfcd539813bd4b7c42459.png',
+          },
         ]}
         currentData={[]}
         open={listProductModal.open}
@@ -1082,15 +1112,32 @@ export default function InventoryPage() {
           handleClosePopupSelectproduct();
         }}
         singleSelect
-        onConfirm={() => {
-          console.log('test');
-        }}
+        onConfirm={setSelectedProductMoveStock}
         moreData={() => {}}
         currentItems={5}
         total={5}
         product={false}
-        confirmButton="Confirm Button"
+        onApply={handleOnApplySelectProduct}
       />
+      <ModalComp
+        open={moveStockFormModal.open}
+        title="Move Stock"
+        onClose={handleCloseFormMoveStock}
+        width="420px"
+      >
+        <MoveStockForm
+          selectedItem={selectedProductMoveStock}
+          onClose={handleCloseFormMoveStock}
+          onSubmit={handleOnSubmitMoveStock}
+        />
+      </ModalComp>
+      <ModalComp
+        open={moveStockConfirmationModal.open}
+        onClose={handleCloseConfirmationMoveStock}
+        width="624px"
+      >
+        <ConfirmMoveStock onClose={handleCloseConfirmationMoveStock} />
+      </ModalComp>
     </Box>
   );
 }
