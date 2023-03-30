@@ -48,6 +48,25 @@ export const createProduct = (data: CreateProduct) =>
     }
   });
 
+export const updateProduct = (data: {
+  id: string | number;
+  payload: CreateProduct;
+}) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.put(
+        `/inventory/b2b/product/parent/${data.id}`,
+        data.payload,
+      );
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
 export const IsExistName = (params: {
   name: string;
   exclude_id?: number | string;
