@@ -50,7 +50,7 @@ export default function Form(props: FormTypes) {
 
   const gradeList = formik.values.productList
     .filter((val) => val.grade.id !== 1)
-    .filter((val) => val.is_active !== false);
+    .filter((val) => val.is_exist !== false);
 
   const onOffCostumeGrade = () => {
     if (!currentGrade.isCostume) {
@@ -81,7 +81,7 @@ export default function Form(props: FormTypes) {
     [],
   );
 
-  const typesProductList = (formik.touched?.productList ?? [])[indexGrade];
+  const touchedProductList = (formik.touched?.productList ?? [])[indexGrade];
   const errorProductList = formik.errors?.productList as TypesError[];
   const isValid = () => {
     let valid = false;
@@ -99,7 +99,7 @@ export default function Form(props: FormTypes) {
       const listGradeActiveIndex = formik.values.productList
         .filter((val) => val.grade.id !== 1)
         .map((val, index) => {
-          if (val.is_active !== true) {
+          if (val.is_exist !== true) {
             return true;
           }
           return (errorProductList ?? [])[index + 1] === undefined;
@@ -129,6 +129,7 @@ export default function Form(props: FormTypes) {
             label="an Image"
             value={formik.values.image}
             onChange={(e: any) => formik.setFieldValue('image', e)}
+            onClear={() => formik.setFieldValue('image', null)}
             width={720}
             height={720}
           />
@@ -268,25 +269,25 @@ export default function Form(props: FormTypes) {
           </Box>
         </Collapse>
         <FormLabel
-          text="Low Stock (Gram)"
+          text="Low Stock (gram)"
           error={
-            (typesProductList?.lowStock || false) &&
+            (touchedProductList?.lowStock || false) &&
             Boolean((errorProductList ?? [])[indexGrade]?.lowStock)
           }
           helperText={
-            (typesProductList?.lowStock || false) &&
+            (touchedProductList?.lowStock || false) &&
             `${(errorProductList ?? [])[indexGrade]?.lowStock || ''}`
           }
         >
           <TextField
             type="number"
             name="lowStock"
-            placeholder="Insert Low Stock (Gram)"
+            placeholder="Insert Low Stock (gram)"
             value={formik.values.productList[indexGrade].lowStock}
             onChange={(e) => {
               const product = formik.values.productList;
               // eslint-disable-next-line radix
-              product[indexGrade].lowStock = parseInt(e.target.value);
+              product[indexGrade].lowStock = e.target.value;
 
               formik.setFieldValue('productList', product);
             }}
@@ -294,31 +295,40 @@ export default function Form(props: FormTypes) {
             fullWidth
             InputProps={{
               endAdornment: (
-                <InputAdornment position="end">Gram</InputAdornment>
+                <InputAdornment position="end">gram</InputAdornment>
               ),
             }}
+            helperText={
+              formik.values.productList[indexGrade].lowStock && (
+                <Typography
+                  sx={{ fontSize: '12px', color: '#797979', ml: '-12px' }}
+                >
+                  The quantity at which you will be notified about low stock
+                </Typography>
+              )
+            }
           />
         </FormLabel>
         <FormLabel
-          text="In Stock (Gram)"
+          text="In Stock (gram)"
           error={
-            (typesProductList?.stock || false) &&
+            (touchedProductList?.stock || false) &&
             Boolean((errorProductList ?? [])[indexGrade]?.stock)
           }
           helperText={
-            (typesProductList?.stock || false) &&
+            (touchedProductList?.stock || false) &&
             `${(errorProductList ?? [])[indexGrade]?.stock || ''}`
           }
         >
           <TextField
             type="number"
             name="stock"
-            placeholder="Insert In Stock (Gram)"
+            placeholder="Insert In Stock (gram)"
             value={formik.values.productList[indexGrade].stock}
             onChange={(e) => {
               const product = formik.values.productList;
               // eslint-disable-next-line radix
-              product[indexGrade].stock = parseInt(e.target.value);
+              product[indexGrade].stock = e.target.value;
 
               formik.setFieldValue('productList', product);
             }}
@@ -326,9 +336,30 @@ export default function Form(props: FormTypes) {
             fullWidth
             InputProps={{
               endAdornment: (
-                <InputAdornment position="end">Gram</InputAdornment>
+                <InputAdornment position="end">gram</InputAdornment>
               ),
             }}
+            helperText={
+              formik.values.productList[indexGrade].stock ? (
+                <Typography
+                  sx={{ fontSize: '12px', color: '#797979', ml: '-12px' }}
+                >
+                  <span style={{ color: '#008e58' }}>
+                    <b>{formik.values.productList[indexGrade].stock}</b> Gram{' '}
+                  </span>
+                  is equivalent to{' '}
+                  <span style={{ color: '#008e58' }}>
+                    <b>
+                      {(formik.values.productList[indexGrade].stock as number) /
+                        1000}
+                    </b>{' '}
+                    Kilogram
+                  </span>
+                </Typography>
+              ) : (
+                false
+              )
+            }
           />
         </FormLabel>
         <FormLabel
@@ -372,7 +403,7 @@ export default function Form(props: FormTypes) {
             sx={{ cursor: 'pointer' }}
             onClick={async () => {
               const product = formik.values.productList;
-              product[indexGrade].is_active = false;
+              product[indexGrade].is_exist = false;
 
               await formik.setFieldValue('productList', product);
 
@@ -380,7 +411,7 @@ export default function Form(props: FormTypes) {
                 isCostume: true,
                 currentID: product
                   .filter((val) => val.grade.id !== 1)
-                  .filter((val) => val.is_active !== false)[0].grade.id,
+                  .filter((val) => val.is_exist !== false)[0].grade.id,
               });
             }}
           >

@@ -292,7 +292,6 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
         }),
       );
     }
-    yield put(productAction.createProductFailed());
   }
 }
 
@@ -500,15 +499,20 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
         payloadImage,
       );
       payloadProductPerant.image_filepath = responUploadImage.data;
+    } else {
+      payloadProductPerant.image_filepath =
+        payloadProductPerant.image_filepath?.slice(
+          payloadProductPerant.image_filepath.search('/b2b'),
+          payloadProductPerant.image_filepath.search('X-Amz-Algorithm') - 1,
+        );
     }
 
     yield call(serviceProductParent.updateProduct, {
       id: dataForm?.idParent || 0,
       payload: payloadProductPerant,
     });
-
+    const callPromise: any = call;
     if (dataForm.typeEdit === 'normal') {
-      const callPromise: any = call;
       yield all(
         dataForm.productList.map((val) => {
           if (val.id) {
@@ -530,8 +534,8 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
         }),
       );
     }
+
     if (dataForm.typeEdit === 'to-costume') {
-      const callPromise: any = call;
       yield all(
         dataForm.productList.map((val) => {
           if (val.grade.id === 1 && val.id) {
@@ -555,58 +559,64 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
               },
             });
           }
-          return callPromise(service.createProduct, {
-            product_type_id: dataForm.type?.id || 0,
-            product_parent_id: dataForm.idParent,
-            product_grade_id: val.grade?.id || 0,
-            description: val.description,
-            stock: val.stock || 0,
-            low_stock_limit: val.lowStock || 0,
-            is_exist: val.is_exist,
-            is_active: val.is_active,
-          });
+          if (val.is_exist) {
+            return callPromise(service.createProduct, {
+              product_type_id: dataForm.type?.id || 0,
+              product_parent_id: dataForm.idParent,
+              product_grade_id: val.grade?.id || 0,
+              description: val.description,
+              stock: val.stock || 0,
+              low_stock_limit: val.lowStock || 0,
+              is_exist: val.is_exist,
+              is_active: val.is_active,
+            });
+          }
+          return () => {};
         }),
       );
     }
-    // if (dataForm.typeEdit === 'to-default') {
-    //   const callPromise: any = call;
-    //   const deleteDataCostumeF =
-    //   yield all(
-    //     dataForm.productList.map((val) => {
-    //       if (val.grade.id === 1 && val.id) {
-    //         return callPromise(service.deleteProduct, {
-    //           is_exist: false,
-    //           ids: [val.id],
-    //         });
-    //       }
-    //       if (val.id) {
-    //         return callPromise(service.updateProduct, {
-    //           id: val.id,
-    //           data: {
-    //             product_type_id: dataForm.type?.id || 0,
-    //             product_parent_id: dataForm.idParent,
-    //             product_grade_id: val.grade?.id || 0,
-    //             description: val.description,
-    //             stock: val.stock || 0,
-    //             low_stock_limit: val.lowStock || 0,
-    //             is_exist: val.is_exist,
-    //             is_active: val.is_active,
-    //           },
-    //         });
-    //       }
-    //       return callPromise(service.createProduct, {
-    //         product_type_id: dataForm.type?.id || 0,
-    //         product_parent_id: dataForm.idParent,
-    //         product_grade_id: val.grade?.id || 0,
-    //         description: val.description,
-    //         stock: val.stock || 0,
-    //         low_stock_limit: val.lowStock || 0,
-    //         is_exist: val.is_exist,
-    //         is_active: val.is_active,
-    //       });
-    //     }),
-    //   );
-    // }
+    if (dataForm.typeEdit === 'to-default') {
+      const idTodelete = dataForm.productList
+        .filter((val) => val.grade.id !== 1 && val.id)
+        .map((val) => val.id) as number[];
+
+      yield call(service.deleteProduct, {
+        is_exist: false,
+        ids: idTodelete,
+      });
+
+      yield all(
+        dataForm.productList
+          .filter((val) => val.grade.id === 1)
+          .map((val) => {
+            if (val.id) {
+              return callPromise(service.updateProduct, {
+                id: val.id,
+                data: {
+                  product_type_id: dataForm.type?.id || 0,
+                  product_parent_id: dataForm.idParent,
+                  product_grade_id: val.grade?.id || 0,
+                  description: val.description,
+                  stock: val.stock || 0,
+                  low_stock_limit: val.lowStock || 0,
+                  is_exist: true,
+                  is_active: true,
+                },
+              });
+            }
+            return callPromise(service.createProduct, {
+              product_type_id: dataForm.type?.id || 0,
+              product_parent_id: dataForm.idParent,
+              product_grade_id: val.grade?.id || 0,
+              description: val.description,
+              stock: val.stock || 0,
+              low_stock_limit: val.lowStock || 0,
+              is_exist: true,
+              is_active: true,
+            });
+          }),
+      );
+    }
 
     yield put(productAction.updateProductSuccess());
     const filter: ProductParams = yield select((state) => state.product.params);

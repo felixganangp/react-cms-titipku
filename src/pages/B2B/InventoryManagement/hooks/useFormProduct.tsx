@@ -47,6 +47,7 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
   useEffect(() => {
     if (isSuccessCreate && !loadingForm) {
       onClose();
+      dispatch(productAction.resetProductForm());
     }
   }, [isSuccessCreate]);
 
@@ -59,7 +60,9 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
       dispatch(
         productAction.createProduct({
           ...value,
-          productList: value.productList.filter((val) => val.grade.id !== 1),
+          productList: value.productList.filter(
+            (val) => val.grade.id !== 1 && val.is_exist === true,
+          ),
         }),
       );
     } else {
@@ -134,9 +137,7 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
       product_parent_id: id,
     })) as ListResponse<Product>;
     if (respon.data?.length > 0) {
-      const data = respon.data.filter(
-        (val) => val.product_parent_id === EditProductParent?.product_parent_id,
-      );
+      const data = respon.data.filter((val) => val.is_exist);
 
       const isCostumeGrade =
         data.findIndex(
@@ -153,8 +154,8 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
             description: '',
             stock: '',
             lowStock: '',
-            is_exist: true,
-            is_active: false,
+            is_exist: false,
+            is_active: true,
           };
         }
         return {

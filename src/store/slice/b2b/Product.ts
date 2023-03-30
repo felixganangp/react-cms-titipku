@@ -272,9 +272,6 @@ const ProductSlice = createSlice({
     updateProductSuccess(state: ProductProps) {
       state.loadingForm = false;
       state.isSuccessCreate = true;
-      setTimeout(() => {
-        state.isSuccessCreate = false;
-      }, 1000);
     },
     resetProductForm(state: ProductProps) {
       state.loadingForm = false;
