@@ -266,7 +266,7 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
       uiAction.openYellowToast({
         totalItem: dataForm.productList.length,
         additionalMsg: '',
-        action: 'successfully created!',
+        action: 'successfully added!',
         error: false,
         noUndo: true,
       }),

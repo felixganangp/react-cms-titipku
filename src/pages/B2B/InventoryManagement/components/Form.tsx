@@ -17,6 +17,7 @@ import { IsExistName } from 'service/B2B/ProductParent';
 import { Response } from 'models/fetch';
 // icon
 import DeleteIcon from '@mui/icons-material/Delete';
+import TrashIcon from 'components/Icon/Trash';
 
 import useFormProduct from '../hooks/useFormProduct';
 import { SwitchStyle } from '../inventory.styled';
@@ -418,7 +419,7 @@ export default function Form(props: FormTypes) {
               });
             }}
           >
-            <DeleteIcon sx={{ fontSize: '19px' }} />
+            <TrashIcon sx={{ fontSize: '25px' }} />
             <Typography fontSize="14px">
               Clear {formik.values.productList[indexGrade].grade.name}
             </Typography>
