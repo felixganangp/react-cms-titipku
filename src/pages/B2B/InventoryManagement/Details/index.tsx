@@ -5,7 +5,8 @@ import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stack, Box, Typography, Button, Grid, Skeleton } from '@mui/material';
 import Table from 'components/Table';
-
+import ModalComp from 'components/Modal';
+import useModal from 'hooks/useModal';
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
@@ -14,6 +15,7 @@ import { productAction } from 'store/slice/b2b/Product';
 import { Log } from 'models/b2b/Product';
 import NoImage from 'assets/no-image.svg';
 import { CardContainer, GradingColor, StatusColor } from '../inventory.styled';
+import Form from '../components/Form';
 
 export default function InvoiceDetail() {
   const navigate = useNavigate();
@@ -22,6 +24,7 @@ export default function InvoiceDetail() {
   const log = useAppSelector((state) => state.product.log);
   const details = useAppSelector((state) => state.product.details);
   const { id } = useParams();
+  const formProductModal = useModal();
 
   useEffect(() => {
     if (id) {
@@ -156,7 +159,11 @@ export default function InvoiceDetail() {
                 </Button>
               </Box>
             </Stack>
-            <Button sx={{ width: '110px' }} endIcon={<ArrowForwardIosIcon />}>
+            <Button
+              sx={{ width: '110px' }}
+              endIcon={<ArrowForwardIosIcon />}
+              onClick={formProductModal.openModal}
+            >
               Edit
             </Button>
           </Stack>
@@ -254,6 +261,20 @@ export default function InvoiceDetail() {
           />
         </Box>
       </CardContainer>
+      <ModalComp
+        open={formProductModal.open}
+        title="Add Product"
+        onClose={() => {
+          formProductModal.closeModal();
+        }}
+      >
+        <Form
+          onClose={() => {
+            formProductModal.closeModal();
+          }}
+          EditProductParent={details}
+        />
+      </ModalComp>
     </Box>
   );
 }
