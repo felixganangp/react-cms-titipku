@@ -15,7 +15,7 @@ import debounce from 'utils/debounce';
 import { Product } from 'models/b2b/Product';
 import { IsExistName } from 'service/B2B/ProductParent';
 import { Response } from 'models/fetch';
-import numberSeperator from 'utils/numberSeperator';
+import numberSeperator, { typeNumberValidate } from 'utils/numberSeperator';
 // icon
 import TrashIcon from 'components/Icon/Trash';
 
@@ -366,8 +366,9 @@ export default function Form(props: FormTypes) {
                   <span style={{ color: '#008e58' }}>
                     <b>
                       {numberSeperator(
-                        (formik.values.productList[indexGrade]
-                          .stock as number) / 1000,
+                        typeNumberValidate(
+                          formik.values.productList[indexGrade].stock as string,
+                        ) / 1000,
                       )}
                     </b>{' '}
                     Kilogram
