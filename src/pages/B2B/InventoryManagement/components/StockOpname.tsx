@@ -68,6 +68,7 @@ function StockOpname({ items, onClose, totalItem }: Props) {
         additionalMsg: 'in stock opname',
         action: 'successfully updated',
         error: false,
+        noUndo: true,
       }),
     );
     await onClose();
