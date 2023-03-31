@@ -15,8 +15,8 @@ import debounce from 'utils/debounce';
 import { Product } from 'models/b2b/Product';
 import { IsExistName } from 'service/B2B/ProductParent';
 import { Response } from 'models/fetch';
+import numberSeperator from 'utils/numberSeperator';
 // icon
-import DeleteIcon from '@mui/icons-material/Delete';
 import TrashIcon from 'components/Icon/Trash';
 
 import useFormProduct from '../hooks/useFormProduct';
@@ -281,14 +281,18 @@ export default function Form(props: FormTypes) {
           }
         >
           <TextField
-            type="number"
+            type="text"
             name="lowStock"
             placeholder="Insert Low Stock (gram)"
-            value={formik.values.productList[indexGrade].lowStock}
+            value={numberSeperator(
+              formik.values.productList[indexGrade].lowStock,
+            )}
             onChange={(e) => {
               const product = formik.values.productList;
-              // eslint-disable-next-line radix
-              product[indexGrade].lowStock = e.target.value;
+
+              product[indexGrade].lowStock = e.target.value
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
 
               formik.setFieldValue('productList', product);
             }}
@@ -324,14 +328,16 @@ export default function Form(props: FormTypes) {
           }
         >
           <TextField
-            type="number"
+            type="text"
             name="stock"
             placeholder="Insert In Stock (gram)"
-            value={formik.values.productList[indexGrade].stock}
+            value={numberSeperator(formik.values.productList[indexGrade].stock)}
             onChange={(e) => {
               const product = formik.values.productList;
               // eslint-disable-next-line radix
-              product[indexGrade].stock = e.target.value;
+              product[indexGrade].stock = e.target.value
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
 
               formik.setFieldValue('productList', product);
             }}
@@ -349,13 +355,20 @@ export default function Form(props: FormTypes) {
                   sx={{ fontSize: '12px', color: '#797979', ml: '-12px' }}
                 >
                   <span style={{ color: '#008e58' }}>
-                    <b>{formik.values.productList[indexGrade].stock}</b> Gram{' '}
+                    <b>
+                      {numberSeperator(
+                        formik.values.productList[indexGrade].stock,
+                      )}
+                    </b>{' '}
+                    Gram{' '}
                   </span>
                   is equivalent to{' '}
                   <span style={{ color: '#008e58' }}>
                     <b>
-                      {(formik.values.productList[indexGrade].stock as number) /
-                        1000}
+                      {numberSeperator(
+                        (formik.values.productList[indexGrade]
+                          .stock as number) / 1000,
+                      )}
                     </b>{' '}
                     Kilogram
                   </span>
