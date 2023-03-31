@@ -558,8 +558,6 @@ export default function InventoryPage() {
     },
   ];
 
-  setTimeout(() => dispatch(uiAction.closeYellowToast()), 70000);
-
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <Grid container spacing={2}>
