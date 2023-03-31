@@ -328,13 +328,11 @@ export default function InventoryPage() {
   };
 
   const handleChangePage = (value: number) => {
-    if (activeDashboard === 'all_stock') {
-      dispatch(
-        productAction.setParams({
-          page: value,
-        }),
-      );
-    }
+    dispatch(
+      productAction.setParams({
+        page: value,
+      }),
+    );
   };
 
   const headCell: HeadCells<Product>[] = [
