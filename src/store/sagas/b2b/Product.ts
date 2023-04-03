@@ -207,6 +207,8 @@ function* stockOpname(payload: PayloadAction<any>) {
     );
     yield put(productAction.stockOpnameSuccess());
     yield put(productAction.fetchData(filter));
+    yield put(productAction.fetchTotalLowStock());
+    yield put(productAction.fetchTotalEmptyStock());
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;

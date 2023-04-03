@@ -69,6 +69,8 @@ const initialState: ProductProps = {
     page: 1,
     count: 10,
     search: '',
+    order_by: 'updated_at',
+    order_type: 'desc',
   },
   // lowStockParams: {
   //   page: 1,
