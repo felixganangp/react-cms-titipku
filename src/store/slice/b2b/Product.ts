@@ -254,8 +254,26 @@ const ProductSlice = createSlice({
     createProductSuccess(state: ProductProps) {
       state.loadingForm = false;
       state.isSuccessCreate = true;
+      setTimeout(() => {
+        state.isSuccessCreate = false;
+      }, 1000);
     },
     createProductFailed(state: ProductProps) {
+      state.loadingForm = false;
+      state.isSuccessCreate = false;
+    },
+    updateProduct(
+      state: ProductProps,
+      action: PayloadAction<FormInventoryTypes>,
+    ) {
+      state.loadingForm = true;
+      state.isSuccessCreate = false;
+    },
+    updateProductSuccess(state: ProductProps) {
+      state.loadingForm = false;
+      state.isSuccessCreate = true;
+    },
+    resetProductForm(state: ProductProps) {
       state.loadingForm = false;
       state.isSuccessCreate = false;
     },

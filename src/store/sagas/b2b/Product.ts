@@ -1,8 +1,10 @@
+/* eslint-disable radix */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { PayloadAction } from '@reduxjs/toolkit';
 import { call, put, select, takeLatest, all } from 'redux-saga/effects';
 import { productAction } from 'store/slice/b2b/Product';
 import { uiAction } from 'store/slice/ui';
+import { typeNumberValidate } from 'utils/numberSeperator';
 // models
 import { ListResponse, Response } from 'models/fetch';
 import {
@@ -11,14 +13,16 @@ import {
   Product,
   ProductParams,
   FormInventoryTypes,
-  CreateProduct,
   Log,
   LogParams,
 } from 'models/b2b/Product';
 import { ProductGrade } from 'models/b2b/Grade';
 import { Category } from 'models/b2b/Category';
 import { ProductType } from 'models/b2b/Type';
-import { ProductParent } from 'models/b2b/ProductParent';
+import {
+  ProductParent,
+  CreateProduct as CreateProductParent,
+} from 'models/b2b/ProductParent';
 // service
 import * as service from 'service/B2B/Product';
 import * as serviceProductParent from 'service/B2B/ProductParent';
@@ -252,24 +256,28 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
           product_parent_id: responProductParent.data.id,
           product_grade_id: val.grade?.id || 0,
           description: val.description,
-          stock: val.stock || 0,
-          low_stock_limit: val.lowStock || 0,
+          stock: typeNumberValidate(val.stock as string),
+          low_stock_limit: typeNumberValidate(val.lowStock as string),
           is_exist: val.is_exist,
           is_active: val.is_active,
         }),
       ),
     );
     yield put(
-      uiAction.openToast({
-        headMsg: 'Success create product',
-        // message: error,
-        severity: 'success',
+      uiAction.openYellowToast({
+        totalItem: dataForm.productList.length,
+        additionalMsg: '',
+        action: 'successfully added!',
+        error: false,
+        noUndo: true,
       }),
     );
     yield put(productAction.createProductSuccess());
     const filter: ProductParams = yield select((state) => state.product.params);
     yield put(productAction.fetchData(filter));
   } catch (err) {
+    yield put(productAction.resetProductForm());
+
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
@@ -288,7 +296,6 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
         }),
       );
     }
-    yield put(productAction.createProductFailed());
   }
 }
 
@@ -476,6 +483,200 @@ function* fetchLog(params: PayloadAction<LogParams>) {
   }
 }
 
+function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
+  try {
+    const dataForm = payload.payload;
+
+    // Step 2. Create Product Perent
+    const payloadProductPerant: CreateProductParent = {
+      name: dataForm.name,
+      image_filepath: dataForm.image as string,
+      product_parent_category_id: dataForm.category.map((val) => val.id),
+    };
+
+    if (typeof dataForm.image !== 'string') {
+      const payloadImage = {
+        image: dataForm.image,
+      };
+      const responUploadImage: Response<string> = yield call(
+        serviceProductParent.uploadImage,
+        payloadImage,
+      );
+      payloadProductPerant.image_filepath = responUploadImage.data;
+    } else {
+      payloadProductPerant.image_filepath =
+        payloadProductPerant.image_filepath?.slice(
+          payloadProductPerant.image_filepath.search('/b2b'),
+          payloadProductPerant.image_filepath.search('X-Amz-Algorithm') - 1,
+        );
+    }
+
+    yield call(serviceProductParent.updateProduct, {
+      id: dataForm?.idParent || 0,
+      payload: payloadProductPerant,
+    });
+    const callPromise: any = call;
+    if (dataForm.typeEdit === 'normal') {
+      yield all(
+        dataForm.productList.map((val) => {
+          if (val.id) {
+            return callPromise(service.updateProduct, {
+              id: val.id,
+              data: {
+                product_type_id: dataForm.type?.id || 0,
+                product_parent_id: dataForm.idParent,
+                product_grade_id: val.grade?.id || 0,
+                description: val.description,
+                stock: typeNumberValidate(val.stock as string),
+                low_stock_limit: typeNumberValidate(val.lowStock as string),
+                is_exist: val.is_exist,
+                is_active: val.is_active,
+              },
+            });
+          }
+          return () => {};
+        }),
+      );
+      yield put(
+        uiAction.openYellowToast({
+          totalItem: dataForm.productList.length,
+          additionalMsg: '',
+          action: 'successfully updated!',
+          error: false,
+          noUndo: true,
+        }),
+      );
+    }
+
+    if (dataForm.typeEdit === 'to-costume') {
+      yield all(
+        dataForm.productList.map((val) => {
+          if (val.grade.id === 1 && val.id) {
+            return callPromise(service.deleteProduct, {
+              is_exist: false,
+              ids: [val.id],
+            });
+          }
+          if (val.id) {
+            return callPromise(service.updateProduct, {
+              id: val.id,
+              data: {
+                product_type_id: dataForm.type?.id || 0,
+                product_parent_id: dataForm.idParent,
+                product_grade_id: val.grade?.id || 0,
+                description: val.description,
+                stock: typeNumberValidate(val.stock as string),
+                low_stock_limit: typeNumberValidate(val.lowStock as string),
+                is_exist: val.is_exist,
+                is_active: val.is_active,
+              },
+            });
+          }
+          if (val.is_exist) {
+            return callPromise(service.createProduct, {
+              product_type_id: dataForm.type?.id || 0,
+              product_parent_id: dataForm.idParent,
+              product_grade_id: val.grade?.id || 0,
+              description: val.description,
+              stock: typeNumberValidate(val.stock as string),
+              low_stock_limit: typeNumberValidate(val.lowStock as string),
+              is_exist: val.is_exist,
+              is_active: val.is_active,
+            });
+          }
+          return () => {};
+        }),
+      );
+      yield put(
+        uiAction.openYellowToast({
+          totalItem: 1,
+          additionalMsg: '',
+          action: 'successfully updated!',
+          error: false,
+          noUndo: true,
+        }),
+      );
+    }
+    if (dataForm.typeEdit === 'to-default') {
+      const idTodelete = dataForm.productList
+        .filter((val) => val.grade.id !== 1 && val.id)
+        .map((val) => val.id) as number[];
+
+      yield call(service.deleteProduct, {
+        is_exist: false,
+        ids: idTodelete,
+      });
+
+      yield all(
+        dataForm.productList
+          .filter((val) => val.grade.id === 1)
+          .map((val) => {
+            if (val.id) {
+              return callPromise(service.updateProduct, {
+                id: val.id,
+                data: {
+                  product_type_id: dataForm.type?.id || 0,
+                  product_parent_id: dataForm.idParent,
+                  product_grade_id: val.grade?.id || 0,
+                  description: val.description,
+                  stock: typeNumberValidate(val.stock as string),
+                  low_stock_limit: typeNumberValidate(val.lowStock as string),
+                  is_exist: true,
+                  is_active: true,
+                },
+              });
+            }
+            return callPromise(service.createProduct, {
+              product_type_id: dataForm.type?.id || 0,
+              product_parent_id: dataForm.idParent,
+              product_grade_id: val.grade?.id || 0,
+              description: val.description,
+              stock: typeNumberValidate(val.stock as string),
+              low_stock_limit: typeNumberValidate(val.lowStock as string),
+              is_exist: true,
+              is_active: true,
+            });
+          }),
+      );
+      yield put(
+        uiAction.openYellowToast({
+          totalItem: 1,
+          additionalMsg: '',
+          action: 'successfully updated!',
+          error: false,
+          noUndo: true,
+        }),
+      );
+    }
+
+    yield put(productAction.updateProductSuccess());
+    const filter: ProductParams = yield select((state) => state.product.params);
+    yield put(productAction.fetchData(filter));
+    // yield put(productAction.resetProductForm());
+  } catch (err) {
+    console.log(err);
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create product',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create product',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(productAction.resetProductForm());
+  }
+}
+
 export default function* productSagas() {
   yield takeLatest(productAction.stockOpname, stockOpname);
   yield takeLatest(productAction.fetchTotalLowStock, fetchTotalLowStock);
@@ -494,4 +695,5 @@ export default function* productSagas() {
   yield takeLatest(productAction.undoChangeStatus.type, undoChangeStatus);
   yield takeLatest(productAction.fetchDetails.type, fetchDetails);
   yield takeLatest(productAction.fetchLog.type, fetchLog);
+  yield takeLatest(productAction.updateProduct.type, updateProduct);
 }

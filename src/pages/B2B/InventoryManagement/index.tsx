@@ -69,6 +69,9 @@ export default function InventoryPage() {
   const { search, grade, category, status } = useAppSelector(
     (state) => state.product.displayFilter,
   );
+  const [EditProductParent, setEditProductParent] = useState<Product | null>(
+    null,
+  );
   const stockOpnameModal = useModal();
   const formProductModal = useModal();
 
@@ -325,13 +328,11 @@ export default function InventoryPage() {
   };
 
   const handleChangePage = (value: number) => {
-    if (activeDashboard === 'all_stock') {
-      dispatch(
-        productAction.setParams({
-          page: value,
-        }),
-      );
-    }
+    dispatch(
+      productAction.setParams({
+        page: value,
+      }),
+    );
   };
 
   const headCell: HeadCells<Product>[] = [
@@ -476,7 +477,11 @@ export default function InventoryPage() {
                       },
                       {
                         label: 'Edit',
-                        onClick: () => dispatch(uiAction.closeYellowToast()),
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          formProductModal.openModal();
+                          setEditProductParent(val);
+                        },
                       },
                       {
                         label: 'See Details',
@@ -508,7 +513,11 @@ export default function InventoryPage() {
                   : [
                       {
                         label: 'Edit',
-                        onClick: () => dispatch(uiAction.closeYellowToast()),
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          formProductModal.openModal();
+                          setEditProductParent(val);
+                        },
                       },
                       {
                         label: 'See Details',
@@ -548,8 +557,6 @@ export default function InventoryPage() {
       ),
     },
   ];
-
-  setTimeout(() => dispatch(uiAction.closeYellowToast()), 70000);
 
   return (
     <Box p="20px" bgcolor="#f8f8f8">
@@ -1053,9 +1060,18 @@ export default function InventoryPage() {
       <ModalComp
         open={formProductModal.open}
         title="Add Product"
-        onClose={formProductModal.closeModal}
+        onClose={() => {
+          formProductModal.closeModal();
+          setEditProductParent(null);
+        }}
       >
-        <Form onClose={formProductModal.closeModal} />
+        <Form
+          onClose={() => {
+            formProductModal.closeModal();
+            setEditProductParent(null);
+          }}
+          EditProductParent={EditProductParent}
+        />
       </ModalComp>
     </Box>
   );
