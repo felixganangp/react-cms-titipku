@@ -31,14 +31,20 @@ import MenuList from 'components/MenuList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Modal from 'components/Modal';
 import useModal from 'hooks/useModal';
+import YellowToast from 'components/YellowToast';
+import NoDataWithAddBtn from 'components/Table/NoDataView/NoData';
 import { CardContainer, CategoryStyle } from './raw.styled';
 import RawForm from './components/form';
 
 export default function RawPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const raws = useAppSelector((state) => state.raw.raws);
+  const data = useAppSelector((state) => state.raw.raws);
   const raw = useAppSelector((state) => state.raw);
+
+  // form
+  const formModal = useModal();
+  const [formData, setFormData] = useState<ProductRaw | null>(null);
 
   // BATCH ACTION
   const [selected, setSelected] = useState<(number | string)[]>([]);
@@ -179,8 +185,13 @@ export default function RawPage() {
               currentTarget.onerror = null;
               currentTarget.src = NoImage;
             }}
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+            }}
           />
-          <Typography>Product Name</Typography>
+          <Typography>{val.product_parent.name}</Typography>
         </Box>
       ),
     },
@@ -214,7 +225,10 @@ export default function RawPage() {
           menu={[
             {
               label: 'Edit',
-              onClick: () => console.log('edit'),
+              onClick: () => {
+                setFormData(val);
+                formModal.openModal();
+              },
             },
             {
               label: 'See Details',
@@ -234,11 +248,6 @@ export default function RawPage() {
     },
   ];
 
-  console.log('selected', selectedRaw);
-
-  // form
-  const formModal = useModal();
-
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <Grid container spacing={2}>
@@ -252,13 +261,20 @@ export default function RawPage() {
             <Typography color="#303030" fontSize="26px" fontWeight="600">
               Raw Management
             </Typography>
-            <Button endIcon={<ArrowIcon />} onClick={formModal.openModal}>
+            <Button
+              endIcon={<ArrowIcon />}
+              onClick={() => {
+                setFormData(null);
+                formModal.openModal();
+              }}
+            >
               Add New
             </Button>
           </Stack>
         </Grid>
         {/* search & filter */}
         <Grid item xs={12}>
+          <YellowToast />
           <CardContainer>
             <Box
               display="flex"
@@ -382,7 +398,7 @@ export default function RawPage() {
             </Collapse>
 
             <Table
-              data={raws}
+              data={data}
               headCells={headCell}
               totalData={raw.total}
               count={raw.params.count}
@@ -393,7 +409,7 @@ export default function RawPage() {
                 setSelectedRaw(() => {
                   const addition: ProductRaw[] = [];
                   arr.map((id) => {
-                    const obj: ProductRaw | undefined = raws.find(
+                    const obj: ProductRaw | undefined = data.find(
                       (item) => item.id === id,
                     );
                     if (
@@ -413,16 +429,26 @@ export default function RawPage() {
               page={raw.params.page}
               onChangePage={handleChangePage}
               onChangeSort={handleChangeSort}
+              noDataComponent={
+                <NoDataWithAddBtn
+                  onAdd={() => {
+                    formModal.openModal();
+                    setFormData(null);
+                  }}
+                  headMsg="No Products Available"
+                  message="Please add new product to make a change"
+                />
+              }
             />
           </CardContainer>
         </Grid>
       </Grid>
       <Modal
         open={formModal.open}
-        title="Add Raw Product"
+        title={formData ? 'Edit Raw Product' : 'Add Raw Product'}
         onClose={formModal.closeModal}
       >
-        <RawForm onClose={formModal.closeModal} />
+        <RawForm onClose={formModal.closeModal} data={formData} />
       </Modal>
     </Box>
   );

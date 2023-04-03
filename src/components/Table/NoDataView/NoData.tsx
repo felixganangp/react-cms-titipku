@@ -5,9 +5,15 @@ import ArrowIcon from '@mui/icons-material/ArrowForwardIos';
 
 interface NoDataProps {
   onAdd: () => void;
+  headMsg: string;
+  message: string;
 }
 
-export default function NoDataInventory({ onAdd }: NoDataProps) {
+export default function NoDataWithAddBtn({
+  onAdd,
+  headMsg,
+  message,
+}: NoDataProps) {
   return (
     <Box
       display="flex"
@@ -16,18 +22,13 @@ export default function NoDataInventory({ onAdd }: NoDataProps) {
       justifyContent="center"
       gap="12px"
     >
-      <img
-        src={EmptyProduct}
-        width="200px"
-        height="200px"
-        alt="No Product Available"
-      />
+      <img src={EmptyProduct} width="200px" height="200px" alt={headMsg} />
       <Box textAlign="center">
         <Typography fontSize="16px" fontWeight="bold" color="#303030">
-          No Product Available
+          {headMsg}
         </Typography>
         <Typography fontSize="14px" color="#303030">
-          Please add new product to make a change
+          {message}
         </Typography>
       </Box>
       <Button endIcon={<ArrowIcon />} onClick={onAdd}>

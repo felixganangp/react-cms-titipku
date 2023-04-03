@@ -39,10 +39,18 @@ export interface InitialCreateRaw {
   description: string;
 }
 
-export interface CreateRawPayload {
+export interface CreateRawSaga {
+  description: string;
+  stock: number;
+  name: string;
+  category_id: number;
+  image: string | Blob;
+}
+
+export interface CreateRawService {
   description: string;
   stock: number;
   is_active: boolean;
-  product_parent_id?: number;
-  product_parent: CreateProduct | null;
+  product_parent_id?: number | null;
+  product_parent: CreateProduct;
 }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  CreateRawPayload,
+  CreateRawSaga,
   ProductRaw,
   RawDisplayFilter,
   RawParams,
@@ -83,7 +83,7 @@ const RawSlice = createSlice({
     fetchDataFailed(state: RawProps) {
       state.loading = false;
     },
-    createRaw(state: RawProps, action: PayloadAction<CreateRawPayload>) {
+    createRaw(state: RawProps, action: PayloadAction<CreateRawSaga>) {
       state.loadingForm = true;
       state.isSuccessCreate = false;
     },
@@ -92,6 +92,21 @@ const RawSlice = createSlice({
       state.isSuccessCreate = true;
     },
     createRawFailed(state: RawProps) {
+      state.loadingForm = false;
+      state.isSuccessCreate = false;
+    },
+    updateRaw(
+      state: RawProps,
+      action: PayloadAction<{ id: string | number; body: CreateRawSaga }>,
+    ) {
+      state.loadingForm = true;
+      state.isSuccessCreate = false;
+    },
+    updateRawSuccess(state: RawProps) {
+      state.loadingForm = false;
+      state.isSuccessCreate = true;
+    },
+    updateRawFailed(state: RawProps) {
       state.loadingForm = false;
       state.isSuccessCreate = false;
     },

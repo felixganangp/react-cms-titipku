@@ -1,4 +1,4 @@
-import { CreateRawPayload, RawParams } from 'models/b2b/ProductRaw';
+import { CreateRawService, RawParams } from 'models/b2b/ProductRaw';
 import http from 'utils/request';
 
 export const fetchData = (params: RawParams) =>
@@ -14,10 +14,23 @@ export const fetchData = (params: RawParams) =>
     }
   });
 
-export const create = (body: CreateRawPayload) =>
+export const create = (body: CreateRawService) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await http.post('/inventory/b2b/product/raw', body);
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const update = (id: string | number, body: CreateRawService) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.put(`/inventory/b2b/product/raw/${id}`, body);
       if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response

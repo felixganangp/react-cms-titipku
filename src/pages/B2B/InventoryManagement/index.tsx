@@ -41,6 +41,7 @@ import ModalComp from 'components/Modal';
 import YellowToast from 'components/YellowToast';
 import { uiAction } from 'store/slice/ui';
 import { useNavigate } from 'react-router-dom';
+import NoDataWithAddBtn from 'components/Table/NoDataView/NoData';
 import {
   CardContainer,
   CategoryStyle,
@@ -56,7 +57,6 @@ import {
 import StockOpname from './components/StockOpname';
 import ChangeStatus from './components/ChangeStatus';
 import Delete from './components/Delete';
-import NoDataInventory from './components/NoData';
 import Form from './components/Form';
 
 export default function InventoryPage() {
@@ -1006,7 +1006,11 @@ export default function InventoryPage() {
                 onChangePage={handleChangePage}
                 page={product.params.page}
                 noDataComponent={
-                  <NoDataInventory onAdd={formProductModal.openModal} />
+                  <NoDataWithAddBtn
+                    onAdd={formProductModal.openModal}
+                    headMsg="No Products Available"
+                    message="Please add new product to make a change"
+                  />
                 }
               />
             </Box>
