@@ -387,11 +387,23 @@ export default function InventoryPage() {
       align: 'left',
       enableSort: false,
       format: (val: Product) => (
-        <CategoryStyle>
-          {val.product_parent.product_parent_category
-            ? val.product_parent.product_parent_category[0].name
-            : '-'}
-        </CategoryStyle>
+        <Box
+          display="flex"
+          flexDirection="row"
+          justifyContent="flex-start"
+          gap="5px"
+          flexWrap="wrap"
+          width="100%"
+          maxWidth="400px"
+        >
+          {val.product_parent.product_parent_category ? (
+            val.product_parent.product_parent_category.map((item) => (
+              <CategoryStyle key={item.id}>{item.name}</CategoryStyle>
+            ))
+          ) : (
+            <CategoryStyle>-</CategoryStyle>
+          )}
+        </Box>
       ),
     },
     {
