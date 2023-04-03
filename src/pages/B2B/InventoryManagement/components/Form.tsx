@@ -296,6 +296,7 @@ export default function Form(props: FormTypes) {
 
               formik.setFieldValue('productList', product);
             }}
+            disabled={!formik.values.productList[indexGrade].is_active}
             // onBlur={handleBlur}
             fullWidth
             InputProps={{
@@ -358,7 +359,9 @@ export default function Form(props: FormTypes) {
                     <b>
                       {numberSeperator(
                         formik.values.productList[indexGrade].stock,
-                      )}
+                      )
+                        .replaceAll('.', ',')
+                        .replaceAll(',', '.')}
                     </b>{' '}
                     Gram{' '}
                   </span>
@@ -409,7 +412,7 @@ export default function Form(props: FormTypes) {
             fullWidth
           />
         </FormLabel>
-        {currentGrade.isCostume && gradeList.length > 1 ? (
+        {currentGrade.isCostume ? (
           <Box
             color="error.main"
             bgcolor="#f9ebe7"
@@ -435,7 +438,8 @@ export default function Form(props: FormTypes) {
           >
             <TrashIcon sx={{ fontSize: '25px' }} />
             <Typography fontSize="14px">
-              Clear {formik.values.productList[indexGrade].grade.name}
+              {isEdit ? 'Delete' : 'Clear'}{' '}
+              {formik.values.productList[indexGrade].grade.name}
             </Typography>
           </Box>
         ) : (
@@ -464,7 +468,9 @@ export default function Form(props: FormTypes) {
             }
           }}
         >
-          {!loadingForm ? `${isEdit ? 'Update' : 'Create'}` : 'Loading...'}
+          {!loadingForm
+            ? `${isEdit ? 'Save Changes' : 'Create'}`
+            : 'Loading...'}
         </Button>
       </Box>
     </>

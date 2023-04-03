@@ -1,5 +1,5 @@
 function addCommas(value: number | string) {
-  let nStr = value.toString();
+  let nStr = value?.toString();
   nStr += '';
   const x = nStr.split('.');
   let x1 = x[0];
@@ -13,7 +13,7 @@ function addCommas(value: number | string) {
 }
 
 export const typeNumberValidate = (value: string) => {
-  if (value.toString().split('.').length > 1) {
+  if (value?.toString()?.split('.')?.length > 1) {
     return parseFloat(value);
   }
 
