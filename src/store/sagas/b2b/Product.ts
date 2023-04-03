@@ -510,6 +510,35 @@ function* fetchDataListProductMovestck(
   }
 }
 
+function* moveStock(
+  payload: PayloadAction<{
+    from_product_id: number | undefined;
+    to_product_id: number | undefined;
+    stock_change: number;
+  }>,
+) {
+  try {
+    const filter: ProductParams = yield select((state) => state.product.params);
+    const response: ListResponse<any> = yield call(
+      service.moveStockProduct,
+      payload.payload,
+    );
+    yield put(productAction.moveStockSuccess());
+    yield put(productAction.fetchData(filter));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: error || 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
 export default function* productSagas() {
   yield takeLatest(productAction.stockOpname, stockOpname);
   yield takeLatest(productAction.fetchTotalLowStock, fetchTotalLowStock);
@@ -532,4 +561,5 @@ export default function* productSagas() {
     productAction.fetchDataListProductsMoveStk.type,
     fetchDataListProductMovestck,
   );
+  yield takeLatest(productAction.moveStock.type, moveStock);
 }

@@ -103,11 +103,87 @@ export default function InventoryPage() {
     stockOpnameModal.openModal();
   };
 
+  const [payloadMoveStock, setPayloadMoveStock] = useState<{
+    from_product_id: number | undefined;
+    to_product_id: number | undefined;
+    stock_change: number;
+  }>({
+    from_product_id: undefined,
+    stock_change: 0,
+    to_product_id: undefined,
+  });
   const handleCloseStockOpname = () => {
     setSelected([]);
     setSelectedProduct([]);
     setParentId(undefined);
+    setPayloadMoveStock({
+      from_product_id: undefined,
+      to_product_id: undefined,
+      stock_change: 0,
+    });
     stockOpnameModal.closeModal();
+  };
+
+  // MOVE STOCK
+  const handleCloseAllModalOnStockOpname = () => {
+    stockOpnameModal.closeModal();
+    listProductModal.closeModal();
+    moveStockFormModal.closeModal();
+    moveStockConfirmationModal.closeModal();
+    setPayloadMoveStock({
+      from_product_id: undefined,
+      to_product_id: undefined,
+      stock_change: 0,
+    });
+  };
+  const [selectedProductMoveStock, setSelectedProductMoveStock] = useState<
+    Product[]
+  >([]);
+
+  const handleClosePopupSelectproduct = () => {
+    // modalFunc.openFunc();
+    stockOpnameModal.openModal();
+    listProductModal.closeModal();
+    setSelectedProductMoveStock([]);
+  };
+  const handleOpenPopupSelectproduct = () => {
+    // modalFunc.closeFunc();
+    stockOpnameModal.closeModal();
+    listProductModal.openModal();
+  };
+  const handleOnApplySelectProduct = () => {
+    listProductModal.closeModal();
+    moveStockFormModal.openModal();
+  };
+  const handleCloseFormMoveStock = () => {
+    listProductModal.openModal();
+    moveStockFormModal.closeModal();
+  };
+  const handleOnSubmitMoveStock = (val: { stock_change: number }) => {
+    setPayloadMoveStock({
+      from_product_id: selectedProduct[0].id,
+      to_product_id: selectedProductMoveStock[0].id,
+      stock_change: val.stock_change,
+    });
+    moveStockFormModal.closeModal();
+    moveStockConfirmationModal.openModal();
+  };
+  const handleCloseConfirmationMoveStock = () => {
+    moveStockFormModal.openModal();
+    moveStockConfirmationModal.closeModal();
+  };
+
+  const handleSubmitMoveToStock = async () => {
+    await dispatch(productAction.moveStock(payloadMoveStock));
+    stockOpnameModal.closeModal();
+    listProductModal.closeModal();
+    moveStockFormModal.closeModal();
+    moveStockConfirmationModal.closeModal();
+    setPayloadMoveStock({
+      from_product_id: undefined,
+      to_product_id: undefined,
+      stock_change: 0,
+    });
   };
 
   const handleClose = () => {
@@ -556,37 +632,6 @@ export default function InventoryPage() {
 
   setTimeout(() => dispatch(uiAction.closeYellowToast()), 70000);
 
-  // MOVE STOCK
-  const [selectedProductMoveStock, setSelectedProductMoveStock] = useState<
-    Product[]
-  >([]);
-  const handleClosePopupSelectproduct = () => {
-    // modalFunc.openFunc();
-    stockOpnameModal.openModal();
-    listProductModal.closeModal();
-    setSelectedProductMoveStock([]);
-  };
-  const handleOpenPopupSelectproduct = () => {
-    // modalFunc.closeFunc();
-    stockOpnameModal.closeModal();
-    listProductModal.openModal();
-  };
-  const handleOnApplySelectProduct = () => {
-    listProductModal.closeModal();
-    moveStockFormModal.openModal();
-  };
-  const handleCloseFormMoveStock = () => {
-    listProductModal.openModal();
-    moveStockFormModal.closeModal();
-  };
-  const handleOnSubmitMoveStock = () => {
-    moveStockFormModal.closeModal();
-    moveStockConfirmationModal.openModal();
-  };
-  const handleCloseConfirmationMoveStock = () => {
-    moveStockFormModal.openModal();
-    moveStockConfirmationModal.closeModal();
-  };
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <Grid container spacing={2}>
@@ -1074,7 +1119,7 @@ export default function InventoryPage() {
       <ModalComp
         open={stockOpnameModal.open}
         title="Stock Opname"
-        onClose={handleCloseStockOpname}
+        onClose={handleCloseAllModalOnStockOpname}
       >
         <StockOpname
           totalItem={selectedProduct.length}
@@ -1093,24 +1138,6 @@ export default function InventoryPage() {
       <PopupAddSelected
         parentId={parentId}
         selectedItem={selectedProduct}
-        // data={[
-        //   {
-        //     id: 1,
-        //     product_name: 'test nama data',
-        //     product_type: 'B2B',
-        //     product_stock: '50.000',
-        //     product_image:
-        //       'https://id-test-11.slatic.net/p/6a78913c131cfcd539813bd4b7c42459.png',
-        //   },
-        //   {
-        //     id: 2,
-        //     product_name: 'test nama data2',
-        //     product_type: 'B2B - Horeca',
-        //     product_stock: '10.000',
-        //     product_image:
-        //       'https://id-test-11.slatic.net/p/6a78913c131cfcd539813bd4b7c42459.png',
-        //   },
-        // ]}
         currentData={[]}
         open={listProductModal.open}
         onClose={() => {
@@ -1124,24 +1151,29 @@ export default function InventoryPage() {
       <ModalComp
         open={moveStockFormModal.open}
         title="Move Stock"
-        onClose={handleCloseFormMoveStock}
+        onClose={handleCloseAllModalOnStockOpname}
         width="420px"
       >
         <MoveStockForm
           selectedItem={selectedProductMoveStock}
           onClose={handleCloseFormMoveStock}
           onSubmit={handleOnSubmitMoveStock}
+          prevItem={selectedProduct}
+          initData={payloadMoveStock.stock_change}
         />
       </ModalComp>
       <ModalComp
         open={moveStockConfirmationModal.open}
-        onClose={handleCloseConfirmationMoveStock}
+        onClose={handleCloseAllModalOnStockOpname}
         width="624px"
+        noTitle
       >
         <ConfirmMoveStock
           onClose={handleCloseConfirmationMoveStock}
           prevItem={selectedProduct}
           moveItem={selectedProductMoveStock}
+          payload={payloadMoveStock}
+          onSubmit={handleSubmitMoveToStock}
         />
       </ModalComp>
     </Box>

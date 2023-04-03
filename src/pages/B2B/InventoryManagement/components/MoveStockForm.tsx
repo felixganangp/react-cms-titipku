@@ -6,16 +6,46 @@ import {
   TextField,
   InputAdornment,
 } from '@mui/material';
+import ReportIcon from '@mui/icons-material/Report';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 import { Product } from 'models/b2b/Product';
 import Content from './PopupSelected/Content';
 
 interface Props {
   onClose: () => void;
   selectedItem: Product[];
-  onSubmit: () => void;
+  onSubmit: (val: { stock_change: number }) => void;
+  prevItem: Product[];
+  initData: number;
 }
 
-function MoveStockForm({ onClose, selectedItem, onSubmit }: Props) {
+function MoveStockForm({
+  onClose,
+  selectedItem,
+  onSubmit,
+  prevItem,
+  initData,
+}: Props) {
+  const [initialValues, setInitialValues] = React.useState({
+    stock_change: initData,
+  });
+  const formik = useFormik({
+    initialValues,
+    onSubmit: async (value, { resetForm }) => {
+      console.log('teset');
+    },
+    validationSchema: yup.object({
+      stock_change: yup
+        .number()
+        .required('Weight is required')
+        .min(1, 'Value weight should be more than 0')
+        .max(prevItem[0].stock, `Max value weight is ${prevItem[0].stock}`),
+    }),
+    enableReinitialize: true,
+  });
+
+  const { values, handleBlur, handleChange, errors, isValid } = formik;
   return (
     <Box width="420px">
       <Box
@@ -40,11 +70,11 @@ function MoveStockForm({ onClose, selectedItem, onSubmit }: Props) {
           <Typography>Weight</Typography>
           <TextField
             type="number"
-            // onChange={handleChange}
-            // onBlur={handleBlur}
-            // name={`product_${item.id}`}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            name="stock_change"
             // placeholder="Stock Weight"
-            // value={values[`product_${item.id}`]}
+            value={values.stock_change}
             fullWidth
             InputProps={{
               endAdornment: (
@@ -52,20 +82,20 @@ function MoveStockForm({ onClose, selectedItem, onSubmit }: Props) {
               ),
             }}
           />
-          {/* {Boolean(errors[`product_${item.id}`]) && (
-                    <Typography
-                      sx={{
-                        mt: '3px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        fontSize: '0.7rem',
-                        color: '#c10000',
-                      }}
-                    >
-                      <ReportIcon sx={{ fontSize: '0.9rem', mr: 0.5 }} />
-                      {errors[`product_${item.id}`]?.toString()}
-                    </Typography>
-                  )} */}
+          {Boolean(errors.stock_change) && (
+            <Typography
+              sx={{
+                mt: '3px',
+                display: 'flex',
+                alignItems: 'center',
+                fontSize: '0.7rem',
+                color: '#c10000',
+              }}
+            >
+              <ReportIcon sx={{ fontSize: '0.9rem', mr: 0.5 }} />
+              {errors.stock_change?.toString()}
+            </Typography>
+          )}
         </Box>
       </Box>
       <Box
@@ -82,7 +112,12 @@ function MoveStockForm({ onClose, selectedItem, onSubmit }: Props) {
         <Button onClick={onClose} variant="text" color="error">
           Cancel
         </Button>
-        <Button onClick={onSubmit}>Move Stock</Button>
+        <Button
+          disabled={!isValid || values.stock_change < 1}
+          onClick={() => onSubmit(values)}
+        >
+          Move Stock
+        </Button>
       </Box>
     </Box>
   );

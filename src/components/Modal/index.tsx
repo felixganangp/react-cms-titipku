@@ -28,7 +28,7 @@ function Modal({
 }: ModalProps) {
   return (
     <Dialog onClose={onClose} open={Boolean(open)}>
-      {noTitle && (
+      {!noTitle && (
         <DialogTitle
           fontSize="20px"
           fontWeight="500"

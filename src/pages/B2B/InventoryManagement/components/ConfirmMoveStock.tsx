@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import { Product } from 'models/b2b/Product';
 
@@ -6,9 +5,21 @@ interface Props {
   onClose: () => void;
   prevItem: Product[];
   moveItem: Product[];
+  payload: {
+    from_product_id: number | undefined;
+    to_product_id: number | undefined;
+    stock_change: number | undefined;
+  };
+  onSubmit: () => void;
 }
 
-function ConfirmMoveStock({ onClose, prevItem, moveItem }: Props) {
+function ConfirmMoveStock({
+  onClose,
+  prevItem,
+  moveItem,
+  payload,
+  onSubmit,
+}: Props) {
   return (
     <Box sx={{ width: '100%' }}>
       <Box
@@ -28,7 +39,8 @@ function ConfirmMoveStock({ onClose, prevItem, moveItem }: Props) {
             }}
           >
             <Typography fontSize="16px">
-              You are about to move stock: 200,000 g{' '}
+              You are about to move stock:{' '}
+              {payload.stock_change?.toLocaleString('en')} g{' '}
               <span style={{ fontWeight: 'bold' }}>
                 [{prevItem[0].product_grade.name}][
                 {prevItem[0].product_type.name}]{' '}
@@ -58,7 +70,7 @@ function ConfirmMoveStock({ onClose, prevItem, moveItem }: Props) {
           <Button onClick={onClose} variant="text" color="error">
             Cancel
           </Button>
-          <Button>Yes, Move Stock</Button>
+          <Button onClick={onSubmit}>Yes, Move Stock</Button>
         </Box>
       </Box>
     </Box>
