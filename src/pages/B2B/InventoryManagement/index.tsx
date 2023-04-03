@@ -628,6 +628,7 @@ export default function InventoryPage() {
                   onClick={() => {
                     cleanSearch();
                     handleResetFilter();
+                    dispatch(uiAction.closeYellowToast());
                     handleSetActiveDashboard(undefined);
                   }}
                   sx={{ cursor: 'pointer' }}
@@ -668,6 +669,7 @@ export default function InventoryPage() {
                 onClick={() => {
                   cleanSearch();
                   handleResetFilter();
+                  dispatch(uiAction.closeYellowToast());
                   handleSetActiveDashboard('low_stock');
                 }}
               >
@@ -719,6 +721,7 @@ export default function InventoryPage() {
                 onClick={() => {
                   cleanSearch();
                   handleResetFilter();
+                  dispatch(uiAction.closeYellowToast());
                   handleSetActiveDashboard('empty_stock');
                 }}
               >
