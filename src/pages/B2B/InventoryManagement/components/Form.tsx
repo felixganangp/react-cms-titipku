@@ -428,12 +428,26 @@ export default function Form(props: FormTypes) {
 
               await formik.setFieldValue('productList', product);
 
-              setCurrentGrade({
-                isCostume: true,
-                currentID: product
+              if (
+                product
                   .filter((val) => val.grade.id !== 1)
-                  .filter((val) => val.is_exist !== false)[0].grade.id,
-              });
+                  .filter((val) => val.is_exist !== false).length > 0
+              ) {
+                setCurrentGrade({
+                  isCostume: true,
+                  currentID: product
+                    .filter((val) => val.grade.id !== 1)
+                    .filter((val) => val.is_exist !== false)[0].grade.id,
+                });
+              } else {
+                setCurrentGrade({
+                  isCostume: false,
+                  currentID: 1,
+                });
+                if (isEdit) {
+                  setTypeUpdate('to-default');
+                }
+              }
             }}
           >
             <TrashIcon sx={{ fontSize: '25px' }} />
