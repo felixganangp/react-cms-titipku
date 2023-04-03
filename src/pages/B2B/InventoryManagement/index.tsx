@@ -1070,7 +1070,7 @@ export default function InventoryPage() {
       </ModalComp>
       <ModalComp
         open={formProductModal.open}
-        title="Add Product"
+        title={EditProductParent ? 'Edit Product' : 'Add Product'}
         onClose={() => {
           formProductModal.closeModal();
           setEditProductParent(null);
