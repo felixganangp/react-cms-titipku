@@ -263,7 +263,7 @@ export default function InvoiceDetail() {
       </CardContainer>
       <ModalComp
         open={formProductModal.open}
-        title="Add Product"
+        title="Edit Product"
         onClose={() => {
           formProductModal.closeModal();
         }}

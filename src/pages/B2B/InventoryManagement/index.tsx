@@ -628,6 +628,7 @@ export default function InventoryPage() {
                   onClick={() => {
                     cleanSearch();
                     handleResetFilter();
+                    dispatch(uiAction.closeYellowToast());
                     handleSetActiveDashboard(undefined);
                   }}
                   sx={{ cursor: 'pointer' }}
@@ -668,6 +669,7 @@ export default function InventoryPage() {
                 onClick={() => {
                   cleanSearch();
                   handleResetFilter();
+                  dispatch(uiAction.closeYellowToast());
                   handleSetActiveDashboard('low_stock');
                 }}
               >
@@ -719,6 +721,7 @@ export default function InventoryPage() {
                 onClick={() => {
                   cleanSearch();
                   handleResetFilter();
+                  dispatch(uiAction.closeYellowToast());
                   handleSetActiveDashboard('empty_stock');
                 }}
               >
@@ -1059,7 +1062,7 @@ export default function InventoryPage() {
       </ModalComp>
       <ModalComp
         open={formProductModal.open}
-        title="Add Product"
+        title={EditProductParent ? 'Edit Product' : 'Add Product'}
         onClose={() => {
           formProductModal.closeModal();
           setEditProductParent(null);
