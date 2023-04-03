@@ -4,6 +4,7 @@ import { PayloadAction } from '@reduxjs/toolkit';
 import { call, put, select, takeLatest, all } from 'redux-saga/effects';
 import { productAction } from 'store/slice/b2b/Product';
 import { uiAction } from 'store/slice/ui';
+import { typeNumberValidate } from 'utils/numberSeperator';
 // models
 import { ListResponse, Response } from 'models/fetch';
 import {
@@ -257,8 +258,8 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
           product_parent_id: responProductParent.data.id,
           product_grade_id: val.grade?.id || 0,
           description: val.description,
-          stock: parseInt(val.stock as string),
-          low_stock_limit: parseInt(val.lowStock as string),
+          stock: typeNumberValidate(val.stock as string),
+          low_stock_limit: typeNumberValidate(val.lowStock as string),
           is_exist: val.is_exist,
           is_active: val.is_active,
         }),
@@ -268,7 +269,7 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
       uiAction.openYellowToast({
         totalItem: dataForm.productList.length,
         additionalMsg: '',
-        action: 'successfully created!',
+        action: 'successfully added!',
         error: false,
         noUndo: true,
       }),
@@ -528,8 +529,8 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
                 product_parent_id: dataForm.idParent,
                 product_grade_id: val.grade?.id || 0,
                 description: val.description,
-                stock: val.stock || 0,
-                low_stock_limit: val.lowStock || 0,
+                stock: typeNumberValidate(val.stock as string),
+                low_stock_limit: typeNumberValidate(val.lowStock as string),
                 is_exist: val.is_exist,
                 is_active: val.is_active,
               },
@@ -550,15 +551,6 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
     }
 
     if (dataForm.typeEdit === 'to-costume') {
-      yield put(
-        uiAction.openYellowToast({
-          totalItem: 1,
-          additionalMsg: '',
-          action: 'successfully updated!',
-          error: false,
-          noUndo: true,
-        }),
-      );
       yield all(
         dataForm.productList.map((val) => {
           if (val.grade.id === 1 && val.id) {
@@ -575,8 +567,8 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
                 product_parent_id: dataForm.idParent,
                 product_grade_id: val.grade?.id || 0,
                 description: val.description,
-                stock: val.stock || 0,
-                low_stock_limit: val.lowStock || 0,
+                stock: typeNumberValidate(val.stock as string),
+                low_stock_limit: typeNumberValidate(val.lowStock as string),
                 is_exist: val.is_exist,
                 is_active: val.is_active,
               },
@@ -588,8 +580,8 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
               product_parent_id: dataForm.idParent,
               product_grade_id: val.grade?.id || 0,
               description: val.description,
-              stock: val.stock || 0,
-              low_stock_limit: val.lowStock || 0,
+              stock: typeNumberValidate(val.stock as string),
+              low_stock_limit: typeNumberValidate(val.lowStock as string),
               is_exist: val.is_exist,
               is_active: val.is_active,
             });
@@ -597,8 +589,6 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
           return () => {};
         }),
       );
-    }
-    if (dataForm.typeEdit === 'to-default') {
       yield put(
         uiAction.openYellowToast({
           totalItem: 1,
@@ -608,6 +598,8 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
           noUndo: true,
         }),
       );
+    }
+    if (dataForm.typeEdit === 'to-default') {
       const idTodelete = dataForm.productList
         .filter((val) => val.grade.id !== 1 && val.id)
         .map((val) => val.id) as number[];
@@ -629,8 +621,8 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
                   product_parent_id: dataForm.idParent,
                   product_grade_id: val.grade?.id || 0,
                   description: val.description,
-                  stock: val.stock || 0,
-                  low_stock_limit: val.lowStock || 0,
+                  stock: typeNumberValidate(val.stock as string),
+                  low_stock_limit: typeNumberValidate(val.lowStock as string),
                   is_exist: true,
                   is_active: true,
                 },
@@ -641,12 +633,21 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
               product_parent_id: dataForm.idParent,
               product_grade_id: val.grade?.id || 0,
               description: val.description,
-              stock: val.stock || 0,
-              low_stock_limit: val.lowStock || 0,
+              stock: typeNumberValidate(val.stock as string),
+              low_stock_limit: typeNumberValidate(val.lowStock as string),
               is_exist: true,
               is_active: true,
             });
           }),
+      );
+      yield put(
+        uiAction.openYellowToast({
+          totalItem: 1,
+          additionalMsg: '',
+          action: 'successfully updated!',
+          error: false,
+          noUndo: true,
+        }),
       );
     }
 
