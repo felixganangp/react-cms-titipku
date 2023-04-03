@@ -1,11 +1,14 @@
 import React from 'react';
-import { Box, Dialog, DialogContent, Button, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
+import { Product } from 'models/b2b/Product';
 
 interface Props {
   onClose: () => void;
+  prevItem: Product[];
+  moveItem: Product[];
 }
 
-function ConfirmMoveStock({ onClose }: Props) {
+function ConfirmMoveStock({ onClose, prevItem, moveItem }: Props) {
   return (
     <Box sx={{ width: '100%' }}>
       <Box
@@ -26,10 +29,16 @@ function ConfirmMoveStock({ onClose }: Props) {
           >
             <Typography fontSize="16px">
               You are about to move stock: 200,000 g{' '}
-              <span style={{ fontWeight: 'bold' }}>[Grade A][B2B] Buncis</span>{' '}
+              <span style={{ fontWeight: 'bold' }}>
+                [{prevItem[0].product_grade.name}][
+                {prevItem[0].product_type.name}]{' '}
+                {prevItem[0].product_parent.name}
+              </span>{' '}
               to{' '}
               <span style={{ fontWeight: 'bold' }}>
-                [Grade B][B2B-Horeca] Buncis
+                [{moveItem[0].product_grade.name}][
+                {moveItem[0].product_type.name}]{' '}
+                {moveItem[0].product_parent.name}
               </span>
             </Typography>
           </Box>

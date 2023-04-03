@@ -5,10 +5,12 @@ import {
   Radio,
   RadioGroup,
 } from '@mui/material';
+import { Product } from 'models/b2b/Product';
+
 import Content from './Content';
 
 interface Props {
-  data: any;
+  data: Product[];
   changeItem: any;
 }
 export const RadioButton = ({ data, changeItem }: Props) => {
@@ -34,7 +36,7 @@ export const RadioButton = ({ data, changeItem }: Props) => {
         aria-labelledby="demo-radio-buttons-group-label"
         name="radio-buttons-group"
       >
-        {data.map((item: any) => (
+        {data.map((item: Product) => (
           <FormControlLabel
             value={item.id}
             onChange={(e) => {
@@ -43,9 +45,9 @@ export const RadioButton = ({ data, changeItem }: Props) => {
               return changeItem(
                 e,
                 item.id,
-                item.product_name,
-                item.product_image,
-                item.product_stock,
+                item.product_parent.name,
+                item.product_parent.image_filepath,
+                item.stock,
               );
             }}
             key={item.id}

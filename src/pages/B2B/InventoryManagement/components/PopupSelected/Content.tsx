@@ -1,11 +1,11 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import { Product } from 'models/b2b/Product';
 import NoImage from 'assets/no-image.svg';
-import { ContentBox, ItemImage, NoItemImage } from './popupselected.styled';
 import { GradingColor } from '../../inventory.styled';
 
 interface Props {
-  item: any;
+  item: Product;
   width?: string;
 }
 
@@ -37,8 +37,8 @@ function Content({ item, width }: Props) {
           borderRadius: '50%',
           marginLeft: 2,
         }}
-        src={item.product_image}
-        alt={item.product_name}
+        src={item.product_parent.image_filepath}
+        alt={item.product_parent.name}
       />
       <Box
         sx={{
@@ -65,14 +65,14 @@ function Content({ item, width }: Props) {
           >
             <GradingColor
               sx={{ padding: '2px !important' }}
-              grade={1}
+              grade={item.product_grade.id}
               fontSize="12px"
             >
-              Grade C
+              {item.product_grade.name}
             </GradingColor>
-            <Typography fontSize={14}>{item.product_name}</Typography>
+            <Typography fontSize={14}>{item.product_parent.name}</Typography>
           </Box>
-          <Typography fontSize={14}>{item.product_type}</Typography>
+          <Typography fontSize={14}>{item.product_type.name}</Typography>
         </Box>
         <Box
           sx={{
@@ -85,7 +85,7 @@ function Content({ item, width }: Props) {
           <Typography fontSize={14} color="#555555">
             in Stock
           </Typography>
-          <Typography fontSize={14}>{item.product_stock} g</Typography>
+          <Typography fontSize={14}>{item.stock} g</Typography>
         </Box>
       </Box>
     </Box>

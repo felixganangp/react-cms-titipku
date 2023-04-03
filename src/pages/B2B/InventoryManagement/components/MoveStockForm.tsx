@@ -6,11 +6,12 @@ import {
   TextField,
   InputAdornment,
 } from '@mui/material';
+import { Product } from 'models/b2b/Product';
 import Content from './PopupSelected/Content';
 
 interface Props {
   onClose: () => void;
-  selectedItem: any;
+  selectedItem: Product[];
   onSubmit: () => void;
 }
 

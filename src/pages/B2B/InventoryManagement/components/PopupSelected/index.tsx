@@ -1,43 +1,87 @@
-import React, { useEffect } from 'react';
-import { Box, Dialog, IconButton, DialogTitle, Button } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import {
+  Box,
+  Dialog,
+  IconButton,
+  DialogTitle,
+  Button,
+  Typography,
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-// import close from '../../images/icons/close.svg';
-import { ContentAction, Contents, MoreContent } from './popupselected.styled';
+import { useAppDispatch, useAppSelector } from 'store/hooks';
+import { productAction } from 'store/slice/b2b/Product';
+import { Product } from 'models/b2b/Product';
+import EmptyProduct from 'assets/empty-product.svg';
+import { ContentAction, Contents } from './popupselected.styled';
 import { RadioButton } from './RadioButton';
 // import { SearchNotFound } from './SearchNotFound';
 // import { SearchBar } from './SearchBar';
+
+function NoDataInventory() {
+  return (
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      justifyContent="center"
+      gap="12px"
+      marginBottom={2}
+    >
+      <img
+        src={EmptyProduct}
+        width="200px"
+        height="200px"
+        alt="No Product Available"
+      />
+      <Box textAlign="center">
+        <Typography fontSize="16px" fontWeight="bold" color="#303030">
+          No Product Available
+        </Typography>
+      </Box>
+    </Box>
+  );
+}
 interface Props {
-  selectedItem: any;
-  data: [];
+  parentId: number | undefined;
   currentData: [];
   open: boolean;
   onClose: () => void;
   singleSelect: boolean;
-  onConfirm: React.Dispatch<React.SetStateAction<never[]>>;
-  moreData: () => void;
-  currentItems: number;
-  total: number;
+  onConfirm: React.Dispatch<React.SetStateAction<Product[]>>;
   product: boolean;
   onApply: () => void;
+  selectedItem: Product[];
 }
 
 function PopupAddSelected({
-  selectedItem,
-  data,
+  parentId,
   currentData,
   open,
   onClose,
   singleSelect,
   onConfirm,
-  moreData,
-  // onSearch,
-  currentItems,
-  total,
   product,
   onApply,
+  selectedItem,
 }: Props) {
-  const [confirm, setConfirm] = React.useState(false);
-  const [items, setItems] = React.useState({});
+  const dispatch = useAppDispatch();
+  const listProduct = useAppSelector(
+    (state) => state.product.listProductsMoveStk,
+  );
+  const filteredListProducts = listProduct.filter((el) => {
+    if (selectedItem.length > 0) {
+      return el.id !== selectedItem[0].id;
+    }
+    return [];
+  });
+  useEffect(() => {
+    dispatch(
+      productAction.fetchDataListProductsMoveStk({
+        product_parent_id: parentId as number,
+      }),
+    );
+  }, [parentId]);
+  const [items, setItems] = React.useState<any>({});
   const [existingItems, setExistingItems] = React.useState([]);
   const [newItems, setNewItems] = React.useState({});
   const [uncheckedItems, setUncheckedItems] = React.useState({});
@@ -45,7 +89,6 @@ function PopupAddSelected({
   const collectItems = () => Object.keys(items).filter((k: any) => items[k]);
   const collect = (datas: any) => Object.keys(datas).filter((k) => datas[k]);
   const collectUnchecked = () => Object.keys(uncheckedItems);
-  const hasData = data && data.length > 0;
   const handleDataExisting = (i: any) => {
     const results: any = [];
     i.map((a: any) => {
@@ -55,15 +98,6 @@ function PopupAddSelected({
       return results;
     });
     setExistingItems(results);
-  };
-  // for checkbox
-  const addOrRemoveItem = (event: any, id: any) => {
-    if (event.target.checked === false && existingItems.includes(id)) {
-      setUncheckedItems({ ...uncheckedItems, [id]: !!event.target.checked });
-    }
-    const nextItems = { ...items, [id]: !!event.target.checked };
-    setNewItems({ ...newItems, [id]: !!event.target.checked });
-    setItems(nextItems);
   };
   // for radio button
   const changeItem = (
@@ -103,7 +137,7 @@ function PopupAddSelected({
   };
 
   const handleConfirm = () => {
-    let submittedItems;
+    let submittedItems: any;
     if (Object.keys(uncheckedItems).length > 0) {
       const res = Object.keys(uncheckedItems);
       submittedItems = {
@@ -116,12 +150,13 @@ function PopupAddSelected({
 
     if (items) {
       // const temp = Object.keys(items).map(i => Number(i));
-      const tempTrue = Object.keys(items)
-        .filter((key) => items[key])
+      const tempTrue: any = Object.keys(items)
+        .filter((key: any) => items[key])
         .map((i) => Number(i));
       const tempFalse = Object.keys(items)
         .filter((key) => !items[key])
         .map((i) => Number(i));
+
       if (existingItems.length > 0) {
         if (tempTrue.length > 0) {
           const tempResult = existingItems.concat(tempTrue);
@@ -145,7 +180,7 @@ function PopupAddSelected({
     setUncheckedItems({});
     setNewItems({});
     // setExistingItems([]);
-    const selected = data.filter((el) => el.id === +submittedItems[0]);
+    const selected = listProduct.filter((el) => el.id === +submittedItems[0]);
     onConfirm(selected);
     onApply();
   };
@@ -157,8 +192,6 @@ function PopupAddSelected({
       setExistingItems([]);
     }
   }, [currentData]);
-
-  useEffect(() => {}, [data]);
 
   useEffect(() => {
     setExistingItems([]);
@@ -203,25 +236,20 @@ function PopupAddSelected({
                 onSearch={onSearch}
               /> */}
       </DialogTitle>
-      {/* {!hasData ? (
-            <SearchNotFound />
-          ) : (
-       )}  */}
-      <Contents>
-        <Box
-          style={{
-            width: 'inherit',
-            border: 'none',
-          }}
-        >
-          <RadioButton data={data} changeItem={changeItem} />
-          {currentItems < total ? (
-            <MoreContent onClick={() => moreData()}>Show More</MoreContent>
-          ) : (
-            ''
-          )}
-        </Box>
-      </Contents>
+      {filteredListProducts.length < 1 ? (
+        <NoDataInventory />
+      ) : (
+        <Contents>
+          <Box
+            style={{
+              width: 'inherit',
+              border: 'none',
+            }}
+          >
+            <RadioButton data={filteredListProducts} changeItem={changeItem} />
+          </Box>
+        </Contents>
+      )}
       <ContentAction>
         <Button variant="text" color="error" onClick={() => handleCancel()}>
           Cancel

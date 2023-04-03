@@ -140,12 +140,10 @@ function StockOpname({
                 </Box>
                 <Box sx={{ display: 'flex' }}>
                   <Typography
-                    sx={{ paddingX: '1em', backgroundColor: '#e4e4e4' }}
+                    // sx={{ paddingX: '1em', backgroundColor: '#e4e4e4' }}
                     fontSize="14px"
                   >
-                    {(item.product_parent.product_parent_category &&
-                      item.product_parent.product_parent_category[0].name) ||
-                      '-'}
+                    {item.product_type.name || '-'}
                   </Typography>
                 </Box>
               </Box>

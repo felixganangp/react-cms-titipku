@@ -78,6 +78,7 @@ export default function InventoryPage() {
   const moveStockFormModal = useModal();
   const moveStockConfirmationModal = useModal();
 
+  const [parentId, setParentId] = useState<number | undefined>();
   // BATCH ACTION
   const [selected, setSelected] = useState<(number | string)[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product[]>([]);
@@ -105,6 +106,7 @@ export default function InventoryPage() {
   const handleCloseStockOpname = () => {
     setSelected([]);
     setSelectedProduct([]);
+    setParentId(undefined);
     stockOpnameModal.closeModal();
   };
 
@@ -477,6 +479,7 @@ export default function InventoryPage() {
                         label: 'Stock Opname',
                         onClick: () => {
                           dispatch(uiAction.closeYellowToast());
+                          setParentId(val.product_parent_id);
                           handleStockOpnameAction(val);
                         },
                       },
@@ -554,7 +557,9 @@ export default function InventoryPage() {
   setTimeout(() => dispatch(uiAction.closeYellowToast()), 70000);
 
   // MOVE STOCK
-  const [selectedProductMoveStock, setSelectedProductMoveStock] = useState([]);
+  const [selectedProductMoveStock, setSelectedProductMoveStock] = useState<
+    Product[]
+  >([]);
   const handleClosePopupSelectproduct = () => {
     // modalFunc.openFunc();
     stockOpnameModal.openModal();
@@ -1086,26 +1091,26 @@ export default function InventoryPage() {
         <Form onClose={formProductModal.closeModal} />
       </ModalComp>
       <PopupAddSelected
-        selectedItem={selectedProductMoveStock}
-        parentMenu="Move stock parent"
-        data={[
-          {
-            id: 1,
-            product_name: 'test nama data',
-            product_type: 'B2B',
-            product_stock: '50.000',
-            product_image:
-              'https://id-test-11.slatic.net/p/6a78913c131cfcd539813bd4b7c42459.png',
-          },
-          {
-            id: 2,
-            product_name: 'test nama data2',
-            product_type: 'B2B - Horeca',
-            product_stock: '10.000',
-            product_image:
-              'https://id-test-11.slatic.net/p/6a78913c131cfcd539813bd4b7c42459.png',
-          },
-        ]}
+        parentId={parentId}
+        selectedItem={selectedProduct}
+        // data={[
+        //   {
+        //     id: 1,
+        //     product_name: 'test nama data',
+        //     product_type: 'B2B',
+        //     product_stock: '50.000',
+        //     product_image:
+        //       'https://id-test-11.slatic.net/p/6a78913c131cfcd539813bd4b7c42459.png',
+        //   },
+        //   {
+        //     id: 2,
+        //     product_name: 'test nama data2',
+        //     product_type: 'B2B - Horeca',
+        //     product_stock: '10.000',
+        //     product_image:
+        //       'https://id-test-11.slatic.net/p/6a78913c131cfcd539813bd4b7c42459.png',
+        //   },
+        // ]}
         currentData={[]}
         open={listProductModal.open}
         onClose={() => {
@@ -1113,9 +1118,6 @@ export default function InventoryPage() {
         }}
         singleSelect
         onConfirm={setSelectedProductMoveStock}
-        moreData={() => {}}
-        currentItems={5}
-        total={5}
         product={false}
         onApply={handleOnApplySelectProduct}
       />
@@ -1136,7 +1138,11 @@ export default function InventoryPage() {
         onClose={handleCloseConfirmationMoveStock}
         width="624px"
       >
-        <ConfirmMoveStock onClose={handleCloseConfirmationMoveStock} />
+        <ConfirmMoveStock
+          onClose={handleCloseConfirmationMoveStock}
+          prevItem={selectedProduct}
+          moveItem={selectedProductMoveStock}
+        />
       </ModalComp>
     </Box>
   );
