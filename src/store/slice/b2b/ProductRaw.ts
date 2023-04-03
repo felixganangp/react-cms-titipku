@@ -13,7 +13,11 @@ interface RawProps {
   loading: boolean;
   loadingFilter: boolean;
   loadingForm: boolean;
+  loadingAction: boolean;
+  isSuccessDelete: boolean;
+  isSuccessUndo: boolean;
   isSuccessCreate: boolean;
+  tempIds: (number | string)[];
   raws: ProductRaw[];
   total: number;
   categories: Category[];
@@ -25,7 +29,11 @@ const initialState: RawProps = {
   loading: false,
   loadingFilter: false,
   loadingForm: false,
+  loadingAction: false,
   isSuccessCreate: false,
+  isSuccessDelete: false,
+  isSuccessUndo: false,
+  tempIds: [],
   raws: [],
   total: 0,
   categories: [],
@@ -109,6 +117,32 @@ const RawSlice = createSlice({
     updateRawFailed(state: RawProps) {
       state.loadingForm = false;
       state.isSuccessCreate = false;
+    },
+    resetFormParam(state: RawProps) {
+      state.loadingForm = false;
+      state.isSuccessCreate = false;
+    },
+    deleteRaw(state: RawProps, action: PayloadAction<(number | string)[]>) {
+      state.loadingAction = true;
+      state.isSuccessDelete = false;
+      state.isSuccessUndo = false;
+      state.tempIds = action.payload;
+    },
+    deleteRawSuccess(state: RawProps) {
+      state.loadingAction = false;
+      state.isSuccessDelete = true;
+    },
+    deleteRawFailed(state: RawProps) {
+      state.loadingAction = false;
+      state.isSuccessDelete = false;
+    },
+    undoDelete(state: RawProps) {
+      state.loadingAction = true;
+      state.isSuccessUndo = false;
+    },
+    undoDeleteDone(state: RawProps) {
+      state.loadingAction = false;
+      state.isSuccessUndo = true;
     },
   },
 });

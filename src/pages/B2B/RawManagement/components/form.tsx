@@ -105,8 +105,19 @@ export default function RawForm({ onClose, data }: RawProps) {
     if (!raw.loadingForm && raw.isSuccessCreate) {
       onClose();
       resetForm();
+      dispatch(
+        uiAction.openYellowToast({
+          totalItem: 1,
+          additionalMsg: 'successfully',
+          action: data ? 'successfully edited!' : 'added!',
+          error: false,
+          noUndo: true,
+        }),
+      );
+      dispatch(rawAction.resetFormParam());
     }
-  }, [raw.loadingForm]);
+  }, [raw.loadingForm, raw.isSuccessCreate]);
+
   return (
     <Box m={0}>
       <form onSubmit={handleSubmit}>

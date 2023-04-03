@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable array-callback-return */
 import React, { useState, useEffect } from 'react';
 import {
@@ -30,9 +31,13 @@ import { rawAction } from 'store/slice/b2b/ProductRaw';
 import MenuList from 'components/MenuList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Modal from 'components/Modal';
+
 import useModal from 'hooks/useModal';
 import YellowToast from 'components/YellowToast';
 import NoDataWithAddBtn from 'components/Table/NoDataView/NoData';
+import MuiModal from '@mui/material/Modal';
+import Delete from 'components/Delete';
+import { uiAction } from 'store/slice/ui';
 import { CardContainer, CategoryStyle } from './raw.styled';
 import RawForm from './components/form';
 
@@ -51,6 +56,7 @@ export default function RawPage() {
   const [selectedRaw, setSelectedRaw] = useState<ProductRaw[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const deleteModal = useModal();
 
   const handleOpenBatchAction = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(e.currentTarget);
@@ -59,6 +65,41 @@ export default function RawPage() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleDelete = () => {
+    setSelected([]);
+    handleClose();
+    dispatch(rawAction.deleteRaw(selected));
+  };
+
+  useEffect(() => {
+    if (!raw.loadingAction && raw.isSuccessDelete && !raw.isSuccessUndo) {
+      deleteModal.closeModal();
+      dispatch(
+        uiAction.openYellowToast({
+          totalItem: selectedRaw.length,
+          onUndoAction() {
+            dispatch(rawAction.undoDelete());
+            dispatch(uiAction.closeYellowToast());
+          },
+          additionalMsg: '',
+          action: 'delete',
+          error: true,
+          noUndo: false,
+        }),
+      );
+    }
+  }, [raw.loadingAction, raw.isSuccessDelete]);
+
+  const getBatchRawDesc = () =>
+    selectedRaw.length > 0
+      ? selectedRaw.length > 3
+        ? `${selectedRaw
+            .slice(0, 3)
+            .map((item) => `${item.product_parent.name}`)
+            .join(',')} & ${selectedRaw.length - 3} other`
+        : selectedRaw.map((item) => `${item.product_parent.name}`).join(',')
+      : '';
 
   // search & filter
   const [openFilter, setOpenFilter] = useState<boolean>(false);
@@ -236,7 +277,12 @@ export default function RawPage() {
             },
             {
               label: 'Delete',
-              onClick: () => console.log('delete'),
+              onClick: () => {
+                dispatch(uiAction.closeYellowToast());
+                deleteModal.openModal();
+                setSelected([val.id]);
+                setSelectedRaw([val]);
+              },
             },
           ]}
         >
@@ -336,9 +382,7 @@ export default function RawPage() {
                     'aria-labelledby': 'basic-button',
                   }}
                 >
-                  <MenuItem onClick={() => console.log('delete')}>
-                    Delete
-                  </MenuItem>
+                  <MenuItem onClick={deleteModal.openModal}>Delete</MenuItem>
                 </Menu>
                 <Button
                   variant="outlined"
@@ -450,6 +494,14 @@ export default function RawPage() {
       >
         <RawForm onClose={formModal.closeModal} data={formData} />
       </Modal>
+      <MuiModal open={deleteModal.open} onClose={deleteModal.closeModal}>
+        <Delete
+          total={selected.length}
+          selectedItemDesc={getBatchRawDesc()}
+          onClose={deleteModal.closeModal}
+          onSubmit={handleDelete}
+        />
+      </MuiModal>
     </Box>
   );
 }

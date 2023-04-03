@@ -42,6 +42,7 @@ import YellowToast from 'components/YellowToast';
 import { uiAction } from 'store/slice/ui';
 import { useNavigate } from 'react-router-dom';
 import NoDataWithAddBtn from 'components/Table/NoDataView/NoData';
+import Delete from 'components/Delete';
 import {
   CardContainer,
   CategoryStyle,
@@ -56,7 +57,6 @@ import {
 } from './inventory.styled';
 import StockOpname from './components/StockOpname';
 import ChangeStatus from './components/ChangeStatus';
-import Delete from './components/Delete';
 import Form from './components/Form';
 
 export default function InventoryPage() {
@@ -1039,8 +1039,8 @@ export default function InventoryPage() {
         </Modal>
         <Modal open={deleteModal.open} onClose={deleteModal.closeModal}>
           <Delete
-            totalItem={selected.length}
-            selectedProduct={getBatchProductDesc()}
+            total={selected.length}
+            selectedItemDesc={getBatchProductDesc()}
             onSubmit={handleDelete}
             onClose={deleteModal.closeModal}
           />

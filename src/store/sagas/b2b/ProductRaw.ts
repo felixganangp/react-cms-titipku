@@ -14,6 +14,7 @@ import { Category } from 'models/b2b/Category';
 import { fetchCategory } from 'service/B2B/Category';
 import { uploadImage, updateProduct } from 'service/B2B/ProductParent';
 import { CreateProduct } from 'models/b2b/ProductParent';
+import { productAction } from 'store/slice/b2b/Product';
 import { rawAction } from '../../slice/b2b/ProductRaw';
 
 function* fetchData(params: PayloadAction<RawParams>) {
@@ -209,9 +210,73 @@ function* updateRaw(
   }
 }
 
+function* deleteRaw(params: PayloadAction<(number | string)[]>) {
+  try {
+    const filter: RawParams = yield select((state) => state.raw.params);
+    yield call(service.deleteRaw, {
+      is_exist: false,
+      ids: params.payload,
+    });
+    yield put(rawAction.fetchData(filter));
+    yield put(rawAction.deleteRawSuccess());
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error delete raw products',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error delete raw products',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+      yield put(rawAction.deleteRawFailed());
+    }
+  }
+}
+
+function* undoDeleteRaw() {
+  try {
+    const filter: RawParams = yield select((state) => state.raw.params);
+    const ids: (string | number)[] = yield select((state) => state.raw.tempIds);
+    yield call(service.deleteRaw, { is_exist: true, ids });
+    yield put(rawAction.fetchData(filter));
+    yield put(rawAction.undoDeleteDone());
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error undo delete raw products',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error undo delete raw products',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+      yield put(rawAction.deleteRawFailed());
+    }
+  }
+}
+
 export default function* rawSagas() {
   yield takeLatest(rawAction.fetchData.type, fetchData);
   yield takeLatest(rawAction.fetchCategory.type, fetchCategories);
   yield takeLatest(rawAction.createRaw.type, createRaw);
   yield takeLatest(rawAction.updateRaw.type, updateRaw);
+  yield takeLatest(rawAction.deleteRaw.type, deleteRaw);
+  yield takeLatest(rawAction.undoDelete.type, undoDeleteRaw);
 }
