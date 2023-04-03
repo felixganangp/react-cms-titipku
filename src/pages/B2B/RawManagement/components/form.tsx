@@ -52,16 +52,34 @@ export default function RawForm({ onClose, data }: RawProps) {
   };
   const formik = useFormik({
     initialValues: data ? editValue : initialValues,
-    onSubmit: async (values, { resetForm }) => {
-      dispatch(
-        rawAction.createRaw({
-          description: values.description,
-          stock: parseInt(values.stock),
-          name: values.name,
-          category_id: values.category?.id || 0,
-          image: values.file,
-        }),
-      );
+    onSubmit: async (values) => {
+      if (data) {
+        dispatch(
+          rawAction.updateRaw({
+            id: data.id,
+            body: {
+              description: values.description,
+              stock: Number(parseFloat(values.stock.split('.').join(''))),
+              name: values.name,
+              category_id: values.category?.id || 0,
+              image: values.file,
+              is_active: data.is_active,
+              is_exist: data.is_exist,
+              parent_id: data.product_parent_id,
+            },
+          }),
+        );
+      } else {
+        dispatch(
+          rawAction.createRaw({
+            description: values.description,
+            stock: Number(parseFloat(values.stock.split('.').join(''))),
+            name: values.name,
+            category_id: values.category?.id || 0,
+            image: values.file,
+          }),
+        );
+      }
     },
     validationSchema: yup.object({
       file: yup.mixed().required('Please upload an image'),

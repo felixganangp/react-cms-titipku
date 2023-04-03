@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { PayloadAction } from '@reduxjs/toolkit';
 import {
   CreateRawSaga,
@@ -11,8 +12,8 @@ import * as service from 'service/B2B/ProductRaw';
 import { uiAction } from 'store/slice/ui';
 import { Category } from 'models/b2b/Category';
 import { fetchCategory } from 'service/B2B/Category';
-import { uploadImage } from 'service/B2B/ProductParent';
-import { updateProduct } from 'service/B2B/Product';
+import { uploadImage, updateProduct } from 'service/B2B/ProductParent';
+import { CreateProduct } from 'models/b2b/ProductParent';
 import { rawAction } from '../../slice/b2b/ProductRaw';
 
 function* fetchData(params: PayloadAction<RawParams>) {
@@ -136,9 +137,17 @@ function* updateRaw(
   payload: PayloadAction<{ id: number | string; body: CreateRawSaga }>,
 ) {
   try {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { description, stock, name, category_id, image } =
-      payload.payload.body;
+    const listParams: RawParams = yield select((state) => state.raw.params);
+    const {
+      description,
+      stock,
+      name,
+      category_id,
+      image,
+      parent_id,
+      is_active,
+      is_exist,
+    } = payload.payload.body;
     const { id } = payload.payload;
     let imagePath: string;
     // upload updated image / slice image url
@@ -159,6 +168,24 @@ function* updateRaw(
     }
 
     // update data
+    // update product parent
+    const payloadParent: CreateProduct = {
+      name,
+      image_filepath: imagePath,
+      product_parent_category_id: [category_id],
+    };
+    yield call(updateProduct, { id: parent_id || 0, payload: payloadParent });
+    // update product raw
+    const payloadRaw: CreateRawService = {
+      product_parent_id: parent_id,
+      description,
+      stock,
+      is_active: is_active || true,
+      is_exist: is_exist || true,
+    };
+    yield call(service.update, { id, body: payloadRaw });
+    yield put(rawAction.updateRawSuccess());
+    yield put(rawAction.fetchData(listParams));
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
@@ -186,4 +213,5 @@ export default function* rawSagas() {
   yield takeLatest(rawAction.fetchData.type, fetchData);
   yield takeLatest(rawAction.fetchCategory.type, fetchCategories);
   yield takeLatest(rawAction.createRaw.type, createRaw);
+  yield takeLatest(rawAction.updateRaw.type, updateRaw);
 }

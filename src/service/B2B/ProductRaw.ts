@@ -27,10 +27,13 @@ export const create = (body: CreateRawService) =>
     }
   });
 
-export const update = (id: string | number, body: CreateRawService) =>
+export const update = (data: { id: string | number; body: CreateRawService }) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await http.put(`/inventory/b2b/product/raw/${id}`, body);
+      const response = await http.put(
+        `/inventory/b2b/product/raw/${data.id}`,
+        data.body,
+      );
       if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response

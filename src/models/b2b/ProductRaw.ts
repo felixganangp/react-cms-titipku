@@ -45,12 +45,16 @@ export interface CreateRawSaga {
   name: string;
   category_id: number;
   image: string | Blob;
+  parent_id?: number;
+  is_active?: boolean;
+  is_exist?: boolean;
 }
 
 export interface CreateRawService {
   description: string;
   stock: number;
   is_active: boolean;
+  is_exist?: boolean;
   product_parent_id?: number | null;
-  product_parent: CreateProduct;
+  product_parent?: CreateProduct;
 }
