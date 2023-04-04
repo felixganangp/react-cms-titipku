@@ -202,11 +202,13 @@ export default function InvoiceDetail() {
               ) : details?.product_parent?.product_parent_category ? (
                 details?.product_parent?.product_parent_category.map(
                   (category) => (
-                    <Typography key={category.id}>{category.name}</Typography>
+                    <Typography fontSize="14px" key={category.id}>
+                      {category.name}
+                    </Typography>
                   ),
                 )
               ) : (
-                <Typography>-</Typography>
+                <Typography fontSize="14px">-</Typography>
               )}
             </Grid>
             <Grid item xs={4} lg={2.4}>
