@@ -29,6 +29,7 @@ interface TypesError {
 interface FormTypes {
   onClose: () => void;
   EditProductParent: Product | null;
+  isDetail?: boolean;
 }
 
 export default function Form(props: FormTypes) {

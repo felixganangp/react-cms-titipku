@@ -547,10 +547,10 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
         noUndo: true,
       }),
     );
-    if (dataForm.typeEdit !== 'normal') {
-      const paramsLogData: LogParams = yield select(
-        (state) => state.product.paramsLog,
-      );
+    const paramsLogData: LogParams = yield select(
+      (state) => state.product.paramsLog,
+    );
+    if (dataForm.typeEdit === 'details' && paramsLogData) {
       yield put(productAction.fetchLog(paramsLogData));
       yield put(productAction.fetchDetails(dataForm.productList[0].id || 0));
     }
@@ -560,7 +560,6 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
     yield put(productAction.fetchData(filter));
     // yield put(productAction.resetProductForm());
   } catch (err) {
-    console.log(err);
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
