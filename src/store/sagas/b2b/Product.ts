@@ -546,7 +546,7 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
       }),
     );
     if (dataForm.typeEdit !== 'normal') {
-      yield put(productAction.fetchDetails(dataForm?.idParent || 0));
+      yield put(productAction.fetchDetails(dataForm.productList[0].id || 0));
     }
 
     yield put(productAction.updateProductSuccess());
