@@ -231,7 +231,7 @@ export default function InvoiceDetail() {
                 status={
                   !details?.is_active
                     ? 0
-                    : details?.stock === 0
+                    : details?.stock <= 0
                     ? 1
                     : details?.stock <= details?.low_stock_limit
                     ? 2
@@ -240,7 +240,7 @@ export default function InvoiceDetail() {
               >
                 {!details?.is_active
                   ? 'Inactive'
-                  : details?.stock === 0
+                  : details?.stock <= 0
                   ? 'Habis'
                   : details?.stock <= details?.low_stock_limit
                   ? 'Hampir Habis'
