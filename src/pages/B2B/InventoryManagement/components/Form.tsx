@@ -177,9 +177,9 @@ export default function Form(props: FormTypes) {
             onChange={(e, value) => {
               formik.setFieldValue('category', value);
             }}
-            // isOptionEqualToValue={(option: Type) => {
-            //   return option.id === values.kurType?.id;
-            // }}
+            isOptionEqualToValue={(option, values) => {
+              return option.id === values.id;
+            }}
             getOptionLabel={(option) => `${option.name}`}
             value={formik.values.category}
             renderInput={(params) => (
