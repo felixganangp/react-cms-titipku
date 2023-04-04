@@ -50,6 +50,7 @@ export interface ProductDisplayFilter {
   grade?: ProductGrade | null;
   category?: Category | null;
   status?: Status | null;
+  type?: ProductType | null;
 }
 
 export interface CreateProduct {

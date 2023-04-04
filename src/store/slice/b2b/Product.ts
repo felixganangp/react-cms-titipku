@@ -72,21 +72,12 @@ const initialState: ProductProps = {
     order_by: 'updated_at',
     order_type: 'desc',
   },
-  // lowStockParams: {
-  //   page: 1,
-  //   count: 10,
-  //   search: '',
-  // },
-  // emptyStockParams: {
-  //   page: 1,
-  //   count: 10,
-  //   search: '',
-  // },
   loadingStockOpname: false,
   displayFilter: {
     search: '',
     grade: null,
     category: null,
+    type: null,
     status: null,
   },
   grades: [],

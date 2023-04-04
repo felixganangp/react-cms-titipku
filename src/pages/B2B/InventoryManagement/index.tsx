@@ -66,7 +66,7 @@ export default function InventoryPage() {
   const activeDashboard = useAppSelector(
     (state) => state.product.activeDashboard,
   );
-  const { search, grade, category, status } = useAppSelector(
+  const { search, grade, category, status, type } = useAppSelector(
     (state) => state.product.displayFilter,
   );
   const [EditProductParent, setEditProductParent] = useState<Product | null>(
@@ -186,6 +186,7 @@ export default function InventoryPage() {
   useEffect(() => {
     dispatch(productAction.fetchGrade());
     dispatch(productAction.fetchCategory());
+    dispatch(productAction.fetchTypes());
   }, []);
 
   const handleSearch = (value: string) => {
@@ -200,6 +201,14 @@ export default function InventoryPage() {
     dispatch(
       productAction.setDisplayFilter({
         grade: value,
+      }),
+    );
+  };
+
+  const handleChangeType = (value: any) => {
+    dispatch(
+      productAction.setDisplayFilter({
+        type: value,
       }),
     );
   };
@@ -227,6 +236,7 @@ export default function InventoryPage() {
         page: 1,
         search: search || '',
         product_grade_id: grade ? grade.id : undefined,
+        product_type_id: type ? type.id : undefined,
         product_parent_category_id: category ? category.id : undefined,
         status: status ? status.value : undefined,
       }),
@@ -249,6 +259,7 @@ export default function InventoryPage() {
       productAction.setDisplayFilter({
         grade: null,
         category: null,
+        type: null,
         // search: '',
         status:
           activeDashboard === 'all_stock' ? null : product.displayFilter.status,
@@ -293,7 +304,7 @@ export default function InventoryPage() {
   };
 
   const getDashboardTitle = () => {
-    if (activeDashboard === 'all_stock') return 'Inventory Management';
+    if (activeDashboard === 'all_stock') return 'Grade Management';
     if (activeDashboard === 'empty_stock') return 'Empty Stock Products';
     return 'Low Stock Products';
   };
@@ -379,6 +390,15 @@ export default function InventoryPage() {
             <Typography>{val.product_parent.name}</Typography>
           </Box>
         </Box>
+      ),
+    },
+    {
+      id: 'b2bType',
+      label: 'B2B Type',
+      align: 'left',
+      enableSort: false,
+      format: (val: Product) => (
+        <Typography>{val.product_type.name}</Typography>
       ),
     },
     {
@@ -906,6 +926,27 @@ export default function InventoryPage() {
                             {...params}
                             name="grade"
                             placeholder="Select Grade"
+                            variant="outlined"
+                          />
+                        );
+                      }}
+                    />
+                  </FormLabel>
+                  <FormLabel text="B2B Type">
+                    <Autocomplete
+                      id="filterType"
+                      value={type}
+                      options={product.types || []}
+                      onChange={(e, value) => {
+                        handleChangeType(value);
+                      }}
+                      getOptionLabel={(option) => `${option.name}`}
+                      renderInput={(params) => {
+                        return (
+                          <TextField
+                            {...params}
+                            name="type"
+                            placeholder="Select Type"
                             variant="outlined"
                           />
                         );
