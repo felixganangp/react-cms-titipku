@@ -41,6 +41,7 @@ import ModalComp from 'components/Modal';
 import YellowToast from 'components/YellowToast';
 import { uiAction } from 'store/slice/ui';
 import { useNavigate } from 'react-router-dom';
+import digitFormatter from 'utils/digitFormatter';
 import {
   CardContainer,
   CategoryStyle,
@@ -335,6 +336,10 @@ export default function InventoryPage() {
     );
   };
 
+  const numberWithCommas = (x: number) => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
   const headCell: HeadCells<Product>[] = [
     {
       id: 'product_name',
@@ -411,7 +416,9 @@ export default function InventoryPage() {
       label: 'Weight ( Gram )',
       align: 'left',
       enableSort: false,
-      format: (val: Product) => <Typography>{val.stock}</Typography>,
+      format: (val: Product) => (
+        <Typography>{numberWithCommas(val.stock)}</Typography>
+      ),
     },
     {
       id: 'status',
