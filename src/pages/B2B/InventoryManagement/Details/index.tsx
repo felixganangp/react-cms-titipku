@@ -199,12 +199,14 @@ export default function InvoiceDetail() {
               </Typography>
               {product.loadingDetails ? (
                 <Skeleton width={50} height={25} />
+              ) : details?.product_parent?.product_parent_category ? (
+                details?.product_parent?.product_parent_category.map(
+                  (category) => (
+                    <Typography key={category.id}>{category.name}</Typography>
+                  ),
+                )
               ) : (
-                <Typography fontSize="14px">
-                  {details?.product_parent?.product_parent_category
-                    ? details?.product_parent?.product_parent_category[0].name
-                    : '-'}
-                </Typography>
+                <Typography>-</Typography>
               )}
             </Grid>
             <Grid item xs={4} lg={2.4}>
