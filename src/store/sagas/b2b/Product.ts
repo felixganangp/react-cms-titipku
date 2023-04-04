@@ -546,6 +546,10 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
       }),
     );
     if (dataForm.typeEdit !== 'normal') {
+      const paramsLogData: LogParams = yield select(
+        (state) => state.product.paramsLog,
+      );
+      yield put(productAction.fetchLog(paramsLogData));
       yield put(productAction.fetchDetails(dataForm.productList[0].id || 0));
     }
 
