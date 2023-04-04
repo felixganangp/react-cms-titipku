@@ -17,7 +17,7 @@ import { IsExistName } from 'service/B2B/ProductParent';
 import { Response } from 'models/fetch';
 import numberSeperator, { typeNumberValidate } from 'utils/numberSeperator';
 // icon
-import TrashIcon from 'components/Icon/Trash';
+// import TrashIcon from 'components/Icon/Trash';
 
 import useFormProduct from '../hooks/useFormProduct';
 import { SwitchStyle } from '../inventory.styled';
@@ -42,7 +42,6 @@ export default function Form(props: FormTypes) {
     loadingForm,
     handleSubmit,
     isEdit,
-    setTypeUpdate,
   } = useFormProduct(props);
 
   const indexGrade = formik.values.productList.findIndex(
@@ -59,14 +58,8 @@ export default function Form(props: FormTypes) {
         isCostume: true,
         currentID: formik.values.productList[1].grade.id,
       });
-      if (isEdit) {
-        setTypeUpdate('to-costume');
-      }
     } else {
       setCurrentGrade({ isCostume: false, currentID: 1 });
-      if (isEdit) {
-        setTypeUpdate('to-default');
-      }
     }
   };
 
@@ -176,7 +169,11 @@ export default function Form(props: FormTypes) {
             data-testid="form-category"
             id="category"
             multiple
-            options={categories}
+            options={
+              categories?.length > 0
+                ? categories.map((val) => ({ id: val.id, name: val.name }))
+                : []
+            }
             onChange={(e, value) => {
               formik.setFieldValue('category', value);
             }}
@@ -310,7 +307,7 @@ export default function Form(props: FormTypes) {
             name="lowStock"
             placeholder="Insert Low Stock (gram)"
             value={numberSeperator(
-              formik.values.productList[indexGrade].lowStock,
+              formik.values.productList[indexGrade]?.lowStock,
             )}
             onChange={(e) => {
               const product = formik.values.productList;
@@ -321,7 +318,7 @@ export default function Form(props: FormTypes) {
 
               formik.setFieldValue('productList', product);
             }}
-            disabled={!formik.values.productList[indexGrade].is_active}
+            disabled={!formik.values.productList[indexGrade]?.is_active}
             // onBlur={handleBlur}
             fullWidth
             InputProps={{
@@ -357,7 +354,9 @@ export default function Form(props: FormTypes) {
             type="text"
             name="stock"
             placeholder="Insert In Stock (gram)"
-            value={numberSeperator(formik.values.productList[indexGrade].stock)}
+            value={numberSeperator(
+              formik.values.productList[indexGrade]?.stock,
+            )}
             onChange={(e) => {
               const product = formik.values.productList;
               // eslint-disable-next-line radix
@@ -368,7 +367,7 @@ export default function Form(props: FormTypes) {
               formik.setFieldValue('productList', product);
             }}
             // onBlur={handleBlur}
-            disabled={!formik.values.productList[indexGrade].is_active}
+            disabled={!formik.values.productList[indexGrade]?.is_active}
             fullWidth
             InputProps={{
               endAdornment: (

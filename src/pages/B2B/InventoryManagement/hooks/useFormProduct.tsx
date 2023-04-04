@@ -39,9 +39,11 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
     isCostume: false,
     currentID: 1,
   });
-  const [typeUpdate, setTypeUpdate] = useState<
-    'normal' | 'to-costume' | 'to-default'
-  >('normal');
+
+  useEffect(() => {
+    dispatch(productAction.fetchGrade());
+    dispatch(productAction.fetchCategory());
+  }, []);
 
   // Close Modal
   useEffect(() => {
@@ -87,7 +89,7 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
           (val) => val.grade.id === EditProductParent?.product_grade_id,
         ),
         idParent: id,
-        typeEdit: 'normal',
+        typeEdit: EditProductParent ? 'details' : 'normal',
       }),
     );
   };
@@ -189,7 +191,9 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
         image: EditProductParent?.product_parent.image_filepath,
         name: EditProductParent?.product_parent.name,
         category:
-          EditProductParent?.product_parent.product_parent_category || [],
+          EditProductParent?.product_parent.product_parent_category?.map(
+            (val) => ({ id: val.id, name: val.name }),
+          ) || [],
         type: EditProductParent?.product_type,
       };
       formik.setValues(fieldValue);
@@ -219,6 +223,5 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
     loadingForm,
     handleSubmit,
     isEdit: Boolean(EditProductParent),
-    setTypeUpdate,
   };
 }
