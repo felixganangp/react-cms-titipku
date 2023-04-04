@@ -369,9 +369,14 @@ export default function Form(props: FormTypes) {
                   <span style={{ color: '#008e58' }}>
                     <b>
                       {numberSeperator(
-                        typeNumberValidate(
-                          formik.values.productList[indexGrade].stock as string,
-                        ) / 1000,
+                        (
+                          typeNumberValidate(
+                            formik.values.productList[indexGrade]
+                              .stock as string,
+                          ) / 1000
+                        )
+                          .toFixed(1)
+                          .replace(/\.?0+$/, ''),
                       )}
                     </b>{' '}
                     Kilogram
