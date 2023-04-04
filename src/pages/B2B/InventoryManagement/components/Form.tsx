@@ -224,21 +224,24 @@ export default function Form(props: FormTypes) {
             )}
           />
         </FormLabel>
-        <Stack
-          direction="row"
-          my={2}
-          p="10px 5px"
-          bgcolor={currentGrade.isCostume ? '#f1f1f1' : 'unset'}
-          justifyContent="space-between"
-        >
-          <Box display="flex" gap="20px" alignItems="center">
-            <SwitchStyle
-              checked={currentGrade.isCostume}
-              onChange={onOffCostumeGrade}
-            />
-            <Typography>Custom Grade</Typography>
-          </Box>
-        </Stack>
+        {!isEdit && (
+          <Stack
+            direction="row"
+            my={2}
+            p="10px 5px"
+            bgcolor={currentGrade.isCostume ? '#f1f1f1' : 'unset'}
+            justifyContent="space-between"
+          >
+            <Box display="flex" gap="20px" alignItems="center">
+              <SwitchStyle
+                checked={currentGrade.isCostume}
+                onChange={onOffCostumeGrade}
+              />
+              <Typography>Custom Grade</Typography>
+            </Box>
+          </Stack>
+        )}
+
         {/* GRADE LIST  */}
         <Collapse in={currentGrade.isCostume}>
           <Box overflow="auto" display="flex" width="100%">
@@ -251,18 +254,40 @@ export default function Form(props: FormTypes) {
                 bgcolor={
                   val.grade.id === currentGrade.currentID
                     ? '#aad9c7'
-                    : '#f8f8f8'
+                    : '#e4e4e4'
                 }
                 minWidth="100pxpx"
-                sx={{ cursor: 'pointer' }}
-                onClick={() =>
-                  setCurrentGrade({
-                    ...currentGrade,
-                    currentID: val.grade.id,
-                  })
-                }
+                sx={{
+                  cursor: isEdit
+                    ? `${
+                        currentGrade.currentID === val.grade.id
+                          ? 'pointer'
+                          : 'default'
+                      }`
+                    : 'pointer',
+                }}
+                onClick={() => {
+                  if (!isEdit) {
+                    setCurrentGrade({
+                      ...currentGrade,
+                      currentID: val.grade.id,
+                    });
+                  }
+                }}
               >
-                <Typography fontSize="14px" color="#005f3b" whiteSpace="nowrap">
+                <Typography
+                  fontSize="14px"
+                  color={
+                    isEdit
+                      ? `${
+                          currentGrade.currentID === val.grade.id
+                            ? '#005f3b'
+                            : '#fff'
+                        }`
+                      : '#005f3b'
+                  }
+                  whiteSpace="nowrap"
+                >
                   {val.grade.name}
                 </Typography>
               </Box>
@@ -391,13 +416,12 @@ export default function Form(props: FormTypes) {
         <FormLabel
           text="Description"
           // error={
-          //   (formik.touched?.productList ?? [])[indexGrade]?.description &&
-          //   Boolean((formik.errors?.productList ?? [])[indexGrade]?.description)
+          //   (touchedProductList?.stock || false) &&
+          //   Boolean((errorProductList ?? [])[indexGrade]?.stock)
           // }
           // helperText={
-          //   (formik.touched?.productList ?? [])[indexGrade]?.description &&
-          //   (formik.errors?.productList ?? [])[indexGrade]?.description &&
-          //   `${(formik.errors?.productList ?? [])[indexGrade]?.description}`
+          //   (touchedProductList?.stock || false) &&
+          //   `${(errorProductList ?? [])[indexGrade]?.stock || ''}`
           // }
         >
           <TextField
@@ -417,7 +441,7 @@ export default function Form(props: FormTypes) {
             fullWidth
           />
         </FormLabel>
-        {currentGrade.isCostume ? (
+        {/* {currentGrade.isCostume && !isEdit ? (
           <Box
             color="error.main"
             bgcolor="#f9ebe7"
@@ -463,7 +487,7 @@ export default function Form(props: FormTypes) {
           </Box>
         ) : (
           false
-        )}
+        )} */}
       </Box>
       <Box
         width="100%"

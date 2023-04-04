@@ -13,12 +13,13 @@ function addCommas(value: number | string) {
 }
 
 export const typeNumberValidate = (value: string) => {
-  if (value?.toString()?.split('.')?.length > 1) {
-    return parseFloat(value);
+  const number = value || '0';
+  if (number?.toString()?.split('.')?.length > 1) {
+    return parseFloat(number);
   }
 
   // eslint-disable-next-line radix
-  return parseInt(value);
+  return parseInt(number);
 };
 
 export default addCommas;

@@ -83,8 +83,11 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
     dispatch(
       productAction.updateProduct({
         ...value,
+        productList: value.productList.filter(
+          (val) => val.grade.id === EditProductParent?.product_grade_id,
+        ),
         idParent: id,
-        typeEdit: typeUpdate,
+        typeEdit: 'normal',
       }),
     );
   };
@@ -117,15 +120,16 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
             stock: yup
               .number()
               .typeError('stock is required')
-              .required('stock is required')
+              // .required('stock is required')
               .min(0, 'Please input positive value stock')
               .max(2147483647, 'Maximal stock is 2.147.483.647'),
             lowStock: yup
               .number()
               .typeError('stock is required')
-              .required('Low stock is required')
+              // .required('Low stock is required')
               .min(0, 'Please input positive value  low stock')
               .max(2147483647, 'Maximal low stock is 2.147.483.647'),
+            // description: yup.string().required('Please input  description'),
           }),
         )
         .required('Company is required'),
