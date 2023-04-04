@@ -374,7 +374,9 @@ export default function Form(props: FormTypes) {
                             formik.values.productList[indexGrade]
                               .stock as string,
                           ) / 1000
-                        ).toFixed(1),
+                        )
+                          .toFixed(1)
+                          .replace(/\.?0+$/, ''),
                       )}
                     </b>{' '}
                     Kilogram
