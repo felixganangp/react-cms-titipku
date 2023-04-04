@@ -421,7 +421,7 @@ export default function InventoryPage() {
       format: (val: Product) => {
         let productStatus = 0;
         if (!val.is_active) productStatus = 0;
-        else if (val.stock === 0) productStatus = 1;
+        else if (val.stock <= 0) productStatus = 1;
         else if (val.stock <= val.low_stock_limit) productStatus = 2;
         else productStatus = 3;
         return (
