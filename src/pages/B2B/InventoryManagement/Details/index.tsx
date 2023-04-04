@@ -279,6 +279,7 @@ export default function InvoiceDetail() {
             formProductModal.closeModal();
           }}
           EditProductParent={details}
+          isDetail
         />
       </ModalComp>
     </Box>

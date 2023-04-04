@@ -12,6 +12,7 @@ import { ListResponse } from 'models/fetch';
 interface FormTypes {
   onClose: () => void;
   EditProductParent: null | Product;
+  isDetail?: boolean;
 }
 const initialValues: FormInventoryTypes = {
   image: '',
@@ -30,7 +31,11 @@ const initialValues: FormInventoryTypes = {
   ],
 };
 
-export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
+export default function FormProduct({
+  onClose,
+  EditProductParent,
+  isDetail,
+}: FormTypes) {
   const dispatch = useAppDispatch();
   const { categories, types, grades, isSuccessCreate, loadingForm } =
     useAppSelector((state) => state.product);
@@ -89,7 +94,7 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
           (val) => val.grade.id === EditProductParent?.product_grade_id,
         ),
         idParent: id,
-        typeEdit: EditProductParent ? 'details' : 'normal',
+        typeEdit: isDetail ? 'details' : 'normal',
       }),
     );
   };
