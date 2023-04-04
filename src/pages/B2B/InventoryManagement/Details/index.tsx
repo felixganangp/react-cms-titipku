@@ -9,6 +9,7 @@ import ModalComp from 'components/Modal';
 import useModal from 'hooks/useModal';
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import YellowToast from 'components/YellowToast';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
@@ -25,6 +26,10 @@ export default function InvoiceDetail() {
   const details = useAppSelector((state) => state.product.details);
   const { id } = useParams();
   const formProductModal = useModal();
+
+  useEffect(() => {
+    dispatch(productAction.fetchGrade());
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -247,6 +252,7 @@ export default function InvoiceDetail() {
         </Box>
       </CardContainer>
       <Box my="10px" />
+      <YellowToast />
       <CardContainer>
         <Box p="16px">
           <Table
