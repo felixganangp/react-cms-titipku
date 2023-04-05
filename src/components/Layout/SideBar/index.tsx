@@ -25,13 +25,13 @@ const drawerWidthClose =
 
 export const sidebarData: FilteredMenu[] = [
   {
-    id: 56,
+    id: 51,
     title: 'B2B',
     path: '',
     icon: <B2B />,
     child: [
       {
-        id: 57,
+        id: 52,
         title: 'Inventory Management',
         path: '/b2b/inventory',
         child: [],
