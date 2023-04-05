@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable radix */
 import React, { useEffect } from 'react';
@@ -36,8 +37,8 @@ export default function RawForm({ onClose, data }: RawProps) {
     name: data ? data.product_parent.name : '',
     category:
       data && data.product_parent.product_parent_category
-        ? data.product_parent.product_parent_category[0]
-        : null,
+        ? data.product_parent.product_parent_category
+        : [],
     stock: data ? data.stock.toString() : '',
     description: data ? data.description : '',
   };
@@ -46,7 +47,7 @@ export default function RawForm({ onClose, data }: RawProps) {
   const initialValues: InitialCreateRaw = {
     file: '',
     name: '',
-    category: null,
+    category: [],
     stock: '',
     description: '',
   };
@@ -61,7 +62,10 @@ export default function RawForm({ onClose, data }: RawProps) {
               description: values.description,
               stock: Number(parseFloat(values.stock.split('.').join(''))),
               name: values.name,
-              category_id: values.category?.id || 0,
+              category_ids:
+                values.category.length > 0
+                  ? values.category.map(({ id }) => id)
+                  : [],
               image: values.file,
               is_active: data.is_active,
               is_exist: data.is_exist,
@@ -75,7 +79,10 @@ export default function RawForm({ onClose, data }: RawProps) {
             description: values.description,
             stock: Number(parseFloat(values.stock.split('.').join(''))),
             name: values.name,
-            category_id: values.category?.id || 0,
+            category_ids:
+              values.category.length > 0
+                ? values.category.map(({ id }) => id)
+                : [],
             image: values.file,
           }),
         );
@@ -206,11 +213,12 @@ export default function RawForm({ onClose, data }: RawProps) {
           >
             <Autocomplete
               options={categories}
+              multiple
               onChange={(e, value) => {
                 setFieldValue('category', value);
               }}
-              isOptionEqualToValue={(option: Category) => {
-                return option.id === values.category?.id;
+              isOptionEqualToValue={(option, values) => {
+                return option.id === values.id;
               }}
               getOptionLabel={(option: Category) => `${option.name}`}
               value={values.category}

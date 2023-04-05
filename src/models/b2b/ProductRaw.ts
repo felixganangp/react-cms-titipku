@@ -34,7 +34,7 @@ export interface RawDisplayFilter {
 export interface InitialCreateRaw {
   file: string | File | Blob;
   name: string;
-  category: Category | null;
+  category: Category[];
   stock: string;
   description: string;
 }
@@ -43,7 +43,7 @@ export interface CreateRawSaga {
   description: string;
   stock: number;
   name: string;
-  category_id: number;
+  category_ids: number[];
   image: string | Blob;
   parent_id?: number;
   is_active?: boolean;

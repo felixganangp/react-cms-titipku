@@ -88,7 +88,7 @@ function* createRaw(payload: PayloadAction<CreateRawSaga>) {
 
     // create product raw
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const { description, stock, name, category_id } = payload.payload;
+    const { description, stock, name, category_ids } = payload.payload;
     const payloadRaw: CreateRawService = {
       description,
       stock,
@@ -96,7 +96,7 @@ function* createRaw(payload: PayloadAction<CreateRawSaga>) {
       product_parent: {
         name,
         image_filepath: uploadImageRes.data,
-        product_parent_category_id: [category_id],
+        product_parent_category_id: category_ids,
       },
     };
     yield call(service.create, payloadRaw);
@@ -143,7 +143,7 @@ function* updateRaw(
       description,
       stock,
       name,
-      category_id,
+      category_ids,
       image,
       parent_id,
       is_active,
@@ -173,7 +173,7 @@ function* updateRaw(
     const payloadParent: CreateProduct = {
       name,
       image_filepath: imagePath,
-      product_parent_category_id: [category_id],
+      product_parent_category_id: category_ids,
     };
     yield call(updateProduct, { id: parent_id || 0, payload: payloadParent });
     // update product raw
