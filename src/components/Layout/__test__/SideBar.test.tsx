@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { store } from 'store';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
 import ManageAccountIcon from '@mui/icons-material/ManageAccountsOutlined';
+import B2B from 'components/Icon/B2B';
 import ChildrenMenu from '../SideBar/ChildMenu';
 
 afterEach(() => {
@@ -12,6 +13,20 @@ afterEach(() => {
 });
 
 const menuList = [
+  {
+    id: 56,
+    title: 'B2B',
+    path: '',
+    icon: <B2B />,
+    child: [
+      {
+        id: 57,
+        title: 'Inventory Management',
+        path: '/b2b/inventory',
+        child: [],
+      },
+    ],
+  },
   {
     id: 48,
     title: 'KUR',

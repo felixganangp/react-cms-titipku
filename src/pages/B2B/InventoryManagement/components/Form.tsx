@@ -17,7 +17,7 @@ import { IsExistName } from 'service/B2B/ProductParent';
 import { Response } from 'models/fetch';
 import numberSeperator, { typeNumberValidate } from 'utils/numberSeperator';
 // icon
-import TrashIcon from 'components/Icon/Trash';
+// import TrashIcon from 'components/Icon/Trash';
 
 import useFormProduct from '../hooks/useFormProduct';
 import { SwitchStyle } from '../inventory.styled';
@@ -29,6 +29,7 @@ interface TypesError {
 interface FormTypes {
   onClose: () => void;
   EditProductParent: Product | null;
+  isDetail?: boolean;
 }
 
 export default function Form(props: FormTypes) {
@@ -42,7 +43,6 @@ export default function Form(props: FormTypes) {
     loadingForm,
     handleSubmit,
     isEdit,
-    setTypeUpdate,
   } = useFormProduct(props);
 
   const indexGrade = formik.values.productList.findIndex(
@@ -59,14 +59,8 @@ export default function Form(props: FormTypes) {
         isCostume: true,
         currentID: formik.values.productList[1].grade.id,
       });
-      if (isEdit) {
-        setTypeUpdate('to-costume');
-      }
     } else {
       setCurrentGrade({ isCostume: false, currentID: 1 });
-      if (isEdit) {
-        setTypeUpdate('to-default');
-      }
     }
   };
 
@@ -176,13 +170,17 @@ export default function Form(props: FormTypes) {
             data-testid="form-category"
             id="category"
             multiple
-            options={categories}
+            options={
+              categories?.length > 0
+                ? categories.map((val) => ({ id: val.id, name: val.name }))
+                : []
+            }
             onChange={(e, value) => {
               formik.setFieldValue('category', value);
             }}
-            // isOptionEqualToValue={(option: Type) => {
-            //   return option.id === values.kurType?.id;
-            // }}
+            isOptionEqualToValue={(option, values) => {
+              return option.id === values.id;
+            }}
             getOptionLabel={(option) => `${option.name}`}
             value={formik.values.category}
             renderInput={(params) => (
@@ -224,21 +222,24 @@ export default function Form(props: FormTypes) {
             )}
           />
         </FormLabel>
-        <Stack
-          direction="row"
-          my={2}
-          p="10px 5px"
-          bgcolor={currentGrade.isCostume ? '#f1f1f1' : 'unset'}
-          justifyContent="space-between"
-        >
-          <Box display="flex" gap="20px" alignItems="center">
-            <SwitchStyle
-              checked={currentGrade.isCostume}
-              onChange={onOffCostumeGrade}
-            />
-            <Typography>Custom Grade</Typography>
-          </Box>
-        </Stack>
+        {!isEdit && (
+          <Stack
+            direction="row"
+            my={2}
+            p="10px 5px"
+            bgcolor={currentGrade.isCostume ? '#f1f1f1' : 'unset'}
+            justifyContent="space-between"
+          >
+            <Box display="flex" gap="20px" alignItems="center">
+              <SwitchStyle
+                checked={currentGrade.isCostume}
+                onChange={onOffCostumeGrade}
+              />
+              <Typography>Custom Grade</Typography>
+            </Box>
+          </Stack>
+        )}
+
         {/* GRADE LIST  */}
         <Collapse in={currentGrade.isCostume}>
           <Box overflow="auto" display="flex" width="100%">
@@ -251,18 +252,40 @@ export default function Form(props: FormTypes) {
                 bgcolor={
                   val.grade.id === currentGrade.currentID
                     ? '#aad9c7'
-                    : '#f8f8f8'
+                    : '#e4e4e4'
                 }
                 minWidth="100pxpx"
-                sx={{ cursor: 'pointer' }}
-                onClick={() =>
-                  setCurrentGrade({
-                    ...currentGrade,
-                    currentID: val.grade.id,
-                  })
-                }
+                sx={{
+                  cursor: isEdit
+                    ? `${
+                        currentGrade.currentID === val.grade.id
+                          ? 'pointer'
+                          : 'default'
+                      }`
+                    : 'pointer',
+                }}
+                onClick={() => {
+                  if (!isEdit) {
+                    setCurrentGrade({
+                      ...currentGrade,
+                      currentID: val.grade.id,
+                    });
+                  }
+                }}
               >
-                <Typography fontSize="14px" color="#005f3b" whiteSpace="nowrap">
+                <Typography
+                  fontSize="14px"
+                  color={
+                    isEdit
+                      ? `${
+                          currentGrade.currentID === val.grade.id
+                            ? '#005f3b'
+                            : '#fff'
+                        }`
+                      : '#005f3b'
+                  }
+                  whiteSpace="nowrap"
+                >
                   {val.grade.name}
                 </Typography>
               </Box>
@@ -285,7 +308,7 @@ export default function Form(props: FormTypes) {
             name="lowStock"
             placeholder="Insert Low Stock (gram)"
             value={numberSeperator(
-              formik.values.productList[indexGrade].lowStock,
+              formik.values.productList[indexGrade]?.lowStock,
             )}
             onChange={(e) => {
               const product = formik.values.productList;
@@ -296,7 +319,7 @@ export default function Form(props: FormTypes) {
 
               formik.setFieldValue('productList', product);
             }}
-            disabled={!formik.values.productList[indexGrade].is_active}
+            disabled={!formik.values.productList[indexGrade]?.is_active}
             // onBlur={handleBlur}
             fullWidth
             InputProps={{
@@ -332,7 +355,9 @@ export default function Form(props: FormTypes) {
             type="text"
             name="stock"
             placeholder="Insert In Stock (gram)"
-            value={numberSeperator(formik.values.productList[indexGrade].stock)}
+            value={numberSeperator(
+              formik.values.productList[indexGrade]?.stock,
+            )}
             onChange={(e) => {
               const product = formik.values.productList;
               // eslint-disable-next-line radix
@@ -343,7 +368,7 @@ export default function Form(props: FormTypes) {
               formik.setFieldValue('productList', product);
             }}
             // onBlur={handleBlur}
-            disabled={!formik.values.productList[indexGrade].is_active}
+            disabled={!formik.values.productList[indexGrade]?.is_active}
             fullWidth
             InputProps={{
               endAdornment: (
@@ -391,13 +416,12 @@ export default function Form(props: FormTypes) {
         <FormLabel
           text="Description"
           // error={
-          //   (formik.touched?.productList ?? [])[indexGrade]?.description &&
-          //   Boolean((formik.errors?.productList ?? [])[indexGrade]?.description)
+          //   (touchedProductList?.stock || false) &&
+          //   Boolean((errorProductList ?? [])[indexGrade]?.stock)
           // }
           // helperText={
-          //   (formik.touched?.productList ?? [])[indexGrade]?.description &&
-          //   (formik.errors?.productList ?? [])[indexGrade]?.description &&
-          //   `${(formik.errors?.productList ?? [])[indexGrade]?.description}`
+          //   (touchedProductList?.stock || false) &&
+          //   `${(errorProductList ?? [])[indexGrade]?.stock || ''}`
           // }
         >
           <TextField
@@ -417,7 +441,7 @@ export default function Form(props: FormTypes) {
             fullWidth
           />
         </FormLabel>
-        {currentGrade.isCostume ? (
+        {/* {currentGrade.isCostume && !isEdit ? (
           <Box
             color="error.main"
             bgcolor="#f9ebe7"
@@ -463,7 +487,7 @@ export default function Form(props: FormTypes) {
           </Box>
         ) : (
           false
-        )}
+        )} */}
       </Box>
       <Box
         width="100%"

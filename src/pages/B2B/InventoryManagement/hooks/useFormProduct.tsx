@@ -12,6 +12,7 @@ import { ListResponse } from 'models/fetch';
 interface FormTypes {
   onClose: () => void;
   EditProductParent: null | Product;
+  isDetail?: boolean;
 }
 const initialValues: FormInventoryTypes = {
   image: '',
@@ -30,7 +31,11 @@ const initialValues: FormInventoryTypes = {
   ],
 };
 
-export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
+export default function FormProduct({
+  onClose,
+  EditProductParent,
+  isDetail,
+}: FormTypes) {
   const dispatch = useAppDispatch();
   const { categories, types, grades, isSuccessCreate, loadingForm } =
     useAppSelector((state) => state.product);
@@ -39,9 +44,11 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
     isCostume: false,
     currentID: 1,
   });
-  const [typeUpdate, setTypeUpdate] = useState<
-    'normal' | 'to-costume' | 'to-default'
-  >('normal');
+
+  useEffect(() => {
+    dispatch(productAction.fetchGrade());
+    dispatch(productAction.fetchCategory());
+  }, []);
 
   // Close Modal
   useEffect(() => {
@@ -83,8 +90,11 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
     dispatch(
       productAction.updateProduct({
         ...value,
+        productList: value.productList.filter(
+          (val) => val.grade.id === EditProductParent?.product_grade_id,
+        ),
         idParent: id,
-        typeEdit: typeUpdate,
+        typeEdit: isDetail ? 'details' : 'normal',
       }),
     );
   };
@@ -117,15 +127,16 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
             stock: yup
               .number()
               .typeError('stock is required')
-              .required('stock is required')
+              // .required('stock is required')
               .min(0, 'Please input positive value stock')
               .max(2147483647, 'Maximal stock is 2.147.483.647'),
             lowStock: yup
               .number()
               .typeError('stock is required')
-              .required('Low stock is required')
+              // .required('Low stock is required')
               .min(0, 'Please input positive value  low stock')
               .max(2147483647, 'Maximal low stock is 2.147.483.647'),
+            // description: yup.string().required('Please input  description'),
           }),
         )
         .required('Company is required'),
@@ -185,7 +196,9 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
         image: EditProductParent?.product_parent.image_filepath,
         name: EditProductParent?.product_parent.name,
         category:
-          EditProductParent?.product_parent.product_parent_category || [],
+          EditProductParent?.product_parent.product_parent_category?.map(
+            (val) => ({ id: val.id, name: val.name }),
+          ) || [],
         type: EditProductParent?.product_type,
       };
       formik.setValues(fieldValue);
@@ -215,6 +228,5 @@ export default function FormProduct({ onClose, EditProductParent }: FormTypes) {
     loadingForm,
     handleSubmit,
     isEdit: Boolean(EditProductParent),
-    setTypeUpdate,
   };
 }

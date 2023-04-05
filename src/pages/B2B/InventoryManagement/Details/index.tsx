@@ -9,6 +9,7 @@ import ModalComp from 'components/Modal';
 import useModal from 'hooks/useModal';
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import YellowToast from 'components/YellowToast';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
@@ -26,6 +27,10 @@ export default function InvoiceDetail() {
   const details = useAppSelector((state) => state.product.details);
   const { id } = useParams();
   const formProductModal = useModal();
+
+  useEffect(() => {
+    dispatch(productAction.fetchGrade());
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -215,12 +220,16 @@ export default function InvoiceDetail() {
               </Typography>
               {product.loadingDetails ? (
                 <Skeleton width={50} height={25} />
+              ) : details?.product_parent?.product_parent_category ? (
+                details?.product_parent?.product_parent_category.map(
+                  (category) => (
+                    <Typography fontSize="14px" key={category.id}>
+                      {category.name}
+                    </Typography>
+                  ),
+                )
               ) : (
-                <Typography fontSize="14px">
-                  {details?.product_parent?.product_parent_category
-                    ? details?.product_parent?.product_parent_category[0].name
-                    : '-'}
-                </Typography>
+                <Typography fontSize="14px">-</Typography>
               )}
             </Grid>
 
@@ -272,7 +281,7 @@ export default function InvoiceDetail() {
                 status={
                   !details?.is_active
                     ? 0
-                    : details?.stock === 0
+                    : details?.stock <= 0
                     ? 1
                     : details?.stock <= details?.low_stock_limit
                     ? 2
@@ -281,7 +290,7 @@ export default function InvoiceDetail() {
               >
                 {!details?.is_active
                   ? 'Inactive'
-                  : details?.stock === 0
+                  : details?.stock <= 0
                   ? 'Habis'
                   : details?.stock <= details?.low_stock_limit
                   ? 'Hampir Habis'
@@ -292,6 +301,7 @@ export default function InvoiceDetail() {
         </Box>
       </CardContainer>
       <Box my="10px" />
+      <YellowToast />
       <CardContainer>
         <Box p="16px">
           <Table
@@ -318,6 +328,7 @@ export default function InvoiceDetail() {
             formProductModal.closeModal();
           }}
           EditProductParent={details}
+          isDetail
         />
       </ModalComp>
     </Box>

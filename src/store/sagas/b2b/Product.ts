@@ -518,64 +518,12 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
       payload: payloadProductPerant,
     });
     const callPromise: any = call;
-    if (dataForm.typeEdit === 'normal') {
-      yield all(
-        dataForm.productList.map((val) => {
-          if (val.id) {
-            return callPromise(service.updateProduct, {
-              id: val.id,
-              data: {
-                product_type_id: dataForm.type?.id || 0,
-                product_parent_id: dataForm.idParent,
-                product_grade_id: val.grade?.id || 0,
-                description: val.description,
-                stock: typeNumberValidate(val.stock as string),
-                low_stock_limit: typeNumberValidate(val.lowStock as string),
-                is_exist: val.is_exist,
-                is_active: val.is_active,
-              },
-            });
-          }
-          return () => {};
-        }),
-      );
-      yield put(
-        uiAction.openYellowToast({
-          totalItem: dataForm.productList.length,
-          additionalMsg: '',
-          action: 'successfully updated!',
-          error: false,
-          noUndo: true,
-        }),
-      );
-    }
-
-    if (dataForm.typeEdit === 'to-costume') {
-      yield all(
-        dataForm.productList.map((val) => {
-          if (val.grade.id === 1 && val.id) {
-            return callPromise(service.deleteProduct, {
-              is_exist: false,
-              ids: [val.id],
-            });
-          }
-          if (val.id) {
-            return callPromise(service.updateProduct, {
-              id: val.id,
-              data: {
-                product_type_id: dataForm.type?.id || 0,
-                product_parent_id: dataForm.idParent,
-                product_grade_id: val.grade?.id || 0,
-                description: val.description,
-                stock: typeNumberValidate(val.stock as string),
-                low_stock_limit: typeNumberValidate(val.lowStock as string),
-                is_exist: val.is_exist,
-                is_active: val.is_active,
-              },
-            });
-          }
-          if (val.is_exist) {
-            return callPromise(service.createProduct, {
+    yield all(
+      dataForm.productList.map((val) => {
+        if (val.id) {
+          return callPromise(service.updateProduct, {
+            id: val.id,
+            data: {
               product_type_id: dataForm.type?.id || 0,
               product_parent_id: dataForm.idParent,
               product_grade_id: val.grade?.id || 0,
@@ -584,71 +532,27 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
               low_stock_limit: typeNumberValidate(val.lowStock as string),
               is_exist: val.is_exist,
               is_active: val.is_active,
-            });
-          }
-          return () => {};
-        }),
-      );
-      yield put(
-        uiAction.openYellowToast({
-          totalItem: 1,
-          additionalMsg: '',
-          action: 'successfully updated!',
-          error: false,
-          noUndo: true,
-        }),
-      );
-    }
-    if (dataForm.typeEdit === 'to-default') {
-      const idTodelete = dataForm.productList
-        .filter((val) => val.grade.id !== 1 && val.id)
-        .map((val) => val.id) as number[];
-
-      yield call(service.deleteProduct, {
-        is_exist: false,
-        ids: idTodelete,
-      });
-
-      yield all(
-        dataForm.productList
-          .filter((val) => val.grade.id === 1)
-          .map((val) => {
-            if (val.id) {
-              return callPromise(service.updateProduct, {
-                id: val.id,
-                data: {
-                  product_type_id: dataForm.type?.id || 0,
-                  product_parent_id: dataForm.idParent,
-                  product_grade_id: val.grade?.id || 0,
-                  description: val.description,
-                  stock: typeNumberValidate(val.stock as string),
-                  low_stock_limit: typeNumberValidate(val.lowStock as string),
-                  is_exist: true,
-                  is_active: true,
-                },
-              });
-            }
-            return callPromise(service.createProduct, {
-              product_type_id: dataForm.type?.id || 0,
-              product_parent_id: dataForm.idParent,
-              product_grade_id: val.grade?.id || 0,
-              description: val.description,
-              stock: typeNumberValidate(val.stock as string),
-              low_stock_limit: typeNumberValidate(val.lowStock as string),
-              is_exist: true,
-              is_active: true,
-            });
-          }),
-      );
-      yield put(
-        uiAction.openYellowToast({
-          totalItem: 1,
-          additionalMsg: '',
-          action: 'successfully updated!',
-          error: false,
-          noUndo: true,
-        }),
-      );
+            },
+          });
+        }
+        return () => {};
+      }),
+    );
+    yield put(
+      uiAction.openYellowToast({
+        totalItem: dataForm.productList.length,
+        additionalMsg: '',
+        action: 'successfully updated!',
+        error: false,
+        noUndo: true,
+      }),
+    );
+    const paramsLogData: LogParams = yield select(
+      (state) => state.product.paramsLog,
+    );
+    if (dataForm.typeEdit === 'details' && paramsLogData) {
+      yield put(productAction.fetchLog(paramsLogData));
+      yield put(productAction.fetchDetails(dataForm.productList[0].id || 0));
     }
 
     yield put(productAction.updateProductSuccess());
@@ -656,7 +560,6 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
     yield put(productAction.fetchData(filter));
     // yield put(productAction.resetProductForm());
   } catch (err) {
-    console.log(err);
     if (typeof err === 'string') {
       const error = err as string;
       yield put(

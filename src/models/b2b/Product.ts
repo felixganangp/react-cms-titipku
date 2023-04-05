@@ -68,7 +68,7 @@ export interface FormInventoryTypes {
   idParent?: number;
   image: string | Blob;
   name: string;
-  category: Category[];
+  category: { id: number; name: string }[];
   type: null | ProductType;
   productList: {
     id?: number;
@@ -79,7 +79,7 @@ export interface FormInventoryTypes {
     is_exist: boolean;
     is_active: boolean;
   }[];
-  typeEdit?: 'normal' | 'to-costume' | 'to-default';
+  typeEdit?: 'normal' | 'details';
 }
 export interface ChangeStatusParams {
   existingStatus: IsActiveType[];

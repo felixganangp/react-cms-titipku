@@ -346,6 +346,10 @@ export default function InventoryPage() {
     );
   };
 
+  const numberWithCommas = (x: number) => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
   const headCell: HeadCells<Product>[] = [
     {
       id: 'product_name',
@@ -431,7 +435,9 @@ export default function InventoryPage() {
       label: 'Weight ( Gram )',
       align: 'left',
       enableSort: false,
-      format: (val: Product) => <Typography>{val.stock}</Typography>,
+      format: (val: Product) => (
+        <Typography>{numberWithCommas(val.stock)}</Typography>
+      ),
     },
     {
       id: 'status',
@@ -441,7 +447,7 @@ export default function InventoryPage() {
       format: (val: Product) => {
         let productStatus = 0;
         if (!val.is_active) productStatus = 0;
-        else if (val.stock === 0) productStatus = 1;
+        else if (val.stock <= 0) productStatus = 1;
         else if (val.stock <= val.low_stock_limit) productStatus = 2;
         else productStatus = 3;
         return (
