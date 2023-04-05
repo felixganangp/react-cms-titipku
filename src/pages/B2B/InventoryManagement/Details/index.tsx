@@ -15,7 +15,6 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
 import { Log } from 'models/b2b/Product';
 import NoImage from 'assets/no-image.svg';
-import digitFormatter from 'utils/digitFormatter';
 import { CardContainer, GradingColor, StatusColor } from '../inventory.styled';
 import Form from '../components/Form';
 
@@ -124,6 +123,11 @@ export default function InvoiceDetail() {
       ),
     },
   ];
+
+  const numberWithCommas = (x: number) => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <CardContainer>
@@ -252,7 +256,7 @@ export default function InvoiceDetail() {
                 <Skeleton width={50} height={25} />
               ) : (
                 <Typography fontSize="14px">
-                  {details ? digitFormatter.format(details?.stock) : 0} gram
+                  {details ? numberWithCommas(details?.stock) : 0} gram
                 </Typography>
               )}
             </Grid>
@@ -265,9 +269,7 @@ export default function InvoiceDetail() {
                 <Skeleton width={50} height={25} />
               ) : (
                 <Typography fontSize="14px">
-                  {details
-                    ? digitFormatter.format(details?.low_stock_limit)
-                    : 0}{' '}
+                  {details ? numberWithCommas(details?.low_stock_limit) : 0}{' '}
                   gram
                 </Typography>
               )}
