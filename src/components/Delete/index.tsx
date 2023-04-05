@@ -2,30 +2,30 @@ import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 
 interface ChangeStatusProps {
-  totalItem: number;
-  selectedProduct: string;
+  total: number;
+  selectedItemDesc: string;
   onSubmit: () => void;
   onClose: () => void;
 }
 
 export default function Delete({
-  totalItem,
-  selectedProduct,
+  total,
+  selectedItemDesc,
   onSubmit,
   onClose,
 }: ChangeStatusProps) {
   const getHeader = () =>
-    totalItem > 1 ? `Delete ${totalItem} Items?` : `Delete ${selectedProduct}?`;
+    total > 1 ? `Delete ${total} Items?` : `Delete ${selectedItemDesc}?`;
 
   const getDescription = () =>
-    totalItem > 1 ? (
+    total > 1 ? (
       <>
-        You are about to delete: <b>{selectedProduct}.</b> <br />
+        You are about to delete: <b>{selectedItemDesc}.</b> <br />
         Are you sure you want to proceed? This action cannot be undone.
       </>
     ) : (
       <>
-        You will need to recreate <b>{selectedProduct}</b> when you need this
+        You will need to recreate <b>{selectedItemDesc}</b> when you need this
         item in the future.
       </>
     );

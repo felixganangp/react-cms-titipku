@@ -15,6 +15,7 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
 import { Log } from 'models/b2b/Product';
 import NoImage from 'assets/no-image.svg';
+import digitFormatter from 'utils/digitFormatter';
 import { CardContainer, GradingColor, StatusColor } from '../inventory.styled';
 import Form from '../components/Form';
 
@@ -173,7 +174,7 @@ export default function InvoiceDetail() {
             </Button>
           </Stack>
 
-          <Grid container mt="30px" mx="10px" mb="10px">
+          <Grid container mt="30px" mx="10px" mb="10px" rowGap="30px">
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 Product Name (SKU)
@@ -186,9 +187,23 @@ export default function InvoiceDetail() {
                 </Typography>
               )}
             </Grid>
+
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
-                Grade
+                B2B Type
+              </Typography>
+              {product.loadingDetails ? (
+                <Skeleton width={50} height={25} />
+              ) : (
+                <Typography fontSize="14px">
+                  {details?.product_type.name}
+                </Typography>
+              )}
+            </Grid>
+
+            <Grid item xs={4} lg={2.4}>
+              <Typography fontSize="14px" color="#0661ae">
+                Product Grade
               </Typography>
               {product.loadingDetails ? (
                 <Skeleton width={50} height={25} />
@@ -198,6 +213,7 @@ export default function InvoiceDetail() {
                 </GradingColor>
               )}
             </Grid>
+
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 Category
@@ -216,18 +232,47 @@ export default function InvoiceDetail() {
                 <Typography fontSize="14px">-</Typography>
               )}
             </Grid>
+
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
-                Weight
+                Description
+              </Typography>
+              {product.loadingDetails ? (
+                <Skeleton width={50} height={25} />
+              ) : (
+                <Typography fontSize="14px">{details?.description}</Typography>
+              )}
+            </Grid>
+
+            <Grid item xs={4} lg={2.4}>
+              <Typography fontSize="14px" color="#0661ae">
+                In Stock
               </Typography>
               {product.loadingDetails ? (
                 <Skeleton width={50} height={25} />
               ) : (
                 <Typography fontSize="14px">
-                  {details ? details?.stock / 1000 : 0} Kg
+                  {details ? digitFormatter.format(details?.stock) : 0} gram
                 </Typography>
               )}
             </Grid>
+
+            <Grid item xs={4} lg={2.4}>
+              <Typography fontSize="14px" color="#0661ae">
+                Low Stock Alerts
+              </Typography>
+              {product.loadingDetails ? (
+                <Skeleton width={50} height={25} />
+              ) : (
+                <Typography fontSize="14px">
+                  {details
+                    ? digitFormatter.format(details?.low_stock_limit)
+                    : 0}{' '}
+                  gram
+                </Typography>
+              )}
+            </Grid>
+
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 Status
