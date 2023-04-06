@@ -6,7 +6,7 @@ import { uiAction } from 'store/slice/ui';
 
 export interface YellowToastProps {
   open?: boolean;
-  totalItem: number;
+  totalItem?: number;
   additionalMsg?: string;
   action: string;
   error: boolean;
@@ -45,21 +45,38 @@ export default function YellowToast() {
         justifyContent="flex-start"
         alignItems="center"
       >
-        <Typography fontSize="16px">
-          <b>{totalItem}</b> Item{totalItem > 1 ? 's' : ''}{' '}
-          {`${additionalMsg ? `${additionalMsg} ` : ''}`}
-        </Typography>
-        <Typography
-          fontSize="16px"
-          fontWeight="600"
-          color={error ? '#bf370c' : '#269946'}
-        >
-          &nbsp;{action.charAt(0).toUpperCase() + action.slice(1)}
-        </Typography>
-        {!noUndo && (
-          <Typography onClick={onUndoAction} sx={{ cursor: 'pointer' }}>
-            &nbsp;<u>Undo</u>
-          </Typography>
+        {totalItem ? (
+          <>
+            <Typography fontSize="16px">
+              <b>{totalItem}</b> Item{totalItem > 1 ? 's' : ''}{' '}
+              {`${additionalMsg ? `${additionalMsg} ` : ''}`}
+            </Typography>
+            <Typography
+              fontSize="16px"
+              fontWeight="600"
+              color={error ? '#bf370c' : '#269946'}
+            >
+              &nbsp;{action.charAt(0).toUpperCase() + action.slice(1)}
+            </Typography>
+            {!noUndo && (
+              <Typography onClick={onUndoAction} sx={{ cursor: 'pointer' }}>
+                &nbsp;<u>Undo</u>
+              </Typography>
+            )}
+          </>
+        ) : (
+          <>
+            <Typography
+              fontSize="16px"
+              fontWeight="600"
+              color={error ? '#bf370c' : '#269946'}
+            >
+              {action.charAt(0).toUpperCase() + action.slice(1)}&nbsp;
+            </Typography>
+            <Typography fontSize="16px">
+              {`${additionalMsg ? `${additionalMsg} ` : ''}`}
+            </Typography>
+          </>
         )}
       </Box>
       <IconButton>

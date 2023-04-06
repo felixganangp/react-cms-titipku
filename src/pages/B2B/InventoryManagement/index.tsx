@@ -178,6 +178,15 @@ export default function InventoryPage() {
 
   const handleSubmitMoveToStock = async () => {
     await dispatch(productAction.moveStock(payloadMoveStock));
+    await dispatch(
+      uiAction.openYellowToast({
+        // totalItem,
+        additionalMsg: `moved stock to [${selectedProductMoveStock[0].product_grade.name}] [${selectedProductMoveStock[0].product_type.name}] ${selectedProductMoveStock[0].product_parent.name}`,
+        action: 'Successfully',
+        error: false,
+        noUndo: true,
+      }),
+    );
     stockOpnameModal.closeModal();
     listProductModal.closeModal();
     moveStockFormModal.closeModal();
