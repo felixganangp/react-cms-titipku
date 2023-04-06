@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable radix */
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import {
   Autocomplete,
   Box,
@@ -21,6 +21,7 @@ import { Category } from 'models/b2b/Category';
 import { NumberFormatValues, NumericFormat } from 'react-number-format';
 import { rawAction } from 'store/slice/b2b/ProductRaw';
 import { uiAction } from 'store/slice/ui';
+import { debounce } from 'lodash';
 
 interface RawProps {
   onClose: () => void;
@@ -31,6 +32,7 @@ export default function RawForm({ onClose, data }: RawProps) {
   const dispatch = useAppDispatch();
   const raw = useAppSelector((state) => state.raw);
   const categories = useAppSelector((state) => state.raw.categories);
+  const isNameExist = useAppSelector((state) => state.raw.isNameExist);
 
   const editValue: InitialCreateRaw = {
     file: data ? data.product_parent.image_filepath : '',
@@ -70,6 +72,8 @@ export default function RawForm({ onClose, data }: RawProps) {
               is_active: data.is_active,
               is_exist: data.is_exist,
               parent_id: data.product_parent_id,
+              is_active_parent: data.product_parent.is_active,
+              is_exist_parent: data.product_parent.is_exist,
             },
           }),
         );
@@ -124,6 +128,17 @@ export default function RawForm({ onClose, data }: RawProps) {
       dispatch(rawAction.resetFormParam());
     }
   }, [raw.loadingForm, raw.isSuccessCreate]);
+
+  const checkName = (value: string) => {
+    dispatch(
+      rawAction.checkingRawName({
+        name: value,
+        exclude_id: data ? data.product_parent_id : 0,
+      }),
+    );
+  };
+
+  const handleChangeName = useCallback(debounce(checkName, 500), []);
 
   return (
     <Box m={0}>
@@ -186,15 +201,30 @@ export default function RawForm({ onClose, data }: RawProps) {
           <FormLabel
             text="Product Name (SKU)"
             required
-            error={touched.name && Boolean(errors.name)}
-            helperText={touched.name && errors.name && `${errors.name}`}
+            error={
+              touched.name &&
+              (Boolean(errors.name) ||
+                isNameExist === true ||
+                isNameExist === undefined)
+            }
+            helperText={
+              touched.name &&
+              ((errors.name && `${errors.name}`) ||
+                (isNameExist === true &&
+                  `Product Name is already used, please use another name`) ||
+                (isNameExist === undefined &&
+                  `Error checking Product Name, please try again`))
+            }
           >
             <TextField
               type="text"
               name="name"
               placeholder="Insert Name"
               value={values.name}
-              onChange={handleChange}
+              onChange={(e) => {
+                handleChange(e);
+                if (e.target.value) handleChangeName(e.target.value);
+              }}
               onBlur={handleBlur}
               fullWidth
               inputProps={{
@@ -303,7 +333,12 @@ export default function RawForm({ onClose, data }: RawProps) {
           <Button
             sx={{ width: 'max-content' }}
             type="submit"
-            disabled={!isValid || raw.loadingForm}
+            disabled={
+              !isValid ||
+              raw.loadingForm ||
+              isNameExist === undefined ||
+              isNameExist === true
+            }
           >
             {raw.loadingForm ? (
               <CircularProgress />

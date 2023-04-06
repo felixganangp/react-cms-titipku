@@ -12,7 +12,11 @@ import * as service from 'service/B2B/ProductRaw';
 import { uiAction } from 'store/slice/ui';
 import { Category } from 'models/b2b/Category';
 import { fetchCategory } from 'service/B2B/Category';
-import { uploadImage, updateProduct } from 'service/B2B/ProductParent';
+import {
+  uploadImage,
+  updateProduct,
+  IsExistName,
+} from 'service/B2B/ProductParent';
 import { CreateProduct } from 'models/b2b/ProductParent';
 import { productAction } from 'store/slice/b2b/Product';
 import { rawAction } from '../../slice/b2b/ProductRaw';
@@ -148,6 +152,8 @@ function* updateRaw(
       parent_id,
       is_active,
       is_exist,
+      is_active_parent,
+      is_exist_parent,
     } = payload.payload.body;
     const { id } = payload.payload;
     let imagePath: string;
@@ -174,6 +180,8 @@ function* updateRaw(
       name,
       image_filepath: imagePath,
       product_parent_category_id: category_ids,
+      is_active: is_active_parent,
+      is_exist: is_exist_parent,
     };
     yield call(updateProduct, { id: parent_id || 0, payload: payloadParent });
     // update product raw
@@ -272,6 +280,38 @@ function* undoDeleteRaw() {
   }
 }
 
+function* checkingName(
+  payload: PayloadAction<{ name: string; exclude_id: number | string }>,
+) {
+  try {
+    const response: Response<boolean> = yield call(IsExistName, {
+      name: payload.payload.name,
+      exclude_id: payload.payload.exclude_id,
+    });
+    yield put(rawAction.checkingRawNameSuccess(response.data));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error checking raw name',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error checking raw name',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+      yield put(rawAction.checkingRawNameFailed());
+    }
+  }
+}
+
 export default function* rawSagas() {
   yield takeLatest(rawAction.fetchData.type, fetchData);
   yield takeLatest(rawAction.fetchCategory.type, fetchCategories);
@@ -279,4 +319,5 @@ export default function* rawSagas() {
   yield takeLatest(rawAction.updateRaw.type, updateRaw);
   yield takeLatest(rawAction.deleteRaw.type, deleteRaw);
   yield takeLatest(rawAction.undoDelete.type, undoDeleteRaw);
+  yield takeLatest(rawAction.checkingRawName.type, checkingName);
 }
