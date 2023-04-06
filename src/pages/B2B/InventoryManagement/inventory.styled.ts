@@ -78,7 +78,7 @@ export const StatusColor = styled(Box)<Pick<StatusProps, 'status'>>`
 export const CardContainer = styled(Card)`
   padding: 0;
   border-radius: 0;
-  box-shadow: 0;
+  box-shadow: none;
   border: 1px solid #e4e4e4;
 `;
 

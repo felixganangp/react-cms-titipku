@@ -4,12 +4,13 @@
  *
  */
 
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 
+import ClearIcon from '@mui/icons-material/Clear';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import ImageCrop from '../ImageCrop';
 
@@ -32,6 +33,7 @@ interface Props {
   value: Blob | string;
   type?: 'cube' | 'rectangle';
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onClear?: () => void;
   cropable?: boolean;
   imageCustomer?: boolean;
 }
@@ -44,6 +46,7 @@ function InputImage({
   type,
   onChange,
   cropable,
+  onClear,
   imageCustomer,
 }: Props) {
   const [imageCrop, setImageCrop] = useState<any>(false);
@@ -87,87 +90,115 @@ function InputImage({
         sx={{
           width: '100%',
           display: 'flex',
+          flexDirection: 'column',
           justifyContent: 'center',
+          alignItems: 'center',
           borderRadius: '5px',
           padding: '10px',
           border: `${imageCustomer ? '' : '1px solid #c4c4c4'}`,
           cursor: 'pointer',
         }}
-        onClick={handleUploadBtnClick}
       >
-        <input
-          type="file"
-          ref={fileInputField}
-          onChange={handleNewFileUpload}
-          title=""
-          value=""
-          style={{ display: 'none' }}
-          accept="image/png, image/jpg, image/jpeg"
-          data-testid="test-input-1"
-          // {...otherProps}
-        />
-        {value ? (
-          <>
-            <Image
-              imageCustomer={imageCustomer}
-              data-testid="test-img-1"
-              src={
-                typeof value !== 'string' ? URL.createObjectURL(value) : value
-              }
+        <Box position="relative">
+          {onClear && value ? (
+            <Box
+              onClick={onClear}
+              width="18px"
+              height="18px"
+              position="absolute"
+              color="#fff"
+              bgcolor="#bf370c"
+              display="flex"
+              alignContent="center"
+              justifyContent="center"
+              borderRadius="100%"
+              right="-10px"
+              top="-5px"
+            >
+              <ClearIcon sx={{ fontSize: '13px', margin: 'auto' }} />
+            </Box>
+          ) : (
+            false
+          )}
+
+          <Box onClick={handleUploadBtnClick}>
+            <input
+              type="file"
+              ref={fileInputField}
+              onChange={handleNewFileUpload}
+              title=""
+              value=""
+              style={{ display: 'none' }}
+              accept="image/png, image/jpg, image/jpeg"
+              data-testid="test-input-1"
+              // {...otherProps}
             />
-            {/* <IconWrapper> */}
-            {imageCustomer && (
+            {value ? (
+              <>
+                <Image
+                  imageCustomer={imageCustomer}
+                  data-testid="test-img-1"
+                  src={
+                    typeof value !== 'string'
+                      ? URL.createObjectURL(value)
+                      : value
+                  }
+                />
+                {/* <IconWrapper> */}
+                {imageCustomer && (
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: 'column-reverse',
+                      marginLeft: '-2.5em',
+                      marginBottom: '.5em',
+                    }}
+                  >
+                    <EditIcon
+                      sx={{
+                        width: '35px',
+                        height: '35px',
+                        backgroundColor: '#008e58',
+                        borderRadius: '50%',
+                        color: '#fff',
+                        padding: 0.8,
+                      }}
+                    />
+                  </Box>
+                )}
+                {/* </IconWrapper> */}
+              </>
+            ) : (
               <Box
                 sx={{
+                  border: '2px dashed #c4c4c4',
+                  bgcolor: '#FAFAFA',
                   display: 'flex',
-                  flexDirection: 'column-reverse',
-                  marginLeft: '-2.5em',
-                  marginBottom: '.5em',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'column',
+                  height: '170px',
+                  width: type === 'cube' ? '170px' : '80%',
+                  padding: '10px',
                 }}
               >
-                <EditIcon
-                  sx={{
-                    width: '35px',
-                    height: '35px',
-                    backgroundColor: '#008e58',
-                    borderRadius: '50%',
-                    color: '#fff',
-                    padding: 0.8,
-                  }}
+                <AddPhotoAlternateIcon
+                  sx={{ fontSize: '50px' }}
+                  htmlColor="#8C95A2"
                 />
+                <Typography
+                  sx={{
+                    textAlign: 'center',
+                    fontSize: '12px',
+                    color: '#8b95a5',
+                  }}
+                >
+                  Please upload {label} with {width}x{height} Pixels
+                </Typography>
               </Box>
             )}
-            {/* </IconWrapper> */}
-          </>
-        ) : (
-          <Box
-            sx={{
-              border: '2px dashed #c4c4c4',
-              bgcolor: '#FAFAFA',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'column',
-              height: '170px',
-              width: type === 'cube' ? '170px' : '80%',
-              padding: '10px',
-            }}
-          >
-            <AddPhotoAlternateIcon
-              sx={{ fontSize: '50px' }}
-              htmlColor="#8C95A2"
-            />
-            <Typography
-              sx={{
-                textAlign: 'center',
-                fontSize: '12px',
-                color: '#8b95a5',
-              }}
-            >
-              Please upload {label} with {width}x{height} Pixels
-            </Typography>
           </Box>
-        )}
+        </Box>
       </Box>
       <ImageCrop
         open={Boolean(imageCrop)}

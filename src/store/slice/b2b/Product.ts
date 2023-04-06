@@ -50,6 +50,7 @@ interface ProductProps {
   listProductsMoveStk: Product[];
   loadingListProductsMoveStk: boolean;
   loadingMoveStock: boolean;
+  paramsLog: LogParams;
 }
 
 const initialState: ProductProps = {
@@ -72,22 +73,15 @@ const initialState: ProductProps = {
     page: 1,
     count: 10,
     search: '',
+    order_by: 'updated_at',
+    order_type: 'desc',
   },
-  // lowStockParams: {
-  //   page: 1,
-  //   count: 10,
-  //   search: '',
-  // },
-  // emptyStockParams: {
-  //   page: 1,
-  //   count: 10,
-  //   search: '',
-  // },
   loadingStockOpname: false,
   displayFilter: {
     search: '',
     grade: null,
     category: null,
+    type: null,
     status: null,
   },
   grades: [],
@@ -260,8 +254,26 @@ const ProductSlice = createSlice({
     createProductSuccess(state: ProductProps) {
       state.loadingForm = false;
       state.isSuccessCreate = true;
+      setTimeout(() => {
+        state.isSuccessCreate = false;
+      }, 1000);
     },
     createProductFailed(state: ProductProps) {
+      state.loadingForm = false;
+      state.isSuccessCreate = false;
+    },
+    updateProduct(
+      state: ProductProps,
+      action: PayloadAction<FormInventoryTypes>,
+    ) {
+      state.loadingForm = true;
+      state.isSuccessCreate = false;
+    },
+    updateProductSuccess(state: ProductProps) {
+      state.loadingForm = false;
+      state.isSuccessCreate = true;
+    },
+    resetProductForm(state: ProductProps) {
       state.loadingForm = false;
       state.isSuccessCreate = false;
     },

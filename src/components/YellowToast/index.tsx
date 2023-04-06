@@ -26,6 +26,8 @@ export default function YellowToast() {
     noUndo,
   } = useAppSelector((state) => state.ui.yellowToast);
 
+  setTimeout(() => dispatch(uiAction.closeYellowToast()), 70000);
+
   return (
     <Box
       display={open ? 'flex' : 'none'}

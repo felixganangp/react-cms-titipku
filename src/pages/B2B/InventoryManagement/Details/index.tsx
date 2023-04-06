@@ -5,14 +5,18 @@ import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stack, Box, Typography, Button, Grid, Skeleton } from '@mui/material';
 import Table from 'components/Table';
-
+import ModalComp from 'components/Modal';
+import useModal from 'hooks/useModal';
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import YellowToast from 'components/YellowToast';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
 import { Log } from 'models/b2b/Product';
+import NoImage from 'assets/no-image.svg';
 import { CardContainer, GradingColor, StatusColor } from '../inventory.styled';
+import Form from '../components/Form';
 
 export default function InvoiceDetail() {
   const navigate = useNavigate();
@@ -21,8 +25,11 @@ export default function InvoiceDetail() {
   const log = useAppSelector((state) => state.product.log);
   const details = useAppSelector((state) => state.product.details);
   const { id } = useParams();
+  const formProductModal = useModal();
 
-  console.log('id', id);
+  useEffect(() => {
+    dispatch(productAction.fetchGrade());
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -35,7 +42,8 @@ export default function InvoiceDetail() {
   }, [id]);
 
   useEffect(() => {
-    dispatch(productAction.fetchLog(product.paramsLog));
+    if (product.paramsLog.product_id)
+      dispatch(productAction.fetchLog(product.paramsLog));
   }, [product.paramsLog]);
 
   useEffect(() => {
@@ -90,10 +98,14 @@ export default function InvoiceDetail() {
               {val.changes.action_type === 'create' ? (
                 ''
               ) : val.changes.action_type === 'update' ? (
-                `${val.changes.columns[0].name.replace(
-                  /^./,
-                  val.changes.columns[0].name[0].toUpperCase(),
-                )}`
+                `${
+                  val.changes.columns
+                    ? val.changes.columns[0].name.replace(
+                        /^./,
+                        val.changes.columns[0].name[0].toUpperCase(),
+                      )
+                    : 'But No Changes'
+                }`
               ) : val.changes.action_type === 'delete' ? (
                 ''
               ) : val.changes.action_type === 'set_to_active' ? (
@@ -111,6 +123,11 @@ export default function InvoiceDetail() {
       ),
     },
   ];
+
+  const numberWithCommas = (x: number) => {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  };
+
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <CardContainer>
@@ -123,7 +140,11 @@ export default function InvoiceDetail() {
             <Stack direction="row" alignItems="center" spacing="16px">
               <Box
                 component="img"
-                src="https://www.static-src.com/wcsstore/Indraprastha/images/catalog/full//90/MTA-70146323/ayam_potong_segar_ayam_potong_frozen_food_full01_4e8623f5.jpg"
+                src={details?.product_parent.image_filepath}
+                onError={({ currentTarget }) => {
+                  currentTarget.onerror = null;
+                  currentTarget.src = NoImage;
+                }}
                 alt="ayam"
                 width="54px"
                 height="54px"
@@ -148,12 +169,16 @@ export default function InvoiceDetail() {
                 </Button>
               </Box>
             </Stack>
-            <Button sx={{ width: '110px' }} endIcon={<ArrowForwardIosIcon />}>
+            <Button
+              sx={{ width: '110px' }}
+              endIcon={<ArrowForwardIosIcon />}
+              onClick={formProductModal.openModal}
+            >
               Edit
             </Button>
           </Stack>
 
-          <Grid container mt="30px" mx="10px" mb="10px">
+          <Grid container mt="30px" mx="10px" mb="10px" rowGap="30px">
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 Product Name (SKU)
@@ -166,9 +191,23 @@ export default function InvoiceDetail() {
                 </Typography>
               )}
             </Grid>
+
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
-                Grade
+                B2B Type
+              </Typography>
+              {product.loadingDetails ? (
+                <Skeleton width={50} height={25} />
+              ) : (
+                <Typography fontSize="14px">
+                  {details?.product_type.name}
+                </Typography>
+              )}
+            </Grid>
+
+            <Grid item xs={4} lg={2.4}>
+              <Typography fontSize="14px" color="#0661ae">
+                Product Grade
               </Typography>
               {product.loadingDetails ? (
                 <Skeleton width={50} height={25} />
@@ -178,32 +217,64 @@ export default function InvoiceDetail() {
                 </GradingColor>
               )}
             </Grid>
+
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 Category
               </Typography>
               {product.loadingDetails ? (
                 <Skeleton width={50} height={25} />
+              ) : details?.product_parent?.product_parent_category ? (
+                details?.product_parent?.product_parent_category.map(
+                  (category) => (
+                    <Typography fontSize="14px" key={category.id}>
+                      {category.name}
+                    </Typography>
+                  ),
+                )
               ) : (
-                <Typography fontSize="14px">
-                  {details?.product_parent?.product_parent_category
-                    ? details?.product_parent?.product_parent_category[0].name
-                    : '-'}
-                </Typography>
+                <Typography fontSize="14px">-</Typography>
               )}
             </Grid>
+
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
-                Weight
+                Description
+              </Typography>
+              {product.loadingDetails ? (
+                <Skeleton width={50} height={25} />
+              ) : (
+                <Typography fontSize="14px">{details?.description}</Typography>
+              )}
+            </Grid>
+
+            <Grid item xs={4} lg={2.4}>
+              <Typography fontSize="14px" color="#0661ae">
+                In Stock
               </Typography>
               {product.loadingDetails ? (
                 <Skeleton width={50} height={25} />
               ) : (
                 <Typography fontSize="14px">
-                  {details ? details?.stock / 1000 : 0} Kg
+                  {details ? numberWithCommas(details?.stock) : 0} gram
                 </Typography>
               )}
             </Grid>
+
+            <Grid item xs={4} lg={2.4}>
+              <Typography fontSize="14px" color="#0661ae">
+                Low Stock Alerts
+              </Typography>
+              {product.loadingDetails ? (
+                <Skeleton width={50} height={25} />
+              ) : (
+                <Typography fontSize="14px">
+                  {details ? numberWithCommas(details?.low_stock_limit) : 0}{' '}
+                  gram
+                </Typography>
+              )}
+            </Grid>
+
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 Status
@@ -212,7 +283,7 @@ export default function InvoiceDetail() {
                 status={
                   !details?.is_active
                     ? 0
-                    : details?.stock === 0
+                    : details?.stock <= 0
                     ? 1
                     : details?.stock <= details?.low_stock_limit
                     ? 2
@@ -221,7 +292,7 @@ export default function InvoiceDetail() {
               >
                 {!details?.is_active
                   ? 'Inactive'
-                  : details?.stock === 0
+                  : details?.stock <= 0
                   ? 'Habis'
                   : details?.stock <= details?.low_stock_limit
                   ? 'Hampir Habis'
@@ -232,10 +303,11 @@ export default function InvoiceDetail() {
         </Box>
       </CardContainer>
       <Box my="10px" />
+      <YellowToast />
       <CardContainer>
         <Box p="16px">
           <Table
-            data={log}
+            data={log || []}
             bgHeader="#cde3f6"
             headCells={headCell}
             totalData={product.totalLog}
@@ -246,6 +318,21 @@ export default function InvoiceDetail() {
           />
         </Box>
       </CardContainer>
+      <ModalComp
+        open={formProductModal.open}
+        title="Edit Product"
+        onClose={() => {
+          formProductModal.closeModal();
+        }}
+      >
+        <Form
+          onClose={() => {
+            formProductModal.closeModal();
+          }}
+          EditProductParent={details}
+          isDetail
+        />
+      </ModalComp>
     </Box>
   );
 }

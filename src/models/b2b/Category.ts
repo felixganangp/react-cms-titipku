@@ -9,7 +9,7 @@ export interface Category {
   updated_at: number;
   created_by_id: number;
   created_by_type: string;
-  created_by: ModifiedUser;
+  created_by: ModifiedUser | null;
   updated_by_id: number | null;
   updated_by_type: null | string;
   updated_by: null | ModifiedUser;

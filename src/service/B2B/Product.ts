@@ -32,10 +32,13 @@ export const createProduct = (data: CreateProduct) =>
     }
   });
 
-export const updateProduct = (id: number, data: CreateProduct) =>
+export const updateProduct = (data: { id: number; data: CreateProduct }) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await http.put(`/inventory/b2b/product/${id}`, data);
+      const response = await http.put(
+        `/inventory/b2b/product/${data.id}`,
+        data.data,
+      );
       if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response
@@ -139,6 +142,7 @@ export const fetchDetails = (id: number | string) =>
 export const fetchLog = (params: LogParams) =>
   new Promise(async (resolve, reject) => {
     try {
+      console.log('params service', params);
       const response = await http.get('/inventory/b2b/product/log', { params });
       if (response.data) resolve(response.data);
     } catch (err: any) {

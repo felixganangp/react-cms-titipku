@@ -31,8 +31,14 @@ export const sidebarData: FilteredMenu[] = [
     icon: <B2B />,
     child: [
       {
-        id: 57,
-        title: 'Inventory Management',
+        id: 58,
+        title: 'RAW Management',
+        path: '/b2b/raw',
+        child: [],
+      },
+      {
+        id: 59,
+        title: 'Grade Management',
         path: '/b2b/inventory',
         child: [],
       },

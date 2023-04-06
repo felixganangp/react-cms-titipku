@@ -1,15 +1,38 @@
+import { CreateRawService, RawParams } from 'models/b2b/ProductRaw';
 import http from 'utils/request';
-import { CreateProduct } from 'models/b2b/ProductParent';
-import { ListParams } from 'models/fetch';
 
-export const uploadImage = (data: { image: string | Blob }) =>
+export const fetchData = (params: RawParams) =>
   new Promise(async (resolve, reject) => {
     try {
-      const fd = new FormData();
-      fd.append('image', data.image);
-      const response = await http.post(
-        '/inventory/b2b/product/parent/upload',
-        fd,
+      const response = await http.get('/inventory/b2b/product/raw', { params });
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const create = (body: CreateRawService) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.post('/inventory/b2b/product/raw', body);
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const update = (data: { id: string | number; body: CreateRawService }) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.put(
+        `/inventory/b2b/product/raw/${data.id}`,
+        data.body,
       );
       if (response.data) resolve(response.data);
     } catch (err: any) {
@@ -20,64 +43,15 @@ export const uploadImage = (data: { image: string | Blob }) =>
     }
   });
 
-export const fetchProduct = (params: ListParams) =>
-  new Promise(async (resolve, reject) => {
-    try {
-      const response = await http.get('/inventory/b2b/product/parent', {
-        params,
-      });
-      if (response.data) resolve(response.data);
-    } catch (err: any) {
-      const message: string = err.response
-        ? `${err.response.data.message}`
-        : 'Oops, something wrong with our server, please try again later.';
-      reject(message);
-    }
-  });
-
-export const createProduct = (data: CreateProduct) =>
-  new Promise(async (resolve, reject) => {
-    try {
-      const response = await http.post('/inventory/b2b/product/parent', data);
-      if (response.data) resolve(response.data);
-    } catch (err: any) {
-      const message: string = err.response
-        ? `${err.response.data.message}`
-        : 'Oops, something wrong with our server, please try again later.';
-      reject(message);
-    }
-  });
-
-export const updateProduct = (data: {
-  id: string | number;
-  payload: CreateProduct;
+export const deleteRaw = (body: {
+  is_exist: boolean;
+  ids: (string | number)[];
 }) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await http.put(
-        `/inventory/b2b/product/parent/${data.id}`,
-        data.payload,
-      );
-      if (response.data) resolve(response.data);
-    } catch (err: any) {
-      const message: string = err.response
-        ? `${err.response.data.message}`
-        : 'Oops, something wrong with our server, please try again later.';
-      reject(message);
-    }
-  });
-
-export const IsExistName = (params: {
-  name: string;
-  exclude_id?: number | string;
-}) =>
-  new Promise(async (resolve, reject) => {
-    try {
-      const response = await http.get(
-        '/inventory/b2b/product/parent/check-name',
-        {
-          params,
-        },
+        `/inventory/b2b/product/raw/batch-is-exist`,
+        body,
       );
       if (response.data) resolve(response.data);
     } catch (err: any) {

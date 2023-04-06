@@ -12,10 +12,12 @@ import {
 import FormLabel from 'components/FormLabel';
 import InputImage from 'components/InputImage';
 import debounce from 'utils/debounce';
+import { Product } from 'models/b2b/Product';
 import { IsExistName } from 'service/B2B/ProductParent';
 import { Response } from 'models/fetch';
+import numberSeperator, { typeNumberValidate } from 'utils/numberSeperator';
 // icon
-import DeleteIcon from '@mui/icons-material/Delete';
+// import TrashIcon from 'components/Icon/Trash';
 
 import useFormProduct from '../hooks/useFormProduct';
 import { SwitchStyle } from '../inventory.styled';
@@ -26,6 +28,8 @@ interface TypesError {
 }
 interface FormTypes {
   onClose: () => void;
+  EditProductParent: Product | null;
+  isDetail?: boolean;
 }
 
 export default function Form(props: FormTypes) {
@@ -38,6 +42,7 @@ export default function Form(props: FormTypes) {
     setCurrentGrade,
     loadingForm,
     handleSubmit,
+    isEdit,
   } = useFormProduct(props);
 
   const indexGrade = formik.values.productList.findIndex(
@@ -46,7 +51,7 @@ export default function Form(props: FormTypes) {
 
   const gradeList = formik.values.productList
     .filter((val) => val.grade.id !== 1)
-    .filter((val) => val.is_active !== false);
+    .filter((val) => val.is_exist !== false);
 
   const onOffCostumeGrade = () => {
     if (!currentGrade.isCostume) {
@@ -71,7 +76,7 @@ export default function Form(props: FormTypes) {
     [],
   );
 
-  const typesProductList = (formik.touched?.productList ?? [])[indexGrade];
+  const touchedProductList = (formik.touched?.productList ?? [])[indexGrade];
   const errorProductList = formik.errors?.productList as TypesError[];
   const isValid = () => {
     let valid = false;
@@ -89,7 +94,7 @@ export default function Form(props: FormTypes) {
       const listGradeActiveIndex = formik.values.productList
         .filter((val) => val.grade.id !== 1)
         .map((val, index) => {
-          if (val.is_active !== true) {
+          if (val.is_exist !== true) {
             return true;
           }
           return (errorProductList ?? [])[index + 1] === undefined;
@@ -119,6 +124,7 @@ export default function Form(props: FormTypes) {
             label="an Image"
             value={formik.values.image}
             onChange={(e: any) => formik.setFieldValue('image', e)}
+            onClear={() => formik.setFieldValue('image', null)}
             width={720}
             height={720}
           />
@@ -164,13 +170,17 @@ export default function Form(props: FormTypes) {
             data-testid="form-category"
             id="category"
             multiple
-            options={categories}
+            options={
+              categories?.length > 0
+                ? categories.map((val) => ({ id: val.id, name: val.name }))
+                : []
+            }
             onChange={(e, value) => {
               formik.setFieldValue('category', value);
             }}
-            // isOptionEqualToValue={(option: Type) => {
-            //   return option.id === values.kurType?.id;
-            // }}
+            isOptionEqualToValue={(option, values) => {
+              return option.id === values.id;
+            }}
             getOptionLabel={(option) => `${option.name}`}
             value={formik.values.category}
             renderInput={(params) => (
@@ -212,21 +222,24 @@ export default function Form(props: FormTypes) {
             )}
           />
         </FormLabel>
-        <Stack
-          direction="row"
-          my={2}
-          p="10px 5px"
-          bgcolor={currentGrade.isCostume ? '#f1f1f1' : 'unset'}
-          justifyContent="space-between"
-        >
-          <Box display="flex" gap="20px" alignItems="center">
-            <SwitchStyle
-              checked={currentGrade.isCostume}
-              onChange={onOffCostumeGrade}
-            />
-            <Typography>Custom Grade</Typography>
-          </Box>
-        </Stack>
+        {!isEdit && (
+          <Stack
+            direction="row"
+            my={2}
+            p="10px 5px"
+            bgcolor={currentGrade.isCostume ? '#f1f1f1' : 'unset'}
+            justifyContent="space-between"
+          >
+            <Box display="flex" gap="20px" alignItems="center">
+              <SwitchStyle
+                checked={currentGrade.isCostume}
+                onChange={onOffCostumeGrade}
+              />
+              <Typography>Custom Grade</Typography>
+            </Box>
+          </Stack>
+        )}
+
         {/* GRADE LIST  */}
         <Collapse in={currentGrade.isCostume}>
           <Box overflow="auto" display="flex" width="100%">
@@ -239,18 +252,40 @@ export default function Form(props: FormTypes) {
                 bgcolor={
                   val.grade.id === currentGrade.currentID
                     ? '#aad9c7'
-                    : '#f8f8f8'
+                    : '#e4e4e4'
                 }
                 minWidth="100pxpx"
-                sx={{ cursor: 'pointer' }}
-                onClick={() =>
-                  setCurrentGrade({
-                    ...currentGrade,
-                    currentID: val.grade.id,
-                  })
-                }
+                sx={{
+                  cursor: isEdit
+                    ? `${
+                        currentGrade.currentID === val.grade.id
+                          ? 'pointer'
+                          : 'default'
+                      }`
+                    : 'pointer',
+                }}
+                onClick={() => {
+                  if (!isEdit) {
+                    setCurrentGrade({
+                      ...currentGrade,
+                      currentID: val.grade.id,
+                    });
+                  }
+                }}
               >
-                <Typography fontSize="14px" color="#005f3b" whiteSpace="nowrap">
+                <Typography
+                  fontSize="14px"
+                  color={
+                    isEdit
+                      ? `${
+                          currentGrade.currentID === val.grade.id
+                            ? '#005f3b'
+                            : '#fff'
+                        }`
+                      : '#005f3b'
+                  }
+                  whiteSpace="nowrap"
+                >
                   {val.grade.name}
                 </Typography>
               </Box>
@@ -258,79 +293,135 @@ export default function Form(props: FormTypes) {
           </Box>
         </Collapse>
         <FormLabel
-          text="Low Stock (Gram)"
+          text="Low Stock (gram)"
           error={
-            (typesProductList?.lowStock || false) &&
+            (touchedProductList?.lowStock || false) &&
             Boolean((errorProductList ?? [])[indexGrade]?.lowStock)
           }
           helperText={
-            (typesProductList?.lowStock || false) &&
+            (touchedProductList?.lowStock || false) &&
             `${(errorProductList ?? [])[indexGrade]?.lowStock || ''}`
           }
         >
           <TextField
-            type="number"
+            type="text"
             name="lowStock"
-            placeholder="Insert Low Stock (Gram)"
-            value={formik.values.productList[indexGrade].lowStock}
+            placeholder="Insert Low Stock (gram)"
+            value={numberSeperator(
+              formik.values.productList[indexGrade]?.lowStock,
+            )}
             onChange={(e) => {
               const product = formik.values.productList;
-              // eslint-disable-next-line radix
-              product[indexGrade].lowStock = parseInt(e.target.value);
+
+              product[indexGrade].lowStock = e.target.value
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
 
               formik.setFieldValue('productList', product);
             }}
+            disabled={!formik.values.productList[indexGrade]?.is_active}
             // onBlur={handleBlur}
             fullWidth
             InputProps={{
               endAdornment: (
-                <InputAdornment position="end">Gram</InputAdornment>
+                <InputAdornment position="end">gram</InputAdornment>
               ),
             }}
+            helperText={
+              formik.values.productList[indexGrade].lowStock ? (
+                <Typography
+                  sx={{ fontSize: '12px', color: '#797979', ml: '-12px' }}
+                >
+                  The quantity at which you will be notified about low stock
+                </Typography>
+              ) : (
+                false
+              )
+            }
           />
         </FormLabel>
         <FormLabel
-          text="In Stock (Gram)"
+          text="In Stock (gram)"
           error={
-            (typesProductList?.stock || false) &&
+            (touchedProductList?.stock || false) &&
             Boolean((errorProductList ?? [])[indexGrade]?.stock)
           }
           helperText={
-            (typesProductList?.stock || false) &&
+            (touchedProductList?.stock || false) &&
             `${(errorProductList ?? [])[indexGrade]?.stock || ''}`
           }
         >
           <TextField
-            type="number"
+            type="text"
             name="stock"
-            placeholder="Insert In Stock (Gram)"
-            value={formik.values.productList[indexGrade].stock}
+            placeholder="Insert In Stock (gram)"
+            value={numberSeperator(
+              formik.values.productList[indexGrade]?.stock,
+            )}
             onChange={(e) => {
               const product = formik.values.productList;
               // eslint-disable-next-line radix
-              product[indexGrade].stock = parseInt(e.target.value);
+              product[indexGrade].stock = e.target.value
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
 
               formik.setFieldValue('productList', product);
             }}
             // onBlur={handleBlur}
+            disabled={!formik.values.productList[indexGrade]?.is_active}
             fullWidth
             InputProps={{
               endAdornment: (
-                <InputAdornment position="end">Gram</InputAdornment>
+                <InputAdornment position="end">gram</InputAdornment>
               ),
             }}
+            helperText={
+              formik.values.productList[indexGrade].stock ? (
+                <Typography
+                  sx={{ fontSize: '12px', color: '#797979', ml: '-12px' }}
+                >
+                  <span style={{ color: '#008e58' }}>
+                    <b>
+                      {numberSeperator(
+                        formik.values.productList[indexGrade].stock,
+                      )
+                        .replaceAll('.', ',')
+                        .replaceAll(',', '.')}
+                    </b>{' '}
+                    Gram{' '}
+                  </span>
+                  is equivalent to{' '}
+                  <span style={{ color: '#008e58' }}>
+                    <b>
+                      {numberSeperator(
+                        (
+                          typeNumberValidate(
+                            formik.values.productList[indexGrade]
+                              .stock as string,
+                          ) / 1000
+                        )
+                          .toFixed(1)
+                          .replace(/\.?0+$/, ''),
+                      )}
+                    </b>{' '}
+                    Kilogram
+                  </span>
+                </Typography>
+              ) : (
+                false
+              )
+            }
           />
         </FormLabel>
         <FormLabel
           text="Description"
           // error={
-          //   (formik.touched?.productList ?? [])[indexGrade]?.description &&
-          //   Boolean((formik.errors?.productList ?? [])[indexGrade]?.description)
+          //   (touchedProductList?.stock || false) &&
+          //   Boolean((errorProductList ?? [])[indexGrade]?.stock)
           // }
           // helperText={
-          //   (formik.touched?.productList ?? [])[indexGrade]?.description &&
-          //   (formik.errors?.productList ?? [])[indexGrade]?.description &&
-          //   `${(formik.errors?.productList ?? [])[indexGrade]?.description}`
+          //   (touchedProductList?.stock || false) &&
+          //   `${(errorProductList ?? [])[indexGrade]?.stock || ''}`
           // }
         >
           <TextField
@@ -350,7 +441,7 @@ export default function Form(props: FormTypes) {
             fullWidth
           />
         </FormLabel>
-        {currentGrade.isCostume && gradeList.length > 1 ? (
+        {/* {currentGrade.isCostume && !isEdit ? (
           <Box
             color="error.main"
             bgcolor="#f9ebe7"
@@ -362,24 +453,41 @@ export default function Form(props: FormTypes) {
             sx={{ cursor: 'pointer' }}
             onClick={async () => {
               const product = formik.values.productList;
-              product[indexGrade].is_active = false;
+              product[indexGrade].is_exist = false;
 
               await formik.setFieldValue('productList', product);
 
-              setCurrentGrade({
-                isCostume: true,
-                currentID: product
+              if (
+                product
                   .filter((val) => val.grade.id !== 1)
-                  .filter((val) => val.is_active !== false)[0].grade.id,
-              });
+                  .filter((val) => val.is_exist !== false).length > 0
+              ) {
+                setCurrentGrade({
+                  isCostume: true,
+                  currentID: product
+                    .filter((val) => val.grade.id !== 1)
+                    .filter((val) => val.is_exist !== false)[0].grade.id,
+                });
+              } else {
+                setCurrentGrade({
+                  isCostume: false,
+                  currentID: 1,
+                });
+                if (isEdit) {
+                  setTypeUpdate('to-default');
+                }
+              }
             }}
           >
-            <DeleteIcon sx={{ fontSize: '19px' }} />
-            <Typography fontSize="14px">Delete Grade</Typography>
+            <TrashIcon sx={{ fontSize: '25px' }} />
+            <Typography fontSize="14px">
+              {isEdit ? 'Delete' : 'Clear'}{' '}
+              {formik.values.productList[indexGrade].grade.name}
+            </Typography>
           </Box>
         ) : (
           false
-        )}
+        )} */}
       </Box>
       <Box
         width="100%"
@@ -403,7 +511,9 @@ export default function Form(props: FormTypes) {
             }
           }}
         >
-          {!loadingForm ? 'Create' : 'Loading...'}
+          {!loadingForm
+            ? `${isEdit ? 'Save Changes' : 'Create'}`
+            : 'Loading...'}
         </Button>
       </Box>
     </>

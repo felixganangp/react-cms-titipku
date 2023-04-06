@@ -11,6 +11,7 @@ import invoiceKurSagas from './sagas/kur/Invoice';
 import merchantSagas from './sagas/MerchantAccess';
 import creditScoreSagas from './sagas/kur/CreditScore';
 import productSagas from './sagas/b2b/Product';
+import rawSagas from './sagas/b2b/ProductRaw';
 
 export default function* rootSaga() {
   yield all([
@@ -26,5 +27,6 @@ export default function* rootSaga() {
     merchantSagas(),
     creditScoreSagas(),
     productSagas(),
+    rawSagas(),
   ]);
 }
