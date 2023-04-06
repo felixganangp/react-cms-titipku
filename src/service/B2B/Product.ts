@@ -152,3 +152,38 @@ export const fetchLog = (params: LogParams) =>
       reject(message);
     }
   });
+
+export const fetchProductListProductMoveStk = (params: {
+  product_parent_id: number;
+}) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.get('/inventory/b2b/product', { params });
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const moveStockProduct = (payload: {
+  from_product_id: number | undefined;
+  to_product_id: number | undefined;
+  stock_change: number;
+}) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.put(
+        `/inventory/b2b/product/move-stock`,
+        payload,
+      );
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });

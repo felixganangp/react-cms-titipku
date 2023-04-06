@@ -58,6 +58,9 @@ import {
 import StockOpname from './components/StockOpname';
 import ChangeStatus from './components/ChangeStatus';
 import Form from './components/Form';
+import PopupAddSelected from './components/PopupSelected';
+import MoveStockForm from './components/MoveStockForm';
+import ConfirmMoveStock from './components/ConfirmMoveStock';
 
 export default function InventoryPage() {
   const dispatch = useAppDispatch();
@@ -74,7 +77,11 @@ export default function InventoryPage() {
   );
   const stockOpnameModal = useModal();
   const formProductModal = useModal();
+  const listProductModal = useModal();
+  const moveStockFormModal = useModal();
+  const moveStockConfirmationModal = useModal();
 
+  const [parentId, setParentId] = useState<number | undefined>();
   // BATCH ACTION
   const [selected, setSelected] = useState<(number | string)[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product[]>([]);
@@ -99,10 +106,87 @@ export default function InventoryPage() {
     stockOpnameModal.openModal();
   };
 
+  const [payloadMoveStock, setPayloadMoveStock] = useState<{
+    from_product_id: number | undefined;
+    to_product_id: number | undefined;
+    stock_change: number;
+  }>({
+    from_product_id: undefined,
+    stock_change: 0,
+    to_product_id: undefined,
+  });
   const handleCloseStockOpname = () => {
     setSelected([]);
     setSelectedProduct([]);
+    setParentId(undefined);
+    setPayloadMoveStock({
+      from_product_id: undefined,
+      to_product_id: undefined,
+      stock_change: 0,
+    });
     stockOpnameModal.closeModal();
+  };
+
+  // MOVE STOCK
+  const handleCloseAllModalOnStockOpname = () => {
+    stockOpnameModal.closeModal();
+    listProductModal.closeModal();
+    moveStockFormModal.closeModal();
+    moveStockConfirmationModal.closeModal();
+    setPayloadMoveStock({
+      from_product_id: undefined,
+      to_product_id: undefined,
+      stock_change: 0,
+    });
+  };
+  const [selectedProductMoveStock, setSelectedProductMoveStock] = useState<
+    Product[]
+  >([]);
+
+  const handleClosePopupSelectproduct = () => {
+    // modalFunc.openFunc();
+    stockOpnameModal.openModal();
+    listProductModal.closeModal();
+    setSelectedProductMoveStock([]);
+  };
+  const handleOpenPopupSelectproduct = () => {
+    // modalFunc.closeFunc();
+    stockOpnameModal.closeModal();
+    listProductModal.openModal();
+  };
+  const handleOnApplySelectProduct = () => {
+    listProductModal.closeModal();
+    moveStockFormModal.openModal();
+  };
+  const handleCloseFormMoveStock = () => {
+    listProductModal.openModal();
+    moveStockFormModal.closeModal();
+  };
+  const handleOnSubmitMoveStock = (val: { stock_change: number }) => {
+    setPayloadMoveStock({
+      from_product_id: selectedProduct[0].id,
+      to_product_id: selectedProductMoveStock[0].id,
+      stock_change: val.stock_change,
+    });
+    moveStockFormModal.closeModal();
+    moveStockConfirmationModal.openModal();
+  };
+  const handleCloseConfirmationMoveStock = () => {
+    moveStockFormModal.openModal();
+    moveStockConfirmationModal.closeModal();
+  };
+
+  const handleSubmitMoveToStock = async () => {
+    await dispatch(productAction.moveStock(payloadMoveStock));
+    stockOpnameModal.closeModal();
+    listProductModal.closeModal();
+    moveStockFormModal.closeModal();
+    moveStockConfirmationModal.closeModal();
+    setPayloadMoveStock({
+      from_product_id: undefined,
+      to_product_id: undefined,
+      stock_change: 0,
+    });
   };
 
   const handleClose = () => {
@@ -510,6 +594,7 @@ export default function InventoryPage() {
                         label: 'Stock Opname',
                         onClick: () => {
                           dispatch(uiAction.closeYellowToast());
+                          setParentId(val.product_parent_id);
                           handleStockOpnameAction(val);
                         },
                       },
@@ -1111,12 +1196,13 @@ export default function InventoryPage() {
       <ModalComp
         open={stockOpnameModal.open}
         title="Stock Opname"
-        onClose={handleCloseStockOpname}
+        onClose={handleCloseAllModalOnStockOpname}
       >
         <StockOpname
           totalItem={selectedProduct.length}
           items={selectedProduct}
           onClose={handleCloseStockOpname}
+          selectPopupOpenFunc={handleOpenPopupSelectproduct}
         />
       </ModalComp>
       <ModalComp
@@ -1133,6 +1219,47 @@ export default function InventoryPage() {
             setEditProductParent(null);
           }}
           EditProductParent={EditProductParent}
+        />
+      </ModalComp>
+      <PopupAddSelected
+        parentId={parentId}
+        selectedItem={selectedProduct}
+        currentData={[]}
+        open={listProductModal.open}
+        onClose={() => {
+          handleClosePopupSelectproduct();
+        }}
+        singleSelect
+        onConfirm={setSelectedProductMoveStock}
+        product={false}
+        onApply={handleOnApplySelectProduct}
+      />
+      <ModalComp
+        open={moveStockFormModal.open}
+        title="Move Stock"
+        onClose={handleCloseAllModalOnStockOpname}
+        width="420px"
+      >
+        <MoveStockForm
+          selectedItem={selectedProductMoveStock}
+          onClose={handleCloseFormMoveStock}
+          onSubmit={handleOnSubmitMoveStock}
+          prevItem={selectedProduct}
+          initData={payloadMoveStock.stock_change}
+        />
+      </ModalComp>
+      <ModalComp
+        open={moveStockConfirmationModal.open}
+        onClose={handleCloseAllModalOnStockOpname}
+        width="624px"
+        noTitle
+      >
+        <ConfirmMoveStock
+          onClose={handleCloseConfirmationMoveStock}
+          prevItem={selectedProduct}
+          moveItem={selectedProductMoveStock}
+          payload={payloadMoveStock}
+          onSubmit={handleSubmitMoveToStock}
         />
       </ModalComp>
     </Box>

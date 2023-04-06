@@ -582,6 +582,69 @@ function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
   }
 }
 
+function* fetchDataListProductMovestck(
+  params: PayloadAction<{ product_parent_id: number }>,
+) {
+  try {
+    if (params.payload.product_parent_id) {
+      const response: ListResponse<Product> = yield call(
+        service.fetchProductListProductMoveStk,
+        params.payload,
+      );
+      yield put(productAction.fetchDataSuccessListProductsMoveStk(response));
+    }
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(productAction.fetchDataFailed());
+  }
+}
+
+function* moveStock(
+  payload: PayloadAction<{
+    from_product_id: number | undefined;
+    to_product_id: number | undefined;
+    stock_change: number;
+  }>,
+) {
+  try {
+    const filter: ProductParams = yield select((state) => state.product.params);
+    const response: ListResponse<any> = yield call(
+      service.moveStockProduct,
+      payload.payload,
+    );
+    yield put(productAction.moveStockSuccess());
+    yield put(productAction.fetchData(filter));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: error || 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
 export default function* productSagas() {
   yield takeLatest(productAction.stockOpname, stockOpname);
   yield takeLatest(productAction.fetchTotalLowStock, fetchTotalLowStock);
@@ -600,5 +663,10 @@ export default function* productSagas() {
   yield takeLatest(productAction.undoChangeStatus.type, undoChangeStatus);
   yield takeLatest(productAction.fetchDetails.type, fetchDetails);
   yield takeLatest(productAction.fetchLog.type, fetchLog);
+  yield takeLatest(
+    productAction.fetchDataListProductsMoveStk.type,
+    fetchDataListProductMovestck,
+  );
+  yield takeLatest(productAction.moveStock.type, moveStock);
   yield takeLatest(productAction.updateProduct.type, updateProduct);
 }

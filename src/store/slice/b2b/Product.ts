@@ -46,6 +46,10 @@ interface ProductProps {
   details: Product | null;
   log: Log[];
   totalLog: number;
+  paramsLog: ListParams;
+  listProductsMoveStk: Product[];
+  loadingListProductsMoveStk: boolean;
+  loadingMoveStock: boolean;
   paramsLog: LogParams;
 }
 
@@ -110,6 +114,9 @@ const initialState: ProductProps = {
     page: 1,
     count: 5,
   },
+  listProductsMoveStk: [],
+  loadingListProductsMoveStk: false,
+  loadingMoveStock: false,
 };
 
 const ProductSlice = createSlice({
@@ -329,6 +336,26 @@ const ProductSlice = createSlice({
         ...state.paramsLog,
         ...action.payload,
       };
+    },
+    fetchDataListProductsMoveStk(
+      state: ProductProps,
+      action: PayloadAction<{ product_parent_id: number }>,
+    ) {
+      state.loadingListProductsMoveStk = true;
+    },
+    fetchDataSuccessListProductsMoveStk(
+      state: ProductProps,
+      action: PayloadAction<ListResponse<Product>>,
+    ) {
+      state.listProductsMoveStk = action.payload.data || [];
+      // state.totalProducts = action.payload.total || 0;
+      state.loadingListProductsMoveStk = false;
+    },
+    moveStock(state: ProductProps, action: PayloadAction<any>) {
+      state.loadingMoveStock = true;
+    },
+    moveStockSuccess(state: ProductProps) {
+      state.loadingMoveStock = false;
     },
   },
 });

@@ -1,15 +1,9 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  FormControlLabel,
-} from '@mui/material';
+import { Box, Typography, TextField, Button } from '@mui/material';
 import ReportIcon from '@mui/icons-material/Report';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { useAppSelector, useAppDispatch } from 'store/hooks';
+import { useAppDispatch } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
 import { uiAction } from 'store/slice/ui';
 import { Product } from 'models/b2b/Product';
@@ -20,9 +14,15 @@ interface Props {
   items: Product[];
   onClose: () => void;
   totalItem: number;
+  selectPopupOpenFunc: () => void;
 }
 
-function StockOpname({ items, onClose, totalItem }: Props) {
+function StockOpname({
+  items,
+  onClose,
+  totalItem,
+  selectPopupOpenFunc,
+}: Props) {
   const dispatch = useAppDispatch();
 
   const initData: any = {};
@@ -122,28 +122,29 @@ function StockOpname({ items, onClose, totalItem }: Props) {
                     flexDirection: 'row',
                     fontSize: '12px',
                     gap: 0.8,
-                    width: '280px',
+                    width: '200px',
+                    alignItems: 'center',
                   }}
                 >
                   {item.product_grade.id !== 1 && (
                     <GradingColor
                       sx={{ padding: '2px !important' }}
                       grade={item.product_grade.id}
+                      fontSize="12px"
                     >
                       {item.product_grade.name}
                     </GradingColor>
                   )}
-                  <Typography fontSize="17px">
+                  <Typography fontSize="14px" sx={{ width: '70%' }}>
                     {item.product_parent.name}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex' }}>
                   <Typography
-                    sx={{ paddingX: '1em', backgroundColor: '#e4e4e4' }}
+                    // sx={{ paddingX: '1em', backgroundColor: '#e4e4e4' }}
+                    fontSize="14px"
                   >
-                    {(item.product_parent.product_parent_category &&
-                      item.product_parent.product_parent_category[0].name) ||
-                      '-'}
+                    {item.product_type.name || '-'}
                   </Typography>
                 </Box>
               </Box>
@@ -157,33 +158,60 @@ function StockOpname({ items, onClose, totalItem }: Props) {
                 <Typography
                   fontSize="14px"
                   fontWeight="500"
-                  sx={{ width: '135px' }}
+                  sx={{ width: '120px' }}
                 >
-                  Stock Weight (Gram)
+                  in Stock (Gram)
                 </Typography>
-                <TextField
-                  type="number"
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  name={`product_${item.id}`}
-                  placeholder="Stock Weight"
-                  value={values[`product_${item.id}`]}
-                  sx={{ width: '135px' }}
-                />
-                {Boolean(errors[`product_${item.id}`]) && (
-                  <Typography
-                    sx={{
-                      mt: '3px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      fontSize: '0.7rem',
-                      color: '#c10000',
-                    }}
-                  >
-                    <ReportIcon sx={{ fontSize: '0.9rem', mr: 0.5 }} />
-                    {errors[`product_${item.id}`]?.toString()}
-                  </Typography>
-                )}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: 1,
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <TextField
+                    type="number"
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    name={`product_${item.id}`}
+                    placeholder="Stock Weight"
+                    value={values[`product_${item.id}`]}
+                    sx={{ width: '120px' }}
+                  />
+                  {Boolean(errors[`product_${item.id}`]) && (
+                    <Typography
+                      sx={{
+                        mt: '3px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        fontSize: '0.7rem',
+                        color: '#c10000',
+                      }}
+                    >
+                      <ReportIcon sx={{ fontSize: '0.9rem', mr: 0.5 }} />
+                      {errors[`product_${item.id}`]?.toString()}
+                    </Typography>
+                  )}
+                  <Box>
+                    <Button
+                      sx={{
+                        backgroundColor: '#f8f8f8',
+                        color: '#008e58',
+                        borderRadius: '32px',
+                        border: 'solid 1px #008e58',
+                        height: '28px',
+                        '&:hover': { backgroundColor: '#f8f8f8' },
+                      }}
+                      onClick={() => {
+                        selectPopupOpenFunc();
+                      }}
+                    >
+                      Move Stock
+                    </Button>
+                  </Box>
+                </Box>
               </Box>
             </Box>
           </Box>
