@@ -48,6 +48,8 @@ export interface CreateRawSaga {
   parent_id?: number;
   is_active?: boolean;
   is_exist?: boolean;
+  is_active_parent?: boolean;
+  is_exist_parent?: boolean;
 }
 
 export interface CreateRawService {

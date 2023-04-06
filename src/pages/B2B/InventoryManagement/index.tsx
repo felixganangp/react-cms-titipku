@@ -516,7 +516,7 @@ export default function InventoryPage() {
     },
     {
       id: 'weight',
-      label: 'Weight ( Gram )',
+      label: 'In Stock (gram)',
       align: 'left',
       enableSort: false,
       format: (val: Product) => (

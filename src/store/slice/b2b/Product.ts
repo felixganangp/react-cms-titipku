@@ -33,8 +33,6 @@ interface ProductProps {
   totalEmptyStock: number;
   products: Product[];
   params: ProductParams;
-  // lowStockParams: ProductParams;
-  // emptyStockParams: ProductParams;
   loadingStockOpname: boolean;
   displayFilter: ProductDisplayFilter;
   grades: ProductGrade[];
@@ -46,7 +44,6 @@ interface ProductProps {
   details: Product | null;
   log: Log[];
   totalLog: number;
-  paramsLog: ListParams;
   listProductsMoveStk: Product[];
   loadingListProductsMoveStk: boolean;
   loadingMoveStock: boolean;
@@ -132,24 +129,6 @@ const ProductSlice = createSlice({
         ...action.payload,
       };
     },
-    // setLowStockParams(
-    //   state: ProductProps,
-    //   action: PayloadAction<ProductParams>,
-    // ) {
-    //   state.lowStockParams = {
-    //     ...state.lowStockParams,
-    //     ...action.payload,
-    //   };
-    // },
-    // setEmptyStockParams(
-    //   state: ProductProps,
-    //   action: PayloadAction<ProductParams>,
-    // ) {
-    //   state.emptyStockParams = {
-    //     ...state.StockParams,
-    //     ...action.payload,
-    //   };
-    // },
     setDisplayFilter(
       state: ProductProps,
       action: PayloadAction<ProductDisplayFilter>,

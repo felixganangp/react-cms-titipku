@@ -22,4 +22,6 @@ export interface CreateProduct {
   name: string;
   image_filepath?: string;
   product_parent_category_id: number[];
+  is_exist?: boolean;
+  is_active?: boolean;
 }

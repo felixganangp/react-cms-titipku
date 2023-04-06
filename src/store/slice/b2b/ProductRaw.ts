@@ -14,6 +14,7 @@ interface RawProps {
   loadingFilter: boolean;
   loadingForm: boolean;
   loadingAction: boolean;
+  loadingNameChecking: boolean;
   isSuccessDelete: boolean;
   isSuccessUndo: boolean;
   isSuccessCreate: boolean;
@@ -23,6 +24,7 @@ interface RawProps {
   categories: Category[];
   params: RawParams;
   displayFilter: RawDisplayFilter;
+  isNameExist: boolean | null | undefined;
 }
 
 const initialState: RawProps = {
@@ -30,6 +32,7 @@ const initialState: RawProps = {
   loadingFilter: false,
   loadingForm: false,
   loadingAction: false,
+  loadingNameChecking: false,
   isSuccessCreate: false,
   isSuccessDelete: false,
   isSuccessUndo: false,
@@ -46,6 +49,7 @@ const initialState: RawProps = {
     search: '',
     category: null,
   },
+  isNameExist: null,
 };
 
 const RawSlice = createSlice({
@@ -143,6 +147,20 @@ const RawSlice = createSlice({
     undoDeleteDone(state: RawProps) {
       state.loadingAction = false;
       state.isSuccessUndo = true;
+    },
+    checkingRawName(
+      state: RawProps,
+      action: PayloadAction<{ name: string; exclude_id: number | string }>,
+    ) {
+      state.loadingNameChecking = true;
+    },
+    checkingRawNameSuccess(state: RawProps, action: PayloadAction<boolean>) {
+      state.loadingNameChecking = false;
+      state.isNameExist = action.payload;
+    },
+    checkingRawNameFailed(state: RawProps) {
+      state.loadingNameChecking = false;
+      state.isNameExist = undefined;
     },
   },
 });
