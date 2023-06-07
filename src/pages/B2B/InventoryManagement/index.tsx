@@ -479,11 +479,11 @@ export default function InventoryPage() {
             justifyContent="flex-start"
             gap="8px"
           >
-            {val.product_grade.id !== 1 && (
+            {/* {val.product_grade.id !== 1 && (
               <GradingColor
                 grade={val.product_grade.id}
               >{`${val.product_grade.name}`}</GradingColor>
-            )}
+            )} */}
             <Typography>{val.product_parent.name}</Typography>
           </Box>
         </Box>
@@ -559,6 +559,13 @@ export default function InventoryPage() {
           </>
         );
       },
+    },
+    {
+      id: 'price',
+      label: 'Price',
+      align: 'left',
+      enableSort: false,
+      format: (val: Product) => <Typography>{val?.price || 0}</Typography>,
     },
     {
       id: 'menu',
@@ -1023,7 +1030,7 @@ export default function InventoryPage() {
                   borderTop="solid 1px #e4e4e4"
                   p="8px 12px 0 12px"
                 >
-                  <FormLabel text="Grade">
+                  {/* <FormLabel text="Grade">
                     <Autocomplete
                       id="filterGrade"
                       value={grade}
@@ -1064,7 +1071,7 @@ export default function InventoryPage() {
                         );
                       }}
                     />
-                  </FormLabel>
+                  </FormLabel> */}
                   <FormLabel text="Product Category">
                     <Autocomplete
                       id="filterCategory"

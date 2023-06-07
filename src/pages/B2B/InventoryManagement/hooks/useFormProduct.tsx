@@ -18,7 +18,25 @@ const initialValues: FormInventoryTypes = {
   image: '',
   name: '',
   category: [],
-  type: null,
+  price: '',
+  type: {
+    id: 1,
+    name: 'B2B',
+    description: 'B2B',
+    is_exist: true,
+    created_at: 1679544954,
+    updated_at: 1679544954,
+    created_by_id: 10,
+    created_by_type: 'admin',
+    created_by: {
+      id: 10,
+      name: 'Yustinus Adhi',
+      type: 'admin',
+    },
+    updated_by_id: null,
+    updated_by_type: null,
+    updated_by: null,
+  },
   productList: [
     {
       grade: { id: 1, name: 'No Grade' },
