@@ -195,7 +195,7 @@ function StockOpname({
                     </Typography>
                   )}
                   <Box>
-                    <Button
+                    {/* <Button
                       sx={{
                         backgroundColor: '#f8f8f8',
                         color: '#008e58',
@@ -209,7 +209,7 @@ function StockOpname({
                       }}
                     >
                       Move Stock
-                    </Button>
+                    </Button> */}
                   </Box>
                 </Box>
               </Box>

@@ -26,6 +26,7 @@ export interface Product {
   updated_by_id: null | number;
   updated_by_type: null | string;
   updated_by: null | ModifiedUser;
+  price: number;
 }
 
 export interface ProductParams extends ListParams {
@@ -80,6 +81,7 @@ export interface FormInventoryTypes {
     is_active: boolean;
   }[];
   typeEdit?: 'normal' | 'details';
+  price: string | number;
 }
 export interface ChangeStatusParams {
   existingStatus: IsActiveType[];

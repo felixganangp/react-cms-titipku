@@ -194,6 +194,34 @@ export default function Form(props: FormTypes) {
           />
         </FormLabel>
         <FormLabel
+          text="Price"
+          error={formik.touched.price && Boolean(formik.errors.price)}
+          helperText={
+            formik.touched.price &&
+            formik.errors.price &&
+            `${formik.errors.price}`
+          }
+        >
+          <TextField
+            type="text"
+            name="price"
+            placeholder="Insert Price"
+            // onChange={(e) => {
+            //   formik.handleChange(e);
+            // }}
+            onBlur={formik.handleBlur}
+            fullWidth
+            value={numberSeperator(formik.values.price)}
+            onChange={(e) => {
+              const value = e.target.value
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
+
+              formik.setFieldValue('price', value);
+            }}
+          />
+        </FormLabel>
+        {/* <FormLabel
           text="B2B Type"
           error={formik.touched.type && Boolean(formik.errors.type)}
           helperText={
@@ -221,8 +249,9 @@ export default function Form(props: FormTypes) {
               />
             )}
           />
-        </FormLabel>
-        {!isEdit && (
+        </FormLabel> */}
+        {/* {!isEdit && ( */}
+        {false && (
           <Stack
             direction="row"
             my={2}
@@ -241,206 +270,201 @@ export default function Form(props: FormTypes) {
         )}
 
         {/* GRADE LIST  */}
-        <Collapse in={currentGrade.isCostume}>
-          <Box overflow="auto" display="flex" width="100%">
-            {gradeList.map((val) => (
-              <Box
-                key={val.grade.id}
-                m={0.5}
-                p={1}
-                borderRadius="4px"
-                bgcolor={
-                  val.grade.id === currentGrade.currentID
-                    ? '#aad9c7'
-                    : '#e4e4e4'
-                }
-                minWidth="100pxpx"
-                sx={{
-                  cursor: isEdit
-                    ? `${
-                        currentGrade.currentID === val.grade.id
-                          ? 'pointer'
-                          : 'default'
-                      }`
-                    : 'pointer',
-                }}
-                onClick={() => {
-                  if (!isEdit) {
-                    setCurrentGrade({
-                      ...currentGrade,
-                      currentID: val.grade.id,
-                    });
-                  }
-                }}
-              >
-                <Typography
-                  fontSize="14px"
-                  color={
-                    isEdit
-                      ? `${
-                          currentGrade.currentID === val.grade.id
-                            ? '#005f3b'
-                            : '#fff'
-                        }`
-                      : '#005f3b'
-                  }
-                  whiteSpace="nowrap"
-                >
-                  {val.grade.name}
-                </Typography>
+        {true && (
+          <>
+            <Collapse in={currentGrade.isCostume}>
+              <Box overflow="auto" display="flex" width="100%">
+                {gradeList.map((val) => (
+                  <Box
+                    key={val.grade.id}
+                    m={0.5}
+                    p={1}
+                    borderRadius="4px"
+                    bgcolor={
+                      val.grade.id === currentGrade.currentID
+                        ? '#aad9c7'
+                        : '#e4e4e4'
+                    }
+                    minWidth="100pxpx"
+                    sx={{
+                      cursor: isEdit
+                        ? `${
+                            currentGrade.currentID === val.grade.id
+                              ? 'pointer'
+                              : 'default'
+                          }`
+                        : 'pointer',
+                    }}
+                    onClick={() => {
+                      if (!isEdit) {
+                        setCurrentGrade({
+                          ...currentGrade,
+                          currentID: val.grade.id,
+                        });
+                      }
+                    }}
+                  >
+                    <Typography
+                      fontSize="14px"
+                      color={
+                        isEdit
+                          ? `${
+                              currentGrade.currentID === val.grade.id
+                                ? '#005f3b'
+                                : '#fff'
+                            }`
+                          : '#005f3b'
+                      }
+                      whiteSpace="nowrap"
+                    >
+                      {val.grade.name}
+                    </Typography>
+                  </Box>
+                ))}
               </Box>
-            ))}
-          </Box>
-        </Collapse>
-        <FormLabel
-          text="Low Stock (gram)"
-          error={
-            (touchedProductList?.lowStock || false) &&
-            Boolean((errorProductList ?? [])[indexGrade]?.lowStock)
-          }
-          helperText={
-            (touchedProductList?.lowStock || false) &&
-            `${(errorProductList ?? [])[indexGrade]?.lowStock || ''}`
-          }
-        >
-          <TextField
-            type="text"
-            name="lowStock"
-            placeholder="Insert Low Stock (gram)"
-            value={numberSeperator(
-              formik.values.productList[indexGrade]?.lowStock,
-            )}
-            onChange={(e) => {
-              const product = formik.values.productList;
+            </Collapse>
+            <FormLabel
+              text="Low Stock (gram)"
+              error={
+                (touchedProductList?.lowStock || false) &&
+                Boolean((errorProductList ?? [])[indexGrade]?.lowStock)
+              }
+              helperText={
+                (touchedProductList?.lowStock || false) &&
+                `${(errorProductList ?? [])[indexGrade]?.lowStock || ''}`
+              }
+            >
+              <TextField
+                type="text"
+                name="lowStock"
+                placeholder="Insert Low Stock (gram)"
+                value={numberSeperator(
+                  formik.values.productList[indexGrade]?.lowStock,
+                )}
+                onChange={(e) => {
+                  const product = formik.values.productList;
 
-              product[indexGrade].lowStock = e.target.value
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
+                  product[indexGrade].lowStock = e.target.value
+                    .replace(/[^0-9.]/g, '')
+                    .replace(/(\..*?)\..*/g, '$1');
 
-              formik.setFieldValue('productList', product);
-            }}
-            disabled={!formik.values.productList[indexGrade]?.is_active}
-            // onBlur={handleBlur}
-            fullWidth
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">gram</InputAdornment>
-              ),
-            }}
-            helperText={
-              formik.values.productList[indexGrade].lowStock ? (
-                <Typography
-                  sx={{ fontSize: '12px', color: '#797979', ml: '-12px' }}
-                >
-                  The quantity at which you will be notified about low stock
-                </Typography>
-              ) : (
-                false
-              )
-            }
-          />
-        </FormLabel>
-        <FormLabel
-          text="In Stock (gram)"
-          error={
-            (touchedProductList?.stock || false) &&
-            Boolean((errorProductList ?? [])[indexGrade]?.stock)
-          }
-          helperText={
-            (touchedProductList?.stock || false) &&
-            `${(errorProductList ?? [])[indexGrade]?.stock || ''}`
-          }
-        >
-          <TextField
-            type="text"
-            name="stock"
-            placeholder="Insert In Stock (gram)"
-            value={numberSeperator(
-              formik.values.productList[indexGrade]?.stock,
-            )}
-            onChange={(e) => {
-              const product = formik.values.productList;
-              // eslint-disable-next-line radix
-              product[indexGrade].stock = e.target.value
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
+                  formik.setFieldValue('productList', product);
+                }}
+                disabled={!formik.values.productList[indexGrade]?.is_active}
+                // onBlur={handleBlur}
+                fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">gram</InputAdornment>
+                  ),
+                }}
+                helperText={
+                  formik.values.productList[indexGrade].lowStock ? (
+                    <Typography
+                      sx={{ fontSize: '12px', color: '#797979', ml: '-12px' }}
+                    >
+                      The quantity at which you will be notified about low stock
+                    </Typography>
+                  ) : (
+                    false
+                  )
+                }
+              />
+            </FormLabel>
+            <FormLabel
+              text="In Stock (gram)"
+              error={
+                (touchedProductList?.stock || false) &&
+                Boolean((errorProductList ?? [])[indexGrade]?.stock)
+              }
+              helperText={
+                (touchedProductList?.stock || false) &&
+                `${(errorProductList ?? [])[indexGrade]?.stock || ''}`
+              }
+            >
+              <TextField
+                type="text"
+                name="stock"
+                placeholder="Insert In Stock (gram)"
+                value={numberSeperator(
+                  formik.values.productList[indexGrade]?.stock,
+                )}
+                onChange={(e) => {
+                  const product = formik.values.productList;
+                  // eslint-disable-next-line radix
+                  product[indexGrade].stock = e.target.value
+                    .replace(/[^0-9.]/g, '')
+                    .replace(/(\..*?)\..*/g, '$1');
 
-              formik.setFieldValue('productList', product);
-            }}
-            // onBlur={handleBlur}
-            disabled={!formik.values.productList[indexGrade]?.is_active}
-            fullWidth
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">gram</InputAdornment>
-              ),
-            }}
-            helperText={
-              formik.values.productList[indexGrade].stock ? (
-                <Typography
-                  sx={{ fontSize: '12px', color: '#797979', ml: '-12px' }}
-                >
-                  <span style={{ color: '#008e58' }}>
-                    <b>
-                      {numberSeperator(
-                        formik.values.productList[indexGrade].stock,
-                      )
-                        .replaceAll('.', ',')
-                        .replaceAll(',', '.')}
-                    </b>{' '}
-                    Gram{' '}
-                  </span>
-                  is equivalent to{' '}
-                  <span style={{ color: '#008e58' }}>
-                    <b>
-                      {numberSeperator(
-                        (
-                          typeNumberValidate(
-                            formik.values.productList[indexGrade]
-                              .stock as string,
-                          ) / 1000
-                        )
-                          .toFixed(1)
-                          .replace(/\.?0+$/, ''),
-                      )}
-                    </b>{' '}
-                    Kilogram
-                  </span>
-                </Typography>
-              ) : (
-                false
-              )
-            }
-          />
-        </FormLabel>
-        <FormLabel
-          text="Description"
-          // error={
-          //   (touchedProductList?.stock || false) &&
-          //   Boolean((errorProductList ?? [])[indexGrade]?.stock)
-          // }
-          // helperText={
-          //   (touchedProductList?.stock || false) &&
-          //   `${(errorProductList ?? [])[indexGrade]?.stock || ''}`
-          // }
-        >
-          <TextField
-            type="text"
-            multiline
-            rows={3}
-            name="description"
-            placeholder="Grade Terbaik Sayap Ayam "
-            value={formik.values.productList[indexGrade].description}
-            onChange={(e) => {
-              const product = formik.values.productList;
-              product[indexGrade].description = e.target.value;
+                  formik.setFieldValue('productList', product);
+                }}
+                // onBlur={handleBlur}
+                disabled={!formik.values.productList[indexGrade]?.is_active}
+                fullWidth
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">gram</InputAdornment>
+                  ),
+                }}
+                helperText={
+                  formik.values.productList[indexGrade].stock ? (
+                    <Typography
+                      sx={{ fontSize: '12px', color: '#797979', ml: '-12px' }}
+                    >
+                      <span style={{ color: '#008e58' }}>
+                        <b>
+                          {numberSeperator(
+                            formik.values.productList[indexGrade].stock,
+                          )
+                            .replaceAll('.', ',')
+                            .replaceAll(',', '.')}
+                        </b>{' '}
+                        Gram{' '}
+                      </span>
+                      is equivalent to{' '}
+                      <span style={{ color: '#008e58' }}>
+                        <b>
+                          {numberSeperator(
+                            (
+                              typeNumberValidate(
+                                formik.values.productList[indexGrade]
+                                  .stock as string,
+                              ) / 1000
+                            )
+                              .toFixed(1)
+                              .replace(/\.?0+$/, ''),
+                          )}
+                        </b>{' '}
+                        Kilogram
+                      </span>
+                    </Typography>
+                  ) : (
+                    false
+                  )
+                }
+              />
+            </FormLabel>
+            <FormLabel text="Description">
+              <TextField
+                type="text"
+                multiline
+                rows={3}
+                name="description"
+                placeholder="Grade Terbaik Sayap Ayam "
+                value={formik.values.productList[indexGrade].description}
+                onChange={(e) => {
+                  const product = formik.values.productList;
+                  product[indexGrade].description = e.target.value;
 
-              formik.setFieldValue('productList', product);
-            }}
-            // onBlur={handleBlur}
-            fullWidth
-          />
-        </FormLabel>
+                  formik.setFieldValue('productList', product);
+                }}
+                // onBlur={handleBlur}
+                fullWidth
+              />
+            </FormLabel>
+          </>
+        )}
+
         {/* {currentGrade.isCostume && !isEdit ? (
           <Box
             color="error.main"

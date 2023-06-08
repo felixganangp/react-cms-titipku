@@ -242,6 +242,7 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
       name: dataForm.name,
       image_filepath: responUploadImage.data,
       product_parent_category_id: dataForm.category.map((val) => val.id),
+      price: dataForm.price,
     };
 
     const responProductParent: Response<ProductParent> = yield call(
