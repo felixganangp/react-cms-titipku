@@ -397,7 +397,7 @@ export default function InventoryPage() {
   };
 
   const getDashboardTitle = () => {
-    if (activeDashboard === 'all_stock') return 'Grade Management';
+    if (activeDashboard === 'all_stock') return 'Product Management';
     if (activeDashboard === 'empty_stock') return 'Empty Stock Products';
     return 'Low Stock Products';
   };

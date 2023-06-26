@@ -242,7 +242,6 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
       name: dataForm.name,
       image_filepath: responUploadImage.data,
       product_parent_category_id: dataForm.category.map((val) => val.id),
-      price: dataForm.price,
     };
 
     const responProductParent: Response<ProductParent> = yield call(
@@ -263,6 +262,7 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
           low_stock_limit: typeNumberValidate(val.lowStock as string),
           is_exist: val.is_exist,
           is_active: val.is_active,
+          price: +dataForm.price,
         }),
       ),
     );
