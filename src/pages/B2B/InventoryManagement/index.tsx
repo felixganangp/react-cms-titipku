@@ -490,14 +490,21 @@ export default function InventoryPage() {
       ),
     },
     {
-      id: 'b2bType',
-      label: 'B2B Type',
+      id: 'price',
+      label: 'Price',
       align: 'left',
       enableSort: false,
-      format: (val: Product) => (
-        <Typography>{val.product_type.name}</Typography>
-      ),
+      format: (val: Product) => <Typography>{val?.price || 0}</Typography>,
     },
+    // {
+    //   id: 'b2bType',
+    //   label: 'B2B Type',
+    //   align: 'left',
+    //   enableSort: false,
+    //   format: (val: Product) => (
+    //     <Typography>{val.product_type.name}</Typography>
+    //   ),
+    // },
     {
       id: 'category',
       label: 'Category',
@@ -525,7 +532,7 @@ export default function InventoryPage() {
     },
     {
       id: 'weight',
-      label: 'In Stock (gram)',
+      label: 'In Stock',
       align: 'left',
       enableSort: false,
       format: (val: Product) => (
@@ -559,13 +566,6 @@ export default function InventoryPage() {
           </>
         );
       },
-    },
-    {
-      id: 'price',
-      label: 'Price',
-      align: 'left',
-      enableSort: false,
-      format: (val: Product) => <Typography>{val?.price || 0}</Typography>,
     },
     {
       id: 'menu',

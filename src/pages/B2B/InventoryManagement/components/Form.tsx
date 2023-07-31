@@ -8,6 +8,7 @@ import {
   Typography,
   Button,
   Collapse,
+  Grid,
 } from '@mui/material';
 import FormLabel from 'components/FormLabel';
 import InputImage from 'components/InputImage';
@@ -158,6 +159,34 @@ export default function Form(props: FormTypes) {
           />
         </FormLabel>
         <FormLabel
+          text="Price"
+          error={formik.touched.price && Boolean(formik.errors.price)}
+          helperText={
+            formik.touched.price &&
+            formik.errors.price &&
+            `${formik.errors.price}`
+          }
+        >
+          <TextField
+            type="text"
+            name="price"
+            placeholder="Insert Price"
+            // onChange={(e) => {
+            //   formik.handleChange(e);
+            // }}
+            onBlur={formik.handleBlur}
+            fullWidth
+            value={numberSeperator(formik.values.price)}
+            onChange={(e) => {
+              const value = e.target.value
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
+
+              formik.setFieldValue('price', value);
+            }}
+          />
+        </FormLabel>
+        <FormLabel
           text="Category"
           error={formik.touched.category && Boolean(formik.errors.category)}
           helperText={
@@ -193,325 +222,110 @@ export default function Form(props: FormTypes) {
             )}
           />
         </FormLabel>
-        <FormLabel
-          text="Price"
-          error={formik.touched.price && Boolean(formik.errors.price)}
-          helperText={
-            formik.touched.price &&
-            formik.errors.price &&
-            `${formik.errors.price}`
-          }
+        <Box
+          p={1}
+          bgcolor="#F8F8F8"
+          border="1px solid #e4e4e4"
+          borderRadius="8px"
         >
-          <TextField
-            type="text"
-            name="price"
-            placeholder="Insert Price"
-            // onChange={(e) => {
-            //   formik.handleChange(e);
-            // }}
-            onBlur={formik.handleBlur}
-            fullWidth
-            value={numberSeperator(formik.values.price)}
-            onChange={(e) => {
-              const value = e.target.value
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
-
-              formik.setFieldValue('price', value);
-            }}
-          />
-        </FormLabel>
-        {/* <FormLabel
-          text="B2B Type"
-          error={formik.touched.type && Boolean(formik.errors.type)}
-          helperText={
-            formik.touched.type && formik.errors.type && `${formik.errors.type}`
-          }
-        >
-          <Autocomplete
-            data-testid="form-type"
-            id="type"
-            options={types}
-            onChange={(e, value) => {
-              formik.setFieldValue('type', value);
-            }}
-            // isOptionEqualToValue={(option: Type) => {
-            //   return option.id === values.kurType?.id;
-            // }}
-            getOptionLabel={(option) => `${option.name}`}
-            value={formik.values.type}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                name="type"
-                onBlur={formik.handleBlur}
-                placeholder="Choose Type"
-              />
-            )}
-          />
-        </FormLabel> */}
-        {/* {!isEdit && ( */}
-        {false && (
-          <Stack
-            direction="row"
-            my={2}
-            p="10px 5px"
-            bgcolor={currentGrade.isCostume ? '#f1f1f1' : 'unset'}
-            justifyContent="space-between"
-          >
-            <Box display="flex" gap="20px" alignItems="center">
-              <SwitchStyle
-                checked={currentGrade.isCostume}
-                onChange={onOffCostumeGrade}
-              />
-              <Typography>Custom Grade</Typography>
-            </Box>
-          </Stack>
-        )}
-
-        {/* GRADE LIST  */}
-        {true && (
-          <>
-            <Collapse in={currentGrade.isCostume}>
-              <Box overflow="auto" display="flex" width="100%">
-                {gradeList.map((val) => (
-                  <Box
-                    key={val.grade.id}
-                    m={0.5}
-                    p={1}
-                    borderRadius="4px"
-                    bgcolor={
-                      val.grade.id === currentGrade.currentID
-                        ? '#aad9c7'
-                        : '#e4e4e4'
-                    }
-                    minWidth="100pxpx"
+          <Grid container spacing="10px">
+            <Grid item xs={8}>
+              <FormLabel text="Low Stock">
+                <>
+                  <TextField
+                    type="text"
+                    name="low_stock"
+                    placeholder="Insert Low Stock"
                     sx={{
-                      cursor: isEdit
-                        ? `${
-                            currentGrade.currentID === val.grade.id
-                              ? 'pointer'
-                              : 'default'
-                          }`
-                        : 'pointer',
+                      '& .MuiOutlinedInput-root': {
+                        backgroundColor: '#fff',
+                        color: '#929395',
+                        '& .MuiSvgIcon-root': {
+                          color: '#929395',
+                        },
+                      },
                     }}
-                    onClick={() => {
-                      if (!isEdit) {
-                        setCurrentGrade({
-                          ...currentGrade,
-                          currentID: val.grade.id,
-                        });
-                      }
-                    }}
-                  >
-                    <Typography
-                      fontSize="14px"
-                      color={
-                        isEdit
-                          ? `${
-                              currentGrade.currentID === val.grade.id
-                                ? '#005f3b'
-                                : '#fff'
-                            }`
-                          : '#005f3b'
-                      }
-                      whiteSpace="nowrap"
-                    >
-                      {val.grade.name}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            </Collapse>
-            <FormLabel
-              text="Low Stock (gram)"
-              error={
-                (touchedProductList?.lowStock || false) &&
-                Boolean((errorProductList ?? [])[indexGrade]?.lowStock)
-              }
-              helperText={
-                (touchedProductList?.lowStock || false) &&
-                `${(errorProductList ?? [])[indexGrade]?.lowStock || ''}`
-              }
-            >
-              <TextField
-                type="text"
-                name="lowStock"
-                placeholder="Insert Low Stock (gram)"
-                value={numberSeperator(
-                  formik.values.productList[indexGrade]?.lowStock,
-                )}
-                onChange={(e) => {
-                  const product = formik.values.productList;
-
-                  product[indexGrade].lowStock = e.target.value
-                    .replace(/[^0-9.]/g, '')
-                    .replace(/(\..*?)\..*/g, '$1');
-
-                  formik.setFieldValue('productList', product);
-                }}
-                disabled={!formik.values.productList[indexGrade]?.is_active}
-                // onBlur={handleBlur}
-                fullWidth
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">gram</InputAdornment>
-                  ),
-                }}
-                helperText={
-                  formik.values.productList[indexGrade].lowStock ? (
-                    <Typography
-                      sx={{ fontSize: '12px', color: '#797979', ml: '-12px' }}
-                    >
-                      The quantity at which you will be notified about low stock
-                    </Typography>
-                  ) : (
-                    false
-                  )
-                }
-              />
-            </FormLabel>
-            <FormLabel
-              text="In Stock (gram)"
-              error={
-                (touchedProductList?.stock || false) &&
-                Boolean((errorProductList ?? [])[indexGrade]?.stock)
-              }
-              helperText={
-                (touchedProductList?.stock || false) &&
-                `${(errorProductList ?? [])[indexGrade]?.stock || ''}`
-              }
-            >
-              <TextField
-                type="text"
-                name="stock"
-                placeholder="Insert In Stock (gram)"
-                value={numberSeperator(
-                  formik.values.productList[indexGrade]?.stock,
-                )}
-                onChange={(e) => {
-                  const product = formik.values.productList;
-                  // eslint-disable-next-line radix
-                  product[indexGrade].stock = e.target.value
-                    .replace(/[^0-9.]/g, '')
-                    .replace(/(\..*?)\..*/g, '$1');
-
-                  formik.setFieldValue('productList', product);
-                }}
-                // onBlur={handleBlur}
-                disabled={!formik.values.productList[indexGrade]?.is_active}
-                fullWidth
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">gram</InputAdornment>
-                  ),
-                }}
-                helperText={
-                  formik.values.productList[indexGrade].stock ? (
-                    <Typography
-                      sx={{ fontSize: '12px', color: '#797979', ml: '-12px' }}
-                    >
-                      <span style={{ color: '#008e58' }}>
-                        <b>
-                          {numberSeperator(
-                            formik.values.productList[indexGrade].stock,
-                          )
-                            .replaceAll('.', ',')
-                            .replaceAll(',', '.')}
-                        </b>{' '}
-                        Gram{' '}
-                      </span>
-                      is equivalent to{' '}
-                      <span style={{ color: '#008e58' }}>
-                        <b>
-                          {numberSeperator(
-                            (
-                              typeNumberValidate(
-                                formik.values.productList[indexGrade]
-                                  .stock as string,
-                              ) / 1000
-                            )
-                              .toFixed(1)
-                              .replace(/\.?0+$/, ''),
-                          )}
-                        </b>{' '}
-                        Kilogram
-                      </span>
-                    </Typography>
-                  ) : (
-                    false
-                  )
-                }
-              />
-            </FormLabel>
-            <FormLabel text="Description">
-              <TextField
-                type="text"
-                multiline
-                rows={3}
-                name="description"
-                placeholder="Grade Terbaik Sayap Ayam "
-                value={formik.values.productList[indexGrade].description}
-                onChange={(e) => {
-                  const product = formik.values.productList;
-                  product[indexGrade].description = e.target.value;
-
-                  formik.setFieldValue('productList', product);
-                }}
-                // onBlur={handleBlur}
-                fullWidth
-              />
-            </FormLabel>
-          </>
-        )}
-
-        {/* {currentGrade.isCostume && !isEdit ? (
-          <Box
-            color="error.main"
-            bgcolor="#f9ebe7"
-            display="inline-flex"
-            alignItems="center"
-            p="5px"
-            gap="px"
-            borderRadius="5px"
-            sx={{ cursor: 'pointer' }}
-            onClick={async () => {
-              const product = formik.values.productList;
-              product[indexGrade].is_exist = false;
-
-              await formik.setFieldValue('productList', product);
-
-              if (
-                product
-                  .filter((val) => val.grade.id !== 1)
-                  .filter((val) => val.is_exist !== false).length > 0
-              ) {
-                setCurrentGrade({
-                  isCostume: true,
-                  currentID: product
-                    .filter((val) => val.grade.id !== 1)
-                    .filter((val) => val.is_exist !== false)[0].grade.id,
-                });
-              } else {
-                setCurrentGrade({
-                  isCostume: false,
-                  currentID: 1,
-                });
-                if (isEdit) {
-                  setTypeUpdate('to-default');
-                }
-              }
-            }}
-          >
-            <TrashIcon sx={{ fontSize: '25px' }} />
-            <Typography fontSize="14px">
-              {isEdit ? 'Delete' : 'Clear'}{' '}
-              {formik.values.productList[indexGrade].grade.name}
-            </Typography>
-          </Box>
-        ) : (
-          false
-        )} */}
+                    fullWidth
+                  />
+                  <Typography fontSize={12} color="#929395" p={0.1}>
+                    The quantity at which you will be notified about low stock
+                  </Typography>
+                </>
+              </FormLabel>
+            </Grid>
+            <Grid item xs={4}>
+              <FormLabel text="Unit">
+                <Autocomplete
+                  data-testid="form-category"
+                  id="category"
+                  multiple
+                  options={[]}
+                  onChange={(e, value) => {
+                    // formik.setFieldValue('category', value);
+                  }}
+                  // isOptionEqualToValue={(option, values) => {
+                  //   return option.id === values.id;
+                  // }}
+                  // getOptionLabel={(option) => `${option.name}`}
+                  // value={formik.values.category}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      name="category"
+                      // onBlur={formik.handleBlur}
+                      placeholder="Choose Unit"
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: '#fff',
+                          color: '#929395',
+                          '& .MuiSvgIcon-root': {
+                            color: '#929395',
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                />
+              </FormLabel>
+            </Grid>
+          </Grid>
+          <FormLabel text="In Stock">
+            <TextField
+              type="text"
+              name="low_stock"
+              placeholder="Insert In Stock"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: '#fff',
+                  color: '#929395',
+                  '& .MuiSvgIcon-root': {
+                    color: '#929395',
+                  },
+                },
+              }}
+              fullWidth
+            />
+          </FormLabel>
+          <FormLabel text="Description">
+            <TextField
+              type="text"
+              name="Description"
+              placeholder="Insert Description"
+              multiline
+              minRows={3}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  backgroundColor: '#fff',
+                  color: '#929395',
+                  '& .MuiSvgIcon-root': {
+                    color: '#929395',
+                  },
+                },
+              }}
+              fullWidth
+            />
+          </FormLabel>
+        </Box>
       </Box>
       <Box
         width="100%"
