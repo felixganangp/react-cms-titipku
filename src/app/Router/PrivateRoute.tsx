@@ -26,10 +26,9 @@ export default function PrivateRoute({
     if (isAuth) dispatch(userDetailsAction.fetchUserDetails());
   }, []);
 
-  if (!isAuth) {
-    console.log('not auth');
-    return <Navigate to={redirect} />;
-  }
+  // if (!isAuth) {
+  //   return <Navigate to={redirect} />;
+  // }
 
   const toggleOpen = () => {
     setOpen(!open);
