@@ -19,8 +19,9 @@ export default function IndexRoute() {
 
   return (
     <Routes>
-      {ListRoute.filter((val) => listIdMenu.indexOf(val.name) !== -1).map(
-        (val, index) => (
+      {ListRoute
+        // .filter((val) => listIdMenu.indexOf(val.name) !== -1)
+        .map((val, index) => (
           <Route
             index={val.index}
             path={val.path}
@@ -44,8 +45,7 @@ export default function IndexRoute() {
               </>
             }
           />
-        ),
-      )}
+        ))}
     </Routes>
   );
 }

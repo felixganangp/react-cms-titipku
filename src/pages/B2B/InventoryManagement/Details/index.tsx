@@ -1,7 +1,7 @@
 /* eslint-disable radix */
 /* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable no-nested-ternary */
-import React, { useEffect } from 'react';
+import React, { Children, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stack, Box, Typography, Button, Grid, Skeleton } from '@mui/material';
 import Table from 'components/Table';
@@ -10,12 +10,12 @@ import useModal from 'hooks/useModal';
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import YellowToast from 'components/YellowToast';
-
+import numberSeperator from 'utils/numberSeperator';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
 import { Log } from 'models/b2b/Product';
 import NoImage from 'assets/no-image.svg';
-import { CardContainer, GradingColor, StatusColor } from '../inventory.styled';
+import { CardContainer, StatusColor } from '../inventory.styled';
 import Form from '../components/Form';
 
 export default function InvoiceDetail() {
@@ -27,9 +27,9 @@ export default function InvoiceDetail() {
   const { id } = useParams();
   const formProductModal = useModal();
 
-  useEffect(() => {
-    dispatch(productAction.fetchGrade());
-  }, []);
+  // useEffect(() => {
+  //   dispatch(productAction.fetchGrade());
+  // }, []);
 
   useEffect(() => {
     if (id) {
@@ -100,10 +100,10 @@ export default function InvoiceDetail() {
               ) : val.changes.action_type === 'update' ? (
                 `${
                   val.changes.columns
-                    ? val.changes.columns[0].name.replace(
+                    ? val.changes.columns[0]?.name.replace(
                         /^./,
                         val.changes.columns[0].name[0].toUpperCase(),
-                      )
+                      ) || '-'
                     : 'But No Changes'
                 }`
               ) : val.changes.action_type === 'delete' ? (
@@ -128,6 +128,13 @@ export default function InvoiceDetail() {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
+  const LoadingComp = ({ children }: { children: JSX.Element }) => {
+    return product.loadingDetails ? (
+      <Skeleton width={50} height={25} />
+    ) : (
+      <>{children}</>
+    );
+  };
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <CardContainer>
@@ -140,7 +147,7 @@ export default function InvoiceDetail() {
             <Stack direction="row" alignItems="center" spacing="16px">
               <Box
                 component="img"
-                src={details?.product_parent.image_filepath}
+                src={details?.image}
                 onError={({ currentTarget }) => {
                   currentTarget.onerror = null;
                   currentTarget.src = NoImage;
@@ -156,14 +163,14 @@ export default function InvoiceDetail() {
                   <Skeleton width={120} height={40} />
                 ) : (
                   <Typography color="#000000" fontSize="24px" fontWeight="600">
-                    {details?.product_parent.name}
+                    {details?.name}
                   </Typography>
                 )}
 
                 <Button
                   variant="text"
                   startIcon={<BackIcon />}
-                  onClick={() => navigate(-1)}
+                  onClick={() => navigate('/b2b/inventory/')}
                 >
                   See all List
                 </Button>
@@ -181,98 +188,63 @@ export default function InvoiceDetail() {
           <Grid container mt="30px" mx="10px" mb="10px" rowGap="30px">
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
-                Product Name (SKU)
+                Average Price
               </Typography>
-              {product.loadingDetails ? (
-                <Skeleton width={50} height={25} />
-              ) : (
+              <LoadingComp>
                 <Typography fontSize="14px">
-                  {details?.product_parent.name}
+                  Rp. {numberSeperator(details?.average_price || 0)}
                 </Typography>
-              )}
+              </LoadingComp>
             </Grid>
 
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
-                B2B Type
+                Selling Price
               </Typography>
-              {product.loadingDetails ? (
-                <Skeleton width={50} height={25} />
-              ) : (
+              <LoadingComp>
                 <Typography fontSize="14px">
-                  {details?.product_type.name}
+                  Rp. {numberSeperator(details?.selling_price || 0)}
                 </Typography>
-              )}
-            </Grid>
-
-            <Grid item xs={4} lg={2.4}>
-              <Typography fontSize="14px" color="#0661ae">
-                Product Grade
-              </Typography>
-              {product.loadingDetails ? (
-                <Skeleton width={50} height={25} />
-              ) : (
-                <GradingColor grade={details ? details?.product_grade.id : 1}>
-                  {details?.product_grade.name}
-                </GradingColor>
-              )}
+              </LoadingComp>
             </Grid>
 
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 Category
               </Typography>
-              {product.loadingDetails ? (
-                <Skeleton width={50} height={25} />
-              ) : details?.product_parent?.product_parent_category ? (
-                details?.product_parent?.product_parent_category.map(
-                  (category) => (
-                    <Typography fontSize="14px" key={category.id}>
-                      {category.name}
-                    </Typography>
-                  ),
-                )
-              ) : (
-                <Typography fontSize="14px">-</Typography>
-              )}
+              <LoadingComp>
+                <Typography fontSize="14px">
+                  {details?.product_category}
+                </Typography>
+              </LoadingComp>
             </Grid>
 
-            <Grid item xs={4} lg={2.4}>
+            <Grid item xs={4} lg={4.8}>
               <Typography fontSize="14px" color="#0661ae">
                 Description
               </Typography>
-              {product.loadingDetails ? (
-                <Skeleton width={50} height={25} />
-              ) : (
+              <LoadingComp>
                 <Typography fontSize="14px">{details?.description}</Typography>
-              )}
+              </LoadingComp>
             </Grid>
 
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 In Stock
               </Typography>
-              {product.loadingDetails ? (
-                <Skeleton width={50} height={25} />
-              ) : (
-                <Typography fontSize="14px">
-                  {details ? numberWithCommas(details?.stock) : 0} gram
-                </Typography>
-              )}
+              <LoadingComp>
+                <Typography fontSize="14px">{details?.stock}</Typography>
+              </LoadingComp>
             </Grid>
-
             <Grid item xs={4} lg={2.4}>
               <Typography fontSize="14px" color="#0661ae">
                 Low Stock Alerts
               </Typography>
-              {product.loadingDetails ? (
-                <Skeleton width={50} height={25} />
-              ) : (
+              <LoadingComp>
                 <Typography fontSize="14px">
-                  {details ? numberWithCommas(details?.low_stock_limit) : 0}{' '}
-                  gram
+                  {details?.low_stock_limit}
                 </Typography>
-              )}
+              </LoadingComp>
             </Grid>
 
             <Grid item xs={4} lg={2.4}>
@@ -329,7 +301,7 @@ export default function InvoiceDetail() {
           onClose={() => {
             formProductModal.closeModal();
           }}
-          EditProductParent={details}
+          EditProduct={details}
           isDetail
         />
       </ModalComp>

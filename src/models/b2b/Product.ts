@@ -7,13 +7,15 @@ import { Category } from 'models/b2b/Category';
 
 export interface Product {
   id: number;
-  product_parent_id: number;
-  product_parent: ProductParent;
-  product_grade_id: number;
-  product_grade: ProductGrade;
-  product_type_id: number;
-  product_type: ProductType;
+  name: string;
+  image: string;
   description: string;
+  product_category_id: number;
+  product_category: string;
+  unit_measurement_id: number;
+  unit_measurement: string;
+  average_price: number;
+  selling_price: number;
   stock: number;
   low_stock_limit: number;
   is_exist: boolean;
@@ -22,11 +24,8 @@ export interface Product {
   updated_at: number;
   created_by_id: number;
   created_by_type: string;
-  created_by: ModifiedUser;
-  updated_by_id: null | number;
-  updated_by_type: null | string;
-  updated_by: null | ModifiedUser;
-  price: number;
+  updated_by_id: number;
+  updated_by_type: string;
 }
 
 export interface ProductParams extends ListParams {
@@ -54,18 +53,20 @@ export interface ProductDisplayFilter {
   type?: ProductType | null;
 }
 
-export interface CreateProduct {
-  product_parent_id: number;
-  product_grade_id: number;
-  product_type_id: number;
-  description: string;
-  stock: number;
-  low_stock_limit: number;
-  is_exist?: boolean;
-  is_active?: boolean;
-}
+// export interface CreateProduct extends FormData {
+//   append(
+//     image: '',
+//     name: '',
+//     category: [],
+//     selling_price: '',
+//     low_stock_limit: '',
+//     stock: '',
+//     description: '',
+//     unit_measurement_id: null,
+//   ): void;
+// }
 
-export interface FormInventoryTypes {
+export interface FormInventoryTypes2 {
   idParent?: number;
   image: string | Blob;
   name: string;
@@ -83,6 +84,18 @@ export interface FormInventoryTypes {
   typeEdit?: 'normal' | 'details';
   price: string | number;
 }
+
+export interface FormInventoryTypes {
+  image: string | Blob;
+  name: string;
+  category: number | null;
+  unit_measurement_id: number | null;
+  selling_price: string | number;
+  description: string;
+  stock: string | number;
+  low_stock_limit: string | number;
+}
+
 export interface ChangeStatusParams {
   existingStatus: IsActiveType[];
   newStatus: IsActiveType;

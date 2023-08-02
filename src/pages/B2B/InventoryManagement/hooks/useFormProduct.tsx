@@ -4,56 +4,35 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
+import { useParams } from 'react-router-dom';
 
 import { FormInventoryTypes, Product } from 'models/b2b/Product';
-import { fetchProduct } from 'service/B2B/Product';
-import { ListResponse } from 'models/fetch';
+// import { fetchProduct } from 'service/B2B/Product';
+// import { ListResponse } from 'models/fetch';
 
 interface FormTypes {
   onClose: () => void;
-  EditProductParent: null | Product;
+  EditProduct: null | Product;
   isDetail?: boolean;
 }
+
 const initialValues: FormInventoryTypes = {
   image: '',
   name: '',
-  category: [],
-  price: '',
-  type: {
-    id: 1,
-    name: 'B2B',
-    description: 'B2B',
-    is_exist: true,
-    created_at: 1679544954,
-    updated_at: 1679544954,
-    created_by_id: 10,
-    created_by_type: 'admin',
-    created_by: {
-      id: 10,
-      name: 'Yustinus Adhi',
-      type: 'admin',
-    },
-    updated_by_id: null,
-    updated_by_type: null,
-    updated_by: null,
-  },
-  productList: [
-    {
-      grade: { id: 1, name: 'No Grade' },
-      description: '',
-      stock: '',
-      lowStock: '',
-      is_exist: true,
-      is_active: true,
-    },
-  ],
+  category: null,
+  selling_price: '',
+  low_stock_limit: '',
+  stock: '',
+  description: '',
+  unit_measurement_id: null,
 };
 
 export default function FormProduct({
   onClose,
-  EditProductParent,
+  EditProduct,
   isDetail,
 }: FormTypes) {
+  const { id } = useParams();
   const dispatch = useAppDispatch();
   const { categories, types, grades, isSuccessCreate, loadingForm } =
     useAppSelector((state) => state.product);
@@ -64,7 +43,6 @@ export default function FormProduct({
   });
 
   useEffect(() => {
-    dispatch(productAction.fetchGrade());
     dispatch(productAction.fetchCategory());
   }, []);
 
@@ -74,167 +52,54 @@ export default function FormProduct({
       onClose();
       dispatch(productAction.resetProductForm());
     }
+    if (isDetail && id) {
+      dispatch(productAction.fetchDetails(id));
+      dispatch(
+        productAction.setLogParams({
+          // eslint-disable-next-line radix
+          product_id: parseInt(id),
+        }),
+      );
+    }
   }, [isSuccessCreate]);
-
-  useEffect(() => {
-    dispatch(productAction.fetchTypes());
-  }, []);
-
-  const createProduct = (value: FormInventoryTypes) => {
-    if (currentGrade.isCostume) {
-      dispatch(
-        productAction.createProduct({
-          ...value,
-          productList: value.productList.filter(
-            (val) => val.grade.id !== 1 && val.is_exist === true,
-          ),
-        }),
-      );
-    } else {
-      dispatch(
-        productAction.createProduct({
-          ...value,
-          productList: value.productList.filter(
-            (val) => val.grade.id === 1 && val.is_active === true,
-          ),
-        }),
-      );
-    }
-  };
-
-  const updateCreateProduct = (id: number, value: FormInventoryTypes) => {
-    // console.log(value);
-    // console.log(typeUpdate);
-    dispatch(
-      productAction.updateProduct({
-        ...value,
-        productList: value.productList.filter(
-          (val) => val.grade.id === EditProductParent?.product_grade_id,
-        ),
-        idParent: id,
-        typeEdit: isDetail ? 'details' : 'normal',
-      }),
-    );
-  };
-
-  const handleSubmit = (value: FormInventoryTypes) => {
-    if (EditProductParent) {
-      updateCreateProduct(EditProductParent.product_parent_id, value);
-    } else {
-      createProduct(value);
-    }
-  };
 
   const formik = useFormik({
     initialValues,
-    onSubmit: () => {
-      // handleSubmit(value);
+    onSubmit: (values) => {
+      if (EditProduct) {
+        dispatch(
+          productAction.updateProduct({ id: EditProduct.id, data: values }),
+        );
+      } else {
+        dispatch(productAction.createProduct(values));
+      }
     },
     validationSchema: yup.object({
       name: yup.string().required('Name is required'),
       image: yup.mixed().required('Image is required'),
-      category: yup
-        .array()
-        .required('Category is required')
-        .min(1, 'Category is required'),
-      type: yup.mixed().required('Type is required'),
-      productList: yup
-        .array()
-        .of(
-          yup.object().shape({
-            stock: yup
-              .number()
-              .typeError('stock is required')
-              // .required('stock is required')
-              .min(0, 'Please input positive value stock')
-              .max(2147483647, 'Maximal stock is 2.147.483.647'),
-            lowStock: yup
-              .number()
-              .typeError('stock is required')
-              // .required('Low stock is required')
-              .min(0, 'Please input positive value  low stock')
-              .max(2147483647, 'Maximal low stock is 2.147.483.647'),
-            // description: yup.string().required('Please input  description'),
-          }),
-        )
-        .required('Company is required'),
+      category: yup.mixed().required('Category is required'),
+      selling_price: yup.string().required('Price is required'),
+      low_stock_limit: yup.string().required('Low Stock is required'),
+      stock: yup.string().required('Stock is required'),
+      description: yup.string().required('Description is required'),
+      unit_measurement_id: yup.mixed().required('Unit is required'),
     }),
   });
 
-  const getEditProductList = async (id: number) => {
-    const respon = (await fetchProduct({
-      product_parent_id: id,
-    })) as ListResponse<Product>;
-    if (respon.data?.length > 0) {
-      const data = respon.data.filter((val) => val.is_exist);
-
-      const isCostumeGrade =
-        data.findIndex(
-          (item) => item.product_grade_id === 1 && item.is_active,
-        ) === -1;
-
-      const result = grades.map((val) => {
-        const index = data.findIndex(
-          (item) => item.product_grade_id === val.id,
-        );
-        if (index === -1) {
-          return {
-            grade: val,
-            description: '',
-            stock: '',
-            lowStock: '',
-            is_exist: false,
-            is_active: true,
-          };
-        }
-        return {
-          id: data[index].id,
-          grade: data[index].product_grade,
-          description: data[index].description,
-          stock: data[index].stock,
-          lowStock: data[index].low_stock_limit,
-          is_exist: data[index].is_exist,
-          is_active: data[index].is_active,
-        };
-      });
-
-      setCurrentGrade({
-        currentID: EditProductParent?.product_grade_id || 0,
-        isCostume: isCostumeGrade,
-      });
-
-      formik.setFieldValue('productList', result);
-    }
-  };
-
   useEffect(() => {
-    if (EditProductParent) {
-      const fieldValue = {
-        ...formik.values,
-        image: EditProductParent?.product_parent.image_filepath,
-        name: EditProductParent?.product_parent.name,
-        category:
-          EditProductParent?.product_parent.product_parent_category?.map(
-            (val) => ({ id: val.id, name: val.name }),
-          ) || [],
-        type: EditProductParent?.product_type,
-      };
-      formik.setValues(fieldValue);
-      getEditProductList(EditProductParent.product_parent_id);
-    } else {
-      formik.setFieldValue(
-        'productList',
-        grades.map((val) => ({
-          grade: val,
-          description: '',
-          stock: '',
-          lowStock: '',
-          is_exist: true,
-          is_active: true,
-        })),
-      );
+    if (EditProduct) {
+      formik.setValues({
+        image: EditProduct.image,
+        name: EditProduct.name,
+        category: EditProduct.product_category_id,
+        selling_price: EditProduct.selling_price,
+        low_stock_limit: EditProduct.low_stock_limit,
+        stock: EditProduct.stock,
+        description: EditProduct.description,
+        unit_measurement_id: EditProduct.unit_measurement_id,
+      });
     }
-  }, [EditProductParent]);
+  }, [EditProduct]);
 
   return {
     formik,
@@ -244,7 +109,6 @@ export default function FormProduct({
     currentGrade,
     setCurrentGrade,
     loadingForm,
-    handleSubmit,
-    isEdit: Boolean(EditProductParent),
+    isEdit: Boolean(EditProduct),
   };
 }
