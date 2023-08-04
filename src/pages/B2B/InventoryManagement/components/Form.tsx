@@ -21,19 +21,29 @@ import numberSeperator, { typeNumberValidate } from 'utils/numberSeperator';
 // import TrashIcon from 'components/Icon/Trash';
 
 import useFormProduct from '../hooks/useFormProduct';
-import { SwitchStyle } from '../inventory.styled';
 
-interface TypesError {
-  lowStock: string | number;
-  stock: string | number;
-}
+const UnitDummy = [
+  {
+    id: 1,
+    name: 'Ekor',
+  },
+  {
+    id: 2,
+    name: 'Gram',
+  },
+  {
+    id: 3,
+    name: 'Liter',
+  },
+];
 interface FormTypes {
-  onClose: () => void;
-  EditProductParent: Product | null;
+  onClose?: () => void;
+  EditProduct?: Product | null;
   isDetail?: boolean;
+  processProduct?: boolean;
 }
 
-export default function Form(props: FormTypes) {
+export default function Form({ processProduct, ...props }: FormTypes) {
   const [isNameExist, setIsNameExist] = useState(false);
   const {
     formik,
@@ -42,28 +52,8 @@ export default function Form(props: FormTypes) {
     currentGrade,
     setCurrentGrade,
     loadingForm,
-    handleSubmit,
     isEdit,
   } = useFormProduct(props);
-
-  const indexGrade = formik.values.productList.findIndex(
-    (val) => val.grade.id === currentGrade.currentID,
-  );
-
-  const gradeList = formik.values.productList
-    .filter((val) => val.grade.id !== 1)
-    .filter((val) => val.is_exist !== false);
-
-  const onOffCostumeGrade = () => {
-    if (!currentGrade.isCostume) {
-      setCurrentGrade({
-        isCostume: true,
-        currentID: formik.values.productList[1].grade.id,
-      });
-    } else {
-      setCurrentGrade({ isCostume: false, currentID: 1 });
-    }
-  };
 
   const handleCheckIsNameExist = async (value: {
     name: string;
@@ -77,43 +67,12 @@ export default function Form(props: FormTypes) {
     [],
   );
 
-  const touchedProductList = (formik.touched?.productList ?? [])[indexGrade];
-  const errorProductList = formik.errors?.productList as TypesError[];
-  const isValid = () => {
-    let valid = false;
-    // check valid product parent
-    const data = Object.values(formik.errors).filter(
-      (val) => typeof val === 'string',
-    );
-    // check is valid product
-    if (!currentGrade.isCostume) {
-      valid =
-        (errorProductList ?? [])[0] === undefined &&
-        data.length === 0 &&
-        !isNameExist;
-    } else {
-      const listGradeActiveIndex = formik.values.productList
-        .filter((val) => val.grade.id !== 1)
-        .map((val, index) => {
-          if (val.is_exist !== true) {
-            return true;
-          }
-          return (errorProductList ?? [])[index + 1] === undefined;
-        });
-
-      valid =
-        listGradeActiveIndex.findIndex((val) => val === false) === -1 &&
-        data.length === 0 &&
-        !isNameExist;
-    }
-
-    return valid;
-  };
   return (
-    <>
-      <Box p="24px">
+    <Box component="form" onSubmit={formik.handleSubmit}>
+      <Box p={processProduct ? 'unset' : '24px'}>
         <FormLabel
           text="Input Image"
+          required
           error={formik.touched.image && Boolean(formik.errors.image)}
           helperText={
             formik.touched.image &&
@@ -131,6 +90,7 @@ export default function Form(props: FormTypes) {
           />
         </FormLabel>
         <FormLabel
+          required
           text="Product Name (SKU)"
           error={
             (formik.touched.name && Boolean(formik.errors.name)) ||
@@ -159,34 +119,40 @@ export default function Form(props: FormTypes) {
           />
         </FormLabel>
         <FormLabel
+          required
           text="Price"
-          error={formik.touched.price && Boolean(formik.errors.price)}
+          error={
+            formik.touched.selling_price && Boolean(formik.errors.selling_price)
+          }
           helperText={
-            formik.touched.price &&
-            formik.errors.price &&
-            `${formik.errors.price}`
+            formik.touched.selling_price &&
+            formik.errors.selling_price &&
+            `${formik.errors.selling_price}`
           }
         >
           <TextField
             type="text"
-            name="price"
+            name="selling_price"
             placeholder="Insert Price"
-            // onChange={(e) => {
-            //   formik.handleChange(e);
-            // }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">Rp</InputAdornment>
+              ),
+            }}
             onBlur={formik.handleBlur}
             fullWidth
-            value={numberSeperator(formik.values.price)}
+            value={numberSeperator(formik.values.selling_price)}
             onChange={(e) => {
               const value = e.target.value
                 .replace(/[^0-9.]/g, '')
                 .replace(/(\..*?)\..*/g, '$1');
 
-              formik.setFieldValue('price', value);
+              formik.setFieldValue('selling_price', value);
             }}
           />
         </FormLabel>
         <FormLabel
+          required
           text="Category"
           error={formik.touched.category && Boolean(formik.errors.category)}
           helperText={
@@ -198,20 +164,19 @@ export default function Form(props: FormTypes) {
           <Autocomplete
             data-testid="form-category"
             id="category"
-            multiple
-            options={
-              categories?.length > 0
-                ? categories.map((val) => ({ id: val.id, name: val.name }))
-                : []
-            }
+            options={categories}
             onChange={(e, value) => {
-              formik.setFieldValue('category', value);
+              formik.setFieldValue('category', value?.id);
             }}
-            isOptionEqualToValue={(option, values) => {
-              return option.id === values.id;
-            }}
-            getOptionLabel={(option) => `${option.name}`}
-            value={formik.values.category}
+            // isOptionEqualToValue={(option, values) => {
+            //   return option.id === values.id;
+            // }}
+            getOptionLabel={(option) => option.name}
+            value={
+              categories?.filter(
+                (val) => val.id === formik.values.category,
+              )[0] || null
+            }
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -230,11 +195,23 @@ export default function Form(props: FormTypes) {
         >
           <Grid container spacing="10px">
             <Grid item xs={8}>
-              <FormLabel text="Low Stock">
+              <FormLabel
+                required
+                text="Low Stock"
+                error={
+                  formik.touched.low_stock_limit &&
+                  Boolean(formik.errors.low_stock_limit)
+                }
+                helperText={
+                  formik.touched.low_stock_limit &&
+                  formik.errors.low_stock_limit &&
+                  `${formik.errors.low_stock_limit}`
+                }
+              >
                 <>
                   <TextField
                     type="text"
-                    name="low_stock"
+                    name="low_stock_limit"
                     placeholder="Insert Low Stock"
                     sx={{
                       '& .MuiOutlinedInput-root': {
@@ -245,7 +222,16 @@ export default function Form(props: FormTypes) {
                         },
                       },
                     }}
+                    onBlur={formik.handleBlur}
                     fullWidth
+                    value={formik.values.low_stock_limit}
+                    onChange={(e) => {
+                      const value = e.target.value
+                        .replace(/[^0-9.]/g, '')
+                        .replace(/(\..*?)\..*/g, '$1');
+
+                      formik.setFieldValue('low_stock_limit', value);
+                    }}
                   />
                   <Typography fontSize={12} color="#929395" p={0.1}>
                     The quantity at which you will be notified about low stock
@@ -254,25 +240,40 @@ export default function Form(props: FormTypes) {
               </FormLabel>
             </Grid>
             <Grid item xs={4}>
-              <FormLabel text="Unit">
+              <FormLabel
+                text="Unit"
+                required
+                error={
+                  formik.touched.unit_measurement_id &&
+                  Boolean(formik.errors.unit_measurement_id)
+                }
+                helperText={
+                  formik.touched.unit_measurement_id &&
+                  formik.errors.unit_measurement_id &&
+                  `${formik.errors.unit_measurement_id}`
+                }
+              >
                 <Autocomplete
                   data-testid="form-category"
-                  id="category"
-                  multiple
-                  options={[]}
+                  id="unit_measurement_id"
+                  options={UnitDummy}
                   onChange={(e, value) => {
-                    // formik.setFieldValue('category', value);
+                    formik.setFieldValue('unit_measurement_id', value?.id);
                   }}
                   // isOptionEqualToValue={(option, values) => {
                   //   return option.id === values.id;
                   // }}
-                  // getOptionLabel={(option) => `${option.name}`}
-                  // value={formik.values.category}
+                  getOptionLabel={(option) => option.name}
+                  value={
+                    UnitDummy.filter(
+                      (val) => val.id === formik.values.unit_measurement_id,
+                    )[0] || null
+                  }
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      name="category"
-                      // onBlur={formik.handleBlur}
+                      name="unit_measurement_id"
+                      onBlur={formik.handleBlur}
                       placeholder="Choose Unit"
                       sx={{
                         '& .MuiOutlinedInput-root': {
@@ -289,27 +290,69 @@ export default function Form(props: FormTypes) {
               </FormLabel>
             </Grid>
           </Grid>
-          <FormLabel text="In Stock">
-            <TextField
-              type="text"
-              name="low_stock"
-              placeholder="Insert In Stock"
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#fff',
-                  color: '#929395',
-                  '& .MuiSvgIcon-root': {
+          <FormLabel
+            required
+            text="In Stock"
+            error={formik.touched.stock && Boolean(formik.errors.stock)}
+            helperText={
+              formik.touched.stock &&
+              formik.errors.stock &&
+              `${formik.errors.stock}`
+            }
+          >
+            <>
+              <TextField
+                type="text"
+                name="stock"
+                placeholder="Insert Low Stock"
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#fff',
                     color: '#929395',
+                    '& .MuiSvgIcon-root': {
+                      color: '#929395',
+                    },
                   },
-                },
-              }}
-              fullWidth
-            />
+                }}
+                onBlur={formik.handleBlur}
+                fullWidth
+                value={formik.values.stock}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="start">
+                      {UnitDummy.filter(
+                        (val) => val.id === formik.values.unit_measurement_id,
+                      )[0]?.name || '-'}
+                    </InputAdornment>
+                  ),
+                }}
+                onChange={(e) => {
+                  const value = e.target.value
+                    .replace(/[^0-9.]/g, '')
+                    .replace(/(\..*?)\..*/g, '$1');
+
+                  formik.setFieldValue('stock', value);
+                }}
+              />
+              <Typography fontSize={12} color="#929395" p={0.1}>
+                Editing “In Stock” can only be done in stock opname menu
+              </Typography>
+            </>
           </FormLabel>
-          <FormLabel text="Description">
+          <FormLabel
+            text="Description"
+            error={
+              formik.touched.description && Boolean(formik.errors.description)
+            }
+            helperText={
+              formik.touched.description &&
+              formik.errors.description &&
+              `${formik.errors.description}`
+            }
+          >
             <TextField
               type="text"
-              name="Description"
+              name="description"
               placeholder="Insert Description"
               multiline
               minRows={3}
@@ -323,6 +366,9 @@ export default function Form(props: FormTypes) {
                 },
               }}
               fullWidth
+              onBlur={formik.handleBlur}
+              value={formik.values.description}
+              onChange={formik.handleChange}
             />
           </FormLabel>
         </Box>
@@ -334,6 +380,7 @@ export default function Form(props: FormTypes) {
         justifyContent="end"
         // mt="50px"
         sx={{
+          display: processProduct ? 'none' : 'unset',
           padding: '24px',
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
@@ -341,19 +388,15 @@ export default function Form(props: FormTypes) {
         <Button
           type="submit"
           size="medium"
-          disabled={loadingForm || (formik.submitCount > 0 && !isValid())}
-          onClick={() => {
-            formik.handleSubmit();
-            if (isValid()) {
-              handleSubmit(formik.values);
-            }
-          }}
+          // onClick={() => {
+          //   formik.handleSubmit();
+          // }}
         >
           {!loadingForm
             ? `${isEdit ? 'Save Changes' : 'Create'}`
             : 'Loading...'}
         </Button>
       </Box>
-    </>
+    </Box>
   );
 }

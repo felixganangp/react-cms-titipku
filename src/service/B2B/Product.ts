@@ -19,7 +19,7 @@ export const fetchProduct = (params: ProductParams) =>
     }
   });
 
-export const createProduct = (data: CreateProduct) =>
+export const createProduct = (data: any) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await http.post('/inventory/b2b/product', data);
@@ -32,7 +32,7 @@ export const createProduct = (data: CreateProduct) =>
     }
   });
 
-export const updateProduct = (data: { id: number; data: CreateProduct }) =>
+export const updateProduct = (data: { id: number; data: any }) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await http.put(

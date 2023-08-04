@@ -243,7 +243,7 @@ const ProductSlice = createSlice({
     },
     updateProduct(
       state: ProductProps,
-      action: PayloadAction<FormInventoryTypes>,
+      action: PayloadAction<{ id: number; data: FormInventoryTypes }>,
     ) {
       state.loadingForm = true;
       state.isSuccessCreate = false;

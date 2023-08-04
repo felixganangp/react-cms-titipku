@@ -64,6 +64,8 @@ function* fetchTotalEmptyStock() {
   try {
     const response: ListResponse<Product> = yield call(service.fetchProduct, {
       status: 'empty_stock',
+      count: 0,
+      page: 1,
     });
     yield put(productAction.fetchTotalEmptyStockSuccess(response));
   } catch (err) {
@@ -93,6 +95,8 @@ function* fetchTotalLowStock() {
   try {
     const response: ListResponse<Product> = yield call(service.fetchProduct, {
       status: 'low_stock',
+      page: 1,
+      count: 0,
     });
     yield put(productAction.fetchTotalLowStockSuccess(response));
   } catch (err) {
@@ -226,49 +230,19 @@ function* stockOpname(payload: PayloadAction<any>) {
 
 function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
   try {
-    const dataForm = payload.payload;
-    // console.log('from saga', payload.payload);
-    // Step 1. upload image
-    const payloadImage = {
-      image: dataForm.image,
+    const { category, ...dataForm } = payload.payload;
+    const body: { [key: string]: any } = {
+      ...dataForm,
+      product_category_id: category,
     };
-    const responUploadImage: Response<string> = yield call(
-      serviceProductParent.uploadImage,
-      payloadImage,
-    );
-    // console.log(responUploadImage);
-    // Step 2. Create Product Perent
-    const payloadProductPerant = {
-      name: dataForm.name,
-      image_filepath: responUploadImage.data,
-      product_parent_category_id: dataForm.category.map((val) => val.id),
-    };
-
-    const responProductParent: Response<ProductParent> = yield call(
-      serviceProductParent.createProduct,
-      payloadProductPerant,
-    );
-
-    // Step 3. upload product List
-    const callPromise: any = call;
-    yield all(
-      dataForm.productList.map((val) =>
-        callPromise(service.createProduct, {
-          product_type_id: dataForm.type?.id || 0,
-          product_parent_id: responProductParent.data.id,
-          product_grade_id: val.grade?.id || 0,
-          description: val.description,
-          stock: typeNumberValidate(val.stock as string),
-          low_stock_limit: typeNumberValidate(val.lowStock as string),
-          is_exist: val.is_exist,
-          is_active: val.is_active,
-          price: +dataForm.price,
-        }),
-      ),
-    );
+    const fd = new FormData();
+    Object.keys(body).forEach((val) => {
+      fd.append(val, body[val]);
+    });
+    yield call(service.createProduct, fd);
     yield put(
       uiAction.openYellowToast({
-        totalItem: dataForm.productList.length,
+        totalItem: 1,
         additionalMsg: '',
         action: 'successfully added!',
         error: false,
@@ -486,80 +460,36 @@ function* fetchLog(params: PayloadAction<LogParams>) {
   }
 }
 
-function* updateProduct(payload: PayloadAction<FormInventoryTypes>) {
+function* updateProduct(
+  payload: PayloadAction<{ id: number; data: FormInventoryTypes }>,
+) {
   try {
-    const dataForm = payload.payload;
-
-    // Step 2. Create Product Perent
-    const payloadProductPerant: CreateProductParent = {
-      name: dataForm.name,
-      image_filepath: dataForm.image as string,
-      product_parent_category_id: dataForm.category.map((val) => val.id),
+    const { data, id } = payload.payload;
+    const { category, ...dataForm } = data;
+    const body: { [key: string]: any } = {
+      ...dataForm,
+      product_category_id: category,
     };
-
-    if (typeof dataForm.image !== 'string') {
-      const payloadImage = {
-        image: dataForm.image,
-      };
-      const responUploadImage: Response<string> = yield call(
-        serviceProductParent.uploadImage,
-        payloadImage,
-      );
-      payloadProductPerant.image_filepath = responUploadImage.data;
-    } else {
-      payloadProductPerant.image_filepath =
-        payloadProductPerant.image_filepath?.slice(
-          payloadProductPerant.image_filepath.search('/b2b'),
-          payloadProductPerant.image_filepath.search('X-Amz-Algorithm') - 1,
-        );
-    }
-
-    yield call(serviceProductParent.updateProduct, {
-      id: dataForm?.idParent || 0,
-      payload: payloadProductPerant,
+    const fd = new FormData();
+    Object.keys(body).forEach((val) => {
+      if (val === 'image' && typeof body[val] === 'string') {
+        return null;
+      }
+      fd.append(val, body[val]);
     });
-    const callPromise: any = call;
-    yield all(
-      dataForm.productList.map((val) => {
-        if (val.id) {
-          return callPromise(service.updateProduct, {
-            id: val.id,
-            data: {
-              product_type_id: dataForm.type?.id || 0,
-              product_parent_id: dataForm.idParent,
-              product_grade_id: val.grade?.id || 0,
-              description: val.description,
-              stock: typeNumberValidate(val.stock as string),
-              low_stock_limit: typeNumberValidate(val.lowStock as string),
-              is_exist: val.is_exist,
-              is_active: val.is_active,
-            },
-          });
-        }
-        return () => {};
-      }),
-    );
+    yield call(service.updateProduct, { id, data: fd });
     yield put(
       uiAction.openYellowToast({
-        totalItem: dataForm.productList.length,
+        totalItem: 1,
         additionalMsg: '',
         action: 'successfully updated!',
         error: false,
         noUndo: true,
       }),
     );
-    const paramsLogData: LogParams = yield select(
-      (state) => state.product.paramsLog,
-    );
-    if (dataForm.typeEdit === 'details' && paramsLogData) {
-      yield put(productAction.fetchLog(paramsLogData));
-      yield put(productAction.fetchDetails(dataForm.productList[0].id || 0));
-    }
-
     yield put(productAction.updateProductSuccess());
     const filter: ProductParams = yield select((state) => state.product.params);
     yield put(productAction.fetchData(filter));
-    // yield put(productAction.resetProductForm());
   } catch (err) {
     if (typeof err === 'string') {
       const error = err as string;
