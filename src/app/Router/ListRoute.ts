@@ -152,14 +152,14 @@ const ListRoute: RouteProps[] = [
     auth: 'Private',
   },
   {
-    name: 'Inventory Management',
+    name: 'Product Management',
     comp: InventoryManagement,
     path: '/b2b/inventory',
     index: true,
     auth: 'Private',
   },
   {
-    name: 'Inventory Management',
+    name: 'Product Management',
     comp: InventoryDetailsManagement,
     path: '/b2b/inventory/:id',
     index: true,
