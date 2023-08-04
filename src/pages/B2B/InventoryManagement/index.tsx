@@ -59,6 +59,7 @@ import StockOpname from './components/StockOpname';
 import ChangeStatus from './components/ChangeStatus';
 import Form from './components/Form';
 import PopupAddSelected from './components/PopupSelected';
+import ProcessProduct from './components/ProcessProduct';
 import MoveStockForm from './components/MoveStockForm';
 import ConfirmMoveStock from './components/ConfirmMoveStock';
 
@@ -1235,7 +1236,7 @@ export default function InventoryPage() {
           EditProduct={EditProduct}
         />
       </ModalComp>
-      <PopupAddSelected
+      {/* <PopupAddSelected
         parentId={parentId}
         selectedItem={selectedProduct}
         currentData={[]}
@@ -1247,7 +1248,7 @@ export default function InventoryPage() {
         onConfirm={setSelectedProductMoveStock}
         product={false}
         onApply={handleOnApplySelectProduct}
-      />
+      /> */}
       <ModalComp
         open={moveStockFormModal.open}
         title="Move Stock"
@@ -1262,6 +1263,7 @@ export default function InventoryPage() {
           initData={payloadMoveStock.stock_change}
         />
       </ModalComp>
+      <ProcessProduct open={false} />
       <ModalComp
         open={moveStockConfirmationModal.open}
         onClose={handleCloseAllModalOnStockOpname}

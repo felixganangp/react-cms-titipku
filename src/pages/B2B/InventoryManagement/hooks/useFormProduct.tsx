@@ -11,8 +11,8 @@ import { FormInventoryTypes, Product } from 'models/b2b/Product';
 // import { ListResponse } from 'models/fetch';
 
 interface FormTypes {
-  onClose: () => void;
-  EditProduct: null | Product;
+  onClose?: () => void;
+  EditProduct?: null | Product;
   isDetail?: boolean;
 }
 
@@ -48,7 +48,7 @@ export default function FormProduct({
 
   // Close Modal
   useEffect(() => {
-    if (isSuccessCreate && !loadingForm) {
+    if (isSuccessCreate && !loadingForm && onClose) {
       onClose();
       dispatch(productAction.resetProductForm());
     }

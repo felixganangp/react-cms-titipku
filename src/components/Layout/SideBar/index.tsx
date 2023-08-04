@@ -26,7 +26,7 @@ const drawerWidthClose =
 export const sidebarData: FilteredMenu[] = [
   {
     id: 56,
-    title: 'B2B',
+    title: 'Serpong Fresh',
     path: '',
     icon: <B2B />,
     child: [
@@ -38,8 +38,26 @@ export const sidebarData: FilteredMenu[] = [
       // },
       {
         id: 59,
-        title: 'Product Management',
+        title: 'Iventory',
         path: '/b2b/inventory',
+        child: [],
+      },
+      {
+        id: 60,
+        title: 'Category',
+        path: '/b2b/category',
+        child: [],
+      },
+      {
+        id: 61,
+        title: 'Unit of Measurement',
+        path: '/b2b/oum',
+        child: [],
+      },
+      {
+        id: 62,
+        title: 'Supplier',
+        path: '/b2b/supplier',
         child: [],
       },
     ],

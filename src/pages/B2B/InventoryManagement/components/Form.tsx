@@ -37,12 +37,13 @@ const UnitDummy = [
   },
 ];
 interface FormTypes {
-  onClose: () => void;
-  EditProduct: Product | null;
+  onClose?: () => void;
+  EditProduct?: Product | null;
   isDetail?: boolean;
+  processProduct?: boolean;
 }
 
-export default function Form(props: FormTypes) {
+export default function Form({ processProduct, ...props }: FormTypes) {
   const [isNameExist, setIsNameExist] = useState(false);
   const {
     formik,
@@ -68,7 +69,7 @@ export default function Form(props: FormTypes) {
 
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
-      <Box p="24px">
+      <Box p={processProduct ? 'unset' : '24px'}>
         <FormLabel
           text="Input Image"
           required
@@ -379,6 +380,7 @@ export default function Form(props: FormTypes) {
         justifyContent="end"
         // mt="50px"
         sx={{
+          display: processProduct ? 'none' : 'unset',
           padding: '24px',
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
