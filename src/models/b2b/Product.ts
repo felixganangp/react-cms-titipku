@@ -34,6 +34,8 @@ export interface ProductParams extends ListParams {
   product_parent_category_id?: number;
   status?: string;
   product_parent_id?: number;
+  pricemin?: number;
+  pricemax?: number;
 }
 
 export interface LogParams extends ListParams {
@@ -51,6 +53,8 @@ export interface ProductDisplayFilter {
   category?: Category | null;
   status?: Status | null;
   type?: ProductType | null;
+  pricemin?: number;
+  pricemax?: number;
 }
 
 // export interface CreateProduct extends FormData {

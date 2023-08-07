@@ -43,6 +43,7 @@ import { uiAction } from 'store/slice/ui';
 import { useNavigate } from 'react-router-dom';
 import NoDataWithAddBtn from 'components/Table/NoDataView/NoData';
 import Delete from 'components/Delete';
+import numberSeperator from 'utils/numberSeperator';
 import {
   CardContainer,
   CategoryStyle,
@@ -70,9 +71,8 @@ export default function InventoryPage() {
   const activeDashboard = useAppSelector(
     (state) => state.product.activeDashboard,
   );
-  const { search, grade, category, status, type } = useAppSelector(
-    (state) => state.product.displayFilter,
-  );
+  const { search, grade, category, status, type, pricemax, pricemin } =
+    useAppSelector((state) => state.product.displayFilter);
   const [EditProduct, setEditProduct] = useState<Product | null>(null);
   const stockOpnameModal = useModal();
   const formProductModal = useModal();
@@ -271,6 +271,8 @@ export default function InventoryPage() {
 
   // SEARCH & FILTER
   const [openFilter, setOpenFilter] = useState<boolean>(false);
+  const [isFiltered, setIsFiltered] = useState<boolean>(false);
+
   const handleExpandFilter = () => {
     setOpenFilter(!openFilter);
   };
@@ -322,6 +324,7 @@ export default function InventoryPage() {
   };
 
   const handleApplyFilter = () => {
+    setIsFiltered(true);
     dispatch(
       productAction.setParams({
         ...product.params,
@@ -331,11 +334,14 @@ export default function InventoryPage() {
         product_type_id: type ? type.id : undefined,
         product_parent_category_id: category ? category.id : undefined,
         status: status ? status.value : undefined,
+        pricemin: pricemin || undefined,
+        pricemax: pricemax || undefined,
       }),
     );
   };
 
   const handleResetFilter = () => {
+    setIsFiltered(false);
     dispatch(
       productAction.setParams({
         page: 1,
@@ -468,9 +474,9 @@ export default function InventoryPage() {
               currentTarget.onerror = null;
               currentTarget.src = NoImage;
             }}
-            src={val.product_parent.image_filepath}
+            src={val.image}
             style={{ height: '48px', width: '48px', borderRadius: '50%' }}
-            alt={val.product_parent.name}
+            alt={val.name}
           />
           <Box
             display="flex"
@@ -483,27 +489,30 @@ export default function InventoryPage() {
                 grade={val.product_grade.id}
               >{`${val.product_grade.name}`}</GradingColor>
             )} */}
-            <Typography>{val.product_parent.name}</Typography>
+            <Typography>{val.name}</Typography>
           </Box>
         </Box>
       ),
     },
     {
-      id: 'price',
-      label: 'Price',
+      id: 'selling_price',
+      label: 'Selling Price',
       align: 'left',
       enableSort: false,
-      format: (val: Product) => <Typography>{val?.price || 0}</Typography>,
+      format: (val: Product) => (
+        <Typography>Rp {numberSeperator(val?.selling_price || 0)}</Typography>
+      ),
     },
-    // {
-    //   id: 'b2bType',
-    //   label: 'B2B Type',
-    //   align: 'left',
-    //   enableSort: false,
-    //   format: (val: Product) => (
-    //     <Typography>{val.product_type.name}</Typography>
-    //   ),
-    // },
+    {
+      id: 'average_price',
+      label: 'Average Price',
+      align: 'left',
+      enableSort: false,
+      format: (val: Product) => (
+        <Typography>Rp {numberSeperator(val?.average_price || 0)}</Typography>
+      ),
+    },
+
     {
       id: 'category',
       label: 'Category',
@@ -519,13 +528,7 @@ export default function InventoryPage() {
           width="100%"
           maxWidth="400px"
         >
-          {val.product_parent.product_parent_category ? (
-            val.product_parent.product_parent_category.map((item) => (
-              <CategoryStyle key={item.id}>{item.name}</CategoryStyle>
-            ))
-          ) : (
-            <CategoryStyle>-</CategoryStyle>
-          )}
+          <CategoryStyle>{val.product_category}</CategoryStyle>
         </Box>
       ),
     },
@@ -1013,6 +1016,7 @@ export default function InventoryPage() {
                   endIcon={<FilterIcon />}
                   onClick={handleExpandFilter}
                   disabled={product.loadingFilter}
+                  sx={{ bgcolor: isFiltered ? '#84bea8' : 'unset' }}
                 >
                   Filter
                 </Button>
@@ -1077,7 +1081,11 @@ export default function InventoryPage() {
                       value={category}
                       options={product.categories || []}
                       onChange={(e, value) => {
-                        handleChangeCategory(value);
+                        dispatch(
+                          productAction.setDisplayFilter({
+                            category: value,
+                          }),
+                        );
                       }}
                       getOptionLabel={(option) => `${option.name}`}
                       renderInput={(params) => {
@@ -1118,6 +1126,58 @@ export default function InventoryPage() {
                       />
                     </FormLabel>
                   </Box>
+                  <FormLabel text="Price Range">
+                    <Stack direction="row" alignItems="center" gap={1}>
+                      <TextField
+                        type="text"
+                        name="selling_price"
+                        placeholder="Insert Price"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">Rp</InputAdornment>
+                          ),
+                        }}
+                        fullWidth
+                        value={numberSeperator(pricemin || '')}
+                        onChange={(e) => {
+                          const value = e.target.value
+                            .replace(/[^0-9.]/g, '')
+                            .replace(/(\..*?)\..*/g, '$1');
+
+                          dispatch(
+                            productAction.setDisplayFilter({
+                              pricemin: parseInt(value),
+                            }),
+                          );
+                          // formik.setFieldValue('selling_price', value);
+                        }}
+                      />
+                      -
+                      <TextField
+                        type="text"
+                        name="selling_price"
+                        placeholder="Insert Price"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">Rp</InputAdornment>
+                          ),
+                        }}
+                        fullWidth
+                        value={numberSeperator(pricemax || '')}
+                        onChange={(e) => {
+                          const value = e.target.value
+                            .replace(/[^0-9.]/g, '')
+                            .replace(/(\..*?)\..*/g, '$1');
+                          dispatch(
+                            productAction.setDisplayFilter({
+                              pricemax: parseInt(value),
+                            }),
+                          );
+                          // formik.setFieldValue('selling_price', value);
+                        }}
+                      />
+                    </Stack>
+                  </FormLabel>
                 </Box>
                 <Box
                   display="flex"
