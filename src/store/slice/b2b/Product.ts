@@ -50,7 +50,7 @@ interface ProductProps {
   paramsLog: LogParams;
 }
 
-const initialState: ProductProps = {
+export const initialState: ProductProps = {
   activeDashboard: 'all_stock',
   loading: false,
   loadingLowStock: false,

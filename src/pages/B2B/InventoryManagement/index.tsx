@@ -34,7 +34,10 @@ import FormLabel from 'components/FormLabel';
 import PaperBox from 'components/Icon/PaperBox';
 import PaperBoxGreen from 'components/Icon/PaperBoxGreen';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { productAction } from 'store/slice/b2b/Product';
+import {
+  productAction,
+  initialState as initialStateProduct,
+} from 'store/slice/b2b/Product';
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import useModal from 'hooks/useModal';
 import ModalComp from 'components/Modal';
@@ -71,8 +74,9 @@ export default function InventoryPage() {
   const activeDashboard = useAppSelector(
     (state) => state.product.activeDashboard,
   );
+  const displayFilter = useAppSelector((state) => state.product.displayFilter);
   const { search, grade, category, status, type, pricemax, pricemin } =
-    useAppSelector((state) => state.product.displayFilter);
+    displayFilter;
   const [EditProduct, setEditProduct] = useState<Product | null>(null);
   const stockOpnameModal = useModal();
   const formProductModal = useModal();
@@ -89,6 +93,28 @@ export default function InventoryPage() {
   const changeStatusModal = useModal();
   const deleteModal = useModal();
   const [newStatus, setNewStatus] = useState<boolean>(false);
+  const [isFiltered, setIsFiltred] = useState<boolean>(false);
+
+  // const isFiltered = displayFilter !== initialStateProduct.displayFilter;
+
+  useEffect(() => {
+    let value = false;
+    Object.keys(displayFilter).forEach((val) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const existing = displayFilter[val] as any;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const initial = initialStateProduct.displayFilter[val] as any;
+
+      if (val === 'pricemin' || val === 'pricemax') {
+        if (existing > 0) value = true;
+      } else {
+        value = existing !== initial;
+      }
+    });
+    setIsFiltred(value);
+  }, [displayFilter]);
 
   const handleOpenBatchAction = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(e.currentTarget);
@@ -271,7 +297,6 @@ export default function InventoryPage() {
 
   // SEARCH & FILTER
   const [openFilter, setOpenFilter] = useState<boolean>(false);
-  const [isFiltered, setIsFiltered] = useState<boolean>(false);
 
   const handleExpandFilter = () => {
     setOpenFilter(!openFilter);
@@ -324,7 +349,6 @@ export default function InventoryPage() {
   };
 
   const handleApplyFilter = () => {
-    setIsFiltered(true);
     dispatch(
       productAction.setParams({
         ...product.params,
@@ -341,7 +365,6 @@ export default function InventoryPage() {
   };
 
   const handleResetFilter = () => {
-    setIsFiltered(false);
     dispatch(
       productAction.setParams({
         page: 1,
