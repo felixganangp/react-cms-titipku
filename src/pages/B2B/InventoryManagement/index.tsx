@@ -34,7 +34,10 @@ import FormLabel from 'components/FormLabel';
 import PaperBox from 'components/Icon/PaperBox';
 import PaperBoxGreen from 'components/Icon/PaperBoxGreen';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { productAction } from 'store/slice/b2b/Product';
+import {
+  productAction,
+  initialState as initialStateProduct,
+} from 'store/slice/b2b/Product';
 import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import useModal from 'hooks/useModal';
 import ModalComp from 'components/Modal';
@@ -43,6 +46,7 @@ import { uiAction } from 'store/slice/ui';
 import { useNavigate } from 'react-router-dom';
 import NoDataWithAddBtn from 'components/Table/NoDataView/NoData';
 import Delete from 'components/Delete';
+import numberSeperator from 'utils/numberSeperator';
 import {
   CardContainer,
   CategoryStyle,
@@ -70,9 +74,9 @@ export default function InventoryPage() {
   const activeDashboard = useAppSelector(
     (state) => state.product.activeDashboard,
   );
-  const { search, grade, category, status, type } = useAppSelector(
-    (state) => state.product.displayFilter,
-  );
+  const displayFilter = useAppSelector((state) => state.product.displayFilter);
+  const { search, grade, category, status, type, pricemax, pricemin } =
+    displayFilter;
   const [EditProduct, setEditProduct] = useState<Product | null>(null);
   const stockOpnameModal = useModal();
   const formProductModal = useModal();
@@ -89,6 +93,28 @@ export default function InventoryPage() {
   const changeStatusModal = useModal();
   const deleteModal = useModal();
   const [newStatus, setNewStatus] = useState<boolean>(false);
+  const [isFiltered, setIsFiltred] = useState<boolean>(false);
+
+  // const isFiltered = displayFilter !== initialStateProduct.displayFilter;
+
+  useEffect(() => {
+    let value = false;
+    Object.keys(displayFilter).forEach((val) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const existing = displayFilter[val] as any;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const initial = initialStateProduct.displayFilter[val] as any;
+
+      if (val === 'pricemin' || val === 'pricemax') {
+        if (existing > 0) value = true;
+      } else {
+        value = existing !== initial;
+      }
+    });
+    setIsFiltred(value);
+  }, [displayFilter]);
 
   const handleOpenBatchAction = (e: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(e.currentTarget);
@@ -256,21 +282,14 @@ export default function InventoryPage() {
       ? selectedProduct.length > 3
         ? `${selectedProduct
             .slice(0, 3)
-            .map(
-              (item) =>
-                `${item.product_parent.name} ${item.product_grade.name}`,
-            )
+            .map((item) => `${item.name} ${item.name}`)
             .join(',')} ... and ${selectedProduct.length - 3} others`
-        : selectedProduct
-            .map(
-              (item) =>
-                `${item.product_parent.name} ${item.product_grade.name}`,
-            )
-            .join(',')
+        : selectedProduct.map((item) => `${item.name} ${item.name}`).join(',')
       : '';
 
   // SEARCH & FILTER
   const [openFilter, setOpenFilter] = useState<boolean>(false);
+
   const handleExpandFilter = () => {
     setOpenFilter(!openFilter);
   };
@@ -331,6 +350,8 @@ export default function InventoryPage() {
         product_type_id: type ? type.id : undefined,
         product_parent_category_id: category ? category.id : undefined,
         status: status ? status.value : undefined,
+        pricemin: pricemin || undefined,
+        pricemax: pricemax || undefined,
       }),
     );
   };
@@ -468,9 +489,9 @@ export default function InventoryPage() {
               currentTarget.onerror = null;
               currentTarget.src = NoImage;
             }}
-            src={val.product_parent.image_filepath}
+            src={val.image}
             style={{ height: '48px', width: '48px', borderRadius: '50%' }}
-            alt={val.product_parent.name}
+            alt={val.name}
           />
           <Box
             display="flex"
@@ -483,27 +504,30 @@ export default function InventoryPage() {
                 grade={val.product_grade.id}
               >{`${val.product_grade.name}`}</GradingColor>
             )} */}
-            <Typography>{val.product_parent.name}</Typography>
+            <Typography>{val.name}</Typography>
           </Box>
         </Box>
       ),
     },
     {
-      id: 'price',
-      label: 'Price',
+      id: 'selling_price',
+      label: 'Selling Price',
       align: 'left',
       enableSort: false,
-      format: (val: Product) => <Typography>{val?.price || 0}</Typography>,
+      format: (val: Product) => (
+        <Typography>Rp {numberSeperator(val?.selling_price || 0)}</Typography>
+      ),
     },
-    // {
-    //   id: 'b2bType',
-    //   label: 'B2B Type',
-    //   align: 'left',
-    //   enableSort: false,
-    //   format: (val: Product) => (
-    //     <Typography>{val.product_type.name}</Typography>
-    //   ),
-    // },
+    {
+      id: 'average_price',
+      label: 'Average Price',
+      align: 'left',
+      enableSort: false,
+      format: (val: Product) => (
+        <Typography>Rp {numberSeperator(val?.average_price || 0)}</Typography>
+      ),
+    },
+
     {
       id: 'category',
       label: 'Category',
@@ -519,13 +543,7 @@ export default function InventoryPage() {
           width="100%"
           maxWidth="400px"
         >
-          {val.product_parent.product_parent_category ? (
-            val.product_parent.product_parent_category.map((item) => (
-              <CategoryStyle key={item.id}>{item.name}</CategoryStyle>
-            ))
-          ) : (
-            <CategoryStyle>-</CategoryStyle>
-          )}
+          <CategoryStyle>{val.product_category}</CategoryStyle>
         </Box>
       ),
     },
@@ -609,7 +627,7 @@ export default function InventoryPage() {
                         label: 'Stock Opname',
                         onClick: () => {
                           dispatch(uiAction.closeYellowToast());
-                          setParentId(val.product_parent_id);
+                          setParentId(val.id);
                           handleStockOpnameAction(val);
                         },
                       },
@@ -1013,6 +1031,7 @@ export default function InventoryPage() {
                   endIcon={<FilterIcon />}
                   onClick={handleExpandFilter}
                   disabled={product.loadingFilter}
+                  sx={{ bgcolor: isFiltered ? '#84bea8' : 'unset' }}
                 >
                   Filter
                 </Button>
@@ -1077,7 +1096,11 @@ export default function InventoryPage() {
                       value={category}
                       options={product.categories || []}
                       onChange={(e, value) => {
-                        handleChangeCategory(value);
+                        dispatch(
+                          productAction.setDisplayFilter({
+                            category: value,
+                          }),
+                        );
                       }}
                       getOptionLabel={(option) => `${option.name}`}
                       renderInput={(params) => {
@@ -1118,6 +1141,58 @@ export default function InventoryPage() {
                       />
                     </FormLabel>
                   </Box>
+                  <FormLabel text="Price Range">
+                    <Stack direction="row" alignItems="center" gap={1}>
+                      <TextField
+                        type="text"
+                        name="selling_price"
+                        placeholder="Insert Price"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">Rp</InputAdornment>
+                          ),
+                        }}
+                        fullWidth
+                        value={numberSeperator(pricemin || '')}
+                        onChange={(e) => {
+                          const value = e.target.value
+                            .replace(/[^0-9.]/g, '')
+                            .replace(/(\..*?)\..*/g, '$1');
+
+                          dispatch(
+                            productAction.setDisplayFilter({
+                              pricemin: parseInt(value),
+                            }),
+                          );
+                          // formik.setFieldValue('selling_price', value);
+                        }}
+                      />
+                      -
+                      <TextField
+                        type="text"
+                        name="selling_price"
+                        placeholder="Insert Price"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">Rp</InputAdornment>
+                          ),
+                        }}
+                        fullWidth
+                        value={numberSeperator(pricemax || '')}
+                        onChange={(e) => {
+                          const value = e.target.value
+                            .replace(/[^0-9.]/g, '')
+                            .replace(/(\..*?)\..*/g, '$1');
+                          dispatch(
+                            productAction.setDisplayFilter({
+                              pricemax: parseInt(value),
+                            }),
+                          );
+                          // formik.setFieldValue('selling_price', value);
+                        }}
+                      />
+                    </Stack>
+                  </FormLabel>
                 </Box>
                 <Box
                   display="flex"

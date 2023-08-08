@@ -13,6 +13,7 @@ interface MenuListProps {
     color?: string;
     onClick(): void;
     dataId?: string;
+    disabled?: boolean;
   }[];
   children: ReactElement<any, string | JSXElementConstructor<any>>;
 }
@@ -46,6 +47,7 @@ export default function MenuList(props: MenuListProps) {
             data-testid={val.dataId}
             sx={{ color: val.color ? val.color : '#000' }}
             key={String(key)}
+            disabled={val.disabled}
             onClick={(e) => {
               val.onClick();
               handleClick('close', e);

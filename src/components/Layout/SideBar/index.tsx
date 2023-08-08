@@ -45,7 +45,7 @@ export const sidebarData: FilteredMenu[] = [
       {
         id: 61,
         title: 'Unit of Measurement',
-        path: '/b2b/oum',
+        path: '/b2b/uom',
         child: [],
       },
       {

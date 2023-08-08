@@ -34,7 +34,7 @@ export default function FormProduct({
 }: FormTypes) {
   const { id } = useParams();
   const dispatch = useAppDispatch();
-  const { categories, types, grades, isSuccessCreate, loadingForm } =
+  const { categories, types, grades, isSuccessCreate, loadingForm, uom } =
     useAppSelector((state) => state.product);
 
   const [currentGrade, setCurrentGrade] = useState({
@@ -44,6 +44,7 @@ export default function FormProduct({
 
   useEffect(() => {
     dispatch(productAction.fetchCategory());
+    dispatch(productAction.fetchUom({ count: 1000 }));
   }, []);
 
   // Close Modal
@@ -106,6 +107,7 @@ export default function FormProduct({
     categories,
     types,
     grades,
+    uom,
     currentGrade,
     setCurrentGrade,
     loadingForm,
