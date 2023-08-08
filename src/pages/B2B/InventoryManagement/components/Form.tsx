@@ -22,20 +22,6 @@ import numberSeperator, { typeNumberValidate } from 'utils/numberSeperator';
 
 import useFormProduct from '../hooks/useFormProduct';
 
-const UnitDummy = [
-  {
-    id: 1,
-    name: 'Ekor',
-  },
-  {
-    id: 2,
-    name: 'Gram',
-  },
-  {
-    id: 3,
-    name: 'Liter',
-  },
-];
 interface FormTypes {
   onClose?: () => void;
   EditProduct?: Product | null;
@@ -45,15 +31,8 @@ interface FormTypes {
 
 export default function Form({ processProduct, ...props }: FormTypes) {
   const [isNameExist, setIsNameExist] = useState(false);
-  const {
-    formik,
-    categories,
-    types,
-    currentGrade,
-    setCurrentGrade,
-    loadingForm,
-    isEdit,
-  } = useFormProduct(props);
+  const { formik, categories, loadingForm, uom, isEdit } =
+    useFormProduct(props);
 
   const handleCheckIsNameExist = async (value: {
     name: string;
@@ -256,7 +235,7 @@ export default function Form({ processProduct, ...props }: FormTypes) {
                 <Autocomplete
                   data-testid="form-category"
                   id="unit_measurement_id"
-                  options={UnitDummy}
+                  options={uom}
                   onChange={(e, value) => {
                     formik.setFieldValue('unit_measurement_id', value?.id);
                   }}
@@ -265,7 +244,7 @@ export default function Form({ processProduct, ...props }: FormTypes) {
                   // }}
                   getOptionLabel={(option) => option.name}
                   value={
-                    UnitDummy.filter(
+                    uom.filter(
                       (val) => val.id === formik.values.unit_measurement_id,
                     )[0] || null
                   }
@@ -320,7 +299,7 @@ export default function Form({ processProduct, ...props }: FormTypes) {
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="start">
-                      {UnitDummy.filter(
+                      {uom.filter(
                         (val) => val.id === formik.values.unit_measurement_id,
                       )[0]?.name || '-'}
                     </InputAdornment>
@@ -380,7 +359,7 @@ export default function Form({ processProduct, ...props }: FormTypes) {
         justifyContent="end"
         // mt="50px"
         sx={{
-          display: processProduct ? 'none' : 'unset',
+          display: processProduct ? 'none' : 'flex',
           padding: '24px',
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
