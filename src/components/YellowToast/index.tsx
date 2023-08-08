@@ -26,7 +26,7 @@ export default function YellowToast() {
     noUndo,
   } = useAppSelector((state) => state.ui.yellowToast);
 
-  setTimeout(() => dispatch(uiAction.closeYellowToast()), 70000);
+  setTimeout(() => dispatch(uiAction.closeYellowToast()), 10000);
 
   return (
     <Box
