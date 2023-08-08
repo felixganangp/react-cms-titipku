@@ -6,7 +6,7 @@ import { productAction } from 'store/slice/b2b/Product';
 import { uiAction } from 'store/slice/ui';
 import { typeNumberValidate } from 'utils/numberSeperator';
 // models
-import { ListResponse, Response } from 'models/fetch';
+import { ListParams, ListResponse, Response } from 'models/fetch';
 import {
   ChangeStatusParams,
   IsActiveType,
@@ -19,13 +19,14 @@ import {
 import { ProductGrade } from 'models/b2b/Grade';
 import { Category } from 'models/b2b/Category';
 import { ProductType } from 'models/b2b/Type';
+import { CreateUomTypes, UomTypes } from 'models/b2b/Uom';
 import {
   ProductParent,
   CreateProduct as CreateProductParent,
 } from 'models/b2b/ProductParent';
 // service
 import * as service from 'service/B2B/Product';
-import * as serviceProductParent from 'service/B2B/ProductParent';
+import * as serviceUom from 'service/B2B/Uom';
 import { fetchGrade } from 'service/B2B/Grade';
 import { fetchCategory } from 'service/B2B/Category';
 import { fetchTypes } from 'service/B2B/Types';
@@ -576,6 +577,147 @@ function* moveStock(
   }
 }
 
+function* fetchUom(payload: PayloadAction<ListParams>) {
+  try {
+    const respon: ListResponse<UomTypes> = yield call(
+      serviceUom.fetchUom,
+      payload.payload,
+    );
+
+    yield put(productAction.fetchOumSuccess(respon));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: error || 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* createUom(payload: PayloadAction<CreateUomTypes>) {
+  try {
+    yield call(serviceUom.create, payload.payload);
+    yield put(
+      uiAction.openYellowToast({
+        totalItem: 1,
+        additionalMsg: '',
+        action: 'successfully added!',
+        error: false,
+        noUndo: true,
+      }),
+    );
+    yield put(productAction.successLoadingOum());
+    const filter: ListParams = yield select((state) => state.product.paramsOum);
+    yield put(productAction.fetchUom(filter));
+  } catch (err) {
+    yield put(productAction.resetUomform());
+
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create Uom',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create Uom',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* updateUom(
+  payload: PayloadAction<{ id: number; body: CreateUomTypes }>,
+) {
+  try {
+    yield call(serviceUom.update, payload.payload.id, payload.payload.body);
+    yield put(
+      uiAction.openYellowToast({
+        totalItem: 1,
+        additionalMsg: '',
+        action: 'successfully update!',
+        error: false,
+        noUndo: true,
+      }),
+    );
+    yield put(productAction.successLoadingOum());
+    const filter: ListParams = yield select((state) => state.product.paramsOum);
+    yield put(productAction.fetchUom(filter));
+  } catch (err) {
+    yield put(productAction.resetUomform());
+
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create Uom',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create Uom',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* deleteUom(payload: PayloadAction<{ id: number }>) {
+  try {
+    yield call(serviceUom.deleteUom, payload.payload.id);
+    yield put(
+      uiAction.openYellowToast({
+        totalItem: 1,
+        additionalMsg: '',
+        action: 'successfully deleted!',
+        error: false,
+        noUndo: true,
+      }),
+    );
+    yield put(productAction.successLoadingOum());
+    const filter: ListParams = yield select((state) => state.product.paramsOum);
+    yield put(productAction.fetchUom(filter));
+  } catch (err) {
+    yield put(productAction.resetUomform());
+
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create Uom',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create Uom',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
 export default function* productSagas() {
   yield takeLatest(productAction.stockOpname, stockOpname);
   yield takeLatest(productAction.fetchTotalLowStock, fetchTotalLowStock);
@@ -600,4 +742,8 @@ export default function* productSagas() {
   );
   yield takeLatest(productAction.moveStock.type, moveStock);
   yield takeLatest(productAction.updateProduct.type, updateProduct);
+  yield takeLatest(productAction.fetchUom.type, fetchUom);
+  yield takeLatest(productAction.createUom.type, createUom);
+  yield takeLatest(productAction.updateUom.type, updateUom);
+  yield takeLatest(productAction.deleteUom.type, deleteUom);
 }

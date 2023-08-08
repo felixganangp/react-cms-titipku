@@ -181,9 +181,9 @@ const ListRoute: RouteProps[] = [
     auth: 'Private',
   },
   {
-    name: 'Oum Management',
+    name: 'Uom Management',
     comp: OumManagement,
-    path: '/b2b/oum',
+    path: '/b2b/uom',
     index: true,
     auth: 'Private',
   },
