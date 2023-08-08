@@ -13,6 +13,7 @@ import creditScoreKurReducer from './slice/kur/CreditScore';
 import invoiceReducer from './slice/kur/Invoice';
 import productsReducer from './slice/b2b/Product';
 import rawsReducer from './slice/b2b/ProductRaw';
+import inboundReducer from './slice/b2b/Inbound';
 
 const reducers = {
   ui: uiReducer,
@@ -30,6 +31,7 @@ const reducers = {
   invoice: invoiceReducer,
   product: productsReducer,
   raw: rawsReducer,
+  inbound: inboundReducer,
 };
 
 export default reducers;
