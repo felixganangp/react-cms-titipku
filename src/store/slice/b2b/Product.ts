@@ -13,6 +13,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListParams, ListResponse, Response } from 'models/fetch';
 import { ProductGrade } from 'models/b2b/Grade';
 import { Category } from 'models/b2b/Category';
+import { CreateUomTypes, UomTypes } from 'models/b2b/Uom';
 import { ProductType } from 'models/b2b/Type';
 import { LogParams } from '../../../models/b2b/Product';
 
@@ -48,6 +49,11 @@ interface ProductProps {
   loadingListProductsMoveStk: boolean;
   loadingMoveStock: boolean;
   paramsLog: LogParams;
+  uom: UomTypes[];
+  totalUom: number;
+  paramsOum: ListParams;
+  loadingFormUom: boolean;
+  isSuccessUom: boolean;
 }
 
 export const initialState: ProductProps = {
@@ -114,6 +120,14 @@ export const initialState: ProductProps = {
   listProductsMoveStk: [],
   loadingListProductsMoveStk: false,
   loadingMoveStock: false,
+  uom: [],
+  totalUom: 0,
+  paramsOum: {
+    page: 1,
+    count: 10,
+  },
+  loadingFormUom: false,
+  isSuccessUom: false,
 };
 
 const ProductSlice = createSlice({
@@ -209,6 +223,37 @@ const ProductSlice = createSlice({
     },
     fetchCategoryFailed(state: ProductProps) {
       state.loadingFilter = false;
+    },
+    updateUom(
+      state: ProductProps,
+      action: PayloadAction<{ id: number; body: CreateUomTypes }>,
+    ) {
+      state.loadingFormUom = true;
+    },
+    deleteUom(state: ProductProps, action: PayloadAction<{ id: number }>) {
+      state.loadingFormUom = true;
+    },
+    createUom(state: ProductProps, action: PayloadAction<CreateUomTypes>) {
+      state.loadingFormUom = true;
+    },
+    fetchUom(state: ProductProps, action: PayloadAction<ListParams>) {
+      state.loadingFilter = true;
+    },
+    successLoadingOum(state) {
+      state.loadingForm = false;
+      state.isSuccessUom = true;
+    },
+    resetUomform(state: ProductProps) {
+      state.loadingForm = false;
+      state.isSuccessUom = false;
+    },
+    fetchOumSuccess(
+      state: ProductProps,
+      action: PayloadAction<ListResponse<UomTypes>>,
+    ) {
+      state.loadingFilter = false;
+      state.totalUom = action.payload.total || 0;
+      state.uom = action.payload.data || [];
     },
     fetchTypes(state: ProductProps) {
       // state.loading = true;

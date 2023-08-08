@@ -4,10 +4,9 @@ import { ListParams } from 'models/fetch';
 export const fetchCategory = (params: ListParams) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await http.get(
-        '/inventory/b2b/product/parent/category',
-        { params },
-      );
+      const response = await http.get('/inventory/b2b/category', {
+        params,
+      });
       if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response

@@ -282,17 +282,9 @@ export default function InventoryPage() {
       ? selectedProduct.length > 3
         ? `${selectedProduct
             .slice(0, 3)
-            .map(
-              (item) =>
-                `${item.product_parent.name} ${item.product_grade.name}`,
-            )
+            .map((item) => `${item.name} ${item.name}`)
             .join(',')} ... and ${selectedProduct.length - 3} others`
-        : selectedProduct
-            .map(
-              (item) =>
-                `${item.product_parent.name} ${item.product_grade.name}`,
-            )
-            .join(',')
+        : selectedProduct.map((item) => `${item.name} ${item.name}`).join(',')
       : '';
 
   // SEARCH & FILTER
@@ -635,7 +627,7 @@ export default function InventoryPage() {
                         label: 'Stock Opname',
                         onClick: () => {
                           dispatch(uiAction.closeYellowToast());
-                          setParentId(val.product_parent_id);
+                          setParentId(val.id);
                           handleStockOpnameAction(val);
                         },
                       },
