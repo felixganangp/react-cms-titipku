@@ -55,3 +55,19 @@ export const updateSupplier = (params: any) =>
       reject(message);
     }
   });
+
+export const deleteSupplier = (body: { ids: (string | number)[] }) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.post(
+        `/inventory/b2b/supplier/batch-delete`,
+        body,
+      );
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });

@@ -1,10 +1,5 @@
 import http from 'utils/request';
-import {
-  ProductParams,
-  CreateProduct,
-  IsActiveType,
-  LogParams,
-} from 'models/b2b/Product';
+import { ProductParams, IsActiveType, LogParams } from 'models/b2b/Product';
 
 export const fetchProduct = (params: ProductParams) =>
   new Promise(async (resolve, reject) => {
