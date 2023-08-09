@@ -11,7 +11,7 @@ export default function Icon(props: SvgIconProps) {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <rect width="24" height="24" rx="12" fill="#F9EBE7" />
+        <rect width="24" height="24" rx="12" />
         <path
           fillRule="evenodd"
           clipRule="evenodd"

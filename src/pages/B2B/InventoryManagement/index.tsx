@@ -81,6 +81,7 @@ export default function InventoryPage() {
   const stockOpnameModal = useModal();
   const formProductModal = useModal();
   const listProductModal = useModal();
+  const procesProductModal = useModal();
   const moveStockFormModal = useModal();
   const moveStockConfirmationModal = useModal();
 
@@ -553,7 +554,9 @@ export default function InventoryPage() {
       align: 'left',
       enableSort: false,
       format: (val: Product) => (
-        <Typography>{numberWithCommas(val.stock)}</Typography>
+        <Typography>
+          {numberWithCommas(val.stock)} {val.unit_measurement}
+        </Typography>
       ),
     },
     {
@@ -629,6 +632,14 @@ export default function InventoryPage() {
                           dispatch(uiAction.closeYellowToast());
                           setParentId(val.id);
                           handleStockOpnameAction(val);
+                        },
+                      },
+                      {
+                        label: 'Proces Product',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          procesProductModal.openModal();
+                          setEditProduct(val);
                         },
                       },
                       {
@@ -1338,7 +1349,11 @@ export default function InventoryPage() {
           initData={payloadMoveStock.stock_change}
         />
       </ModalComp>
-      <ProcessProduct open={false} />
+      <ProcessProduct
+        open={procesProductModal.open}
+        EditProduct={EditProduct}
+        onClose={procesProductModal.closeModal}
+      />
       <ModalComp
         open={moveStockConfirmationModal.open}
         onClose={handleCloseAllModalOnStockOpname}

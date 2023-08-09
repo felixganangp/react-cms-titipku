@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -8,6 +8,7 @@ import {
   Radio,
   Checkbox,
   Typography,
+  Skeleton,
 } from '@mui/material';
 import ModalComp from 'components/Modal';
 import debounce from 'utils/debounce';
@@ -19,10 +20,15 @@ interface SelectItemProsp {
   title?: string;
   data: any[];
   value: number[];
+  hidenData?: number[];
   multiple?: boolean;
   renderItem: (props: any) => JSX.Element;
   onChangeSearch?: (e: string) => void;
   onClose: () => void;
+  loading?: boolean;
+  showMore?: boolean;
+  onShowmore?: () => void;
+  onSubmit: (data: number[]) => void;
 }
 
 export default function SelectItem({
@@ -32,16 +38,41 @@ export default function SelectItem({
   renderItem,
   multiple,
   value,
+  hidenData,
   onChangeSearch,
   onClose,
+  loading,
+  showMore,
+  onShowmore,
+  onSubmit,
 }: SelectItemProsp) {
+  const [temporaryValue, setTemporaryValue] = useState(value);
+
+  useEffect(() => {
+    setTemporaryValue(value);
+  }, [value]);
+
   const handleSearch = (search: string) => {
     if (onChangeSearch) {
       onChangeSearch(search);
     }
   };
 
-  const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
+  const debounceSearch = useCallback(debounce(handleSearch, 700), []);
+
+  const handleSelected = (id: number) => {
+    if (multiple) {
+      const isExist = temporaryValue.includes(id);
+
+      if (isExist) {
+        setTemporaryValue(temporaryValue.filter((val) => val !== id));
+      } else {
+        setTemporaryValue([...temporaryValue, id]);
+      }
+    } else {
+      setTemporaryValue([id]);
+    }
+  };
 
   return (
     <ModalComp
@@ -57,6 +88,7 @@ export default function SelectItem({
             name="stock"
             placeholder={`Search ${title}`}
             sx={{
+              display: onChangeSearch ? 'block' : 'none',
               '& .MuiOutlinedInput-root': {
                 backgroundColor: '#fff',
                 color: '#929395',
@@ -83,7 +115,7 @@ export default function SelectItem({
             height="100%"
             sx={{ overflowY: 'auto', maxHeight: 400 }}
           >
-            {data.length === 0 && (
+            {!loading && data.length === 0 && (
               <Stack alignItems="center" gap={1} textAlign="center">
                 <Box
                   component="img"
@@ -98,26 +130,56 @@ export default function SelectItem({
                 </Typography>
               </Stack>
             )}
+            {!loading && data.length > 0 && (
+              <>
+                {data
+                  .filter((val) => {
+                    if (hidenData) {
+                      return !hidenData.includes(val.id);
+                    }
 
-            {data.map((val) => (
-              <Stack
-                key={val.id}
-                direction="row"
-                alignItems="center"
-                bgcolor={value.includes(val.id) ? '#ddf0e9' : 'unset'}
-                py={1}
-                gap={1}
-                sx={{ cursor: 'pointer' }}
-              >
-                {/* <Radio /> */}
-                {multiple ? (
-                  <Checkbox checked={value.includes(val.id)} />
-                ) : (
-                  <Radio checked={value.includes(val.id)} />
-                )}
-                {renderItem(val)}
-              </Stack>
-            ))}
+                    return true;
+                  })
+                  ?.sort((x, y) => (value?.includes(x?.id) ? -1 : 1))
+                  .map((val) => (
+                    <Stack
+                      key={val.id}
+                      direction="row"
+                      alignItems="center"
+                      bgcolor={
+                        temporaryValue.includes(val.id) ? '#ddf0e9' : 'unset'
+                      }
+                      py={1}
+                      gap={1}
+                      sx={{ cursor: 'pointer' }}
+                      onClick={() => handleSelected(val.id)}
+                    >
+                      {/* <Radio /> */}
+                      {multiple ? (
+                        <Checkbox checked={temporaryValue.includes(val.id)} />
+                      ) : (
+                        <Radio checked={temporaryValue.includes(val.id)} />
+                      )}
+                      {renderItem(val)}
+                    </Stack>
+                  ))}
+              </>
+            )}
+            {loading &&
+              Array(10)
+                .fill('1')
+                .map((val, index) => (
+                  <Box width="100%" key={index}>
+                    <Skeleton width="100%" height="25px" />
+                  </Box>
+                ))}
+            <Stack
+              alignItems="center"
+              sx={{ cursor: 'pointer', display: showMore ? 'flex' : 'none' }}
+              onClick={onShowmore}
+            >
+              <Typography color="primary.main">See More</Typography>
+            </Stack>
           </Stack>
         </Box>
         <Box
@@ -143,11 +205,12 @@ export default function SelectItem({
           </Button>
           <Button
             type="submit"
-            // onClick={() => {
-            //   formik.handleSubmit();
-            // }}
+            onClick={() => {
+              onSubmit(temporaryValue);
+              onClose();
+            }}
           >
-            Create
+            Select
           </Button>
         </Box>
       </>
