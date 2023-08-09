@@ -81,6 +81,7 @@ export default function InventoryPage() {
   const stockOpnameModal = useModal();
   const formProductModal = useModal();
   const listProductModal = useModal();
+  const procesProductModal = useModal();
   const moveStockFormModal = useModal();
   const moveStockConfirmationModal = useModal();
 
@@ -206,7 +207,8 @@ export default function InventoryPage() {
     await dispatch(
       uiAction.openYellowToast({
         // totalItem,
-        additionalMsg: `moved stock to [${selectedProductMoveStock[0].product_grade.name}] [${selectedProductMoveStock[0].product_type.name}] ${selectedProductMoveStock[0].product_parent.name}`,
+        additionalMsg: 'moved stock',
+        // additionalMsg: `moved stock to [${selectedProductMoveStock[0].product_grade.name}] [${selectedProductMoveStock[0].product_type.name}] ${selectedProductMoveStock[0].product_parent.name}`,
         action: 'Successfully',
         error: false,
         noUndo: true,
@@ -282,9 +284,9 @@ export default function InventoryPage() {
       ? selectedProduct.length > 3
         ? `${selectedProduct
             .slice(0, 3)
-            .map((item) => `${item.name} ${item.name}`)
+            .map((item) => `${item.name}`)
             .join(',')} ... and ${selectedProduct.length - 3} others`
-        : selectedProduct.map((item) => `${item.name} ${item.name}`).join(',')
+        : selectedProduct.map((item) => `${item.name}`).join(',')
       : '';
 
   // SEARCH & FILTER
@@ -510,21 +512,21 @@ export default function InventoryPage() {
       ),
     },
     {
-      id: 'selling_price',
-      label: 'Selling Price',
-      align: 'left',
-      enableSort: false,
-      format: (val: Product) => (
-        <Typography>Rp {numberSeperator(val?.selling_price || 0)}</Typography>
-      ),
-    },
-    {
       id: 'average_price',
       label: 'Average Price',
       align: 'left',
       enableSort: false,
       format: (val: Product) => (
         <Typography>Rp {numberSeperator(val?.average_price || 0)}</Typography>
+      ),
+    },
+    {
+      id: 'selling_price',
+      label: 'Selling Price',
+      align: 'left',
+      enableSort: false,
+      format: (val: Product) => (
+        <Typography>Rp {numberSeperator(val?.selling_price || 0)}</Typography>
       ),
     },
 
@@ -553,7 +555,9 @@ export default function InventoryPage() {
       align: 'left',
       enableSort: false,
       format: (val: Product) => (
-        <Typography>{numberWithCommas(val.stock)}</Typography>
+        <Typography>
+          {numberWithCommas(val.stock)} {val.unit_measurement}
+        </Typography>
       ),
     },
     {
@@ -629,6 +633,14 @@ export default function InventoryPage() {
                           dispatch(uiAction.closeYellowToast());
                           setParentId(val.id);
                           handleStockOpnameAction(val);
+                        },
+                      },
+                      {
+                        label: 'Proces Product',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          procesProductModal.openModal();
+                          setEditProduct(val);
                         },
                       },
                       {
@@ -991,11 +1003,12 @@ export default function InventoryPage() {
                   anchorEl={anchorEl}
                   open={open}
                   onClose={handleClose}
+                  PaperProps={{ sx: { minWidth: 130 } }}
                   MenuListProps={{
                     'aria-labelledby': 'basic-button',
                   }}
                 >
-                  <MenuItem
+                  {/* <MenuItem
                     onClick={() => {
                       handleStockOpnameBatchAction();
                     }}
@@ -1017,7 +1030,7 @@ export default function InventoryPage() {
                     }}
                   >
                     Make Active
-                  </MenuItem>
+                  </MenuItem> */}
                   <MenuItem
                     onClick={() => {
                       deleteModal.openModal();
@@ -1338,7 +1351,11 @@ export default function InventoryPage() {
           initData={payloadMoveStock.stock_change}
         />
       </ModalComp>
-      <ProcessProduct open={false} />
+      <ProcessProduct
+        open={procesProductModal.open}
+        EditProduct={EditProduct}
+        onClose={procesProductModal.closeModal}
+      />
       <ModalComp
         open={moveStockConfirmationModal.open}
         onClose={handleCloseAllModalOnStockOpname}

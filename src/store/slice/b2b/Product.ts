@@ -54,6 +54,12 @@ interface ProductProps {
   paramsOum: ListParams;
   loadingFormUom: boolean;
   isSuccessUom: boolean;
+  productSelect: {
+    data: Product[];
+    params: ProductParams;
+    totalProduct: number;
+    isLoading: boolean;
+  };
 }
 
 export const initialState: ProductProps = {
@@ -76,7 +82,7 @@ export const initialState: ProductProps = {
     page: 1,
     count: 10,
     search: '',
-    order_by: 'updated_at',
+    order_by: 'created_at',
     order_type: 'desc',
   },
   loadingStockOpname: false,
@@ -128,6 +134,18 @@ export const initialState: ProductProps = {
   },
   loadingFormUom: false,
   isSuccessUom: false,
+  productSelect: {
+    isLoading: false,
+    data: [],
+    params: {
+      page: 1,
+      count: 10,
+      search: '',
+      order_by: 'created_at',
+      order_type: 'desc',
+    },
+    totalProduct: 0,
+  },
 };
 
 const ProductSlice = createSlice({
@@ -380,6 +398,39 @@ const ProductSlice = createSlice({
     },
     moveStockSuccess(state: ProductProps) {
       state.loadingMoveStock = false;
+    },
+    // Proccess Product ================
+    setProcesProduct(state, action: PayloadAction<{ id: number; body: any }>) {
+      state.loadingForm = true;
+    },
+    successProcesProduct(state) {
+      state.loadingForm = false;
+      state.isSuccessCreate = true;
+    },
+    // Product Select ================
+    fetchProductSelect(state, action: PayloadAction<ProductParams>) {
+      state.productSelect.isLoading = true;
+    },
+    stopLodingProductSelect(state) {
+      state.productSelect.isLoading = false;
+    },
+    setPorductSelectData(state, action: PayloadAction<Product[]>) {
+      state.productSelect.data = action.payload;
+    },
+    setPorductSelectDataMerge(state, action: PayloadAction<Product[]>) {
+      state.productSelect.data = [
+        ...state.productSelect.data,
+        ...action.payload,
+      ];
+    },
+    setProductSelectTotalData(state, action: PayloadAction<number>) {
+      state.productSelect.totalProduct = action.payload;
+    },
+    setParamsProductSelect(state, action: PayloadAction<ProductParams>) {
+      state.productSelect.params = {
+        ...state.productSelect.params,
+        ...action.payload,
+      };
     },
   },
 });

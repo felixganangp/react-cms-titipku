@@ -37,8 +37,8 @@ function Content({ item, width }: Props) {
           borderRadius: '50%',
           marginLeft: 2,
         }}
-        src={item.product_parent.image_filepath}
-        alt={item.product_parent.name}
+        src={item.image}
+        alt={item.name}
       />
       <Box
         sx={{
@@ -70,7 +70,7 @@ function Content({ item, width }: Props) {
             >
               {item.product_grade.name}
             </GradingColor>
-            <Typography fontSize={14}>{item.product_parent.name}</Typography>
+            <Typography fontSize={14}>{item.name}</Typography>
           </Box>
           <Typography fontSize={14}>{item.product_type.name}</Typography>
         </Box>

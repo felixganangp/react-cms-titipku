@@ -718,6 +718,87 @@ function* deleteUom(payload: PayloadAction<{ id: number }>) {
   }
 }
 
+function* fetchDataProductSelect(params: PayloadAction<ProductParams>) {
+  try {
+    const response: ListResponse<Product> = yield call(
+      service.fetchProduct,
+      params.payload,
+    );
+    yield put(productAction.setProductSelectTotalData(response?.total || 0));
+    if ((params.payload?.page as number) > 1) {
+      yield put(productAction.setPorductSelectDataMerge(response.data));
+    } else {
+      yield put(productAction.setPorductSelectData(response.data));
+    }
+    yield put(productAction.stopLodingProductSelect());
+  } catch (err) {
+    yield put(productAction.stopLodingProductSelect());
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(productAction.fetchDataFailed());
+  }
+}
+
+function* procesProduct(payload: PayloadAction<{ id: number; body: any }>) {
+  try {
+    const { id, body } = payload.payload;
+    const fd = new FormData();
+    Object.keys(body).forEach((val) => {
+      fd.append(val, body[val]);
+    });
+    yield call(service.procesProduct, id, fd);
+    yield put(
+      uiAction.openYellowToast({
+        totalItem: 1,
+        additionalMsg: '',
+        action: 'successfully proces product!',
+        error: false,
+        noUndo: true,
+      }),
+    );
+    yield put(productAction.createProductSuccess());
+    const filter: ProductParams = yield select((state) => state.product.params);
+    yield put(productAction.fetchData(filter));
+  } catch (err) {
+    yield put(productAction.resetProductForm());
+
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create product',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error create product',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
 export default function* productSagas() {
   yield takeLatest(productAction.stockOpname, stockOpname);
   yield takeLatest(productAction.fetchTotalLowStock, fetchTotalLowStock);
@@ -746,4 +827,9 @@ export default function* productSagas() {
   yield takeLatest(productAction.createUom.type, createUom);
   yield takeLatest(productAction.updateUom.type, updateUom);
   yield takeLatest(productAction.deleteUom.type, deleteUom);
+  yield takeLatest(productAction.setProcesProduct.type, procesProduct);
+  yield takeLatest(
+    productAction.fetchProductSelect.type,
+    fetchDataProductSelect,
+  );
 }

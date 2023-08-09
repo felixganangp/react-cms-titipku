@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   TextField,
@@ -27,9 +27,16 @@ interface FormTypes {
   EditProduct?: Product | null;
   isDetail?: boolean;
   processProduct?: boolean;
+  isSubmitedProcess?: boolean;
+  onChangeFormProces?: (value: any, error: any) => void;
 }
 
-export default function Form({ processProduct, ...props }: FormTypes) {
+export default function Form({
+  processProduct,
+  isSubmitedProcess,
+  onChangeFormProces,
+  ...props
+}: FormTypes) {
   const [isNameExist, setIsNameExist] = useState(false);
   const { formik, categories, loadingForm, uom, isEdit } =
     useFormProduct(props);
@@ -41,10 +48,30 @@ export default function Form({ processProduct, ...props }: FormTypes) {
     const respon = (await IsExistName(value)) as Response<boolean>;
     setIsNameExist(respon.data);
   };
+
   const debounceCheckIsName = useCallback(
     debounce(handleCheckIsNameExist, 1000),
     [],
   );
+
+  // Function for Proces Product =====
+  const callOnChange = useCallback(() => {
+    if (onChangeFormProces) onChangeFormProces(formik.values, formik.errors);
+  }, [formik.values]);
+
+  useEffect(() => {
+    if (processProduct) {
+      callOnChange();
+    }
+  }, [processProduct, formik.values, formik.errors]);
+
+  useEffect(() => {
+    if (isSubmitedProcess) {
+      Object.keys(formik.values).forEach((val) => {
+        formik.setFieldTouched(val, true);
+      });
+    }
+  }, [isSubmitedProcess]);
 
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
