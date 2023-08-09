@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { CreateSupplier, Supplier } from 'models/b2b/Supplier';
 import { uiAction } from 'store/slice/ui';
+import YellowToast from 'components/YellowToast';
 import Table from 'components/Table';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -42,16 +43,17 @@ export default function SupplierPage() {
 
   // Delete Data
   const handleDelete = () => {
-    console.log('delete');
     setSelected([]);
     deleteModal.closeModal();
     dispatch(SupplierAction.delete(selected));
     dispatch(
       uiAction.openYellowToast({
-        totalItem: selectedSupplier.length,
-        additionalMsg: '',
-        action: 'delete',
+        totalItem: selected.length,
+        itemType: 'supplier',
+        additionalMsg: `successfully`,
+        action: 'Deleted',
         error: true,
+        noUndo: true,
       }),
     );
   };
@@ -109,6 +111,16 @@ export default function SupplierPage() {
 
   const onCloseForm = async () => {
     await dispatch(SupplierAction.fetchData(supplier.params));
+    dispatch(
+      uiAction.openYellowToast({
+        totalItem: 1,
+        itemType: 'supplier',
+        additionalMsg: `successfully`,
+        action: formData.isEdit ? 'Edited' : 'Created',
+        error: true,
+        noUndo: true,
+      }),
+    );
     setFormData({
       isEdit: false,
       data: {
@@ -118,10 +130,6 @@ export default function SupplierPage() {
       },
     });
     formModal.closeModal();
-  };
-
-  const onCloseFormDelete = async () => {
-    deleteModal.closeModal();
   };
 
   React.useEffect(() => {
@@ -255,6 +263,7 @@ export default function SupplierPage() {
         </Box>
 
         <Box mt={2}>
+          <YellowToast />
           <Table
             data={supplier.data}
             headCells={headCell}

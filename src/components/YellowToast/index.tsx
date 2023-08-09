@@ -12,6 +12,7 @@ export interface YellowToastProps {
   error: boolean;
   onUndoAction?: () => void | undefined;
   noUndo?: boolean;
+  itemType?: string;
 }
 
 export default function YellowToast() {
@@ -24,6 +25,7 @@ export default function YellowToast() {
     error,
     onUndoAction,
     noUndo,
+    itemType,
   } = useAppSelector((state) => state.ui.yellowToast);
 
   setTimeout(() => dispatch(uiAction.closeYellowToast()), 10000);
@@ -48,7 +50,8 @@ export default function YellowToast() {
         {totalItem ? (
           <>
             <Typography fontSize="16px">
-              <b>{totalItem}</b> Item{totalItem > 1 ? 's' : ''}{' '}
+              <b>{totalItem}</b> {itemType !== '' ? itemType : 'item'}{' '}
+              {totalItem > 1 ? 's' : ''}{' '}
               {`${additionalMsg ? `${additionalMsg} ` : ''}`}
             </Typography>
             <Typography
