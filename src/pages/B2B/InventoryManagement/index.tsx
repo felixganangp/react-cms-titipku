@@ -350,7 +350,7 @@ export default function InventoryPage() {
         search: search || '',
         product_grade_id: grade ? grade.id : undefined,
         product_type_id: type ? type.id : undefined,
-        product_parent_category_id: category ? category.id : undefined,
+        product_category_id: category ? category.id : undefined,
         status: status ? status.value : undefined,
         pricemin: pricemin || undefined,
         pricemax: pricemax || undefined,
@@ -365,7 +365,7 @@ export default function InventoryPage() {
         // search: '',
         product_type_id: undefined,
         product_grade_id: undefined,
-        product_parent_category_id: undefined,
+        product_category_id: undefined,
         status:
           activeDashboard === 'all_stock' ? undefined : product.params.status,
       }),
@@ -387,7 +387,7 @@ export default function InventoryPage() {
         search: product.params.search,
         product_type_id: undefined,
         product_grade_id: undefined,
-        product_parent_category_id: undefined,
+        product_category_id: undefined,
         status:
           activeDashboard === 'all_stock' ? undefined : product.params.status,
       }),

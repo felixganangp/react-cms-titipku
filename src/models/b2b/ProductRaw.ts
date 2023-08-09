@@ -23,7 +23,7 @@ export interface ProductRaw {
 }
 
 export interface RawParams extends ListParams {
-  product_parent_category_id?: number;
+  product_category_id?: number;
 }
 
 export interface RawDisplayFilter {
