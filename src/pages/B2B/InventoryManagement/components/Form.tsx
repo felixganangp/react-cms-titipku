@@ -222,10 +222,6 @@ export default function Form({
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         backgroundColor: '#fff',
-                        color: '#929395',
-                        '& .MuiSvgIcon-root': {
-                          color: '#929395',
-                        },
                       },
                     }}
                     onBlur={formik.handleBlur}
@@ -284,10 +280,6 @@ export default function Form({
                       sx={{
                         '& .MuiOutlinedInput-root': {
                           backgroundColor: '#fff',
-                          color: '#929395',
-                          '& .MuiSvgIcon-root': {
-                            color: '#929395',
-                          },
                         },
                       }}
                     />
@@ -314,10 +306,6 @@ export default function Form({
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: '#fff',
-                    color: '#929395',
-                    '& .MuiSvgIcon-root': {
-                      color: '#929395',
-                    },
                   },
                 }}
                 onBlur={formik.handleBlur}
@@ -365,10 +353,6 @@ export default function Form({
               sx={{
                 '& .MuiOutlinedInput-root': {
                   backgroundColor: '#fff',
-                  color: '#929395',
-                  '& .MuiSvgIcon-root': {
-                    color: '#929395',
-                  },
                 },
               }}
               fullWidth

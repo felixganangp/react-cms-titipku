@@ -21,8 +21,8 @@ const initialValues: FormInventoryTypes = {
   name: '',
   category: null,
   selling_price: '',
-  low_stock_limit: '',
-  stock: '',
+  low_stock_limit: '0',
+  stock: '0',
   description: '',
   unit_measurement_id: null,
 };
@@ -43,7 +43,7 @@ export default function FormProduct({
   });
 
   useEffect(() => {
-    dispatch(productAction.fetchCategory());
+    dispatch(productAction.fetchCategory({ count: 1000 }));
     dispatch(productAction.fetchUom({ count: 1000 }));
   }, []);
 

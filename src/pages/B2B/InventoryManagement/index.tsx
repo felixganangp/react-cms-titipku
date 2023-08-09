@@ -298,7 +298,7 @@ export default function InventoryPage() {
 
   useEffect(() => {
     dispatch(productAction.fetchGrade());
-    dispatch(productAction.fetchCategory());
+    dispatch(productAction.fetchCategory({ count: 100 }));
     dispatch(productAction.fetchTypes());
   }, []);
 
@@ -1315,6 +1315,7 @@ export default function InventoryPage() {
           formProductModal.closeModal();
           setEditProduct(null);
         }}
+        disableOutsideClose
       >
         <Form
           onClose={() => {
