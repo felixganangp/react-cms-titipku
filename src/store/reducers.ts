@@ -14,6 +14,7 @@ import invoiceReducer from './slice/kur/Invoice';
 import productsReducer from './slice/b2b/Product';
 import rawsReducer from './slice/b2b/ProductRaw';
 import inboundReducer from './slice/b2b/Inbound';
+import supplierReducer from './slice/b2b/Supplier';
 
 const reducers = {
   ui: uiReducer,
@@ -32,6 +33,7 @@ const reducers = {
   product: productsReducer,
   raw: rawsReducer,
   inbound: inboundReducer,
+  supplier: supplierReducer,
 };
 
 export default reducers;
