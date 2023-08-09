@@ -95,9 +95,9 @@ function StockOpname({
                 currentTarget.onerror = null;
                 currentTarget.src = NoImage;
               }}
-              src={item.product_parent.image_filepath}
+              src={item.image}
               style={{ height: '48px', width: '48px', borderRadius: '50%' }}
-              alt={item.product_parent.name}
+              alt={item.name}
             />
             <Box
               sx={{
@@ -126,17 +126,8 @@ function StockOpname({
                     alignItems: 'center',
                   }}
                 >
-                  {item.product_grade.id !== 1 && (
-                    <GradingColor
-                      sx={{ padding: '2px !important' }}
-                      grade={item.product_grade.id}
-                      fontSize="12px"
-                    >
-                      {item.product_grade.name}
-                    </GradingColor>
-                  )}
                   <Typography fontSize="14px" sx={{ width: '70%' }}>
-                    {item.product_parent.name}
+                    {item.name}
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex' }}>
@@ -144,7 +135,7 @@ function StockOpname({
                     // sx={{ paddingX: '1em', backgroundColor: '#e4e4e4' }}
                     fontSize="14px"
                   >
-                    {item.product_type.name || '-'}
+                    {item.name || '-'}
                   </Typography>
                 </Box>
               </Box>
