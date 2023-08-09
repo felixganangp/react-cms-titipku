@@ -49,16 +49,21 @@ export const sidebarData: FilteredMenu[] = [
         child: [],
       },
       {
-        id: 61,
-        title: 'Unit of Measurement',
-        path: '/b2b/uom',
-        child: [],
-      },
-      {
-        id: 62,
-        title: 'Supplier',
-        path: '/b2b/supplier',
-        child: [],
+        id: 64,
+        title: 'Setting',
+        path: '',
+        child: [
+          {
+            id: 61,
+            title: 'Unit of Measurement',
+            path: '/b2b/uom',
+          },
+          {
+            id: 62,
+            title: 'Supplier',
+            path: '/b2b/supplier',
+          },
+        ],
       },
     ],
   },

@@ -17,7 +17,7 @@ import digitFormatter from 'utils/digitFormatter';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { debounce } from 'lodash';
 import { Button, Typography } from '@mui/material';
-import { InboundDetail } from '../../../../models/b2b/Inbound';
+import NoImage from 'assets/no-image.svg';
 import {
   TitleWrapper,
   ContentWrapper,
@@ -46,6 +46,33 @@ export default function InboundDetailPopUp(props: InboundDetailProps) {
       id: 'product_name',
       label: 'Product/SKU',
       align: 'left',
+      format: (val: any) => (
+        <Box
+          display="flex"
+          flexDirection="row"
+          justifyContent="flex-start"
+          alignItems="center"
+          gap="24px"
+        >
+          <img
+            onError={({ currentTarget }) => {
+              currentTarget.onerror = null;
+              currentTarget.src = NoImage;
+            }}
+            src={val.product_image}
+            style={{ height: '48px', width: '48px', borderRadius: '50%' }}
+            alt={val.product_name}
+          />
+          <Box
+            display="flex"
+            flexDirection="row"
+            justifyContent="flex-start"
+            gap="8px"
+          >
+            <Typography>{val.product_name}</Typography>
+          </Box>
+        </Box>
+      ),
     },
     {
       id: 'supplier_price',

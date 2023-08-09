@@ -1,18 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
-  Grid,
   Typography,
   Box,
   TextField,
   InputAdornment,
   Button,
   IconButton,
-  Menu,
-  MenuItem,
-  Collapse,
-  Modal,
-  Autocomplete,
-  Skeleton,
   Stack,
 } from '@mui/material';
 import Table from 'components/Table';
@@ -155,12 +148,7 @@ export default function InboundPage() {
           size="small"
           sx={{ flex: 1, bgcolor: '#f8f8f8', maxWidth: '560px' }}
           fullWidth
-          // defaultValue={product.displayFilter.search}
           value={inbound.params.search}
-          // onChange={(e) => handleSearch(e.target.value)}
-          // onKeyDown={(e) => {
-          //   if (e.key === 'Enter') handleApplyFilter();
-          // }}
           onChange={(event) => handleSearch(event.target.value)}
           InputProps={{
             startAdornment: (

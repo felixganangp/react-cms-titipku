@@ -37,6 +37,7 @@ const RawManagement = lazy(() => import('pages/B2B/RawManagement'));
 
 const OumManagement = lazy(() => import('pages/B2B/OumManagement'));
 const InboundManagement = lazy(() => import('pages/B2B/InboundManagement'));
+const SupplierManagement = lazy(() => import('pages/B2B/SupplierManagement'));
 
 interface RouteProps {
   path: string;
@@ -177,6 +178,13 @@ const ListRoute: RouteProps[] = [
     name: 'Inbound Management',
     comp: InboundManagement,
     path: '/b2b/inbound',
+    index: true,
+    auth: 'Private',
+  },
+  {
+    name: 'Supplier Management',
+    comp: SupplierManagement,
+    path: '/b2b/supplier',
     index: true,
     auth: 'Private',
   },
