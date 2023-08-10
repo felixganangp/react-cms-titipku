@@ -130,14 +130,6 @@ function StockOpname({
                     {item.name}
                   </Typography>
                 </Box>
-                <Box sx={{ display: 'flex' }}>
-                  <Typography
-                    // sx={{ paddingX: '1em', backgroundColor: '#e4e4e4' }}
-                    fontSize="14px"
-                  >
-                    {item.name || '-'}
-                  </Typography>
-                </Box>
               </Box>
               <Box
                 sx={{
@@ -151,7 +143,7 @@ function StockOpname({
                   fontWeight="500"
                   sx={{ width: '120px' }}
                 >
-                  in Stock (Gram)
+                  in Stock ({item.unit_measurement})
                 </Typography>
                 <Box
                   sx={{

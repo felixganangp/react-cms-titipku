@@ -368,6 +368,8 @@ export default function InventoryPage() {
         product_category_id: undefined,
         status:
           activeDashboard === 'all_stock' ? undefined : product.params.status,
+        pricemin: undefined,
+        pricemax: undefined,
       }),
     );
     dispatch(
@@ -378,6 +380,8 @@ export default function InventoryPage() {
         // search: '',
         status:
           activeDashboard === 'all_stock' ? null : product.displayFilter.status,
+        pricemin: undefined,
+        pricemax: undefined,
       }),
     );
     dispatch(
@@ -419,7 +423,7 @@ export default function InventoryPage() {
   };
 
   const getDashboardTitle = () => {
-    if (activeDashboard === 'all_stock') return 'Product Management';
+    if (activeDashboard === 'all_stock') return 'Inventory Management';
     if (activeDashboard === 'empty_stock') return 'Empty Stock Products';
     return 'Low Stock Products';
   };
@@ -641,6 +645,8 @@ export default function InventoryPage() {
                           dispatch(uiAction.closeYellowToast());
                           procesProductModal.openModal();
                           setEditProduct(val);
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
                         },
                       },
                       {
@@ -649,6 +655,8 @@ export default function InventoryPage() {
                           dispatch(uiAction.closeYellowToast());
                           formProductModal.openModal();
                           setEditProduct(val);
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
                         },
                       },
                       {
@@ -685,6 +693,8 @@ export default function InventoryPage() {
                           dispatch(uiAction.closeYellowToast());
                           formProductModal.openModal();
                           setEditProduct(val);
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
                         },
                       },
                       {
@@ -957,7 +967,7 @@ export default function InventoryPage() {
               p="16px 12px"
             >
               <TextField
-                placeholder="Search item"
+                placeholder="Search Item"
                 size="small"
                 sx={{ flex: 1, bgcolor: '#f8f8f8', maxWidth: '560px' }}
                 fullWidth
@@ -1166,6 +1176,7 @@ export default function InventoryPage() {
                           ),
                         }}
                         fullWidth
+                        autoComplete="off"
                         value={numberSeperator(pricemin || '')}
                         onChange={(e) => {
                           const value = e.target.value
@@ -1185,6 +1196,7 @@ export default function InventoryPage() {
                         type="text"
                         name="selling_price"
                         placeholder="Insert Price"
+                        autoComplete="off"
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">Rp</InputAdornment>
@@ -1323,6 +1335,16 @@ export default function InventoryPage() {
             setEditProduct(null);
           }}
           EditProduct={EditProduct}
+          handleDeleteButton={() => {
+            if (EditProduct) {
+              setEditProduct(null);
+              formProductModal.closeModal();
+              dispatch(uiAction.closeYellowToast());
+              deleteModal.openModal();
+              setSelected([EditProduct.id]);
+              setSelectedProduct([EditProduct]);
+            }
+          }}
         />
       </ModalComp>
       {/* <PopupAddSelected

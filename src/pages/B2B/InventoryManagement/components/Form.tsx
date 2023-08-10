@@ -29,6 +29,7 @@ interface FormTypes {
   processProduct?: boolean;
   isSubmitedProcess?: boolean;
   onChangeFormProces?: (value: any, error: any) => void;
+  handleDeleteButton?: () => void;
 }
 
 export default function Form({
@@ -305,9 +306,10 @@ export default function Form({
                 placeholder="Insert Low Stock"
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    backgroundColor: '#fff',
+                    backgroundColor: isEdit ? '#e4e4e4' : '#fff',
                   },
                 }}
+                disabled={isEdit}
                 onBlur={formik.handleBlur}
                 fullWidth
                 value={formik.values.stock}
@@ -375,6 +377,16 @@ export default function Form({
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
+        {props?.handleDeleteButton && (
+          <Button
+            variant="text"
+            color="error"
+            onClick={props.handleDeleteButton}
+          >
+            Delete Item
+          </Button>
+        )}
+
         <Button
           type="submit"
           size="medium"
@@ -382,9 +394,7 @@ export default function Form({
           //   formik.handleSubmit();
           // }}
         >
-          {!loadingForm
-            ? `${isEdit ? 'Save Changes' : 'Create'}`
-            : 'Loading...'}
+          {!loadingForm ? `${isEdit ? 'Edit' : 'Create'}` : 'Loading...'}
         </Button>
       </Box>
     </Box>
