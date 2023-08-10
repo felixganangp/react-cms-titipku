@@ -74,7 +74,41 @@ function* updateSupplier(payload: PayloadAction<CreateSupplier>) {
   }
 }
 
+function* deleteSupplier(params: PayloadAction<(number | string)[]>) {
+  try {
+    const filter: SupplierParams = yield select(
+      (state) => state.supplier.params,
+    );
+    yield call(SupplierServices.deleteSupplier, {
+      ids: params.payload,
+    });
+    yield put(SupplierAction.deleteDone());
+    yield put(SupplierAction.fetchData(filter));
+  } catch (err) {
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error delete products',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error delete products',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(SupplierAction.deleteDone());
+  }
+}
+
 export default function* supplierSagas() {
   yield takeLatest(SupplierAction.fetchData.type, fetchData);
   yield takeLatest(SupplierAction.updateSupplier.type, updateSupplier);
+  yield takeLatest(SupplierAction.delete.type, deleteSupplier);
 }

@@ -11,6 +11,8 @@ interface SupplierProps {
   params: SupplierParams;
   validMsg?: boolean;
   loadingValidMsg?: boolean;
+  loadingDelete?: boolean;
+  tempIds?: (number | string)[];
 }
 
 const initialState: SupplierProps = {
@@ -26,6 +28,8 @@ const initialState: SupplierProps = {
   },
   validMsg: false,
   loadingValidMsg: false,
+  loadingDelete: false,
+  tempIds: [],
 };
 
 const SupplierSlice = createSlice({
@@ -68,6 +72,13 @@ const SupplierSlice = createSlice({
     ) {
       state.loadingForm = false;
       state.error = action.payload.error;
+    },
+    delete(state: SupplierProps, action: PayloadAction<(number | string)[]>) {
+      state.loadingDelete = true;
+      state.tempIds = action.payload;
+    },
+    deleteDone(state: SupplierProps) {
+      state.loadingDelete = false;
     },
     failedError(state: SupplierProps, action: PayloadAction<any>) {
       state.loadingForm = false;

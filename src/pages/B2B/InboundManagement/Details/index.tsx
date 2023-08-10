@@ -86,7 +86,11 @@ export default function InboundDetailPopUp(props: InboundDetailProps) {
       id: 'quantity',
       label: 'Quantity',
       align: 'left',
-      format: (val: any) => <Typography>{val.quantity} uom</Typography>,
+      format: (val: any) => (
+        <Typography>
+          {val.quantity} {val.unit_measurement}
+        </Typography>
+      ),
     },
   ];
 
@@ -145,6 +149,7 @@ export default function InboundDetailPopUp(props: InboundDetailProps) {
             data={inbound.detailsData?.purchase_detail}
             headCells={headCell}
             loading={inbound.loading}
+            disablePagination
           />
         </BoxTable>
       </ContentWrapper>

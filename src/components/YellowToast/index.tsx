@@ -12,6 +12,7 @@ export interface YellowToastProps {
   error: boolean;
   onUndoAction?: () => void | undefined;
   noUndo?: boolean;
+  itemType?: string;
 }
 
 export default function YellowToast() {
@@ -24,6 +25,7 @@ export default function YellowToast() {
     error,
     onUndoAction,
     noUndo,
+    itemType,
   } = useAppSelector((state) => state.ui.yellowToast);
 
   setTimeout(() => dispatch(uiAction.closeYellowToast()), 10000);
