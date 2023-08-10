@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import Table from 'components/Table';
 import ArrowIcon from '@mui/icons-material/ArrowForwardIos';
-import SearchIcon from '@mui/icons-material/Search';
+import Add from '@mui/icons-material/Add';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
 import MenuList from 'components/MenuList';
@@ -110,7 +110,7 @@ export default function CategoryPage() {
       <Box mt={2} bgcolor="#fff" border="1px solid #EBEFF3">
         <Box p={2}>
           <Button
-            endIcon={<ArrowIcon />}
+            startIcon={<Add />}
             onClick={formModal.openModal}
             size="large"
           >

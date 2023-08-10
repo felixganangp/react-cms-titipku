@@ -30,6 +30,7 @@ interface FormTypes {
   isSubmitedProcess?: boolean;
   onChangeFormProces?: (value: any, error: any) => void;
   handleDeleteButton?: () => void;
+  enableDeleteButton?: boolean;
 }
 
 export default function Form({
@@ -377,7 +378,7 @@ export default function Form({
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
-        {props?.handleDeleteButton && (
+        {props?.enableDeleteButton && props?.handleDeleteButton && (
           <Button
             variant="text"
             color="error"
@@ -390,6 +391,7 @@ export default function Form({
         <Button
           type="submit"
           size="medium"
+          disabled={loadingForm || !formik.isValid}
           // onClick={() => {
           //   formik.handleSubmit();
           // }}

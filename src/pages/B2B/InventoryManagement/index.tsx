@@ -821,7 +821,11 @@ export default function InventoryPage() {
             {activeDashboard === 'all_stock' ? (
               <Button
                 endIcon={<ArrowIcon />}
-                onClick={formProductModal.openModal}
+                onClick={() => {
+                  formProductModal.openModal();
+                  setSelected([]);
+                  setSelectedProduct([]);
+                }}
                 size="large"
               >
                 Add New
@@ -1335,6 +1339,7 @@ export default function InventoryPage() {
             setEditProduct(null);
           }}
           EditProduct={EditProduct}
+          enableDeleteButton={Boolean(EditProduct)}
           handleDeleteButton={() => {
             if (EditProduct) {
               setEditProduct(null);
