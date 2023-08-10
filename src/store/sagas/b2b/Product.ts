@@ -217,8 +217,8 @@ function* createProduct(payload: PayloadAction<FormInventoryTypes>) {
     yield put(
       uiAction.openYellowToast({
         totalItem: 1,
-        additionalMsg: '',
-        action: 'successfully added!',
+        additionalMsg: 'Product successfully',
+        action: 'added!',
         error: false,
         noUndo: true,
       }),

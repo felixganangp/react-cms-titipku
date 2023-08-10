@@ -3,7 +3,15 @@
 /* eslint-disable no-nested-ternary */
 import React, { Children, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Stack, Box, Typography, Button, Grid, Skeleton } from '@mui/material';
+import {
+  Stack,
+  Box,
+  Typography,
+  Button,
+  Grid,
+  Modal,
+  Skeleton,
+} from '@mui/material';
 import Table from 'components/Table';
 import ModalComp from 'components/Modal';
 import useModal from 'hooks/useModal';
@@ -11,10 +19,13 @@ import BackIcon from '@mui/icons-material/KeyboardArrowLeftOutlined';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import YellowToast from 'components/YellowToast';
 import numberSeperator from 'utils/numberSeperator';
+import Delete from 'components/Delete';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
 import { Log } from 'models/b2b/Product';
 import NoImage from 'assets/no-image.svg';
+import moment from 'moment';
+import { uiAction } from 'store/slice/ui';
 import { CardContainer, StatusColor } from '../inventory.styled';
 import Form from '../components/Form';
 
@@ -26,6 +37,7 @@ export default function InvoiceDetail() {
   const details = useAppSelector((state) => state.product.details);
   const { id } = useParams();
   const formProductModal = useModal();
+  const deleteModal = useModal();
 
   // useEffect(() => {
   //   dispatch(productAction.fetchGrade());
@@ -60,6 +72,33 @@ export default function InvoiceDetail() {
     );
   };
 
+  const handleChangeRowPerPage = (value: number) => {
+    dispatch(
+      productAction.setLogParams({
+        page: 1,
+        count: value,
+      }),
+    );
+  };
+
+  const handleDelete = () => {
+    deleteModal.closeModal();
+    dispatch(productAction.delete([details?.id || 0]));
+    dispatch(
+      uiAction.openYellowToast({
+        totalItem: 1,
+        onUndoAction() {
+          dispatch(productAction.undoDelete());
+          dispatch(uiAction.closeYellowToast());
+        },
+        additionalMsg: '',
+        action: 'delete',
+        error: true,
+      }),
+    );
+    navigate('/b2b/inventory');
+  };
+
   const headCell = [
     {
       id: 'Editor',
@@ -67,6 +106,16 @@ export default function InvoiceDetail() {
       align: 'left',
       format: (val: Log) => (
         <Typography color="#0774d1">{val.created_by.name}</Typography>
+      ),
+    },
+    {
+      id: 'time',
+      label: 'Time',
+      align: 'left',
+      format: (val: Log) => (
+        <Typography fontSize={14}>
+          {moment(val.created_at).format('DD/MM/YYYY . hh:mm')}
+        </Typography>
       ),
     },
     {
@@ -287,6 +336,7 @@ export default function InvoiceDetail() {
             count={product.paramsLog.count}
             page={product.paramsLog.page}
             onChangePage={handleChangePage}
+            onChangeRowPerpage={handleChangeRowPerPage}
           />
         </Box>
       </CardContainer>
@@ -303,8 +353,24 @@ export default function InvoiceDetail() {
           }}
           EditProduct={details}
           isDetail
+          enableDeleteButton
+          handleDeleteButton={() => {
+            if (details) {
+              formProductModal.closeModal();
+              dispatch(uiAction.closeYellowToast());
+              deleteModal.openModal();
+            }
+          }}
         />
       </ModalComp>
+      <Modal open={deleteModal.open} onClose={deleteModal.closeModal}>
+        <Delete
+          total={1}
+          selectedItemDesc={details?.name || ''}
+          onSubmit={handleDelete}
+          onClose={deleteModal.closeModal}
+        />
+      </Modal>
     </Box>
   );
 }
