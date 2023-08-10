@@ -5,6 +5,7 @@ export interface UomTypes {
   updated_at: Date;
   deleted_at: Date;
   total_product: number;
+  product_count: number;
 }
 
 export interface CreateUomTypes {

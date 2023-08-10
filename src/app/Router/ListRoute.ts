@@ -35,7 +35,8 @@ const InventoryDetailsManagement = lazy(
 
 const RawManagement = lazy(() => import('pages/B2B/RawManagement'));
 
-const OumManagement = lazy(() => import('pages/B2B/OumManagement'));
+const OumManagement = lazy(() => import('pages/B2B/UomManagement'));
+const CategoryManagement = lazy(() => import('pages/B2B/CategoryManagement'));
 const InboundManagement = lazy(() => import('pages/B2B/InboundManagement'));
 const SupplierManagement = lazy(() => import('pages/B2B/SupplierManagement'));
 
@@ -192,6 +193,13 @@ const ListRoute: RouteProps[] = [
     name: 'Uom Management',
     comp: OumManagement,
     path: '/b2b/uom',
+    index: true,
+    auth: 'Private',
+  },
+  {
+    name: 'Category Management',
+    comp: CategoryManagement,
+    path: '/b2b/category',
     index: true,
     auth: 'Private',
   },

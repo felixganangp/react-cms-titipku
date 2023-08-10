@@ -31,7 +31,7 @@ export interface Product {
 export interface ProductParams extends ListParams {
   product_grade_id?: number;
   product_type_id?: number;
-  product_parent_category_id?: number;
+  product_category_id?: number;
   status?: string;
   product_parent_id?: number;
   pricemin?: number;

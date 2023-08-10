@@ -60,6 +60,12 @@ interface ProductProps {
     totalProduct: number;
     isLoading: boolean;
   };
+  category: {
+    loadingForm: boolean;
+    params: ListParams;
+    totalProduct: number;
+    isLoading: boolean;
+  };
 }
 
 export const initialState: ProductProps = {
@@ -82,7 +88,7 @@ export const initialState: ProductProps = {
     page: 1,
     count: 10,
     search: '',
-    order_by: 'created_at',
+    order_by: 'update_at',
     order_type: 'desc',
   },
   loadingStockOpname: false,
@@ -137,6 +143,18 @@ export const initialState: ProductProps = {
   productSelect: {
     isLoading: false,
     data: [],
+    params: {
+      page: 1,
+      count: 10,
+      search: '',
+      order_by: 'created_at',
+      order_type: 'desc',
+    },
+    totalProduct: 0,
+  },
+  category: {
+    loadingForm: false,
+    isLoading: false,
     params: {
       page: 1,
       count: 10,
@@ -229,19 +247,6 @@ const ProductSlice = createSlice({
     fetchGradeFailed(state: ProductProps) {
       state.loadingFilter = false;
     },
-    fetchCategory(state: ProductProps) {
-      state.loadingFilter = true;
-    },
-    fetchCategorySuccess(
-      state: ProductProps,
-      action: PayloadAction<ListResponse<Category>>,
-    ) {
-      state.loadingFilter = false;
-      state.categories = action.payload.data || [];
-    },
-    fetchCategoryFailed(state: ProductProps) {
-      state.loadingFilter = false;
-    },
     updateUom(
       state: ProductProps,
       action: PayloadAction<{ id: number; body: CreateUomTypes }>,
@@ -256,6 +261,9 @@ const ProductSlice = createSlice({
     },
     fetchUom(state: ProductProps, action: PayloadAction<ListParams>) {
       state.loadingFilter = true;
+    },
+    setParamsUom(state: ProductProps, action: PayloadAction<ListParams>) {
+      state.paramsOum = { ...state.paramsOum, ...action.payload };
     },
     successLoadingOum(state) {
       state.loadingForm = false;
@@ -431,6 +439,44 @@ const ProductSlice = createSlice({
         ...state.productSelect.params,
         ...action.payload,
       };
+    },
+    // Category=====
+    fetchCategory(state: ProductProps, action?: PayloadAction<ListParams>) {
+      state.loadingFilter = true;
+    },
+    fetchCategorySuccess(
+      state: ProductProps,
+      action: PayloadAction<ListResponse<Category>>,
+    ) {
+      state.loadingFilter = false;
+      state.categories = action.payload.data || [];
+      state.category.totalProduct = action.payload.total || 0;
+    },
+    fetchCategoryFailed(state: ProductProps) {
+      state.loadingFilter = false;
+    },
+    updateCategory(
+      state: ProductProps,
+      action: PayloadAction<{ id: number; body: CreateUomTypes }>,
+    ) {
+      state.category.isLoading = true;
+    },
+    setParamsCategory(state: ProductProps, action: PayloadAction<ListParams>) {
+      state.category.params = { ...state.category.params, ...action.payload };
+    },
+    deleteCategory(state: ProductProps, action: PayloadAction<{ id: number }>) {
+      state.category.isLoading = true;
+    },
+    createCategory(state: ProductProps, action: PayloadAction<CreateUomTypes>) {
+      state.category.isLoading = true;
+    },
+    successLoadingCategory(state) {
+      state.category.isLoading = false;
+      state.category.loadingForm = true;
+    },
+    resetCategoryform(state: ProductProps) {
+      state.category.loadingForm = false;
+      state.category.loadingForm = false;
     },
   },
 });

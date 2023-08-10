@@ -100,7 +100,7 @@ function* createRaw(payload: PayloadAction<CreateRawSaga>) {
       product_parent: {
         name,
         image_filepath: uploadImageRes.data,
-        product_parent_category_id: category_ids,
+        product_category_id: category_ids,
       },
     };
     yield call(service.create, payloadRaw);
@@ -179,7 +179,7 @@ function* updateRaw(
     const payloadParent: CreateProduct = {
       name,
       image_filepath: imagePath,
-      product_parent_category_id: category_ids,
+      product_category_id: category_ids,
       is_active: is_active_parent,
       is_exist: is_exist_parent,
     };
