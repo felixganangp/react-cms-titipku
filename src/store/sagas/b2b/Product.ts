@@ -739,8 +739,8 @@ function* procesProduct(payload: PayloadAction<{ id: number; body: any }>) {
     yield put(
       uiAction.openYellowToast({
         totalItem: 1,
-        additionalMsg: '',
-        action: 'successfully proces product!',
+        additionalMsg: 'Product successfully',
+        action: 'Added!',
         error: false,
         noUndo: true,
       }),
