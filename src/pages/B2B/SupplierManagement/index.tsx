@@ -77,7 +77,6 @@ export default function SupplierPage() {
       : '';
 
   const getHeaderTextModal = () => {
-    console.log('selected', selectedSupplier, selected);
     if (selectedSupplier.length > 1) {
       return <b>Delete {getBatchSupplierDesc()}?</b>;
     }

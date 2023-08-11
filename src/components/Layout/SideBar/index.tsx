@@ -43,16 +43,15 @@ export const sidebarData: FilteredMenu[] = [
         child: [],
       },
       {
-        id: 60,
-        title: 'Category',
-        path: '/b2b/category',
-        child: [],
-      },
-      {
         id: 64,
         title: 'Setting',
         path: '',
         child: [
+          {
+            id: 60,
+            title: 'Category',
+            path: '/b2b/category',
+          },
           {
             id: 61,
             title: 'Unit of Measurement',
