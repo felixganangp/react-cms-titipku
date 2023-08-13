@@ -578,8 +578,8 @@ function* createUom(payload: PayloadAction<CreateUomTypes>) {
     yield put(
       uiAction.openYellowToast({
         totalItem: 1,
-        additionalMsg: '',
-        action: 'successfully added!',
+        additionalMsg: 'UoM successfully',
+        action: 'added!',
         error: false,
         noUndo: true,
       }),
@@ -658,8 +658,8 @@ function* deleteUom(payload: PayloadAction<{ id: number }>) {
     yield put(
       uiAction.openYellowToast({
         totalItem: 1,
-        additionalMsg: '',
-        action: 'successfully deleted!',
+        additionalMsg: 'UoM successfully',
+        action: 'deleted!',
         error: false,
         noUndo: true,
       }),
@@ -739,8 +739,8 @@ function* procesProduct(payload: PayloadAction<{ id: number; body: any }>) {
     yield put(
       uiAction.openYellowToast({
         totalItem: 1,
-        additionalMsg: '',
-        action: 'successfully proces product!',
+        additionalMsg: 'Product successfully',
+        action: 'Added!',
         error: false,
         noUndo: true,
       }),

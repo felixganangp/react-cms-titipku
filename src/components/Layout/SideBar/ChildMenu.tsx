@@ -77,7 +77,9 @@ export default function ChildrenMenu({
               }
               key={item.id + item.title}
             >
-              <ListItemIcon sx={{ minWidth: '46px', fontSize: '20px' }} />
+              <ListItemIcon
+                sx={{ minWidth: '46px', fontSize: '20px', ml: '-10px' }}
+              />
               <ItemTextChildAsParent
                 currentActive={currentActiveMenu === item.id}
                 primary={item.title}

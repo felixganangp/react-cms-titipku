@@ -99,7 +99,7 @@ export default function InventoryPage() {
   // const isFiltered = displayFilter !== initialStateProduct.displayFilter;
 
   useEffect(() => {
-    let value = false;
+    const value: boolean[] = [];
     Object.keys(displayFilter).forEach((val) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
@@ -108,13 +108,26 @@ export default function InventoryPage() {
       // @ts-ignore
       const initial = initialStateProduct.displayFilter[val] as any;
 
-      if (val === 'pricemin' || val === 'pricemax') {
-        if (existing > 0) value = true;
-      } else {
-        value = existing !== initial;
+      switch (val) {
+        case 'pricemin':
+          if (existing > 0) value.push(true);
+          break;
+        case 'pricemax':
+          if (existing > 0) value.push(true);
+          break;
+        case 'status':
+          if (activeDashboard !== 'all_stock') {
+            value.push(false);
+          } else {
+            value.push(existing !== initial);
+          }
+          break;
+        default:
+          value.push(existing !== initial);
+          break;
       }
     });
-    setIsFiltred(value);
+    setIsFiltred(value.includes(true));
   }, [displayFilter]);
 
   const handleOpenBatchAction = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -362,7 +375,7 @@ export default function InventoryPage() {
     dispatch(
       productAction.setParams({
         page: 1,
-        // search: '',
+        search: '',
         product_type_id: undefined,
         product_grade_id: undefined,
         product_category_id: undefined,
@@ -377,7 +390,7 @@ export default function InventoryPage() {
         grade: null,
         category: null,
         type: null,
-        // search: '',
+        search: '',
         status:
           activeDashboard === 'all_stock' ? null : product.displayFilter.status,
         pricemin: undefined,

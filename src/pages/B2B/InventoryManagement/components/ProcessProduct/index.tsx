@@ -66,28 +66,32 @@ export default function ProcessProduct({
       } = values;
 
       if (useExistingProduct) {
-        dispatch(
-          productAction.setProcesProduct({
-            id: EditProduct?.id || 0,
-            body: {
-              source_stock_amount,
-              target_stock_amount,
-              target_product_id: selectedExistingData?.id || 0,
-            },
-          }),
-        );
+        if (!isErrorValue.useExisting) {
+          dispatch(
+            productAction.setProcesProduct({
+              id: EditProduct?.id || 0,
+              body: {
+                source_stock_amount,
+                target_stock_amount,
+                target_product_id: selectedExistingData?.id || 0,
+              },
+            }),
+          );
+        }
       } else {
         const { category, ...body } = newProduct as any;
-        dispatch(
-          productAction.setProcesProduct({
-            id: EditProduct?.id || 0,
-            body: {
-              source_stock_amount,
-              ...body,
-              product_category_id: category || 0,
-            },
-          }),
-        );
+        if (!isErrorValue.useNew) {
+          dispatch(
+            productAction.setProcesProduct({
+              id: EditProduct?.id || 0,
+              body: {
+                source_stock_amount,
+                ...body,
+                product_category_id: category || 0,
+              },
+            }),
+          );
+        }
       }
     },
     validationSchema: yup.object({
@@ -160,10 +164,6 @@ export default function ProcessProduct({
               sx={{
                 '& .MuiOutlinedInput-root': {
                   backgroundColor: '#fff',
-                  color: '#929395',
-                  '& .MuiSvgIcon-root': {
-                    color: '#929395',
-                  },
                 },
               }}
               onBlur={(e) => {
@@ -218,6 +218,7 @@ export default function ProcessProduct({
       />
     </Stack>
   );
+  // console.log(isErrorValue);
 
   return (
     <ModalComp
@@ -256,7 +257,10 @@ export default function ProcessProduct({
           </Grid>
           <Stack mt={3} gap={0.4}>
             <Typography fontWeight={500}>
-              Enter stock amount that you want to process to a new product
+              Enter stock amount that you want to process to a new product{' '}
+              <Typography component="span" color="error.main">
+                *
+              </Typography>
             </Typography>
             <TextField
               type="number"
@@ -265,10 +269,6 @@ export default function ProcessProduct({
               sx={{
                 '& .MuiOutlinedInput-root': {
                   backgroundColor: '#fff',
-                  color: '#929395',
-                  '& .MuiSvgIcon-root': {
-                    color: '#929395',
-                  },
                 },
               }}
               onBlur={formik.handleBlur}

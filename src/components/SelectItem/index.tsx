@@ -46,10 +46,14 @@ export default function SelectItem({
   onShowmore,
   onSubmit,
 }: SelectItemProsp) {
-  const [temporaryValue, setTemporaryValue] = useState(value);
+  const [temporaryValue, setTemporaryValue] = useState<number[]>([]);
 
   useEffect(() => {
-    setTemporaryValue(value);
+    if (value) {
+      setTemporaryValue(value);
+    } else {
+      setTemporaryValue([]);
+    }
   }, [value]);
 
   const handleSearch = (search: string) => {
@@ -91,10 +95,6 @@ export default function SelectItem({
               display: onChangeSearch ? 'block' : 'none',
               '& .MuiOutlinedInput-root': {
                 backgroundColor: '#fff',
-                color: '#929395',
-                '& .MuiSvgIcon-root': {
-                  color: '#929395',
-                },
               },
             }}
             fullWidth
@@ -197,9 +197,9 @@ export default function SelectItem({
             type="submit"
             variant="text"
             color="error"
-            // onClick={() => {
-            //   formik.handleSubmit();
-            // }}
+            onClick={() => {
+              onClose();
+            }}
           >
             Cancel
           </Button>
@@ -209,6 +209,7 @@ export default function SelectItem({
               onSubmit(temporaryValue);
               onClose();
             }}
+            disabled={temporaryValue.length === 0}
           >
             Select
           </Button>
