@@ -26,6 +26,7 @@ import { Log } from 'models/b2b/Product';
 import NoImage from 'assets/no-image.svg';
 import moment from 'moment';
 import { uiAction } from 'store/slice/ui';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { CardContainer, StatusColor } from '../inventory.styled';
 import Form from '../components/Form';
 
@@ -104,9 +105,7 @@ export default function InvoiceDetail() {
       id: 'Editor',
       label: 'Editor',
       align: 'left',
-      format: (val: Log) => (
-        <Typography color="#0774d1">{val.created_by.name}</Typography>
-      ),
+      format: (val: Log) => <Typography>{val.created_by.name}</Typography>,
     },
     {
       id: 'time',
@@ -122,54 +121,62 @@ export default function InvoiceDetail() {
       id: 'action',
       label: 'Action',
       align: 'left',
-      format: (val: Log) => (
-        <Box
-          display="flex"
-          flexDirection="row"
-          justifyContent="flex-start"
-          alignItems="center"
-          height="min-content"
-          margin={0}
-          padding={0}
-        >
-          <p>
-            {val.changes.action_type === 'create'
-              ? 'Created this product'
-              : val.changes.action_type === 'update'
-              ? 'Editing'
-              : val.changes.action_type === 'delete'
-              ? 'Delete this product'
-              : 'set to'}{' '}
-          </p>
-          &nbsp;
-          <p style={{ height: 'fit-content' }}>
-            <b>
-              {val.changes.action_type === 'create' ? (
-                ''
-              ) : val.changes.action_type === 'update' ? (
-                `${
-                  val.changes.columns
-                    ? val.changes.columns[0]?.name.replace(
-                        /^./,
-                        val.changes.columns[0].name[0].toUpperCase(),
-                      ) || '-'
-                    : 'But No Changes'
-                }`
-              ) : val.changes.action_type === 'delete' ? (
-                ''
-              ) : val.changes.action_type === 'set_to_active' ? (
-                <p style={{ color: '#008e58', margin: 0, padding: 0 }}>
-                  Make Active
-                </p>
-              ) : (
-                <p style={{ color: '#bf370c', margin: 0, padding: 0 }}>
-                  Make Inactive
-                </p>
-              )}
-            </b>
-          </p>
-        </Box>
-      ),
+      format: (val: Log) => {
+        let text = '-';
+        let render = <></>;
+
+        switch (val.changes.action_type) {
+          case 'create':
+            text = 'Created this Product';
+            break;
+          case 'update':
+            text = 'Edit Product';
+            render = (
+              <Stack>
+                {val.changes.columns.map((item, index) => (
+                  <Stack direction="row" key={index} alignItems="center">
+                    <FiberManualRecordIcon sx={{ fontSize: 5, mx: 1 }} />
+                    <Typography fontSize={14} fontWeight={500}>
+                      {item.name.replace(/([a-z])([A-Z])/g, '$1 $2')}:
+                    </Typography>
+                    <Typography fontSize={14}>
+                      Before: {item.old_value}, After: {item.new_value}
+                    </Typography>
+                  </Stack>
+                ))}
+                {val.changes.columns.length === 0 && (
+                  <Typography> -</Typography>
+                )}
+              </Stack>
+            );
+            break;
+          case 'process':
+            text = 'Process this Product';
+            render = (
+              <Stack>
+                {val.changes.columns.map((item, index) => (
+                  <Stack direction="row" key={index} alignItems="center">
+                    <Typography fontSize={14}>
+                      Before: {item.old_value}, After: {item.new_value}
+                    </Typography>
+                  </Stack>
+                ))}
+              </Stack>
+            );
+            break;
+          default:
+            break;
+        }
+
+        return (
+          <Stack gap={0.5}>
+            <Typography fontSize={14} fontWeight={600}>
+              {text}
+            </Typography>
+            {render}
+          </Stack>
+        );
+      },
     },
   ];
 

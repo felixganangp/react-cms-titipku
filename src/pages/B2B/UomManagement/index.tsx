@@ -27,6 +27,7 @@ import useModal from 'hooks/useModal';
 import ModalComp from 'components/Modal';
 import { UomTypes } from 'models/b2b/Uom';
 import YellowToast from 'components/YellowToast';
+import AddIcon from '@mui/icons-material/Add';
 import Form from './components/Form';
 
 export default function UomPage() {
@@ -121,7 +122,7 @@ export default function UomPage() {
       <Box mt={2} bgcolor="#fff" border="1px solid #EBEFF3">
         <Box p={2}>
           <Button
-            endIcon={<ArrowIcon />}
+            startIcon={<AddIcon />}
             onClick={formModal.openModal}
             size="large"
           >
