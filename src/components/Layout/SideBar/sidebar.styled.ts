@@ -51,7 +51,6 @@ export const ItemButtonChildAsParent = styled(ListItemButton)`
   margin: 6px 14px;
   padding: 10px;
   border-radius: 8px;
-  padding-left: 0px;
 `;
 
 export const ItemTextChildAsParent = styled(ListItemText)<
