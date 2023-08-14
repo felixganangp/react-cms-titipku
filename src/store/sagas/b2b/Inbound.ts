@@ -4,7 +4,12 @@ import { InboundAction } from 'store/slice/b2b/Inbound';
 import { uiAction } from 'store/slice/ui';
 import * as InboundService from 'service/B2B/Inbound';
 import { Response, ListResponse } from 'models/fetch';
-import { Inbound, InboundDetail, InboundParams } from 'models/b2b/Inbound';
+import {
+  CreateInbound,
+  Inbound,
+  InboundDetail,
+  InboundParams,
+} from 'models/b2b/Inbound';
 
 function* fetchData(params: PayloadAction<InboundParams>) {
   try {
@@ -69,7 +74,43 @@ function* fetchDataDetail(params: PayloadAction<{ id: string | number }>) {
   }
 }
 
+function* createInbound(payload: PayloadAction<CreateInbound>) {
+  try {
+    const response: Response<string> = yield call(
+      InboundService.createInbound as any,
+      payload.payload,
+    );
+
+    yield put(InboundAction.createInboundSuccess());
+    yield call(fetchData, {
+      type: InboundAction.fetchData.type,
+      payload: {
+        page: 1,
+        count: 10,
+        search: '',
+      },
+    });
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Success create inbound',
+        severity: 'success',
+      }),
+    );
+  } catch (error) {
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Failed to create inbound',
+        message: error as string,
+        severity: 'error',
+      }),
+    );
+    yield put(InboundAction.createInboundFailed());
+    console.log(`Failed to create inbound: `, error);
+  }
+}
+
 export default function* roleUserSagas() {
   yield takeLatest(InboundAction.fetchData.type, fetchData);
   yield takeLatest(InboundAction.fetchDataDetail.type, fetchDataDetail);
+  yield takeLatest(InboundAction.createInbound.type, createInbound);
 }
