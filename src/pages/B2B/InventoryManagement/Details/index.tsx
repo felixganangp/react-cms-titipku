@@ -113,7 +113,7 @@ export default function InvoiceDetail() {
       align: 'left',
       format: (val: Log) => (
         <Typography fontSize={14}>
-          {moment(val.created_at).format('DD/MM/YYYY . hh:mm')}
+          {moment.unix(val.created_at).format('DD/MM/YYYY . hh:mm')}
         </Typography>
       ),
     },
