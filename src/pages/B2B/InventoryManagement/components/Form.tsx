@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   TextField,
@@ -27,9 +27,18 @@ interface FormTypes {
   EditProduct?: Product | null;
   isDetail?: boolean;
   processProduct?: boolean;
+  isSubmitedProcess?: boolean;
+  onChangeFormProces?: (value: any, error: any) => void;
+  handleDeleteButton?: () => void;
+  enableDeleteButton?: boolean;
 }
 
-export default function Form({ processProduct, ...props }: FormTypes) {
+export default function Form({
+  processProduct,
+  isSubmitedProcess,
+  onChangeFormProces,
+  ...props
+}: FormTypes) {
   const [isNameExist, setIsNameExist] = useState(false);
   const { formik, categories, loadingForm, uom, isEdit } =
     useFormProduct(props);
@@ -41,10 +50,30 @@ export default function Form({ processProduct, ...props }: FormTypes) {
     const respon = (await IsExistName(value)) as Response<boolean>;
     setIsNameExist(respon.data);
   };
+
   const debounceCheckIsName = useCallback(
     debounce(handleCheckIsNameExist, 1000),
     [],
   );
+
+  // Function for Proces Product =====
+  const callOnChange = useCallback(() => {
+    if (onChangeFormProces) onChangeFormProces(formik.values, formik.errors);
+  }, [formik.values]);
+
+  useEffect(() => {
+    if (processProduct) {
+      callOnChange();
+    }
+  }, [processProduct, formik.values, formik.errors]);
+
+  useEffect(() => {
+    if (isSubmitedProcess) {
+      Object.keys(formik.values).forEach((val) => {
+        formik.setFieldTouched(val, true);
+      });
+    }
+  }, [isSubmitedProcess]);
 
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
@@ -195,10 +224,6 @@ export default function Form({ processProduct, ...props }: FormTypes) {
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         backgroundColor: '#fff',
-                        color: '#929395',
-                        '& .MuiSvgIcon-root': {
-                          color: '#929395',
-                        },
                       },
                     }}
                     onBlur={formik.handleBlur}
@@ -257,10 +282,6 @@ export default function Form({ processProduct, ...props }: FormTypes) {
                       sx={{
                         '& .MuiOutlinedInput-root': {
                           backgroundColor: '#fff',
-                          color: '#929395',
-                          '& .MuiSvgIcon-root': {
-                            color: '#929395',
-                          },
                         },
                       }}
                     />
@@ -286,13 +307,10 @@ export default function Form({ processProduct, ...props }: FormTypes) {
                 placeholder="Insert Low Stock"
                 sx={{
                   '& .MuiOutlinedInput-root': {
-                    backgroundColor: '#fff',
-                    color: '#929395',
-                    '& .MuiSvgIcon-root': {
-                      color: '#929395',
-                    },
+                    backgroundColor: isEdit ? '#e4e4e4' : '#fff',
                   },
                 }}
+                disabled={isEdit}
                 onBlur={formik.handleBlur}
                 fullWidth
                 value={formik.values.stock}
@@ -338,10 +356,6 @@ export default function Form({ processProduct, ...props }: FormTypes) {
               sx={{
                 '& .MuiOutlinedInput-root': {
                   backgroundColor: '#fff',
-                  color: '#929395',
-                  '& .MuiSvgIcon-root': {
-                    color: '#929395',
-                  },
                 },
               }}
               fullWidth
@@ -364,16 +378,25 @@ export default function Form({ processProduct, ...props }: FormTypes) {
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
+        {props?.enableDeleteButton && props?.handleDeleteButton && (
+          <Button
+            variant="text"
+            color="error"
+            onClick={props.handleDeleteButton}
+          >
+            Delete Item
+          </Button>
+        )}
+
         <Button
           type="submit"
           size="medium"
+          disabled={loadingForm || !formik.isValid}
           // onClick={() => {
           //   formik.handleSubmit();
           // }}
         >
-          {!loadingForm
-            ? `${isEdit ? 'Save Changes' : 'Create'}`
-            : 'Loading...'}
+          {!loadingForm ? `${isEdit ? 'Edit' : 'Create'}` : 'Loading...'}
         </Button>
       </Box>
     </Box>

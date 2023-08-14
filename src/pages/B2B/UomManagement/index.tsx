@@ -44,6 +44,23 @@ export default function UomPage() {
     dispatch(productAction.fetchUom(paramsOum));
   }, [paramsOum]);
 
+  const handleChangePage = (value: number) => {
+    dispatch(
+      productAction.setParamsUom({
+        page: value,
+      }),
+    );
+  };
+
+  const handleChangeRowPerpage = (value: number) => {
+    dispatch(
+      productAction.setParamsUom({
+        page: 1,
+        count: value,
+      }),
+    );
+  };
+
   const headCell = [
     {
       id: 'name',
@@ -113,7 +130,16 @@ export default function UomPage() {
         </Box>
         <YellowToast />
         <Box p={2}>
-          <Table data={uom} headCells={headCell} loading={loadingFilter} />
+          <Table
+            data={uom}
+            headCells={headCell}
+            loading={loadingFilter}
+            totalData={totalUom}
+            count={paramsOum.count}
+            page={paramsOum.page}
+            onChangePage={(page) => handleChangePage(page)}
+            onChangeRowPerpage={(page) => handleChangeRowPerpage(page)}
+          />
         </Box>
       </Box>
       <Modal open={deleteModal.open} onClose={deleteModal.closeModal}>
@@ -122,9 +148,8 @@ export default function UomPage() {
           headerText={`Delete UoM ${selected?.name}?`}
           desc={
             <>
-              Are you sure want to delete this UoM? UoM Ekor is used by{' '}
-              {selected?.total_product}
-              product
+              Are you sure want to delete this UoM? UoM {selected?.name} is used
+              by {selected?.total_product} product
             </>
           }
           onSubmit={() => {

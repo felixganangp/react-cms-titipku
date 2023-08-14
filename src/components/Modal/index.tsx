@@ -16,6 +16,7 @@ interface ModalProps {
   padding?: string;
   onClose: () => void;
   noTitle?: boolean;
+  disableOutsideClose?: boolean;
 }
 function Modal({
   onClose,
@@ -25,9 +26,15 @@ function Modal({
   width,
   padding,
   noTitle,
+  disableOutsideClose,
 }: ModalProps) {
   return (
-    <Dialog onClose={onClose} open={Boolean(open)}>
+    <Dialog
+      onClose={() => {
+        if (!disableOutsideClose) onClose();
+      }}
+      open={Boolean(open)}
+    >
       {!noTitle && (
         <DialogTitle
           fontSize="20px"

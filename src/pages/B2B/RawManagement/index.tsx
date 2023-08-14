@@ -137,7 +137,7 @@ export default function RawPage() {
         ...raw.params,
         page: 1,
         search,
-        product_parent_category_id: category ? category.id : undefined,
+        product_category_id: category ? category.id : undefined,
       }),
     );
   };
@@ -146,7 +146,7 @@ export default function RawPage() {
     dispatch(
       rawAction.setParams({
         page: 1,
-        product_parent_category_id: undefined,
+        product_category_id: undefined,
       }),
     );
     dispatch(

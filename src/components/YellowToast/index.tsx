@@ -50,14 +50,13 @@ export default function YellowToast() {
         {totalItem ? (
           <>
             <Typography fontSize="16px">
-              <b>{totalItem}</b> {itemType !== '' ? itemType : 'item'}{' '}
-              {totalItem > 1 ? 's' : ''}{' '}
+              <b>{totalItem}</b> {` ${itemType} `}
               {`${additionalMsg ? `${additionalMsg} ` : ''}`}
             </Typography>
             <Typography
               fontSize="16px"
               fontWeight="600"
-              color={error ? '#bf370c' : '#269946'}
+              color={error ? '#bf370c' : '#000000'}
             >
               &nbsp;{action.charAt(0).toUpperCase() + action.slice(1)}
             </Typography>

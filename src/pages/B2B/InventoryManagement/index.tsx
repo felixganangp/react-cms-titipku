@@ -81,6 +81,7 @@ export default function InventoryPage() {
   const stockOpnameModal = useModal();
   const formProductModal = useModal();
   const listProductModal = useModal();
+  const procesProductModal = useModal();
   const moveStockFormModal = useModal();
   const moveStockConfirmationModal = useModal();
 
@@ -206,7 +207,8 @@ export default function InventoryPage() {
     await dispatch(
       uiAction.openYellowToast({
         // totalItem,
-        additionalMsg: `moved stock to [${selectedProductMoveStock[0].product_grade.name}] [${selectedProductMoveStock[0].product_type.name}] ${selectedProductMoveStock[0].product_parent.name}`,
+        additionalMsg: 'moved stock',
+        // additionalMsg: `moved stock to [${selectedProductMoveStock[0].product_grade.name}] [${selectedProductMoveStock[0].product_type.name}] ${selectedProductMoveStock[0].product_parent.name}`,
         action: 'Successfully',
         error: false,
         noUndo: true,
@@ -282,9 +284,9 @@ export default function InventoryPage() {
       ? selectedProduct.length > 3
         ? `${selectedProduct
             .slice(0, 3)
-            .map((item) => `${item.name} ${item.name}`)
+            .map((item) => `${item.name}`)
             .join(',')} ... and ${selectedProduct.length - 3} others`
-        : selectedProduct.map((item) => `${item.name} ${item.name}`).join(',')
+        : selectedProduct.map((item) => `${item.name}`).join(',')
       : '';
 
   // SEARCH & FILTER
@@ -296,7 +298,7 @@ export default function InventoryPage() {
 
   useEffect(() => {
     dispatch(productAction.fetchGrade());
-    dispatch(productAction.fetchCategory());
+    dispatch(productAction.fetchCategory({ count: 100 }));
     dispatch(productAction.fetchTypes());
   }, []);
 
@@ -348,7 +350,7 @@ export default function InventoryPage() {
         search: search || '',
         product_grade_id: grade ? grade.id : undefined,
         product_type_id: type ? type.id : undefined,
-        product_parent_category_id: category ? category.id : undefined,
+        product_category_id: category ? category.id : undefined,
         status: status ? status.value : undefined,
         pricemin: pricemin || undefined,
         pricemax: pricemax || undefined,
@@ -363,9 +365,11 @@ export default function InventoryPage() {
         // search: '',
         product_type_id: undefined,
         product_grade_id: undefined,
-        product_parent_category_id: undefined,
+        product_category_id: undefined,
         status:
           activeDashboard === 'all_stock' ? undefined : product.params.status,
+        pricemin: undefined,
+        pricemax: undefined,
       }),
     );
     dispatch(
@@ -376,6 +380,8 @@ export default function InventoryPage() {
         // search: '',
         status:
           activeDashboard === 'all_stock' ? null : product.displayFilter.status,
+        pricemin: undefined,
+        pricemax: undefined,
       }),
     );
     dispatch(
@@ -385,7 +391,7 @@ export default function InventoryPage() {
         search: product.params.search,
         product_type_id: undefined,
         product_grade_id: undefined,
-        product_parent_category_id: undefined,
+        product_category_id: undefined,
         status:
           activeDashboard === 'all_stock' ? undefined : product.params.status,
       }),
@@ -417,7 +423,7 @@ export default function InventoryPage() {
   };
 
   const getDashboardTitle = () => {
-    if (activeDashboard === 'all_stock') return 'Product Management';
+    if (activeDashboard === 'all_stock') return 'Inventory Management';
     if (activeDashboard === 'empty_stock') return 'Empty Stock Products';
     return 'Low Stock Products';
   };
@@ -510,21 +516,21 @@ export default function InventoryPage() {
       ),
     },
     {
-      id: 'selling_price',
-      label: 'Selling Price',
-      align: 'left',
-      enableSort: false,
-      format: (val: Product) => (
-        <Typography>Rp {numberSeperator(val?.selling_price || 0)}</Typography>
-      ),
-    },
-    {
       id: 'average_price',
       label: 'Average Price',
       align: 'left',
       enableSort: false,
       format: (val: Product) => (
         <Typography>Rp {numberSeperator(val?.average_price || 0)}</Typography>
+      ),
+    },
+    {
+      id: 'selling_price',
+      label: 'Selling Price',
+      align: 'left',
+      enableSort: false,
+      format: (val: Product) => (
+        <Typography>Rp {numberSeperator(val?.selling_price || 0)}</Typography>
       ),
     },
 
@@ -553,7 +559,9 @@ export default function InventoryPage() {
       align: 'left',
       enableSort: false,
       format: (val: Product) => (
-        <Typography>{numberWithCommas(val.stock)}</Typography>
+        <Typography>
+          {numberWithCommas(val.stock)} {val.unit_measurement}
+        </Typography>
       ),
     },
     {
@@ -632,11 +640,23 @@ export default function InventoryPage() {
                         },
                       },
                       {
+                        label: 'Proces Product',
+                        onClick: () => {
+                          dispatch(uiAction.closeYellowToast());
+                          procesProductModal.openModal();
+                          setEditProduct(val);
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
+                        },
+                      },
+                      {
                         label: 'Edit',
                         onClick: () => {
                           dispatch(uiAction.closeYellowToast());
                           formProductModal.openModal();
                           setEditProduct(val);
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
                         },
                       },
                       {
@@ -673,6 +693,8 @@ export default function InventoryPage() {
                           dispatch(uiAction.closeYellowToast());
                           formProductModal.openModal();
                           setEditProduct(val);
+                          setSelected([val.id]);
+                          setSelectedProduct([val]);
                         },
                       },
                       {
@@ -799,7 +821,11 @@ export default function InventoryPage() {
             {activeDashboard === 'all_stock' ? (
               <Button
                 endIcon={<ArrowIcon />}
-                onClick={formProductModal.openModal}
+                onClick={() => {
+                  formProductModal.openModal();
+                  setSelected([]);
+                  setSelectedProduct([]);
+                }}
                 size="large"
               >
                 Add New
@@ -945,7 +971,7 @@ export default function InventoryPage() {
               p="16px 12px"
             >
               <TextField
-                placeholder="Search item"
+                placeholder="Search Item"
                 size="small"
                 sx={{ flex: 1, bgcolor: '#f8f8f8', maxWidth: '560px' }}
                 fullWidth
@@ -991,11 +1017,12 @@ export default function InventoryPage() {
                   anchorEl={anchorEl}
                   open={open}
                   onClose={handleClose}
+                  PaperProps={{ sx: { minWidth: 130 } }}
                   MenuListProps={{
                     'aria-labelledby': 'basic-button',
                   }}
                 >
-                  <MenuItem
+                  {/* <MenuItem
                     onClick={() => {
                       handleStockOpnameBatchAction();
                     }}
@@ -1017,7 +1044,7 @@ export default function InventoryPage() {
                     }}
                   >
                     Make Active
-                  </MenuItem>
+                  </MenuItem> */}
                   <MenuItem
                     onClick={() => {
                       deleteModal.openModal();
@@ -1153,6 +1180,7 @@ export default function InventoryPage() {
                           ),
                         }}
                         fullWidth
+                        autoComplete="off"
                         value={numberSeperator(pricemin || '')}
                         onChange={(e) => {
                           const value = e.target.value
@@ -1172,6 +1200,7 @@ export default function InventoryPage() {
                         type="text"
                         name="selling_price"
                         placeholder="Insert Price"
+                        autoComplete="off"
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">Rp</InputAdornment>
@@ -1302,6 +1331,7 @@ export default function InventoryPage() {
           formProductModal.closeModal();
           setEditProduct(null);
         }}
+        disableOutsideClose
       >
         <Form
           onClose={() => {
@@ -1309,6 +1339,17 @@ export default function InventoryPage() {
             setEditProduct(null);
           }}
           EditProduct={EditProduct}
+          enableDeleteButton={Boolean(EditProduct)}
+          handleDeleteButton={() => {
+            if (EditProduct) {
+              setEditProduct(null);
+              formProductModal.closeModal();
+              dispatch(uiAction.closeYellowToast());
+              deleteModal.openModal();
+              setSelected([EditProduct.id]);
+              setSelectedProduct([EditProduct]);
+            }
+          }}
         />
       </ModalComp>
       {/* <PopupAddSelected
@@ -1338,7 +1379,11 @@ export default function InventoryPage() {
           initData={payloadMoveStock.stock_change}
         />
       </ModalComp>
-      <ProcessProduct open={false} />
+      <ProcessProduct
+        open={procesProductModal.open}
+        EditProduct={EditProduct}
+        onClose={procesProductModal.closeModal}
+      />
       <ModalComp
         open={moveStockConfirmationModal.open}
         onClose={handleCloseAllModalOnStockOpname}

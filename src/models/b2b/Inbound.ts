@@ -45,6 +45,13 @@ export interface CreateInbound {
   products: InboundProduct[];
 }
 
+export interface CreateInboundParams {
+  supplier: Supplier;
+  code: string;
+  date: number | null;
+  description: string;
+}
+
 export interface CheckValidResponse {
   timestamp: number;
   status: string;
