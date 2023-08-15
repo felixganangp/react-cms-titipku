@@ -7,11 +7,13 @@ import DialogContent from '@mui/material/DialogContent';
 import Box from '@mui/material/Box';
 
 import CloseIcon from '@mui/icons-material/Close';
+import { Breakpoint } from '@mui/material';
 
 interface ModalProps {
   open: boolean;
   title?: string;
   width?: string;
+  maxWidth?: false | Breakpoint;
   children: JSX.Element;
   padding?: string;
   onClose: () => void;
@@ -24,6 +26,7 @@ function Modal({
   title,
   children,
   width,
+  maxWidth,
   padding,
   noTitle,
   disableOutsideClose,
@@ -34,6 +37,7 @@ function Modal({
         if (!disableOutsideClose) onClose();
       }}
       open={Boolean(open)}
+      maxWidth={maxWidth}
     >
       {!noTitle && (
         <DialogTitle
@@ -65,6 +69,7 @@ function Modal({
 
 Modal.defaultProps = {
   width: '600px',
+  maxWidth: 'sm',
   padding: '0px',
   noTitle: false,
   title: '',

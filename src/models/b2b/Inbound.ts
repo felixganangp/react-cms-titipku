@@ -35,6 +35,15 @@ export interface InboundProduct {
   id: number;
   supplier_price: number;
   quantity: number;
+  name: string;
+  image: string;
+  uom: string;
+}
+
+export interface InboundProductRequest {
+  id: number;
+  supplier_price: number;
+  quantity: number;
 }
 
 export interface CreateInbound {
@@ -42,14 +51,15 @@ export interface CreateInbound {
   code: string;
   date: number;
   description: string;
-  products: InboundProduct[];
+  products: InboundProductRequest[];
 }
 
 export interface CreateInboundParams {
   supplier: Supplier;
   code: string;
-  date: number | null;
+  date: string | null;
   description: string;
+  products: InboundProduct[];
 }
 
 export interface CheckValidResponse {

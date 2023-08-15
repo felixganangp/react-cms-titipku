@@ -77,10 +77,7 @@ const InboundSlice = createSlice({
       state.loading = false;
       state.detailsData = action.payload.data;
     },
-    createInbound(
-      state: InboundProps,
-      action: PayloadAction<CreateInboundParams>,
-    ) {
+    createInbound(state: InboundProps, action: PayloadAction<CreateInbound>) {
       state.loadingForm = true;
     },
     createInboundSuccess(state: InboundProps) {

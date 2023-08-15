@@ -33,8 +33,9 @@ export default function InboundDetailPopUp(props: InboundDetailProps) {
   const inbound = useAppSelector((state) => state.inbound);
 
   useEffect(() => {
+    console.log('getdata', ids);
     dispatch(InboundAction.fetchDataDetail({ id: ids }));
-  }, []);
+  }, [ids]);
 
   const headCell = [
     {
