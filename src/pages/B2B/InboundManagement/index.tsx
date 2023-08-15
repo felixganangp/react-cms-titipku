@@ -125,7 +125,6 @@ export default function InboundPage() {
                 onClick: () => {
                   setCurrentId(val.id);
                   handleDetail(val.id);
-                  // setOpenPopUp(!openPopUp);
                 },
               },
             ]}
