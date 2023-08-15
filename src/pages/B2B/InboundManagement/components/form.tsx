@@ -6,8 +6,8 @@ import {
   InputAdornment,
   IconButton,
 } from '@mui/material';
-import { Field, Form, Formik, FieldArray, ErrorMessage } from 'formik';
-import { object, string } from 'yup';
+import { Form, Formik, FieldArray, ErrorMessage } from 'formik';
+import { object } from 'yup';
 import { useState, useEffect } from 'react';
 import NoImage from 'assets/no-image.svg';
 import Plus from 'components/Icon/Plus';
@@ -99,25 +99,28 @@ export default function FormInbound({ onClose }: FormProps) {
               'Maximal character for description is 500',
               (val) => val !== undefined && val.toString().length < 500,
             ),
-          products: yup.array().of(
-            yup.object().shape({
-              name: yup.string(),
-              id: yup.number(),
-              image: yup.string(),
-              quantity: yup
-                .number()
-                .min(1, 'Minimun quantity is 1')
-                .required('Please input quantity'),
-              uom: yup.string(),
-              supplier_price: yup
-                .number()
-                .min(1, 'Minimun supplier price is 1')
-                .required('Please input supplier price'),
-            }),
-          ),
+          products: yup
+            .array()
+            .required('Please select product')
+            .of(
+              yup.object().shape({
+                name: yup.string(),
+                id: yup.number(),
+                image: yup.string(),
+                quantity: yup
+                  .number()
+                  .min(1, 'Minimun quantity is 1')
+                  .required('Please input quantity'),
+                uom: yup.string(),
+                supplier_price: yup
+                  .number()
+                  .min(1, 'Minimun supplier price is 1')
+                  .required('Please input supplier price'),
+              }),
+            )
+            .min(1, 'the error message if length === 0 | 1'),
         })}
         onSubmit={async (values, formikHelpers) => {
-          console.log('form values', values);
           const prodTemp: InboundProductRequest[] = [];
           values.products.forEach((val) => {
             const temp: InboundProductRequest = {
@@ -170,17 +173,19 @@ export default function FormInbound({ onClose }: FormProps) {
                   id="supplier_id"
                   options={supplier.data}
                   onChange={(e, value) => {
-                    setFieldValue('supplier', value);
+                    if (value?.id) {
+                      setFieldValue('supplier', value);
+                    }
                   }}
                   isOptionEqualToValue={(option: Supplier) => {
                     return option.id === values.supplier.id;
                   }}
                   getOptionLabel={(option) => `${option.name}`}
                   value={values.supplier}
-                  onBlur={handleBlur}
                   renderInput={(params) => (
                     <TextField
                       {...params}
+                      onBlur={handleBlur}
                       name="supplier"
                       placeholder="Select Supplier Name"
                     />
