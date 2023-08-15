@@ -5,13 +5,13 @@ export default function Icon(props: SvgIconProps) {
   return (
     <SvgIcon {...props}>
       <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
+        width={props.width || 24}
+        height={props.height || 24}
+        viewBox={`0 0 ${props.width || 24} ${props.height || 24}`}
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <rect width="24" height="24" rx="12" />
+        <rect width={props.width || 24} height={props.width || 24} rx="12" />
         <path
           fillRule="evenodd"
           clipRule="evenodd"

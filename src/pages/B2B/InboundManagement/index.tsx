@@ -7,10 +7,11 @@ import {
   Button,
   IconButton,
   Stack,
+  Modal,
 } from '@mui/material';
 import Table from 'components/Table';
 import useModal from 'hooks/useModal';
-import Modal from 'components/Modal';
+import ModalComp from 'components/Modal';
 import ArrowIcon from '@mui/icons-material/ArrowForwardIos';
 import SearchIcon from '@mui/icons-material/Search';
 import moment from 'moment';
@@ -66,6 +67,12 @@ export default function InboundPage() {
     formModal.openModal();
   };
 
+  const handleDetail = async (id: string) => {
+    // dispatch(SupplierAction.fetchData({ page: 1, count: 1000 }));
+    await setCurrentId(id);
+    setOpenPopUp(true);
+  };
+
   const headCell = [
     {
       id: 'supplier_id',
@@ -117,7 +124,8 @@ export default function InboundPage() {
                 label: 'Detail',
                 onClick: () => {
                   setCurrentId(val.id);
-                  setOpenPopUp(!openPopUp);
+                  handleDetail(val.id);
+                  // setOpenPopUp(!openPopUp);
                 },
               },
             ]}
@@ -133,11 +141,6 @@ export default function InboundPage() {
 
   return (
     <Box p="20px" bgcolor="#f8f8f8">
-      <DetailPopUp
-        open={openPopUp}
-        onClose={() => setOpenPopUp(!openPopUp)}
-        ids={currentId}
-      />
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Typography fontSize="26px" fontWeight="600" fontFamily="Montserrat">
           Inbound Management
@@ -175,13 +178,21 @@ export default function InboundPage() {
           />
         </Box>
       </Box>
-      <Modal
+
+      <DetailPopUp
+        open={openPopUp}
+        onClose={() => setOpenPopUp(!openPopUp)}
+        ids={currentId}
+      />
+      <ModalComp
         open={formModal.open}
         title="Product Inbound"
         onClose={formModal.closeModal}
+        width="700px"
+        maxWidth="md"
       >
         <FormInbound onClose={formModal.closeModal} />
-      </Modal>
+      </ModalComp>
     </Box>
   );
 }
