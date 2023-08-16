@@ -249,7 +249,11 @@ const ProductSlice = createSlice({
     },
     updateUom(
       state: ProductProps,
-      action: PayloadAction<{ id: number; body: CreateUomTypes }>,
+      action: PayloadAction<{
+        id: number;
+        body: CreateUomTypes;
+        isUndo?: boolean;
+      }>,
     ) {
       state.loadingFormUom = true;
     },
@@ -270,7 +274,7 @@ const ProductSlice = createSlice({
       state.isSuccessUom = true;
     },
     resetUomform(state: ProductProps) {
-      state.loadingForm = false;
+      state.loadingFormUom = false;
       state.isSuccessUom = false;
     },
     fetchOumSuccess(
@@ -457,7 +461,11 @@ const ProductSlice = createSlice({
     },
     updateCategory(
       state: ProductProps,
-      action: PayloadAction<{ id: number; body: CreateUomTypes }>,
+      action: PayloadAction<{
+        id: number;
+        body: CreateUomTypes;
+        isUndo?: boolean;
+      }>,
     ) {
       state.category.isLoading = true;
     },

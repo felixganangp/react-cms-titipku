@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Grid,
   Typography,
@@ -17,9 +17,11 @@ import {
 } from '@mui/material';
 import Table from 'components/Table';
 import ArrowIcon from '@mui/icons-material/ArrowForwardIos';
+import SearchIcon from '@mui/icons-material/Search';
 import Add from '@mui/icons-material/Add';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
+import { uiAction } from 'store/slice/ui';
 import MenuList from 'components/MenuList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteModal from 'components/Delete/freetext';
@@ -27,6 +29,7 @@ import useModal from 'hooks/useModal';
 import ModalComp from 'components/Modal';
 import { UomTypes } from 'models/b2b/Uom';
 import YellowToast from 'components/YellowToast';
+import { debounce } from 'lodash';
 import Form from './components/Form';
 
 export default function CategoryPage() {
@@ -59,12 +62,47 @@ export default function CategoryPage() {
     );
   };
 
+  const handleSearch = (value: string) => {
+    dispatch(
+      productAction.setParamsCategory({
+        search: value,
+        page: 1,
+      }),
+    );
+  };
+  const handleSeachDebounce = useCallback(debounce(handleSearch, 80), []);
+
+  const handleDelete = () => {
+    if (selected?.id) {
+      dispatch(productAction.deleteCategory({ id: selected.id }));
+      dispatch(
+        uiAction.openYellowToast({
+          totalItem: 1,
+          additionalMsg: 'Category successfully',
+          action: 'deleted!',
+          error: true,
+          onUndoAction: () => {
+            dispatch(
+              productAction.updateCategory({
+                id: selected.id,
+                body: { name: selected.name },
+                isUndo: true,
+              }),
+            );
+          },
+          noUndo: false,
+        }),
+      );
+      setSelected(null);
+      deleteModal.closeModal();
+    }
+  };
   const headCell = [
     {
       id: 'name',
       label: 'Category',
       align: 'left',
-      width: '80%',
+      width: '95%',
     },
     {
       id: 'menu',
@@ -108,7 +146,7 @@ export default function CategoryPage() {
         </Typography>
       </Stack>
       <Box mt={2} bgcolor="#fff" border="1px solid #EBEFF3">
-        <Box p={2}>
+        <Stack direction="row" gap={1} p={2}>
           <Button
             startIcon={<Add />}
             onClick={formModal.openModal}
@@ -116,7 +154,23 @@ export default function CategoryPage() {
           >
             Add Category
           </Button>
-        </Box>
+          <TextField
+            placeholder="Search Item"
+            size="small"
+            sx={{ flex: 1, bgcolor: '#f8f8f8', maxWidth: '560px' }}
+            fullWidth
+            defaultValue={category.params.search}
+            // value={product.displayFilter.search}
+            onChange={(e) => handleSeachDebounce(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Stack>
         <YellowToast />
         <Box p={2}>
           <Table
@@ -137,22 +191,16 @@ export default function CategoryPage() {
           headerText={`Delete UoM ${selected?.name}?`}
           desc={
             <>
-              Are you sure want to delete this Category? UoM Ekor is used by{' '}
-              {selected?.product_count} product
+              Are you sure want to delete this Category? Category{' '}
+              {selected?.name} is used by {selected?.product_count} product
             </>
           }
-          onSubmit={() => {
-            if (selected?.id) {
-              dispatch(productAction.deleteCategory({ id: selected.id }));
-              setSelected(null);
-              deleteModal.closeModal();
-            }
-          }}
+          onSubmit={handleDelete}
         />
       </Modal>
       <ModalComp
         open={formModal.open}
-        title={isEdited ? 'Edit Category' : 'AddCategory'}
+        title={isEdited ? 'Edit Category' : 'Add Category'}
         onClose={() => {
           formModal.closeModal();
           setSelected(null);

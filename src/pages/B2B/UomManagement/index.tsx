@@ -20,6 +20,7 @@ import ArrowIcon from '@mui/icons-material/ArrowForwardIos';
 import SearchIcon from '@mui/icons-material/Search';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { productAction } from 'store/slice/b2b/Product';
+import { uiAction } from 'store/slice/ui';
 import MenuList from 'components/MenuList';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DeleteModal from 'components/Delete/freetext';
@@ -60,6 +61,32 @@ export default function UomPage() {
         count: value,
       }),
     );
+  };
+
+  const handleDelete = () => {
+    if (selected?.id) {
+      dispatch(productAction.deleteUom({ id: selected.id }));
+      dispatch(
+        uiAction.openYellowToast({
+          totalItem: 1,
+          additionalMsg: 'UoM successfully',
+          action: 'deleted!',
+          error: true,
+          onUndoAction: () => {
+            dispatch(
+              productAction.updateUom({
+                id: selected.id,
+                body: { name: selected.name },
+                isUndo: true,
+              }),
+            );
+          },
+          noUndo: false,
+        }),
+      );
+      setSelected(null);
+      deleteModal.closeModal();
+    }
   };
 
   const headCell = [
@@ -153,13 +180,7 @@ export default function UomPage() {
               by {selected?.total_product} product
             </>
           }
-          onSubmit={() => {
-            if (selected?.id) {
-              dispatch(productAction.deleteUom({ id: selected.id }));
-              setSelected(null);
-              deleteModal.closeModal();
-            }
-          }}
+          onSubmit={handleDelete}
         />
       </Modal>
       <ModalComp
