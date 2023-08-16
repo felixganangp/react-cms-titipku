@@ -83,7 +83,13 @@ export default function Form({
   }, [isSubmitedProcess]);
 
   return (
-    <Box component="form" onSubmit={formik.handleSubmit}>
+    <Box
+      component="form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        formik.handleSubmit(e);
+      }}
+    >
       <Box p={processProduct ? 'unset' : '24px'}>
         <FormLabel
           text="Input Image"
@@ -119,15 +125,18 @@ export default function Form({
           }
         >
           <TextField
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') e.preventDefault();
+            }}
             type="text"
             name="name"
             placeholder="Insert Name"
             value={formik.values.name}
             onChange={(e) => {
               formik.handleChange(e);
-              if (e.target.value) {
-                debounceCheckIsName({ name: e.target.value });
-              }
+              // if (e.target.value) {
+              //   debounceCheckIsName({ name: e.target.value });
+              // }
             }}
             onBlur={formik.handleBlur}
             fullWidth
@@ -146,6 +155,9 @@ export default function Form({
           }
         >
           <TextField
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') e.preventDefault();
+            }}
             type="text"
             name="selling_price"
             placeholder="Insert Price"
@@ -225,6 +237,9 @@ export default function Form({
               >
                 <>
                   <TextField
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') e.preventDefault();
+                    }}
                     type="text"
                     name="low_stock_limit"
                     placeholder="Insert Low Stock"
@@ -282,6 +297,9 @@ export default function Form({
                   }
                   renderInput={(params) => (
                     <TextField
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') e.preventDefault();
+                      }}
                       {...params}
                       name="unit_measurement_id"
                       onBlur={formik.handleBlur}
@@ -309,6 +327,9 @@ export default function Form({
           >
             <>
               <TextField
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') e.preventDefault();
+                }}
                 type="text"
                 name="stock"
                 placeholder="Insert Low Stock"
@@ -355,6 +376,9 @@ export default function Form({
             }
           >
             <TextField
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') e.preventDefault();
+              }}
               type="text"
               name="description"
               placeholder="Insert Description"

@@ -188,11 +188,12 @@ export default function CategoryPage() {
       <Modal open={deleteModal.open} onClose={deleteModal.closeModal}>
         <DeleteModal
           onClose={deleteModal.closeModal}
-          headerText={`Delete UoM ${selected?.name}?`}
+          headerText={`Delete Category ${selected?.name}?`}
           desc={
             <>
               Are you sure want to delete this Category? Category{' '}
-              {selected?.name} is used by {selected?.product_count} product
+              <b>{selected?.name}</b> is used by{' '}
+              <b>{selected?.product_count} product</b>
             </>
           }
           onSubmit={handleDelete}

@@ -28,7 +28,7 @@ export default function YellowToast() {
     itemType,
   } = useAppSelector((state) => state.ui.yellowToast);
 
-  setTimeout(() => dispatch(uiAction.closeYellowToast()), 10000);
+  setTimeout(() => dispatch(uiAction.closeYellowToast()), 20000);
 
   return (
     <Box

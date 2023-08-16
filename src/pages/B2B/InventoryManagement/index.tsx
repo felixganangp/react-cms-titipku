@@ -1398,6 +1398,7 @@ export default function InventoryPage() {
         onClose={() => {
           procesProductModal.closeModal();
           setSelected([]);
+          setEditProduct(null);
         }}
       />
       <ModalComp
