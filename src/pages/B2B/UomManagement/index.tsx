@@ -176,8 +176,8 @@ export default function UomPage() {
           headerText={`Delete UoM ${selected?.name}?`}
           desc={
             <>
-              Are you sure want to delete this UoM? UoM {selected?.name} is used
-              by {selected?.total_product} product
+              Are you sure want to delete this UoM? UoM <b>{selected?.name}</b>{' '}
+              is used by <b>{selected?.total_product} product</b>
             </>
           }
           onSubmit={handleDelete}
