@@ -155,7 +155,7 @@ export default function FormInbound({ onClose }: FormProps) {
           <Form style={{ padding: '0px !important' }}>
             <Box sx={{ padding: '24px' }}>
               <FormLabel
-                text="Supplier"
+                text="Supplier Name"
                 required
                 error={touched.supplier && Boolean(errors.supplier)}
                 helperText={
@@ -194,14 +194,14 @@ export default function FormInbound({ onClose }: FormProps) {
                 />
               </FormLabel>
               <FormLabel
-                text="Inbound Code / Number"
+                text="Inbound Code/Number"
                 error={touched.code && Boolean(errors.code)}
                 helperText={touched.code && errors.code && `${errors.code}`}
               >
                 <TextField
                   type="text"
                   name="code"
-                  placeholder="Insert inbound code / number"
+                  placeholder="Insert inbound code/number"
                   value={values.code}
                   fullWidth
                   onChange={handleChange}
@@ -275,7 +275,7 @@ export default function FormInbound({ onClose }: FormProps) {
               </FormLabel>
 
               <FormLabel
-                text="Note/Description"
+                text="Description"
                 error={touched.description && Boolean(errors.description)}
                 helperText={
                   touched.description &&
@@ -286,7 +286,7 @@ export default function FormInbound({ onClose }: FormProps) {
                 <TextField
                   type="text"
                   name="description"
-                  placeholder="Insert some Additional note"
+                  placeholder="Insert some note"
                   value={values.description}
                   fullWidth
                   onChange={handleChange}
@@ -555,7 +555,7 @@ export default function FormInbound({ onClose }: FormProps) {
                                     size="medium"
                                     onClick={() => remove(index)}
                                   >
-                                    <Trash width="40" height="40" />
+                                    <Trash sx={{ fontSize: '33px' }} />
                                   </IconButton>
                                 </td>
                               </tr>
