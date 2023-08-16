@@ -101,11 +101,21 @@ export default function InboundPage() {
       id: 'code',
       label: 'Inbound Code',
       align: 'left',
+      format: (val: any) => {
+        return <p>{val.code ? val.code : '-'}</p>;
+      },
     },
     {
       id: 'description',
       label: 'Note',
       align: 'left',
+      format: (val: any) => {
+        return (
+          <p style={{ maxWidth: '500px' }}>
+            {val.description ? val.description : '-'}
+          </p>
+        );
+      },
     },
     {
       id: 'created_at',

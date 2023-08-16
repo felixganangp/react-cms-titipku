@@ -29,7 +29,6 @@ import {
   CreateInboundParams,
   InboundProductRequest,
 } from 'models/b2b/Inbound';
-import { Supplier } from 'models/b2b/Supplier';
 import { InboundAction } from 'store/slice/b2b/Inbound';
 import { productAction } from 'store/slice/b2b/Product';
 
@@ -77,6 +76,8 @@ export default function FormInbound({ onClose }: FormProps) {
           supplier: yup.mixed().required('Supplier is required'),
           code: yup
             .string()
+            .trim()
+            .matches(/^\S*$/, 'Spaces are not allowed')
             .test(
               'len',
               'Maximal character length for inbound code / number is 50',
@@ -316,7 +317,7 @@ export default function FormInbound({ onClose }: FormProps) {
                           if (value?.id) {
                             push({
                               id: value?.id,
-                              supplier_price: 0,
+                              supplier_price: null,
                               quantity: 0,
                               name: value?.name,
                               image: value?.image,
@@ -476,11 +477,11 @@ export default function FormInbound({ onClose }: FormProps) {
                                       InputProps={{
                                         inputProps: {
                                           style: {
-                                            width: '40px',
                                             textAlign: 'center',
                                           },
                                         },
                                         style: {
+                                          width: '120px',
                                           paddingLeft: '0px',
                                           paddingRight: '0px',
                                         },
@@ -516,7 +517,7 @@ export default function FormInbound({ onClose }: FormProps) {
                                               onClick={() =>
                                                 setFieldValue(
                                                   `products[${index}].quantity`,
-                                                  values.products[index]
+                                                  +values.products[index]
                                                     .quantity + 1,
                                                 )
                                               }
