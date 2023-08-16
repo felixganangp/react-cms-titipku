@@ -18,9 +18,11 @@ import moment from 'moment';
 import digitFormatter from 'utils/digitFormatter';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MenuList from 'components/MenuList';
+import YellowToast from 'components/YellowToast';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { InboundAction } from 'store/slice/b2b/Inbound';
 import { SupplierAction } from 'store/slice/b2b/Supplier';
+import { uiAction } from 'store/slice/ui';
 import DetailPopUp from './Details';
 import FormInbound from './components/form';
 
@@ -65,6 +67,21 @@ export default function InboundPage() {
   const handleAddInbound = () => {
     dispatch(SupplierAction.fetchData({ page: 1, count: 1000 }));
     formModal.openModal();
+  };
+
+  const addInbound = () => {
+    dispatch(InboundAction.fetchData({}));
+    dispatch(
+      uiAction.openYellowToast({
+        totalItem: 1,
+        itemType: 'Inbound',
+        additionalMsg: `successfully`,
+        action: 'Added',
+        error: false,
+        noUndo: true,
+      }),
+    );
+    formModal.closeModal();
   };
 
   const handleDetail = async (id: string) => {
@@ -165,6 +182,7 @@ export default function InboundPage() {
           }}
         />
         <Box mt={2}>
+          <YellowToast />
           <Table
             data={inbound.data}
             headCells={headCell}
@@ -190,7 +208,7 @@ export default function InboundPage() {
         width="700px"
         maxWidth="md"
       >
-        <FormInbound onClose={formModal.closeModal} />
+        <FormInbound onClose={addInbound} />
       </ModalComp>
     </Box>
   );
