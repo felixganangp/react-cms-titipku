@@ -181,6 +181,23 @@ export default function InvoiceDetail() {
               </Stack>
             );
             break;
+          case 'stock_opname':
+            text = `Stock Opname`;
+            render = (
+              <Stack>
+                {val.changes.columns.map((item, index) => (
+                  <Stack direction="row" key={index} alignItems="center">
+                    <Typography fontSize={14}>
+                      Before: {item.old_value}{' '}
+                      {val.changes?.unit_measurement || ''}, After:{' '}
+                      {item.new_value} {val.changes?.unit_measurement || ''}
+                    </Typography>
+                  </Stack>
+                ))}
+              </Stack>
+            );
+            break;
+
           default:
             break;
         }
