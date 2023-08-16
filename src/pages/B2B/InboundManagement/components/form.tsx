@@ -314,7 +314,10 @@ export default function FormInbound({ onClose }: FormProps) {
                       <Autocomplete
                         options={product.products}
                         onChange={(e, value) => {
-                          if (value?.id) {
+                          if (
+                            value?.id &&
+                            !values.products.some((el) => el.id === value.id)
+                          ) {
                             push({
                               id: value?.id,
                               supplier_price: null,
