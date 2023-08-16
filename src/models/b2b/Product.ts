@@ -127,6 +127,9 @@ export interface Log {
 export interface ChangesLog {
   action_type: string;
   columns: ColumnLog[];
+  unit_measurement?: string;
+  is_new_product?: boolean;
+  process_product?: string;
 }
 
 export interface ColumnLog {

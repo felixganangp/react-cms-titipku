@@ -579,7 +579,7 @@ function* createUom(payload: PayloadAction<CreateUomTypes>) {
       uiAction.openYellowToast({
         totalItem: 1,
         additionalMsg: 'UoM successfully',
-        action: 'added!',
+        action: 'Added!',
         error: false,
         noUndo: true,
       }),
@@ -612,19 +612,26 @@ function* createUom(payload: PayloadAction<CreateUomTypes>) {
 }
 
 function* updateUom(
-  payload: PayloadAction<{ id: number; body: CreateUomTypes }>,
+  payload: PayloadAction<{
+    id: number;
+    body: CreateUomTypes;
+    isUndo?: boolean;
+  }>,
 ) {
   try {
     yield call(serviceUom.update, payload.payload.id, payload.payload.body);
-    yield put(
-      uiAction.openYellowToast({
-        totalItem: 1,
-        additionalMsg: '',
-        action: 'successfully update!',
-        error: false,
-        noUndo: true,
-      }),
-    );
+    if (!payload.payload?.isUndo) {
+      yield put(
+        uiAction.openYellowToast({
+          totalItem: 1,
+          additionalMsg: 'UoM successfully',
+          action: 'Edited!',
+          error: false,
+          noUndo: true,
+        }),
+      );
+    }
+
     yield put(productAction.successLoadingOum());
     const filter: ListParams = yield select((state) => state.product.paramsOum);
     yield put(productAction.fetchUom(filter));
@@ -654,16 +661,11 @@ function* updateUom(
 
 function* deleteUom(payload: PayloadAction<{ id: number }>) {
   try {
-    yield call(serviceUom.deleteUom, payload.payload.id);
-    yield put(
-      uiAction.openYellowToast({
-        totalItem: 1,
-        additionalMsg: 'UoM successfully',
-        action: 'deleted!',
-        error: false,
-        noUndo: true,
-      }),
+    const respon: Response<UomTypes> = yield call(
+      serviceUom.deleteUom,
+      payload.payload.id,
     );
+
     yield put(productAction.successLoadingOum());
     const filter: ListParams = yield select((state) => state.product.paramsOum);
     yield put(productAction.fetchUom(filter));
@@ -809,8 +811,8 @@ function* createCategory(payload: PayloadAction<CreateUomTypes>) {
     yield put(
       uiAction.openYellowToast({
         totalItem: 1,
-        additionalMsg: '',
-        action: 'successfully added!',
+        additionalMsg: 'Category successfully',
+        action: 'Added!',
         error: false,
         noUndo: true,
       }),
@@ -845,7 +847,11 @@ function* createCategory(payload: PayloadAction<CreateUomTypes>) {
 }
 
 function* updateCategory(
-  payload: PayloadAction<{ id: number; body: CreateUomTypes }>,
+  payload: PayloadAction<{
+    id: number;
+    body: CreateUomTypes;
+    isUndo?: boolean;
+  }>,
 ) {
   try {
     yield call(
@@ -853,15 +859,18 @@ function* updateCategory(
       payload.payload.id,
       payload.payload.body,
     );
-    yield put(
-      uiAction.openYellowToast({
-        totalItem: 1,
-        additionalMsg: '',
-        action: 'successfully update!',
-        error: false,
-        noUndo: true,
-      }),
-    );
+    if (!payload.payload.isUndo) {
+      yield put(
+        uiAction.openYellowToast({
+          totalItem: 1,
+          additionalMsg: 'Category successfully',
+          action: 'Edited!',
+          error: false,
+          noUndo: true,
+        }),
+      );
+    }
+
     yield put(productAction.successLoadingCategory());
     const filter: ListParams = yield select(
       (state) => state.product.category.params,
@@ -894,19 +903,11 @@ function* updateCategory(
 function* deleteCategory(payload: PayloadAction<{ id: number }>) {
   try {
     yield call(serviceCategory.deleteCategory, payload.payload.id);
-    yield put(
-      uiAction.openYellowToast({
-        totalItem: 1,
-        additionalMsg: '',
-        action: 'successfully deleted!',
-        error: false,
-        noUndo: true,
-      }),
-    );
     yield put(productAction.successLoadingOum());
     const filter: ListParams = yield select(
       (state) => state.product.category.params,
     );
+    yield put(productAction.successLoadingCategory());
     yield put(productAction.fetchCategory(filter));
   } catch (err) {
     yield put(productAction.resetCategoryform());

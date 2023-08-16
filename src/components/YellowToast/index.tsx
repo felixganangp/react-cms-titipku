@@ -50,7 +50,7 @@ export default function YellowToast() {
         {totalItem ? (
           <>
             <Typography fontSize="16px">
-              <b>{totalItem}</b> {` ${itemType} `}
+              <b>{totalItem}</b> {` ${itemType || ''} `}
               {`${additionalMsg ? `${additionalMsg} ` : ''}`}
             </Typography>
             <Typography

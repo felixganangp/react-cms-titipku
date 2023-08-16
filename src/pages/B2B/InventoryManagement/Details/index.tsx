@@ -113,7 +113,7 @@ export default function InvoiceDetail() {
       align: 'left',
       format: (val: Log) => (
         <Typography fontSize={14}>
-          {moment.unix(val.created_at).format('DD/MM/YYYY . hh:mm')}
+          {moment(val.created_at * 1000).format('DD/MM/YYYY . HH:mm')}
         </Typography>
       ),
     },
@@ -128,6 +128,12 @@ export default function InvoiceDetail() {
         switch (val.changes.action_type) {
           case 'create':
             text = 'Created this Product';
+            break;
+          case 'set_to_active':
+            text = 'Set product to Inactive';
+            break;
+          case 'set_to_inactive':
+            text = 'Set product to Active';
             break;
           case 'update':
             text = 'Edit Product';
@@ -151,13 +157,24 @@ export default function InvoiceDetail() {
             );
             break;
           case 'process':
-            text = 'Process this Product';
+            text = `Process ${
+              (val.changes.columns[0].old_value || 0) -
+              (val.changes.columns[0].new_value || 0)
+            } ${val.changes?.unit_measurement || ''} to ${
+              val.changes?.is_new_product ? 'new' : 'existing'
+            } product ${
+              val.changes?.process_product
+                ? `: ${val.changes?.process_product}`
+                : ''
+            }`;
             render = (
               <Stack>
                 {val.changes.columns.map((item, index) => (
                   <Stack direction="row" key={index} alignItems="center">
                     <Typography fontSize={14}>
-                      Before: {item.old_value}, After: {item.new_value}
+                      Before: {item.old_value}{' '}
+                      {val.changes?.unit_measurement || ''}, After:{' '}
+                      {item.new_value} {val.changes?.unit_measurement || ''}
                     </Typography>
                   </Stack>
                 ))}
@@ -289,7 +306,9 @@ export default function InvoiceDetail() {
                 In Stock
               </Typography>
               <LoadingComp>
-                <Typography fontSize="14px">{details?.stock}</Typography>
+                <Typography fontSize="14px">
+                  {details?.stock} {details?.unit_measurement}
+                </Typography>
               </LoadingComp>
             </Grid>
             <Grid item xs={4} lg={2.4}>
@@ -298,7 +317,7 @@ export default function InvoiceDetail() {
               </Typography>
               <LoadingComp>
                 <Typography fontSize="14px">
-                  {details?.low_stock_limit}
+                  {details?.low_stock_limit} {details?.unit_measurement}
                 </Typography>
               </LoadingComp>
             </Grid>

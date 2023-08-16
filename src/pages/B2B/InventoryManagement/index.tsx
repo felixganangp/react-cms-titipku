@@ -1395,7 +1395,10 @@ export default function InventoryPage() {
       <ProcessProduct
         open={procesProductModal.open}
         EditProduct={EditProduct}
-        onClose={procesProductModal.closeModal}
+        onClose={() => {
+          procesProductModal.closeModal();
+          setSelected([]);
+        }}
       />
       <ModalComp
         open={moveStockConfirmationModal.open}

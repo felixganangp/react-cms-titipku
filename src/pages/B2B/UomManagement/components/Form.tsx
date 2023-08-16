@@ -41,23 +41,16 @@ export default function Form({ isEdit, selected, onClose }: FormTypes) {
   useEffect(() => {
     if (selected) {
       formik.setValues({ name: selected.name });
+    } else {
+      formik.setValues({ name: '' });
     }
   }, [selected]);
 
   useEffect(() => {
     if (isSuccessUom) {
       onClose();
-      dispatch(productAction.resetProductForm());
+      dispatch(productAction.resetUomform());
     }
-    // if (isDetail && selected?.id) {
-    //   dispatch(productAction.fetchDetails(id));
-    //   dispatch(
-    //     productAction.setLogParams({
-    //       // eslint-disable-next-line radix
-    //       product_id: parseInt(id),
-    //     }),
-    //   );
-    // }
   }, [isSuccessUom]);
 
   return (
@@ -104,7 +97,7 @@ export default function Form({ isEdit, selected, onClose }: FormTypes) {
           // onClick={() => {
           //   formik.handleSubmit();
           // }}
-          disabled={loadingFormUom}
+          disabled={loadingFormUom || !formik.isValid}
         >
           {!loadingFormUom
             ? `${isEdit ? 'Save Changes' : 'Create'}`

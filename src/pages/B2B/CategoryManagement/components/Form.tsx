@@ -43,6 +43,8 @@ export default function Form({ isEdit, selected, onClose }: FormTypes) {
   useEffect(() => {
     if (selected) {
       formik.setValues({ name: selected.name });
+    } else {
+      formik.setValues({ name: '' });
     }
   }, [selected]);
 
@@ -67,7 +69,7 @@ export default function Form({ isEdit, selected, onClose }: FormTypes) {
       <Box p="24px">
         <FormLabel
           required
-          text="Product Name (SKU)"
+          text="Category Name"
           error={
             (formik.touched.name && Boolean(formik.errors.name)) ||
             formik.touched.name
@@ -79,7 +81,7 @@ export default function Form({ isEdit, selected, onClose }: FormTypes) {
           <TextField
             type="text"
             name="name"
-            placeholder="Insert Name"
+            placeholder="Insert Category Nameme"
             value={formik.values.name}
             onChange={(e) => {
               formik.handleChange(e);
@@ -106,7 +108,7 @@ export default function Form({ isEdit, selected, onClose }: FormTypes) {
           // onClick={() => {
           //   formik.handleSubmit();
           // }}
-          disabled={isLoading}
+          disabled={isLoading || !formik.isValid}
         >
           {!isLoading ? `${isEdit ? 'Save Changes' : 'Create'}` : 'Loading...'}
         </Button>
