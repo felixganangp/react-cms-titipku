@@ -55,7 +55,8 @@ export interface CreateInbound {
 }
 
 export interface CreateInboundParams {
-  supplier: Supplier;
+  // supplier: Supplier;
+  supplier: number | null;
   code: string;
   date: string | null;
   description: string;

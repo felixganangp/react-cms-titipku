@@ -15,6 +15,7 @@ import Minus from 'components/Icon/Minus';
 import Autocomplete from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 import Trash from 'components/Icon/Trash';
+import Calendar from 'components/Icon/Calendar';
 import * as yup from 'yup';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import useToast from 'hooks/useToast';
@@ -33,17 +34,9 @@ import { InboundAction } from 'store/slice/b2b/Inbound';
 import { productAction } from 'store/slice/b2b/Product';
 
 const initalValues: CreateInboundParams = {
-  supplier: {
-    id: 0,
-    total_inbound: 0,
-    name: '',
-    address: '',
-    phone_number: 0,
-    created_at: 0,
-    updated_at: 0,
-  },
+  supplier: null,
   code: '',
-  date: moment().toISOString(),
+  date: null,
   description: '',
   products: [],
 };
@@ -79,17 +72,16 @@ export default function FormInbound({ onClose }: FormProps) {
   return (
     <Box>
       <Formik
-        initialValues={initalValues}
+        initialValues={initialValues}
         validationSchema={object({
           supplier: yup.mixed().required('Supplier is required'),
           code: yup
             .string()
-            .required('Please input inbound code / number')
             .test(
               'len',
-              'Maximal character length for inbounc code / number is 50',
+              'Maximal character length for inbound code / number is 50',
               (val: string | undefined) =>
-                val !== undefined && val?.length < 51,
+                val === undefined || val?.length <= 50,
             ),
           date: yup.mixed().required('Date is required'),
           description: yup
@@ -97,7 +89,8 @@ export default function FormInbound({ onClose }: FormProps) {
             .test(
               'len',
               'Maximal character for description is 500',
-              (val) => val !== undefined && val.toString().length < 500,
+              (val: string | undefined) =>
+                val === undefined || val?.length <= 500,
             ),
           products: yup
             .array()
@@ -132,7 +125,7 @@ export default function FormInbound({ onClose }: FormProps) {
           });
 
           const payload: CreateInbound = {
-            supplier_id: +(values?.supplier.id || 0),
+            supplier_id: +(values?.supplier || 0),
             code: values.code,
             date: moment(values.date).unix(),
             description: values.description,
@@ -162,7 +155,7 @@ export default function FormInbound({ onClose }: FormProps) {
           <Form style={{ padding: '0px !important' }}>
             <Box sx={{ padding: '24px' }}>
               <FormLabel
-                text="Supplier Name"
+                text="Supplier"
                 required
                 error={touched.supplier && Boolean(errors.supplier)}
                 helperText={
@@ -170,31 +163,38 @@ export default function FormInbound({ onClose }: FormProps) {
                 }
               >
                 <Autocomplete
-                  id="supplier_id"
+                  data-testid="form-category"
+                  id="unit_measurement_id"
                   options={supplier.data}
                   onChange={(e, value) => {
-                    if (value?.id) {
-                      setFieldValue('supplier', value);
-                    }
+                    setFieldValue('supplier', value?.id);
                   }}
-                  isOptionEqualToValue={(option: Supplier) => {
-                    return option.id === values.supplier.id;
-                  }}
-                  getOptionLabel={(option) => `${option.name}`}
-                  value={values.supplier}
+                  // isOptionEqualToValue={(option, values) => {
+                  //   return option.id === values.id;
+                  // }}
+                  getOptionLabel={(option) => option.name}
+                  value={
+                    supplier.data.filter(
+                      (val) => val.id === values.supplier,
+                    )[0] || null
+                  }
                   renderInput={(params) => (
                     <TextField
                       {...params}
-                      onBlur={handleBlur}
                       name="supplier"
+                      onBlur={handleBlur}
                       placeholder="Select Supplier Name"
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          backgroundColor: '#fff',
+                        },
+                      }}
                     />
                   )}
                 />
               </FormLabel>
               <FormLabel
                 text="Inbound Code / Number"
-                required
                 error={touched.code && Boolean(errors.code)}
                 helperText={touched.code && errors.code && `${errors.code}`}
               >
@@ -238,6 +238,7 @@ export default function FormInbound({ onClose }: FormProps) {
                     }}
                     value={values.date}
                     inputFormat="MMMM DD, YYYY"
+                    toolbarPlaceholder="Select Date"
                     onChange={(e) => {
                       setFieldValue('date', e, true);
                     }}
@@ -245,7 +246,7 @@ export default function FormInbound({ onClose }: FormProps) {
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <CalendarMonthIcon />
+                          <Calendar />
                         </InputAdornment>
                       ),
                     }}
@@ -264,7 +265,7 @@ export default function FormInbound({ onClose }: FormProps) {
                         }
                         inputProps={{
                           ...params.inputProps,
-                          placeholder: 'Input date',
+                          placeholder: 'Select date',
                         }}
                       />
                     )}
@@ -275,7 +276,6 @@ export default function FormInbound({ onClose }: FormProps) {
 
               <FormLabel
                 text="Note/Description"
-                required
                 error={touched.description && Boolean(errors.description)}
                 helperText={
                   touched.description &&
@@ -473,11 +473,16 @@ export default function FormInbound({ onClose }: FormProps) {
                                       onBlur={handleBlur}
                                       value={prod.quantity}
                                       fullWidth
-                                      sx={{ padding: '0px' }}
                                       InputProps={{
+                                        inputProps: {
+                                          style: {
+                                            width: '40px',
+                                            textAlign: 'center',
+                                          },
+                                        },
                                         style: {
-                                          padding: 0,
-                                          width: '120px',
+                                          paddingLeft: '0px',
+                                          paddingRight: '0px',
                                         },
                                         startAdornment: (
                                           <InputAdornment position="start">
@@ -609,16 +614,6 @@ export default function FormInbound({ onClose }: FormProps) {
                 )}
               </Button>
             </Box>
-            {/* <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              size="large"
-              disabled={!isValid || !dirty}
-            >
-              Sign up
-            </Button> */}
-
             {/* <pre>{JSON.stringify(values, null, 2)}</pre> */}
           </Form>
         )}
