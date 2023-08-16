@@ -10,6 +10,9 @@ const components = (palette: Palette): ThemeOptions['components'] => ({
       root: {
         borderRadius: '32px',
         textTransform: 'unset',
+        '&:disabled': {
+          color: '#797979',
+        },
       },
       contained: {
         borderRadius: '32px',
@@ -35,6 +38,22 @@ const components = (palette: Palette): ThemeOptions['components'] => ({
   },
 
   MuiTextField: {
+    styleOverrides: {
+      root: {
+        '.MuiOutlinedInput-root': {
+          borderRadius: '10px',
+          '.MuiInputBase-input.Mui-disabled': {
+            backgroundColor: 'unset',
+          },
+        },
+        '.Mui-disabled': {
+          backgroundColor: '#f8f8f8',
+        },
+        '.MuiIconButton-root.Mui-disabled': {
+          backgroundColor: '#f8f8f8',
+        },
+      },
+    },
     defaultProps: {
       size: 'small',
     },

@@ -127,14 +127,20 @@ export default function InboundDetailPopUp(props: InboundDetailProps) {
           <Grid item xs={6} md={4}>
             <DescDetails
               title="InBound Code/Number"
-              content={inbound.detailsData?.code}
+              content={
+                inbound.detailsData?.code ? inbound.detailsData?.code : '-'
+              }
               color="#0661ae"
             />
           </Grid>
-          <Grid item xs={6} md={4}>
+          <Grid item xs={6} md={8}>
             <DescDetails
               title="Description"
-              content={inbound.detailsData?.description}
+              content={
+                inbound.detailsData?.description
+                  ? inbound.detailsData?.description
+                  : '-'
+              }
               color="#0661ae"
             />
           </Grid>
