@@ -35,12 +35,29 @@ export interface InboundProduct {
   id: number;
   supplier_price: number;
   quantity: number;
+  name: string;
+  image: string;
+  uom: string;
+}
+
+export interface InboundProductRequest {
+  id: number;
+  supplier_price: number;
+  quantity: number;
 }
 
 export interface CreateInbound {
   supplier_id: number;
   code: string;
   date: number;
+  description: string;
+  products: InboundProductRequest[];
+}
+
+export interface CreateInboundParams {
+  supplier: Supplier;
+  code: string;
+  date: string | null;
   description: string;
   products: InboundProduct[];
 }

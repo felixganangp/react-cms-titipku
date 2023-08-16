@@ -7,24 +7,29 @@ import {
   Button,
   IconButton,
   Stack,
+  Modal,
 } from '@mui/material';
 import Table from 'components/Table';
+import useModal from 'hooks/useModal';
+import ModalComp from 'components/Modal';
 import ArrowIcon from '@mui/icons-material/ArrowForwardIos';
 import SearchIcon from '@mui/icons-material/Search';
-import debounce from 'utils/debounce';
 import moment from 'moment';
 import digitFormatter from 'utils/digitFormatter';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MenuList from 'components/MenuList';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { InboundAction } from 'store/slice/b2b/Inbound';
+import { SupplierAction } from 'store/slice/b2b/Supplier';
 import DetailPopUp from './Details';
+import FormInbound from './components/form';
 
 export default function InboundPage() {
   const dispatch = useAppDispatch();
   const inbound = useAppSelector((state) => state.inbound);
   const [openPopUp, setOpenPopUp] = useState<boolean>(false);
   const [currentId, setCurrentId] = useState<string>('1');
+  const formModal = useModal();
 
   React.useEffect(() => {
     dispatch(InboundAction.fetchData(inbound.params));
@@ -39,7 +44,6 @@ export default function InboundPage() {
       }),
     );
   };
-  const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
 
   const handleChangePage = (value: number) => {
     dispatch(
@@ -56,6 +60,17 @@ export default function InboundPage() {
         count: value,
       }),
     );
+  };
+
+  const handleAddInbound = () => {
+    dispatch(SupplierAction.fetchData({ page: 1, count: 1000 }));
+    formModal.openModal();
+  };
+
+  const handleDetail = async (id: string) => {
+    // dispatch(SupplierAction.fetchData({ page: 1, count: 1000 }));
+    await setCurrentId(id);
+    setOpenPopUp(true);
   };
 
   const headCell = [
@@ -109,7 +124,7 @@ export default function InboundPage() {
                 label: 'Detail',
                 onClick: () => {
                   setCurrentId(val.id);
-                  setOpenPopUp(!openPopUp);
+                  handleDetail(val.id);
                 },
               },
             ]}
@@ -125,20 +140,11 @@ export default function InboundPage() {
 
   return (
     <Box p="20px" bgcolor="#f8f8f8">
-      <DetailPopUp
-        open={openPopUp}
-        onClose={() => setOpenPopUp(!openPopUp)}
-        ids={currentId}
-      />
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Typography fontSize="26px" fontWeight="600" fontFamily="Montserrat">
           Inbound Management
         </Typography>
-        <Button
-          endIcon={<ArrowIcon />}
-          // onClick={formProductModal.openModal}
-          size="large"
-        >
+        <Button endIcon={<ArrowIcon />} onClick={handleAddInbound} size="large">
           Add Inbound
         </Button>
       </Stack>
@@ -171,6 +177,21 @@ export default function InboundPage() {
           />
         </Box>
       </Box>
+
+      <DetailPopUp
+        open={openPopUp}
+        onClose={() => setOpenPopUp(!openPopUp)}
+        ids={currentId}
+      />
+      <ModalComp
+        open={formModal.open}
+        title="Product Inbound"
+        onClose={formModal.closeModal}
+        width="700px"
+        maxWidth="md"
+      >
+        <FormInbound onClose={formModal.closeModal} />
+      </ModalComp>
     </Box>
   );
 }

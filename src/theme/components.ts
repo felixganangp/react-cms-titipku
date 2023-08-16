@@ -55,6 +55,32 @@ const components = (palette: Palette): ThemeOptions['components'] => ({
       },
     },
   },
+
+  MuiInput: {
+    styleOverrides: {
+      root: {
+        '&::-webkit-outer-spin-button, &::-webkit-inner-spin-button': {
+          '-webkit-appearance': 'none',
+          margin: 0,
+        },
+        '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button':
+          {
+            display: 'none',
+          },
+        '& input[type=number]': {
+          MozAppearance: 'textfield',
+        },
+        '& input[type=number]::-webkit-outer-spin-button': {
+          '-webkit-appearance': 'none',
+          margin: 0,
+        },
+        '& input[type=number]::-webkit-inner-spin-button': {
+          '-webkit-appearance': 'none',
+          margin: 0,
+        },
+      },
+    },
+  },
 });
 
 export default components;

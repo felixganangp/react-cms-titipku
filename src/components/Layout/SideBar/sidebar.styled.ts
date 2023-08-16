@@ -70,6 +70,7 @@ export const ItemButtonSuperChild = styled(ListItemButton)`
   margin: 6px 20px;
   padding: 10px;
   border-radius: 8px;
+  padding-left: 0px;
 `;
 
 export const ItemTextSuperChild = styled(ListItemText)<

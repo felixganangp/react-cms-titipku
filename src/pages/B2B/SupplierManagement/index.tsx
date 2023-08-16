@@ -49,7 +49,7 @@ export default function SupplierPage() {
     dispatch(
       uiAction.openYellowToast({
         totalItem: selected.length,
-        itemType: 'supplier',
+        itemType: 'Supplier',
         additionalMsg: `successfully`,
         action: 'Deleted',
         error: true,
@@ -77,7 +77,6 @@ export default function SupplierPage() {
       : '';
 
   const getHeaderTextModal = () => {
-    console.log('selected', selectedSupplier, selected);
     if (selectedSupplier.length > 1) {
       return <b>Delete {getBatchSupplierDesc()}?</b>;
     }
@@ -114,10 +113,10 @@ export default function SupplierPage() {
     dispatch(
       uiAction.openYellowToast({
         totalItem: 1,
-        itemType: 'supplier',
+        itemType: 'Supplier',
         additionalMsg: `successfully`,
-        action: formData.isEdit ? 'Edited' : 'Created',
-        error: true,
+        action: formData.isEdit ? 'Edited!' : 'Added!',
+        error: false,
         noUndo: true,
       }),
     );
@@ -129,6 +128,7 @@ export default function SupplierPage() {
         phone_number: '',
       },
     });
+    setSelected([]);
     formModal.closeModal();
   };
 
@@ -191,7 +191,7 @@ export default function SupplierPage() {
     // },
     {
       id: 'menu',
-      label: 'Action',
+      label: '',
       align: 'left',
       width: '20px',
       format: (val: any) => (
@@ -211,6 +211,7 @@ export default function SupplierPage() {
                     },
                   };
                   setFormData(data);
+                  setSelected([val.id]);
                   formModal.openModal();
                 },
               },
@@ -308,8 +309,8 @@ export default function SupplierPage() {
       </Modal>
       <ModalComp
         open={formModal.open}
-        title={`${formData.isEdit ? 'Edit ' : 'Add New '} Role User`}
-        onClose={onCloseForm}
+        title={`${formData.isEdit ? 'Edit ' : 'Add New '} Supplier`}
+        onClose={formModal.closeModal}
       >
         <FormSupplier
           onClose={onCloseForm}

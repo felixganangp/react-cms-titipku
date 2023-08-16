@@ -32,7 +32,7 @@ export const sidebarData: FilteredMenu[] = [
     child: [
       {
         id: 57,
-        title: 'Iventory',
+        title: 'Inventory',
         path: '/b2b/inventory',
         child: [],
       },
@@ -49,7 +49,7 @@ export const sidebarData: FilteredMenu[] = [
         child: [
           {
             id: 60,
-            title: 'Category',
+            title: 'Category Management',
             path: '/b2b/category',
           },
           {
@@ -59,7 +59,7 @@ export const sidebarData: FilteredMenu[] = [
           },
           {
             id: 62,
-            title: 'Supplier',
+            title: 'Supplier Management',
             path: '/b2b/supplier',
           },
         ],

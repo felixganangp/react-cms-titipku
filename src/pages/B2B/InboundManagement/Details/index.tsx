@@ -1,22 +1,18 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable radix */
 /* eslint-disable guard-for-in */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect } from 'react';
 import Dialog from '@mui/material/Dialog';
 import moment from 'moment';
 import { InboundAction } from 'store/slice/b2b/Inbound';
 import Table from 'components/Table';
-import TextField from '@mui/material/TextField';
 import CloseIcon from '@mui/icons-material/Close';
-import FormGroup from '@mui/material/FormGroup';
-import Checkbox from '@mui/material/Checkbox';
 import Box from '@mui/material/Box';
 import DescDetails from 'components/DescDetails';
 import Grid from '@mui/material/Grid';
 import digitFormatter from 'utils/digitFormatter';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { debounce } from 'lodash';
-import { Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import NoImage from 'assets/no-image.svg';
 import {
   TitleWrapper,
@@ -35,11 +31,11 @@ export default function InboundDetailPopUp(props: InboundDetailProps) {
   const { open, onClose, ids } = props;
   const dispatch = useAppDispatch();
   const inbound = useAppSelector((state) => state.inbound);
-  console.log('detail', ids, inbound.detailsData);
 
   useEffect(() => {
+    console.log('getdata', ids);
     dispatch(InboundAction.fetchDataDetail({ id: ids }));
-  }, []);
+  }, [ids]);
 
   const headCell = [
     {

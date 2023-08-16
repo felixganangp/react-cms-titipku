@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Response, ListResponse } from 'models/fetch';
 import {
   CreateInbound,
+  CreateInboundParams,
   Inbound,
   InboundParams,
   InboundDetail,
@@ -76,39 +77,15 @@ const InboundSlice = createSlice({
       state.loading = false;
       state.detailsData = action.payload.data;
     },
-    // addRoleUser(state: InboundProps, action: PayloadAction<CreateInbound>) {
-    //   state.loadingForm = true;
-    // },
-    // editRoleUser(
-    //   state: RoleUserProps,
-    //   action: PayloadAction<CreateRoleUserPayload>,
-    // ) {
-    //   state.loadingForm = true;
-    // },
-    // editStatusRoleUser(
-    //   state: RoleUserProps,
-    //   action: PayloadAction<CreateRoleUserPayload>,
-    // ) {
-    //   state.loadingForm = true;
-    // },
-    // addOrEditRoleUserSuccess(
-    //   state: RoleUserProps,
-    //   action: PayloadAction<{ error: boolean }>,
-    // ) {
-    //   state.loadingForm = false;
-    //   state.error = action.payload.error;
-    // },
-    // failedError(state: RoleUserProps, action: PayloadAction<any>) {
-    //   state.loadingForm = false;
-    //   state.error = action.payload.error;
-    // },
-    // checkEmailValid(state: RoleUserProps, action: PayloadAction<any>) {
-    //   state.loadingValidMsg = true;
-    // },
-    // checkEmailValidSuccess(state: RoleUserProps, action: PayloadAction<any>) {
-    //   state.loadingValidMsg = false;
-    //   state.validMsg = action.payload.data;
-    // },
+    createInbound(state: InboundProps, action: PayloadAction<CreateInbound>) {
+      state.loadingForm = true;
+    },
+    createInboundSuccess(state: InboundProps) {
+      state.loadingForm = false;
+    },
+    createInboundFailed(state: InboundProps) {
+      state.loadingForm = false;
+    },
   },
 });
 
