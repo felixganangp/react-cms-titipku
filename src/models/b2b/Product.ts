@@ -118,7 +118,7 @@ export interface Log {
   updated_at: number;
   created_by_id: number;
   created_by_type: string;
-  created_by: ModifiedUser;
+  editor: ModifiedUser;
   updated_by_id: number | null;
   updated_by_type: string | null;
   updated_by: ModifiedUser | null;
