@@ -735,8 +735,23 @@ function* procesProduct(payload: PayloadAction<{ id: number; body: any }>) {
     const { id, body } = payload.payload;
     const fd = new FormData();
     Object.keys(body).forEach((val) => {
-      fd.append(val, body[val]);
+      switch (val) {
+        case 'target_products':
+          fd.append(val, JSON.stringify(body[val]));
+          break;
+        default:
+          fd.append(val, body[val]);
+          break;
+      }
     });
+
+    // fd.append('source_stock_amount', body.source_stock_amount);
+    // fd.append('target_products', JSON.stringify(body.target_products));
+
+    // body.target_products.forEach((val) => {
+    //   fd.append('target_products[]', JSON.stringify(val));
+    // });
+
     yield call(service.procesProduct, id, fd);
     yield put(
       uiAction.openYellowToast({

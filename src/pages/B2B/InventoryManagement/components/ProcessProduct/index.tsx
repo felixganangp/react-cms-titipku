@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/naming-convention */
 import React, { useEffect, useState } from 'react';
 
@@ -30,6 +31,53 @@ interface ProcessProductProps {
   EditProduct: Product | null;
   onClose: () => void;
 }
+
+const validationNewProduct = yup.object({
+  source_stock_amount: yup
+    .number()
+    .min(1, 'Stock amount  must be greater than or equal to 1')
+    .required('Stock is required'),
+  name: yup.string().required('Name is required'),
+  image: yup.mixed().required('Image is required'),
+  category: yup.mixed().required('Category is required'),
+  selling_price: yup.string().required('Price is required'),
+  low_stock_limit: yup.string().required('Low Stock is required'),
+  stock: yup.string().required('Stock is required'),
+  description: yup.string().required('Description is required'),
+  unit_measurement_id: yup.mixed().required('Unit is required'),
+});
+
+const validationExistingProduct = yup.object({
+  source_stock_amount: yup
+    .number()
+    .min(1, 'Stock amount  must be greater than or equal to 1')
+    .required('Stock is required'),
+  target_products: yup
+    .array(
+      yup.object().shape({
+        stock_amount: yup
+          .number()
+          .min(1, 'Stock amount  must be greater than or equal to 1')
+          .required('Stock amount required'),
+        id: yup
+          .number()
+          .min(1, 'Stock amount  must be greater than or equal to 1')
+          .required('Product id required'),
+      }),
+    )
+    .min(1, 'Product  must be greater than or equal to 1'),
+});
+
+interface InitialValuesTypes {
+  source_stock_amount: number;
+  target_products: { stock_amount: number; id: number }[];
+}
+
+const initialValues: InitialValuesTypes = {
+  source_stock_amount: 0,
+  target_products: [],
+};
+
 export default function ProcessProduct({
   open,
   EditProduct,
@@ -51,56 +99,38 @@ export default function ProcessProduct({
   });
 
   const formik = useFormik({
-    initialValues: {
-      source_stock_amount: 0,
-      target_stock_amount: 0,
-    },
+    initialValues,
     onSubmit: (values) => {
       setIsSubmited(true);
-      const {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        source_stock_amount,
-        // target_product_id,
-        target_stock_amount,
-        ...newProduct
-      } = values;
+      const { source_stock_amount, target_products, ...newProduct } = values;
 
       if (useExistingProduct) {
-        if (!isErrorValue.useExisting) {
-          dispatch(
-            productAction.setProcesProduct({
-              id: EditProduct?.id || 0,
-              body: {
-                source_stock_amount,
-                target_stock_amount,
-                target_product_id: selectedExistingData?.id || 0,
-              },
-            }),
-          );
-        }
+        dispatch(
+          productAction.setProcesProduct({
+            id: EditProduct?.id || 0,
+            body: {
+              source_stock_amount,
+              target_products,
+            },
+          }),
+        );
       } else {
         const { category, ...body } = newProduct as any;
-        if (!isErrorValue.useNew) {
-          dispatch(
-            productAction.setProcesProduct({
-              id: EditProduct?.id || 0,
-              body: {
-                source_stock_amount,
-                ...body,
-                product_category_id: category || 0,
-              },
-            }),
-          );
-        }
+        dispatch(
+          productAction.setProcesProduct({
+            id: EditProduct?.id || 0,
+            body: {
+              source_stock_amount,
+              ...body,
+              product_category_id: category || 0,
+            },
+          }),
+        );
       }
     },
-    validationSchema: yup.object({
-      source_stock_amount: yup
-        .number()
-        .min(1, 'Stock amount  must be greater than or equal to 1')
-        .required('Stock is required'),
-      target_stock_amount: yup.number(),
-    }),
+    validationSchema: !useExistingProduct
+      ? validationNewProduct
+      : validationExistingProduct,
     enableReinitialize: true,
   });
 
@@ -126,64 +156,83 @@ export default function ProcessProduct({
     dispatch(productAction.fetchProductSelect(productSelect.params));
   }, [productSelect.params]);
 
+  const getHelperText = (index: number) => {
+    try {
+      return (
+        // @ts-ignore
+        formik.touched?.target_products[index].stock_amount &&
+        // @ts-ignore
+        formik.errors?.target_products[index].stock_amount
+      );
+    } catch (error) {
+      return false;
+    }
+  };
+
   const ExistingProductView = useExistingProduct && (
     <Stack mt={3} gap={1} alignItems="start">
-      <Typography fontWeight="500">Product Name (SKU)</Typography>
-      {selectedExistingData ? (
-        <Box width="100%">
-          <Stack
-            width="100%"
-            direction="row"
-            gap={1}
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <Stack direction="row" gap={1} alignItems="center">
-              <Box
-                component="img"
-                alt="image"
-                src={selectedExistingData.image}
-                sx={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '100%',
-                }}
-              />
-              <Typography>{selectedExistingData.name}</Typography>
-            </Stack>
-            <IconButton onClick={() => setSelectedExistingData(null)}>
-              <TrashIcon sx={{ fontSize: 30 }} />
-            </IconButton>
-          </Stack>
-          <Stack mt={3} gap={0.4}>
+      {formik.values.target_products.map((val, index) => (
+        <Stack
+          key={val.id}
+          sx={{
+            py: 2,
+            px: 1,
+            borderRadius: '8px',
+            border: '1px solid #E4E4E4',
+            bgcolor: '#f8f8f8',
+            width: '100%',
+          }}
+          gap={1}
+        >
+          <Typography fontWeight="500" fontSize={14}>
+            Product {index + 1}
+          </Typography>
+          {productSelect.data
+            .filter((_val) => val.id === _val.id)
+            .map((item) => (
+              <Stack
+                key={item.id}
+                width="100%"
+                direction="row"
+                gap={1}
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Stack direction="row" gap={1} alignItems="center">
+                  <Box
+                    component="img"
+                    alt="image"
+                    src={item.image}
+                    sx={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '100%',
+                    }}
+                  />
+                  <Typography>{item.name}</Typography>
+                </Stack>
+                <IconButton onClick={() => setSelectedExistingData(null)}>
+                  <TrashIcon sx={{ fontSize: 30 }} />
+                </IconButton>
+              </Stack>
+            ))}
+          <Stack gap={0.4}>
             <Typography fontWeight={500}>Amount</Typography>
             <TextField
               type="number"
-              name="target_stock_amount"
+              name={`target_products[${index}].stock_amount`}
               placeholder="Insert Stock Amount"
               sx={{
                 '& .MuiOutlinedInput-root': {
                   backgroundColor: '#fff',
                 },
               }}
-              onBlur={(e) => {
-                formik.handleBlur(e);
-                setIsErroValue({
-                  ...isErrorValue,
-                  useExisting: formik.values.target_stock_amount < 1,
-                });
-              }}
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
               fullWidth
-              value={formik.values.target_stock_amount}
-              error={
-                formik.touched.target_stock_amount &&
-                formik.values.target_stock_amount < 1
-              }
-              helperText={
-                formik.touched.target_stock_amount &&
-                formik.values.target_stock_amount < 1 &&
-                `Stock amount  must be greater than or equal to 1`
-              }
+              value={formik.values.target_products[index].stock_amount}
+              error={getHelperText(index)}
+              helperText={getHelperText(index)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="start">
@@ -191,15 +240,32 @@ export default function ProcessProduct({
                   </InputAdornment>
                 ),
               }}
-              onChange={formik.handleChange}
             />
           </Stack>
-        </Box>
-      ) : (
-        <Button startIcon={<AddIcon />} onClick={modalSelectProduct.openModal}>
-          Select Product
+        </Stack>
+      ))}
+      <Stack
+        sx={[
+          formik.values.target_products.length === 0 && {
+            p: 3,
+            borderRadius: '8px',
+            border: '1px solid #E4E4E4',
+            justifyContent: 'center',
+            alignItems: 'center',
+            bgcolor: '#f8f8f8',
+            width: '100%',
+          },
+        ]}
+      >
+        <Button
+          startIcon={<AddIcon />}
+          onClick={modalSelectProduct.openModal}
+          variant="outlined"
+        >
+          {formik.values.target_products.length !== 0 ? 'Add More' : 'Select'}{' '}
+          Product
         </Button>
-      )}
+      </Stack>
     </Stack>
   );
 
@@ -218,7 +284,8 @@ export default function ProcessProduct({
       />
     </Stack>
   );
-  // console.log(isErrorValue);
+  // console.log('errro', formik.errors);
+  // console.log('value', formik.values);
 
   return (
     <ModalComp
@@ -317,11 +384,12 @@ export default function ProcessProduct({
           <Button
             type="submit"
             size="large"
-            disabled={
-              useExistingProduct
-                ? isErrorValue.useExisting
-                : isErrorValue.useNew || loadingForm
-            }
+            disabled={!formik.isValid}
+            // disabled={
+            //   useExistingProduct
+            //     ? isErrorValue.useExisting
+            //     : isErrorValue.useNew || loadingForm
+            // }
             // onClick={() => {
             //   // formik.handleSubmit();
             // }}
@@ -343,14 +411,25 @@ export default function ProcessProduct({
             );
           }}
           onSubmit={(e) => {
-            setSelectedExistingData(
-              productSelect.data.filter((val) => e.includes(val.id))[0],
-            );
+            formik.setFieldValue('target_products', [
+              ...formik.values.target_products,
+              { stock_amount: null, id: null },
+            ]);
+            formik.setValues({
+              ...formik.values,
+              target_products: [
+                ...formik.values.target_products,
+                { stock_amount: 0, id: e[0] },
+              ],
+            });
+            // setSelectedExistingData(
+            //   productSelect.data.filter((val) => e.includes(val.id))[0],
+            // );
           }}
           loading={productSelect.isLoading}
           title="Product"
           // multiple
-          value={selectedExistingData ? [selectedExistingData?.id] : []}
+          value={[]}
           data={productSelect.data}
           hidenData={[EditProduct?.id || 0]}
           renderItem={(val) => (
