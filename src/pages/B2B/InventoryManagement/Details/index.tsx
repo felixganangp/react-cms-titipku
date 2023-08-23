@@ -105,7 +105,7 @@ export default function InvoiceDetail() {
       id: 'Editor',
       label: 'Editor',
       align: 'left',
-      format: (val: Log) => <Typography>{val.created_by.name}</Typography>,
+      format: (val: Log) => <Typography>{val.editor.name}</Typography>,
     },
     {
       id: 'time',

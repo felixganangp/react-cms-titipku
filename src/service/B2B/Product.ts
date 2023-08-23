@@ -134,10 +134,13 @@ export const fetchDetails = (id: number | string) =>
     }
   });
 
-export const fetchLog = (params: LogParams) =>
+export const fetchLog = ({ product_id, ...params }: LogParams) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await http.get('/inventory/b2b/product/log', { params });
+      const response = await http.get(
+        `/inventory/b2b/product/${product_id}/log`,
+        { params },
+      );
       if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response
