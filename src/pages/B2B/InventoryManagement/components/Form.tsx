@@ -59,7 +59,6 @@ export default function Form({
   // Function for Proces Product =====
   const callOnChange = useCallback(() => {
     if (onChangeFormProces) onChangeFormProces(formik.values, formik.errors);
-    console.log(formik.errors);
   }, [formik.values, formik.errors]);
 
   useEffect(() => {
