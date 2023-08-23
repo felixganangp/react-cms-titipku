@@ -456,6 +456,9 @@ export default function InventoryPage() {
 
   // TABLE
   useEffect(() => {
+    dispatch(productAction.setActiveDashboard('all_stock'));
+  }, []);
+  useEffect(() => {
     dispatch(productAction.fetchData(product.params));
     dispatch(productAction.fetchTotalEmptyStock());
     dispatch(productAction.fetchTotalLowStock());
