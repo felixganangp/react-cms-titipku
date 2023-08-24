@@ -1,7 +1,4 @@
 import { useState, useEffect } from 'react';
-// import Box from '@mui/material/Box';
-// import Button from '@mui/material/Button';
-// import TextField from '@mui/material/TextField';
 import {
   Box,
   TextField,
@@ -9,7 +6,6 @@ import {
   InputAdornment,
   CircularProgress,
 } from '@mui/material';
-// import Autocomplete from '@mui/material/Autocomplete';
 // import CircularProgress from '@mui/material/CircularProgress';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -17,7 +13,7 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import useToast from 'hooks/useToast';
 import FormLabel from 'components/FormLabel';
 import { CreateSupplier } from 'models/b2b/Supplier';
-import { createSupplier } from 'service/B2B/Supplier';
+import { createSupplier, updateSupplier } from 'service/B2B/Supplier';
 import { SupplierAction } from 'store/slice/b2b/Supplier';
 
 const initial: CreateSupplier = {
@@ -58,7 +54,8 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
       };
       try {
         if (isEdit) {
-          await dispatch(SupplierAction.updateSupplier(payload));
+          // await dispatch(SupplierAction.updateSupplier(payload));
+          const updateUser = await updateSupplier(payload);
           toast.openToast({
             headMsg: 'Supplier Edited',
             severity: 'success',
@@ -74,6 +71,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
         await onClose();
       } catch (error: any) {
         const errMsg = error;
+        console.log('errmsg', errMsg);
         setErrorRsp({ error: true, message: errMsg });
       }
     },
@@ -123,15 +121,21 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
           <FormLabel
             text="Supplier Name"
             required
-            error={touched.name && Boolean(errors.name)}
-            helperText={touched.name && errors.name && `${errors.name}`}
+            error={(touched.name && Boolean(errors.name)) || errorRsp.error}
+            helperText={
+              (touched.name && errors.name && `${errors.name}`) ||
+              errorRsp.message
+            }
           >
             <TextField
               type="text"
               name="name"
               placeholder="Insert Supplier Name"
               value={values.name}
-              onChange={handleChange}
+              onChange={(event) => {
+                handleChange(event);
+                setErrorRsp({ error: false, message: '' });
+              }}
               onBlur={handleBlur}
               fullWidth
               inputProps={{
@@ -147,15 +151,11 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
           <FormLabel
             text="Phone Number"
             required
-            error={
-              (touched.phone_number && Boolean(errors.phone_number)) ||
-              errorRsp.error
-            }
+            error={touched.phone_number && Boolean(errors.phone_number)}
             helperText={
-              (touched.phone_number &&
-                errors.phone_number &&
-                `${errors.phone_number}`) ||
-              errorRsp.message
+              touched.phone_number &&
+              errors.phone_number &&
+              `${errors.phone_number}`
             }
           >
             <TextField
@@ -163,10 +163,7 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
               name="phone_number"
               placeholder="Insert active phone number"
               value={values.phone_number}
-              onChange={(event) => {
-                handleChange(event);
-                setErrorRsp({ error: false, message: '' });
-              }}
+              onChange={handleChange}
               onBlur={handleBlur}
               fullWidth
               sx={{
@@ -216,9 +213,6 @@ export default function Form({ onClose, isEdit, data }: FormProps) {
             boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
           }}
         >
-          {/* <Button variant="text" color="error" onClick={onClose}>
-            Cancel
-          </Button> */}
           <Button
             type="submit"
             disabled={

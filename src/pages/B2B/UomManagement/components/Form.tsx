@@ -58,7 +58,7 @@ export default function Form({ isEdit, selected, onClose }: FormTypes) {
       <Box p="24px">
         <FormLabel
           required
-          text="Category Name"
+          text="UoM Name"
           error={
             (formik.touched.name && Boolean(formik.errors.name)) ||
             formik.touched.name
@@ -70,7 +70,7 @@ export default function Form({ isEdit, selected, onClose }: FormTypes) {
           <TextField
             type="text"
             name="name"
-            placeholder="Insert Category Name"
+            placeholder="Insert UoM Name"
             value={formik.values.name}
             onChange={(e) => {
               formik.handleChange(e);
