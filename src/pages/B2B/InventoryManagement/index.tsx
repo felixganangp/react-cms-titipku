@@ -540,15 +540,15 @@ export default function InventoryPage() {
         <Typography>Rp {numberSeperator(val?.average_price || 0)}</Typography>
       ),
     },
-    {
-      id: 'selling_price',
-      label: 'Selling Price',
-      align: 'left',
-      enableSort: false,
-      format: (val: Product) => (
-        <Typography>Rp {numberSeperator(val?.selling_price || 0)}</Typography>
-      ),
-    },
+    // {
+    //   id: 'selling_price',
+    //   label: 'Selling Price',
+    //   align: 'left',
+    //   enableSort: false,
+    //   format: (val: Product) => (
+    //     <Typography>Rp {numberSeperator(val?.selling_price || 0)}</Typography>
+    //   ),
+    // },
 
     {
       id: 'category',

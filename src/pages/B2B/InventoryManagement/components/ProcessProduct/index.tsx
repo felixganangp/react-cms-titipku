@@ -384,7 +384,9 @@ export default function ProcessProduct({
           <Button
             type="submit"
             size="large"
-            disabled={!formik.isValid}
+            disabled={
+              !formik.isValid || formik.values.source_stock_amount === 0
+            }
             // disabled={
             //   useExistingProduct
             //     ? isErrorValue.useExisting
@@ -431,7 +433,10 @@ export default function ProcessProduct({
           // multiple
           value={[]}
           data={productSelect.data}
-          hidenData={[EditProduct?.id || 0]}
+          hidenData={[
+            EditProduct?.id || 0,
+            ...formik.values.target_products.map((val) => val.id),
+          ]}
           renderItem={(val) => (
             <Stack direction="row" gap={1} alignItems="center">
               <Box

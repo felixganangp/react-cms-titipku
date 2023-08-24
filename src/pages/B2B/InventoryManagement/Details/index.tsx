@@ -142,7 +142,7 @@ export default function InvoiceDetail() {
                 {val.changes.columns.map((item, index) => (
                   <Stack direction="row" key={index} alignItems="center">
                     <FiberManualRecordIcon sx={{ fontSize: 5, mx: 1 }} />
-                    <Typography fontSize={14} fontWeight={500}>
+                    <Typography fontSize={14} fontWeight={600} mr={1}>
                       {item.name.replace(/([a-z])([A-Z])/g, '$1 $2')}:
                     </Typography>
                     <Typography fontSize={14}>
@@ -197,7 +197,35 @@ export default function InvoiceDetail() {
               </Stack>
             );
             break;
-
+          case 'inbound':
+            text = `Add Inbound`;
+            render = (
+              <Stack>
+                {val.changes.columns.map((item, index) => (
+                  <Stack direction="row" key={index} alignItems="center">
+                    <FiberManualRecordIcon sx={{ fontSize: 5, mx: 1 }} />
+                    <Typography fontSize={14} fontWeight={600} mr={1}>
+                      {item.name.replace(/([a-z])([A-Z])/g, '$1 $2')}:
+                    </Typography>
+                    <Typography fontSize={14}>
+                      Before: {item.old_value}{' '}
+                      {val.changes?.unit_measurement || ''}, After:{' '}
+                      {item.new_value} {val.changes?.unit_measurement || ''}
+                    </Typography>
+                  </Stack>
+                ))}
+                <Stack direction="row" alignItems="center">
+                  <FiberManualRecordIcon sx={{ fontSize: 5, mx: 1 }} />
+                  <Typography fontSize={14} fontWeight={600} mr={1}>
+                    Supplier:
+                  </Typography>
+                  <Typography fontSize={14}>
+                    {val.changes?.inbound_supplier || '-'}
+                  </Typography>
+                </Stack>
+              </Stack>
+            );
+            break;
           default:
             break;
         }

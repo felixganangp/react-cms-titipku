@@ -141,42 +141,46 @@ export default function Form({
             fullWidth
           />
         </FormLabel>
-        <FormLabel
-          required
-          text="Price"
-          error={
-            formik.touched.selling_price && Boolean(formik.errors.selling_price)
-          }
-          helperText={
-            formik.touched.selling_price &&
-            formik.errors.selling_price &&
-            `${formik.errors.selling_price}`
-          }
-        >
-          <TextField
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') e.preventDefault();
-            }}
-            type="text"
-            name="selling_price"
-            placeholder="Insert Price"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">Rp</InputAdornment>
-              ),
-            }}
-            onBlur={formik.handleBlur}
-            fullWidth
-            value={numberSeperator(formik.values.selling_price)}
-            onChange={(e) => {
-              const value = e.target.value
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
+        {!props.EditProduct && (
+          <FormLabel
+            required
+            text="Initial Price"
+            error={
+              formik.touched.selling_price &&
+              Boolean(formik.errors.selling_price)
+            }
+            helperText={
+              formik.touched.selling_price &&
+              formik.errors.selling_price &&
+              `${formik.errors.selling_price}`
+            }
+          >
+            <TextField
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') e.preventDefault();
+              }}
+              type="text"
+              name="selling_price"
+              placeholder="Insert Price"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Rp</InputAdornment>
+                ),
+              }}
+              onBlur={formik.handleBlur}
+              fullWidth
+              value={numberSeperator(formik.values.selling_price)}
+              onChange={(e) => {
+                const value = e.target.value
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
 
-              formik.setFieldValue('selling_price', value);
-            }}
-          />
-        </FormLabel>
+                formik.setFieldValue('selling_price', value);
+              }}
+            />
+          </FormLabel>
+        )}
+
         <FormLabel
           required
           text="Category"
