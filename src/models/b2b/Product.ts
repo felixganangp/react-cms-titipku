@@ -130,6 +130,7 @@ export interface ChangesLog {
   unit_measurement?: string;
   is_new_product?: boolean;
   process_product?: string;
+  inbound_supplier?: string;
 }
 
 export interface ColumnLog {
