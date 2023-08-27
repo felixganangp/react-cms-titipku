@@ -211,7 +211,16 @@ export default function ProcessProduct({
                   />
                   <Typography>{item.name}</Typography>
                 </Stack>
-                <IconButton onClick={() => setSelectedExistingData(null)}>
+                <IconButton
+                  onClick={() => {
+                    formik.setValues({
+                      ...formik.values,
+                      target_products: formik.values.target_products.filter(
+                        (_item) => _item.id !== item.id,
+                      ),
+                    });
+                  }}
+                >
                   <TrashIcon sx={{ fontSize: 30 }} />
                 </IconButton>
               </Stack>
@@ -413,10 +422,10 @@ export default function ProcessProduct({
             );
           }}
           onSubmit={(e) => {
-            formik.setFieldValue('target_products', [
-              ...formik.values.target_products,
-              { stock_amount: null, id: null },
-            ]);
+            // formik.setFieldValue('target_products', [
+            //   ...formik.values.target_products,
+            //   { stock_amount: null, id: null },
+            // ]);
             formik.setValues({
               ...formik.values,
               target_products: [
