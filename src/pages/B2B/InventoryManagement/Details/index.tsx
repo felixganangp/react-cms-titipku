@@ -28,6 +28,7 @@ import moment from 'moment';
 import { uiAction } from 'store/slice/ui';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { CardContainer, StatusColor } from '../inventory.styled';
+
 import Form from '../components/Form';
 
 export default function InvoiceDetail() {
@@ -207,11 +208,18 @@ export default function InvoiceDetail() {
                     <Typography fontSize={14} fontWeight={600} mr={1}>
                       {item.name.replace(/([a-z])([A-Z])/g, '$1 $2')}:
                     </Typography>
-                    <Typography fontSize={14}>
-                      Before: {item.old_value}{' '}
-                      {val.changes?.unit_measurement || ''}, After:{' '}
-                      {item.new_value} {val.changes?.unit_measurement || ''}
-                    </Typography>
+                    {item.name === 'AveragePrice' ? (
+                      <Typography>
+                        Before: Rp {numberSeperator(item.old_value)} , After: Rp{' '}
+                        {numberSeperator(item.new_value)}
+                      </Typography>
+                    ) : (
+                      <Typography fontSize={14}>
+                        Before: {item.old_value}{' '}
+                        {val.changes?.unit_measurement || ''}, After:{' '}
+                        {item.new_value} {val.changes?.unit_measurement || ''}
+                      </Typography>
+                    )}
                   </Stack>
                 ))}
                 <Stack direction="row" alignItems="center">
