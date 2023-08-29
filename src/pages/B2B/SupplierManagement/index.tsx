@@ -257,7 +257,10 @@ export default function SupplierPage() {
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Button
             startIcon={<AddIcon />}
-            onClick={formModal.openModal}
+            onClick={() => {
+              formModal.openModal();
+              setSelected([]);
+            }}
             size="large"
           >
             Add Supplier
