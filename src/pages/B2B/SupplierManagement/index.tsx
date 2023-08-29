@@ -108,6 +108,16 @@ export default function SupplierPage() {
     },
   });
 
+  const onSetFormData = () =>
+    setFormData({
+      isEdit: false,
+      data: {
+        name: '',
+        address: '',
+        phone_number: '',
+      },
+    });
+
   const onCloseForm = async () => {
     await dispatch(SupplierAction.fetchData(supplier.params));
     dispatch(
@@ -120,14 +130,15 @@ export default function SupplierPage() {
         noUndo: true,
       }),
     );
-    setFormData({
-      isEdit: false,
-      data: {
-        name: '',
-        address: '',
-        phone_number: '',
-      },
-    });
+    onSetFormData();
+    // setFormData({
+    //   isEdit: false,
+    //   data: {
+    //     name: '',
+    //     address: '',
+    //     phone_number: '',
+    //   },
+    // });
     setSelected([]);
     formModal.closeModal();
   };
@@ -310,7 +321,11 @@ export default function SupplierPage() {
       <ModalComp
         open={formModal.open}
         title={`${formData.isEdit ? 'Edit ' : 'Add New '} Supplier`}
-        onClose={formModal.closeModal}
+        onClose={() => {
+          formModal.closeModal();
+          onSetFormData();
+          setSelected([]);
+        }}
       >
         <FormSupplier
           onClose={onCloseForm}
