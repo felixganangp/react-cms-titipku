@@ -484,7 +484,7 @@ const ProductSlice = createSlice({
     },
     resetCategoryform(state: ProductProps) {
       state.category.loadingForm = false;
-      state.category.loadingForm = false;
+      state.category.isLoading = false;
     },
   },
 });

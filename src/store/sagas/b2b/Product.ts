@@ -844,7 +844,7 @@ function* createCategory(payload: PayloadAction<CreateUomTypes>) {
       const error = err as string;
       yield put(
         uiAction.openToast({
-          headMsg: 'Error create Uom',
+          headMsg: 'Error create Category',
           message: error,
           severity: 'error',
         }),
@@ -852,7 +852,7 @@ function* createCategory(payload: PayloadAction<CreateUomTypes>) {
     } else {
       yield put(
         uiAction.openToast({
-          headMsg: 'Error create Uom',
+          headMsg: 'Error create Category',
           message: 'interval server error',
           severity: 'error',
         }),
@@ -898,7 +898,7 @@ function* updateCategory(
       const error = err as string;
       yield put(
         uiAction.openToast({
-          headMsg: 'Error create Uom',
+          headMsg: 'Error update Category',
           message: error,
           severity: 'error',
         }),
@@ -906,7 +906,7 @@ function* updateCategory(
     } else {
       yield put(
         uiAction.openToast({
-          headMsg: 'Error create Uom',
+          headMsg: 'Error update Category',
           message: 'interval server error',
           severity: 'error',
         }),
