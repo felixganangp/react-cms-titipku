@@ -19,9 +19,7 @@ interface CustomerInitialProps {
   params: CustomerParams;
   details: Customer | null;
   stateFilter?: {
-    typeKur?: Type | null;
-    areaKur?: Area[] | [];
-    creditScore?: UserCreditScore | null;
+    status: number;
   };
   loadingMerchantExist: boolean;
   merchantExistMsg: string;
@@ -38,11 +36,10 @@ const initialState: CustomerInitialProps = {
     search: '',
     order_by: 'id',
     order_type: 'desc',
+    status: 1,
   },
   stateFilter: {
-    typeKur: null,
-    areaKur: [],
-    creditScore: null,
+    status: 1,
   },
   details: null,
   loadingMerchantExist: false,
@@ -113,9 +110,7 @@ const CustomerSlice = createSlice({
     setFilter(
       state: CustomerInitialProps,
       action: PayloadAction<{
-        typeKur: Type | null;
-        areaKur: Area[] | undefined;
-        creditScore: UserCreditScore | null;
+        status?: number;
       }>,
     ) {
       state.stateFilter = {

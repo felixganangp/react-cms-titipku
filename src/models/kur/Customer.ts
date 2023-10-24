@@ -40,38 +40,59 @@ export interface CreateCustomer {
 
 export interface Customer {
   id?: number;
-  created_at: number;
-  updated_at: number;
-  created_by_id: number;
-  created_by_type: string;
-  created_by: object;
-  updated_by_id: number;
-  updated_by_type: string;
-  updated_by: object;
-  user_id: number;
-  user_type: string;
-  user: Merchant;
-  kur_user_number?: string;
-  name: string;
-  nik: string;
-  birth_date: number;
-  email: string;
+  user_number: string;
+  debtor_name: string;
+  merchant_name: string;
+  request_number: string;
   phone_number: string;
-  registered_address: string;
-  living_address: string;
-  credit_limit: number;
-  admin_fee: number;
-  dpd_rate: number;
-  user_account_number: string;
-  user_bank: string;
-  nobu_account_number: string;
-  join_date?: number;
-  kur_user_status: KurUserStatus;
-  kur_user_type: KurUserType;
-  kur_user_document: KurUserDocument[];
-  total_outstanding_amount: number;
-  kur_user_credit_score: UserCreditScore;
+  family_phone_number: string;
+  business_lifetime: number;
+  marriage_status: string;
+  marriage_partner_name: string;
+  limit_request_plafon: number;
+  limit_request_cash: number;
+  limit_plafon: string | null;
+  limit_cash: string | null;
+  user_type_id: number;
+  user_status_id: number;
+  bi_checking_status: string;
+  bi_checking_notes: string | null;
+  komite_notes: string | null;
+  is_merchant_titipku: boolean;
+  area_id: number;
+  area_name: string;
+  created_by: number;
+  last_co_id: number | null;
+  last_komite_id: number | null;
+  last_admin_id: number | null;
+  category_jelajah_id: number;
+  category_jelajah_name: string;
+  batch_id: number | null;
+  balance: number;
+  created_at: number;
+  updated_at: number | null;
+  deleted_at: number | null;
+  user_status: CustomerStatus;
+  user_type: CustomerType;
 }
+
+export interface CustomerStatus {
+  id: number;
+  name: string;
+}
+
+export interface CustomerType {
+  id: number;
+  name: string;
+}
+
+export interface BiChecking {
+  id: number;
+  bi_checking_status_id: number;
+  bi_checking_status_notes: string;
+}
+
+// old
 export interface KurUserStatus {
   id?: number;
   created_at: number;
@@ -86,14 +107,7 @@ export interface KurUserStatus {
 
 export interface KurUserType {
   id?: number;
-  created_at: number;
-  updated_at: number;
-  created_by_id: number;
-  created_by_type: string;
-  updated_by_id: number;
-  updated_by_type: string;
-  name: string;
-  description: string;
+  name?: string;
 }
 
 export interface KurUserDocument {
@@ -112,9 +126,10 @@ export interface KurUserDocument {
 }
 
 export interface CustomerParams extends ListParams {
-  kur_user_type_id?: number;
-  area_ids?: string;
-  credit_score?: number;
+  // kur_user_type_id?: number;
+  // area_ids?: string;
+  // credit_score?: number;
+  status?: number;
 }
 
 export interface BankList {

@@ -15,6 +15,7 @@ import productsReducer from './slice/b2b/Product';
 import rawsReducer from './slice/b2b/ProductRaw';
 import inboundReducer from './slice/b2b/Inbound';
 import supplierReducer from './slice/b2b/Supplier';
+import financingCustomerReducer from './slice/financing/Customer';
 
 const reducers = {
   ui: uiReducer,
@@ -23,6 +24,7 @@ const reducers = {
   roleAccess: roleAccessReducer,
   userDetails: userDetailsReducer,
   customerKur: customerKurReducer,
+  customerFinancing: financingCustomerReducer,
   typeKur: typeKurReducer,
   area: areaReducer,
   request: requestKURReducer,

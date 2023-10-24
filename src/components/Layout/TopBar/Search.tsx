@@ -34,7 +34,7 @@ const StyledSearchbar = styled('div')<{ openSidebar: boolean }>(
     right: 0,
     zIndex: 99,
     width: `${(props: { openSidebar: boolean }) =>
-      props.openSidebar ? 'calc(100vw - 100px)' : 'calc(100vw - 236px)'}`,
+      props.openSidebar ? 'calc(100vw - 100px)' : 'calc(100vw - 266px)'}`,
     display: 'flex',
     position: 'absolute',
     alignItems: 'center',

@@ -35,6 +35,7 @@ import {
   CreateCustomer,
   UserCreditScore,
 } from 'models/kur/Customer';
+// import { Customer } from 'models/financing/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
 import { MerchantResp } from 'models/Merchant';
@@ -42,7 +43,7 @@ import debounce from 'utils/debounce';
 import { getColorCreditScore } from 'utils/creditScoreColor';
 import bankData from 'data/list-bank.json';
 
-import FormCustomer from './components/form';
+// import FormCustomer from '../Verification/components/form';
 
 interface FormDataType {
   isEdit: boolean;
@@ -137,137 +138,157 @@ export default function KurCustomer() {
     return result;
   };
 
-  const getInitialData = (val: Customer) => {
-    const birthDate = new Date(0);
-    birthDate.setUTCSeconds(val.birth_date);
-    const date = birthDate.getDate();
-    const month = birthDate.getMonth();
-    const year = birthDate.getFullYear();
-    const d = moment({ year, month, day: date });
-    // const convertBirthDate = `${date}/${month + 1}/${year}`;
-    const convertBirthDate = moment(birthDate).format('MM/DD/YYYY');
-    const findBank = bankData.data.filter((el) => el.name === val.user_bank);
+  // const getInitialData = (val: Customer) => {
+  //   const birthDate = new Date(0);
+  //   birthDate.setUTCSeconds(val.birth_date);
+  //   const date = birthDate.getDate();
+  //   const month = birthDate.getMonth();
+  //   const year = birthDate.getFullYear();
+  //   const d = moment({ year, month, day: date });
+  //   const convertBirthDate = moment(birthDate).format('MM/DD/YYYY');
+  //   const findBank = bankData.data.filter((el) => el.name === val.user_bank);
 
-    const findKtp = val.kur_user_document.filter(
-      (el) => el.document_type === 'ktp',
-    );
-    const findKk = val.kur_user_document.filter(
-      (el) => el.document_type === 'kk',
-    );
-    const findNpwp = val.kur_user_document.filter(
-      (el) => el.document_type === 'npwp',
-    );
-    const findSKU = val.kur_user_document.filter(
-      (el) => el.document_type === 'sku',
-    );
-    const merchantName: MerchantResp = {
-      merchant_name: val.user.name,
-      id: val.user.id,
-    };
+  //   const findKtp = val.kur_user_document.filter(
+  //     (el) => el.document_type === 'ktp',
+  //   );
+  //   const findKk = val.kur_user_document.filter(
+  //     (el) => el.document_type === 'kk',
+  //   );
+  //   const findNpwp = val.kur_user_document.filter(
+  //     (el) => el.document_type === 'npwp',
+  //   );
+  //   const findSKU = val.kur_user_document.filter(
+  //     (el) => el.document_type === 'sku',
+  //   );
+  //   const merchantName: MerchantResp = {
+  //     merchant_name: val.user.name,
+  //     id: val.user.id,
+  //   };
 
-    const pasarName: Area = {
-      id: val.user.area.id,
-      title: val.user.area.name,
-    };
-    const initialDataPayload = {
-      // imageCustomer: '',
-      idCustomer: val.id?.toString(),
-      name: val.name,
-      kurType: val.kur_user_type,
-      adminFee: val.admin_fee.toString(),
-      dpdRate: val.dpd_rate.toString(),
-      birthDate: d,
-      phoneNumber: val.phone_number,
-      email: val.email,
-      addressKtp: val.registered_address,
-      addressDomisili: val.living_address,
-      pasarName,
-      merchantName,
-      nikKtp: findKtp[0].document_number,
-      oldNikKtp: findKtp[0].document_number,
-      imageNik: findKtp[0].document_filepath,
-      kkNumber: findKk[0].document_number,
-      oldKkNumber: findKk[0].document_number,
-      imageKk: findKk[0].document_filepath,
-      npwp: findNpwp[0].document_number,
-      oldNpwp: findNpwp[0].document_number,
-      imageNpwp: findNpwp[0].document_filepath,
-      imageSKUsaha: findSKU[0].document_filepath,
-      creditLimit: val.credit_limit.toString(),
-      bankName: findBank[0],
-      bankNumberPrimary: val.user_account_number,
-      nobuAccountNumber: val.nobu_account_number,
-      idImageNik: findKtp[0].id,
-      idImageKk: findKk[0].id,
-      idImageNpwp: findNpwp[0].id,
-      idImageSKUsaha: findSKU[0].id,
-      kurUserStatus: val.kur_user_status.id?.toString(),
-    };
-    return initialDataPayload;
-  };
+  //   const pasarName: Area = {
+  //     id: val.user.area.id,
+  //     title: val.user.area.name,
+  //   };
+  //   const initialDataPayload = {
+  //     idCustomer: val.id?.toString(),
+  //     name: val.name,
+  //     userType: val.user_type,
+  //     adminFee: val.admin_fee.toString(),
+  //     dpdRate: val.dpd_rate.toString(),
+  //     birthDate: d,
+  //     phoneNumber: val.phone_number,
+  //     email: val.email,
+  //     addressKtp: val.registered_address,
+  //     addressDomisili: val.living_address,
+  //     pasarName,
+  //     merchantName,
+  //     nikKtp: findKtp[0].document_number,
+  //     oldNikKtp: findKtp[0].document_number,
+  //     imageNik: findKtp[0].document_filepath,
+  //     kkNumber: findKk[0].document_number,
+  //     oldKkNumber: findKk[0].document_number,
+  //     imageKk: findKk[0].document_filepath,
+  //     npwp: findNpwp[0].document_number,
+  //     oldNpwp: findNpwp[0].document_number,
+  //     imageNpwp: findNpwp[0].document_filepath,
+  //     imageSKUsaha: findSKU[0].document_filepath,
+  //     creditLimit: val.credit_limit.toString(),
+  //     bankName: findBank[0],
+  //     bankNumberPrimary: val.user_account_number,
+  //     nobuAccountNumber: val.nobu_account_number,
+  //     idImageNik: findKtp[0].id,
+  //     idImageKk: findKk[0].id,
+  //     idImageNpwp: findNpwp[0].id,
+  //     idImageSKUsaha: findSKU[0].id,
+  //     kurUserStatus: val.kur_user_status.id?.toString(),
+  //   };
+  //   return initialDataPayload;
+  // };
 
-  const [formHead, setFormHead] = useState('');
-  const handleOpenEdit = (val: Customer) => {
-    setFormHead('Edit Customer');
-    const initialDataPayload = getInitialData(val);
-    setFormData({
-      isEdit: true,
-      initialData: initialDataPayload,
-    });
-    formModal.openModal();
-  };
-  const handleOpenAdd = () => {
-    setFormHead('Add Customer');
-    formModal.openModal();
-  };
+  // const [formHead, setFormHead] = useState('');
+  // const handleOpenEdit = (val: Customer) => {
+  //   setFormHead('Edit Customer');
+  //   const initialDataPayload = getInitialData(val);
+  //   setFormData({
+  //     isEdit: true,
+  //     initialData: initialDataPayload,
+  //   });
+  //   formModal.openModal();
+  // };
+  // const handleOpenAdd = () => {
+  //   setFormHead('Add Customer');
+  //   formModal.openModal();
+  // };
 
-  const convertStrCreditScore = (val: string) => {
-    const splitStr = val.split(' ');
-    const firstCharUpperCase = splitStr.map((el) => {
-      return el.charAt(0).toUpperCase() + el.slice(1);
-    });
+  // const convertStrCreditScore = (val: string) => {
+  //   const splitStr = val.split(' ');
+  //   const firstCharUpperCase = splitStr.map((el) => {
+  //     return el.charAt(0).toUpperCase() + el.slice(1);
+  //   });
 
-    const result = firstCharUpperCase.join(' ');
-    return result;
-  };
+  //   const result = firstCharUpperCase.join(' ');
+  //   return result;
+  // };
 
-  const handleHoldCustomer = async (val: Customer) => {
-    let statusId;
-    if (val.kur_user_status?.id === 3) {
-      statusId = 1;
-    }
-    if (val.kur_user_status?.id === 1) {
-      statusId = 3;
-    }
-    const newPayload: Customer = {
-      ...val,
-      kur_user_status: { ...val.kur_user_status, id: statusId },
-    };
-    const initialDataPayload = getInitialData(newPayload);
-    await dispatch(customerAction.editCustomer(initialDataPayload));
-  };
+  // const handleHoldCustomer = async (val: Customer) => {
+  //   let statusId;
+  //   if (val.kur_user_status?.id === 3) {
+  //     statusId = 1;
+  //   }
+  //   if (val.kur_user_status?.id === 1) {
+  //     statusId = 3;
+  //   }
+  //   const newPayload: Customer = {
+  //     ...val,
+  //     kur_user_status: { ...val.kur_user_status, id: statusId },
+  //   };
+  //   const initialDataPayload = getInitialData(newPayload);
+  //   await dispatch(customerAction.editCustomer(initialDataPayload));
+  // };
+
   const headCell = [
     {
       id: 'id',
       label: 'ID',
       align: 'left',
-      // format: (val: Customer) => <div>{val.kur_user_number}</div>,
+      format: (val: Customer) => <div>{val.id}</div>,
       enableSort: true,
     },
     {
-      id: 'name',
-      label: 'Name',
+      id: 'user_number',
+      label: 'User Number',
       align: 'left',
       width: '200px',
-      // format: (val: Customer) => <div>{val.name}</div>,
+      format: (val: Customer) => <div>{val.user_number}</div>,
       enableSort: true,
+    },
+    {
+      id: 'debtor_name',
+      label: 'Debtor Name',
+      align: 'left',
+      width: '200px',
+      format: (val: Customer) => <div>{val.debtor_name}</div>,
+      enableSort: true,
+    },
+    {
+      id: 'merchant',
+      label: 'Merchant',
+      align: 'left',
+      width: '410px',
+      format: (val: Customer) => <div>{val.merchant_name}</div>,
+    },
+    {
+      id: 'pasar',
+      label: 'Pasar',
+      align: 'left',
+      format: (val: Customer) => <div>{val.merchant_name}</div>,
     },
     {
       id: 'kur_user_type',
       label: 'KUR Type',
       align: 'left',
       width: '95px',
-      format: (val: Customer) => <div>{val.kur_user_type.name}</div>,
+      format: (val: Customer) => <div>{val.user_type.name}</div>,
       enableSort: true,
     },
     {
@@ -277,43 +298,30 @@ export default function KurCustomer() {
       width: '100px',
       format: (val: Customer) => <div>{convertDate(val.created_at)}</div>,
     },
-    {
-      id: 'merchant',
-      label: 'Merchant',
-      align: 'left',
-      width: '410px',
-      format: (val: Customer) => <div>{val.user.name}</div>,
-    },
-    {
-      id: 'pasar',
-      label: 'Pasar',
-      align: 'left',
-      format: (val: Customer) => <div>{val.user.area.name}</div>,
-    },
-    {
-      id: 'kur_user_credit_score',
-      label: 'Credit Score',
-      align: 'left',
-      width: '200px',
-      enableSort: true,
-      format: (val: Customer) => {
-        const bgColor = getColorCreditScore(val.kur_user_credit_score.id);
-        return (
-          <Chip
-            sx={{
-              borderRadius: '8px',
-              paddingX: '16px',
-              paddingY: '8px',
-              color: '#fff',
-              backgroundColor: bgColor,
-              fontSize: '12px',
-              fontWeight: 500,
-            }}
-            label={convertStrCreditScore(val.kur_user_credit_score.name)}
-          />
-        );
-      },
-    },
+    // {
+    //   id: 'kur_user_credit_score',
+    //   label: 'Credit Score',
+    //   align: 'left',
+    //   width: '200px',
+    //   enableSort: true,
+    //   format: (val: Customer) => {
+    //     const bgColor = getColorCreditScore(val.kur_user_credit_score.id);
+    //     return (
+    //       <Chip
+    //         sx={{
+    //           borderRadius: '8px',
+    //           paddingX: '16px',
+    //           paddingY: '8px',
+    //           color: '#fff',
+    //           backgroundColor: bgColor,
+    //           fontSize: '12px',
+    //           fontWeight: 500,
+    //         }}
+    //         label={convertStrCreditScore(val.kur_user_credit_score.name)}
+    //       />
+    //     );
+    //   },
+    // },
     {
       id: 'action',
       label: 'Action',
@@ -332,18 +340,18 @@ export default function KurCustomer() {
               {
                 label: `Edit`,
                 onClick: () => {
-                  handleOpenEdit(val);
+                  console.log('edit');
                 },
                 dataId: 'button-edit-customer',
               },
-              {
-                label: val.kur_user_status?.id === 3 ? 'Active' : 'Hold',
-                color: val.kur_user_status?.id === 3 ? '#008e58' : '#c10000',
-                onClick: () => {
-                  handleHoldCustomer(val);
-                },
-                dataId: 'button-hold-customer',
-              },
+              // {
+              //   label: val.kur_user_status?.id === 3 ? 'Active' : 'Hold',
+              //   color: val.kur_user_status?.id === 3 ? '#008e58' : '#c10000',
+              //   onClick: () => {
+              //     handleHoldCustomer(val);
+              //   },
+              //   dataId: 'button-hold-customer',
+              // },
             ]}
           >
             <IconButton>
@@ -548,7 +556,7 @@ export default function KurCustomer() {
                 width="100%"
                 sx={{ display: 'flex', gap: 2, alignContent: 'center' }}
               >
-                <Button
+                {/* <Button
                   data-testid="button-add-customer"
                   sx={{ width: '180px' }}
                   startIcon={<AddIcon />}
@@ -557,9 +565,9 @@ export default function KurCustomer() {
                   }}
                 >
                   Add Customer
-                </Button>
+                </Button> */}
                 <Box
-                  width="90%"
+                  width="100%"
                   display="flex"
                   justifyContent="space-between"
                   gap="20px"
@@ -782,9 +790,9 @@ export default function KurCustomer() {
           </Box>
         </Grid>
       </Grid>
-      <Modal open={formModal.open} title={formHead} onClose={formHandleClose}>
+      {/* <Modal open={formModal.open} title={formHead} onClose={formHandleClose}>
         <FormCustomer onClose={formHandleClose} formData={formData} />
-      </Modal>
+      </Modal> */}
     </Box>
   );
 }
