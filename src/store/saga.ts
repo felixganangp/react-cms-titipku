@@ -2,7 +2,6 @@ import { all } from 'redux-saga/effects';
 import roleUserSagas from 'store/sagas/RoleUser';
 import roleAccessSagas from 'store/sagas/RoleAccess';
 import customerKurSagas from 'store/sagas/kur/Customer';
-import customerFinancingSagas from 'store/sagas/financing/Customer';
 import typeKurSagas from 'store/sagas/kur/Type';
 import areaSagas from 'store/sagas/Area';
 import userDetailsSaga from './sagas/UserDetails';
@@ -22,7 +21,6 @@ export default function* rootSaga() {
     roleAccessSagas(),
     userDetailsSaga(),
     customerKurSagas(),
-    customerFinancingSagas(),
     typeKurSagas(),
     areaSagas(),
     requestKurSagas(),

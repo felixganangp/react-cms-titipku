@@ -42,16 +42,16 @@ import {
   CustomerParams,
   CreateCustomer,
   UserCreditScore,
+  ReviewCustomer,
 } from 'models/kur/Customer';
-// import { Customer } from 'models/financing/Customer';
+import * as customerService from 'service/Kur/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
 import { MerchantResp } from 'models/Merchant';
 import debounce from 'utils/debounce';
-import { getColorCreditScore } from 'utils/creditScoreColor';
-import bankData from 'data/list-bank.json';
-
-// import FormCustomer from '../Verification/components/form';
+import useToast from 'hooks/useToast';
+import FormBiChecking from './components/form-bi-checking';
+import FormCustomerReview from './components/form-customer-review';
 
 interface FormDataType {
   isEdit: boolean;
@@ -59,6 +59,7 @@ interface FormDataType {
 }
 
 export default function KurCustomerVerification() {
+  const toast = useToast();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const customerKur = useAppSelector((state) => state.customerKur);
@@ -68,6 +69,7 @@ export default function KurCustomerVerification() {
 
   // Batch Action
   const [selected, setSelected] = useState<(number | string)[]>([]);
+  const [selectedSingle, setSelectedSingle] = useState<number | undefined>(0);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer[]>([]);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -76,6 +78,22 @@ export default function KurCustomerVerification() {
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleVerify = async (id: number | undefined) => {
+    console.log();
+    // const formData = new FormData();
+    const data: ReviewCustomer = {
+      new_status: 6,
+      komite_notes: '',
+      id,
+    };
+    const updateUser = await customerService.updateStatusCustomer(data);
+    toast.openToast({
+      headMsg: 'Customer Verified',
+      severity: 'success',
+    });
+    // customerService.updateStatusCustomer(id, formData);
   };
 
   useEffect(() => {
@@ -123,12 +141,10 @@ export default function KurCustomerVerification() {
   };
   const [openFilter, setOpenFilter] = useState(false);
   const [userTab, setUserTab] = useState(0);
-  const [formData, setFormData] = useState<FormDataType>({
-    isEdit: false,
-    initialData,
-  });
+  const [biCheckingData, setBiCheckingData] = useState<Customer[]>();
 
-  const formModal = useModal();
+  const formBiChecking = useModal();
+  const formCustomerReview = useModal();
 
   const convertDate = (date: number) => {
     const d = new Date(0); // The 0 there is the key, which sets the date to the epoch
@@ -253,7 +269,23 @@ export default function KurCustomerVerification() {
                 dataId: 'button-details-customer',
               },
               {
-                label: `Edit`,
+                label: `Approve`,
+                onClick: () => {
+                  setSelectedSingle(val.id);
+                  formCustomerReview.openModal();
+                },
+                dataId: 'button-review-customer',
+              },
+              {
+                label: `Verify`,
+                onClick: () => {
+                  setSelectedSingle(val.id);
+                  handleVerify(val.id);
+                },
+                dataId: 'button-review-customer',
+              },
+              {
+                label: `Reject`,
                 onClick: () => {
                   console.log('edit');
                 },
@@ -399,18 +431,16 @@ export default function KurCustomerVerification() {
 
   const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
 
+  const handleBiChecking = () => {
+    formBiChecking.openModal();
+  };
+
   const formHandleClose = async () => {
-    // await dispatch(
-    //   customerAction.setParams({
-    //     page: 1,
-    //     count: 10,
-    //     search: '',
-    //     order_by: 'id',
-    //     order_type: 'desc',
-    //   }),
-    // );
-    setFormData({ isEdit: false, initialData });
-    await formModal.closeModal();
+    await formBiChecking.closeModal();
+  };
+
+  const formHandleCloseReview = async () => {
+    await formCustomerReview.closeModal();
   };
 
   return (
@@ -495,9 +525,10 @@ export default function KurCustomerVerification() {
                       }}
                     >
                       <MenuItem
-                        onClick={() => {
-                          console.log(selectedCustomer);
-                        }}
+                        onClick={
+                          // formBiChecking.openModal();
+                          handleBiChecking
+                        }
                       >
                         Bi Checking
                       </MenuItem>
@@ -688,8 +719,9 @@ export default function KurCustomerVerification() {
               >
                 <Tabs.Item label="New" />
                 <Tabs.Item label="Bi-Checking" />
-                <Tabs.Item label="CO" />
-                <Tabs.Item label="Final Review" />
+                <Tabs.Item label="Komite Review" />
+                <Tabs.Item label="Location Check" />
+                {/* <Tabs.Item label="Final Review" /> */}
               </Tabs.Container>
             </Box>
             <Table
@@ -731,9 +763,26 @@ export default function KurCustomerVerification() {
           </Box>
         </Grid>
       </Grid>
-      {/* <Modal open={formModal.open} title={formHead} onClose={formHandleClose}>
-        <FormCustomer onClose={formHandleClose} formData={formData} />
-      </Modal> */}
+      <Modal
+        open={formBiChecking.open}
+        title="Bi Cheking"
+        onClose={formHandleClose}
+      >
+        <FormBiChecking
+          onClose={formHandleClose}
+          biCheckingData={selectedCustomer}
+        />
+      </Modal>
+      <Modal
+        open={formCustomerReview.open}
+        title="Komite Review"
+        onClose={formHandleCloseReview}
+      >
+        <FormCustomerReview
+          id={selectedSingle}
+          onClose={formHandleCloseReview}
+        />
+      </Modal>
     </Box>
   );
 }

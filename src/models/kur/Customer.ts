@@ -92,6 +92,33 @@ export interface BiChecking {
   bi_checking_status_notes: string;
 }
 
+export interface BiCheckingCustomer {
+  debtor_name: string;
+  customer_number: string;
+  id: number | undefined;
+  bi_checking_status_id: number;
+  bi_checking_status_notes: string;
+  bi_checking_status: BiCheckingStatus;
+}
+
+export interface BiCheckingStatus {
+  id: number;
+  name: string;
+}
+
+export interface ReviewCustomer {
+  new_status: number;
+  komite_notes: string;
+  id: number | undefined;
+}
+
+// export interface ReviewCustomer {
+//   name: string;
+//   address: string;
+//   phone_number: string;
+//   id?: number;
+// }
+
 // old
 export interface KurUserStatus {
   id?: number;

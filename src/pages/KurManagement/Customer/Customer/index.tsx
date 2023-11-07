@@ -35,7 +35,6 @@ import {
   CreateCustomer,
   UserCreditScore,
 } from 'models/kur/Customer';
-// import { Customer } from 'models/financing/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
 import { MerchantResp } from 'models/Merchant';
@@ -58,13 +57,28 @@ export default function KurCustomer() {
   const areaKur = useAppSelector((state) => state.area);
   const creditScore = useAppSelector((state) => state.creditScore);
 
+  // useEffect(() => {
+  //   dispatch(customerAction.fetchData(customerKur.params));
+  // }, [
+  //   customerKur.params.search,
+  //   customerKur.params.order_by,
+  //   customerKur.params.order_type,
+  //   customerKur.params.page,
+  //   customerKur.params.status,
+  // ]);
+
   useEffect(() => {
-    dispatch(customerAction.fetchData(customerKur.params));
+    dispatch(
+      customerAction.fetchData({
+        status: 6,
+      }),
+    );
   }, [
     customerKur.params.search,
-    customerKur.params.order_by,
-    customerKur.params.order_type,
+    // customerKur.params.order_by,
+    // customerKur.params.order_type,
     customerKur.params.page,
+    // customerKur.params.status,
   ]);
 
   const initialData = {
