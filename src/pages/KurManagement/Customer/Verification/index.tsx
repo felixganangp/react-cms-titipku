@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useState, useEffect, useCallback } from 'react';
+/* eslint-disable radix */
+/* eslint-disable array-callback-return */
+/* eslint-disable no-nested-ternary */
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Card,
@@ -13,13 +16,17 @@ import {
   Collapse,
   IconButton,
   Chip,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+// import ArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import MenuList from 'components/MenuList';
 import moment from 'moment';
+import digitFormatter from 'utils/digitFormatter';
 
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { customerAction } from 'store/slice/kur/Customer';
@@ -28,34 +35,66 @@ import { creditScoreAction } from 'store/slice/kur/CreditScore';
 import { areaAction } from 'store/slice/Area';
 import useModal from 'hooks/useModal';
 import Table from 'components/Table';
+import Tabs from 'components/Tabs';
 import Modal from 'components/Modal';
 import {
   Customer,
   CustomerParams,
   CreateCustomer,
   UserCreditScore,
+  ReviewCustomer,
 } from 'models/kur/Customer';
+import * as customerService from 'service/Kur/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
 import { MerchantResp } from 'models/Merchant';
 import debounce from 'utils/debounce';
-import { getColorCreditScore } from 'utils/creditScoreColor';
-import bankData from 'data/list-bank.json';
-
-import FormCustomer from './components/form';
+import useToast from 'hooks/useToast';
+import FormBiChecking from './components/form-bi-checking';
+import FormCustomerReview from './components/form-customer-review';
 
 interface FormDataType {
   isEdit: boolean;
   initialData: CreateCustomer;
 }
 
-export default function KurCustomer() {
+export default function KurCustomerVerification() {
+  const toast = useToast();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const customerKur = useAppSelector((state) => state.customerKur);
   const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
   const creditScore = useAppSelector((state) => state.creditScore);
+
+  // Batch Action
+  const [selected, setSelected] = useState<(number | string)[]>([]);
+  const [selectedSingle, setSelectedSingle] = useState<number | undefined>(0);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer[]>([]);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleOpenBatchAction = (e: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(e.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleVerify = async (id: number | undefined) => {
+    console.log();
+    // const formData = new FormData();
+    const data: ReviewCustomer = {
+      new_status: 6,
+      komite_notes: '',
+      id,
+    };
+    const updateUser = await customerService.updateStatusCustomer(data);
+    toast.openToast({
+      headMsg: 'Customer Verified',
+      severity: 'success',
+    });
+    // customerService.updateStatusCustomer(id, formData);
+  };
 
   useEffect(() => {
     dispatch(customerAction.fetchData(customerKur.params));
@@ -64,10 +103,10 @@ export default function KurCustomer() {
     customerKur.params.order_by,
     customerKur.params.order_type,
     customerKur.params.page,
+    customerKur.params.status,
   ]);
 
   const initialData = {
-    // imageCustomer: '',
     idCustomer: '',
     name: '',
     kurType: null,
@@ -101,28 +140,11 @@ export default function KurCustomer() {
     kurUserStatus: '',
   };
   const [openFilter, setOpenFilter] = useState(false);
-  const [formData, setFormData] = useState<FormDataType>({
-    isEdit: false,
-    initialData,
-  });
-  useEffect(() => {
-    if (
-      customerKur.stateFilter?.areaKur &&
-      customerKur.stateFilter?.areaKur.length > 0
-    ) {
-      setOpenFilter(true);
-    }
-    dispatch(typeAction.fetchData());
-    dispatch(areaAction.fetchData());
-    dispatch(creditScoreAction.fetchData());
-  }, []);
+  const [userTab, setUserTab] = useState(0);
+  const [biCheckingData, setBiCheckingData] = useState<Customer[]>();
 
-  // const [typeKurFilter, setTypeKurFilter] = useState<Type | null>(null);
-  // const [areaKurFilter, setAreaKurFilter] = useState<Area[] | undefined>([]);
-  // const [searchKur, setSearchKur] = useState<string>('');
-  const [inputValueArea, setInputValueArea] = useState('');
-
-  const formModal = useModal();
+  const formBiChecking = useModal();
+  const formCustomerReview = useModal();
 
   const convertDate = (date: number) => {
     const d = new Date(0); // The 0 there is the key, which sets the date to the epoch
@@ -137,137 +159,60 @@ export default function KurCustomer() {
     return result;
   };
 
-  const getInitialData = (val: Customer) => {
-    const birthDate = new Date(0);
-    birthDate.setUTCSeconds(val.birth_date);
-    const date = birthDate.getDate();
-    const month = birthDate.getMonth();
-    const year = birthDate.getFullYear();
-    const d = moment({ year, month, day: date });
-    // const convertBirthDate = `${date}/${month + 1}/${year}`;
-    const convertBirthDate = moment(birthDate).format('MM/DD/YYYY');
-    const findBank = bankData.data.filter((el) => el.name === val.user_bank);
-
-    const findKtp = val.kur_user_document.filter(
-      (el) => el.document_type === 'ktp',
+  const handleChangeKurHistoryTab = (
+    event: React.SyntheticEvent,
+    newValue: number,
+  ) => {
+    console.log(newValue);
+    setUserTab(newValue);
+    dispatch(
+      customerAction.fetchData({
+        status: newValue + 1,
+      }),
     );
-    const findKk = val.kur_user_document.filter(
-      (el) => el.document_type === 'kk',
-    );
-    const findNpwp = val.kur_user_document.filter(
-      (el) => el.document_type === 'npwp',
-    );
-    const findSKU = val.kur_user_document.filter(
-      (el) => el.document_type === 'sku',
-    );
-    const merchantName: MerchantResp = {
-      merchant_name: val.user.name,
-      id: val.user.id,
-    };
-
-    const pasarName: Area = {
-      id: val.user.area.id,
-      title: val.user.area.name,
-    };
-    const initialDataPayload = {
-      // imageCustomer: '',
-      idCustomer: val.id?.toString(),
-      name: val.name,
-      kurType: val.kur_user_type,
-      adminFee: val.admin_fee.toString(),
-      dpdRate: val.dpd_rate.toString(),
-      birthDate: d,
-      phoneNumber: val.phone_number,
-      email: val.email,
-      addressKtp: val.registered_address,
-      addressDomisili: val.living_address,
-      pasarName,
-      merchantName,
-      nikKtp: findKtp[0].document_number,
-      oldNikKtp: findKtp[0].document_number,
-      imageNik: findKtp[0].document_filepath,
-      kkNumber: findKk[0].document_number,
-      oldKkNumber: findKk[0].document_number,
-      imageKk: findKk[0].document_filepath,
-      npwp: findNpwp[0].document_number,
-      oldNpwp: findNpwp[0].document_number,
-      imageNpwp: findNpwp[0].document_filepath,
-      imageSKUsaha: findSKU[0].document_filepath,
-      creditLimit: val.credit_limit.toString(),
-      bankName: findBank[0],
-      bankNumberPrimary: val.user_account_number,
-      nobuAccountNumber: val.nobu_account_number,
-      idImageNik: findKtp[0].id,
-      idImageKk: findKk[0].id,
-      idImageNpwp: findNpwp[0].id,
-      idImageSKUsaha: findSKU[0].id,
-      kurUserStatus: val.kur_user_status.id?.toString(),
-    };
-    return initialDataPayload;
-  };
-
-  const [formHead, setFormHead] = useState('');
-  const handleOpenEdit = (val: Customer) => {
-    setFormHead('Edit Customer');
-    const initialDataPayload = getInitialData(val);
-    setFormData({
-      isEdit: true,
-      initialData: initialDataPayload,
-    });
-    formModal.openModal();
-  };
-  const handleOpenAdd = () => {
-    setFormHead('Add Customer');
-    formModal.openModal();
-  };
-
-  const convertStrCreditScore = (val: string) => {
-    const splitStr = val.split(' ');
-    const firstCharUpperCase = splitStr.map((el) => {
-      return el.charAt(0).toUpperCase() + el.slice(1);
-    });
-
-    const result = firstCharUpperCase.join(' ');
-    return result;
-  };
-
-  const handleHoldCustomer = async (val: Customer) => {
-    let statusId;
-    if (val.kur_user_status?.id === 3) {
-      statusId = 1;
-    }
-    if (val.kur_user_status?.id === 1) {
-      statusId = 3;
-    }
-    const newPayload: Customer = {
-      ...val,
-      kur_user_status: { ...val.kur_user_status, id: statusId },
-    };
-    const initialDataPayload = getInitialData(newPayload);
-    await dispatch(customerAction.editCustomer(initialDataPayload));
   };
   const headCell = [
     {
       id: 'id',
       label: 'ID',
       align: 'left',
-      // format: (val: Customer) => <div>{val.kur_user_number}</div>,
+      format: (val: Customer) => <div>{val.id}</div>,
       enableSort: true,
     },
     {
-      id: 'name',
-      label: 'Name',
+      id: 'user_number',
+      label: 'User Number',
       align: 'left',
       width: '200px',
-      // format: (val: Customer) => <div>{val.name}</div>,
+      format: (val: Customer) => <div>{val.user_number}</div>,
       enableSort: true,
+    },
+    {
+      id: 'debtor_name',
+      label: 'Debtor Name',
+      align: 'left',
+      width: '200px',
+      format: (val: Customer) => <div>{val.debtor_name}</div>,
+      enableSort: true,
+    },
+    {
+      id: 'merchant',
+      label: 'Merchant',
+      align: 'left',
+      format: (val: Customer) => <div>{val.merchant_name}</div>,
+    },
+    {
+      id: 'pasar',
+      label: 'Pasar',
+      align: 'left',
+      format: (val: Customer) => <div>{val.merchant_name}</div>,
     },
     {
       id: 'kur_user_type',
       label: 'KUR Type',
       align: 'left',
       width: '95px',
-      format: (val: Customer) => <div>{val.kur_user_type.name}</div>,
+      format: (val: Customer) => <div>{val.user_type.name}</div>,
       enableSort: true,
     },
     {
@@ -278,41 +223,35 @@ export default function KurCustomer() {
       format: (val: Customer) => <div>{convertDate(val.created_at)}</div>,
     },
     {
-      id: 'merchant',
-      label: 'Merchant',
+      id: 'status',
+      label: 'Status',
       align: 'left',
-      width: '410px',
-      format: (val: Customer) => <div>{val.user.name}</div>,
+      width: '100px',
+      format: (val: Customer) => (
+        <Typography>{val.user_status.name}</Typography>
+      ),
     },
     {
-      id: 'pasar',
-      label: 'Pasar',
-      align: 'left',
-      format: (val: Customer) => <div>{val.user.area.name}</div>,
-    },
-    {
-      id: 'kur_user_credit_score',
-      label: 'Credit Score',
+      id: 'limit_request',
+      label: 'Limit Request',
       align: 'left',
       width: '200px',
-      enableSort: true,
-      format: (val: Customer) => {
-        const bgColor = getColorCreditScore(val.kur_user_credit_score.id);
-        return (
-          <Chip
-            sx={{
-              borderRadius: '8px',
-              paddingX: '16px',
-              paddingY: '8px',
-              color: '#fff',
-              backgroundColor: bgColor,
-              fontSize: '12px',
-              fontWeight: 500,
-            }}
-            label={convertStrCreditScore(val.kur_user_credit_score.name)}
-          />
-        );
-      },
+      format: (val: Customer) => (
+        <Typography>
+          Rp {digitFormatter.format(val.limit_request_plafon)}
+        </Typography>
+      ),
+    },
+    {
+      id: 'limit_request_cash',
+      label: 'Limit Cash Request',
+      align: 'left',
+      width: '100px',
+      format: (val: Customer) => (
+        <Typography>
+          Rp {digitFormatter.format(val.limit_request_cash)}
+        </Typography>
+      ),
     },
     {
       id: 'action',
@@ -330,20 +269,36 @@ export default function KurCustomer() {
                 dataId: 'button-details-customer',
               },
               {
-                label: `Edit`,
+                label: `Approve`,
                 onClick: () => {
-                  handleOpenEdit(val);
+                  setSelectedSingle(val.id);
+                  formCustomerReview.openModal();
+                },
+                dataId: 'button-review-customer',
+              },
+              {
+                label: `Verify`,
+                onClick: () => {
+                  setSelectedSingle(val.id);
+                  handleVerify(val.id);
+                },
+                dataId: 'button-review-customer',
+              },
+              {
+                label: `Reject`,
+                onClick: () => {
+                  console.log('edit');
                 },
                 dataId: 'button-edit-customer',
               },
-              {
-                label: val.kur_user_status?.id === 3 ? 'Active' : 'Hold',
-                color: val.kur_user_status?.id === 3 ? '#008e58' : '#c10000',
-                onClick: () => {
-                  handleHoldCustomer(val);
-                },
-                dataId: 'button-hold-customer',
-              },
+              // {
+              //   label: val.kur_user_status?.id === 3 ? 'Active' : 'Hold',
+              //   color: val.kur_user_status?.id === 3 ? '#008e58' : '#c10000',
+              //   onClick: () => {
+              //     handleHoldCustomer(val);
+              //   },
+              //   dataId: 'button-hold-customer',
+              // },
             ]}
           >
             <IconButton>
@@ -357,43 +312,20 @@ export default function KurCustomer() {
 
   const handleChangePage = (value: number) => {
     let payload: {
-      typeKur?: Type | null;
-      areaKur?: Area[] | [];
-      creditScore?: UserCreditScore | null;
+      status?: number;
     } = {
-      areaKur: [],
-      typeKur: null,
-      creditScore: null,
+      status: 1,
     };
 
-    if (customerKur.params.kur_user_type_id) {
+    if (customerKur.params.status) {
       payload = {
         ...payload,
-        typeKur: customerKur.stateFilter?.typeKur,
+        status: customerKur.stateFilter?.status,
       };
     }
-    if (customerKur.params.area_ids) {
-      payload = {
-        ...payload,
-        areaKur: customerKur.stateFilter?.areaKur,
-      };
-    }
-    if (customerKur.params.credit_score) {
-      payload = {
-        ...payload,
-        creditScore: customerKur.stateFilter?.creditScore,
-      };
-    }
-    dispatch(
-      customerAction.setFilter(
-        payload as {
-          typeKur: Type | null;
-          areaKur: Area[] | [];
-          creditScore: UserCreditScore | null;
-        },
-      ),
-    );
-    // }
+
+    dispatch(customerAction.setFilter(payload));
+
     dispatch(
       customerAction.setParams({
         ...customerKur.params,
@@ -402,52 +334,35 @@ export default function KurCustomer() {
     );
   };
 
-  const handleChangeType = (value: Type | null) => {
-    dispatch(
-      customerAction.setFilter({
-        typeKur: value,
-        areaKur: customerKur.stateFilter?.areaKur,
-        creditScore: customerKur.stateFilter?.creditScore || null,
-      }),
-    );
-    // dispatch(
-    //   customerAction.setParams({
-    //     page: 1,
-    //     kur_user_type_id: value?.id,
-    //   }),
-    // );
-  };
+  // const handleChangeCreditScore = (value: UserCreditScore | null) => {
+  //   dispatch(
+  //     customerAction.setFilter({
+  //       typeKur: customerKur.stateFilter?.typeKur || null,
+  //       areaKur: customerKur.stateFilter?.areaKur,
+  //       creditScore: value,
+  //     }),
+  //   );
+  // };
 
-  const handleChangeCreditScore = (value: UserCreditScore | null) => {
-    dispatch(
-      customerAction.setFilter({
-        typeKur: customerKur.stateFilter?.typeKur || null,
-        areaKur: customerKur.stateFilter?.areaKur,
-        creditScore: value,
-      }),
-    );
-  };
-
-  const handleChangeArea = (value: Area[]) => {
-    const payload: CustomerParams = {
-      page: 1,
-    };
-    if (value.length > 0) {
-      const ids = value.map((el) => el.id);
-      const areas = ids.toString();
-      payload.area_ids = areas;
-    } else {
-      payload.area_ids = undefined;
-    }
-    dispatch(
-      customerAction.setFilter({
-        typeKur: customerKur.stateFilter?.typeKur || null,
-        areaKur: value,
-        creditScore: customerKur.stateFilter?.creditScore || null,
-      }),
-    );
-    // dispatch(customerAction.setParams(payload));
-  };
+  // const handleChangeArea = (value: Area[]) => {
+  //   const payload: CustomerParams = {
+  //     page: 1,
+  //   };
+  //   if (value.length > 0) {
+  //     const ids = value.map((el) => el.id);
+  //     const areas = ids.toString();
+  //     payload.area_ids = areas;
+  //   } else {
+  //     payload.area_ids = undefined;
+  //   }
+  //   dispatch(
+  //     customerAction.setFilter({
+  //       typeKur: customerKur.stateFilter?.typeKur || null,
+  //       areaKur: value,
+  //       creditScore: customerKur.stateFilter?.creditScore || null,
+  //     }),
+  //   );
+  // };
 
   const handleSearch = (value: string) => {
     dispatch(
@@ -471,64 +386,61 @@ export default function KurCustomer() {
     );
   };
 
-  const handleApplyFilter = () => {
-    const payloadParams = {
-      ...customerKur.params,
-      page: 1,
-      kur_user_type_id: customerKur.stateFilter?.typeKur?.id,
-      credit_score: customerKur.stateFilter?.creditScore?.id,
-    };
-    if (
-      customerKur.stateFilter?.areaKur &&
-      customerKur.stateFilter?.areaKur.length > 0
-    ) {
-      const ids = customerKur.stateFilter?.areaKur.map((el: Area) => el.id);
-      const areas = ids.toString();
-      payloadParams.area_ids = areas;
-    } else {
-      payloadParams.area_ids = undefined;
-    }
-    dispatch(customerAction.setParams(payloadParams));
-    dispatch(customerAction.fetchData(payloadParams));
-  };
+  // const handleApplyFilter = () => {
+  //   const payloadParams = {
+  //     ...customerKur.params,
+  //     page: 1,
+  //     kur_user_type_id: customerKur.stateFilter?.typeKur?.id,
+  //     credit_score: customerKur.stateFilter?.creditScore?.id,
+  //   };
+  //   if (
+  //     customerKur.stateFilter?.areaKur &&
+  //     customerKur.stateFilter?.areaKur.length > 0
+  //   ) {
+  //     const ids = customerKur.stateFilter?.areaKur.map((el: Area) => el.id);
+  //     const areas = ids.toString();
+  //     payloadParams.area_ids = areas;
+  //   } else {
+  //     payloadParams.area_ids = undefined;
+  //   }
+  //   dispatch(customerAction.setParams(payloadParams));
+  //   dispatch(customerAction.fetchData(payloadParams));
+  // };
 
-  const handleResetFilter = async () => {
-    const params: CustomerParams = {
-      ...customerKur.params,
-      page: 1,
-      count: 10,
-      order_by: 'id',
-      order_type: 'desc',
-      kur_user_type_id: undefined,
-      credit_score: undefined,
-      area_ids: undefined,
-    };
-    await dispatch(
-      customerAction.setFilter({
-        areaKur: [],
-        typeKur: null,
-        creditScore: null,
-      }),
-    );
-    await dispatch(customerAction.setParams(params));
-    await dispatch(customerAction.fetchData(params));
-    // await handleApplyFilter();
-  };
+  // const handleResetFilter = async () => {
+  //   const params: CustomerParams = {
+  //     ...customerKur.params,
+  //     page: 1,
+  //     count: 10,
+  //     order_by: 'id',
+  //     order_type: 'desc',
+  //     kur_user_type_id: undefined,
+  //     credit_score: undefined,
+  //     area_ids: undefined,
+  //   };
+  //   await dispatch(
+  //     customerAction.setFilter({
+  //       areaKur: [],
+  //       typeKur: null,
+  //       creditScore: null,
+  //     }),
+  //   );
+  //   await dispatch(customerAction.setParams(params));
+  //   await dispatch(customerAction.fetchData(params));
+  // };
 
   const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
 
+  const handleBiChecking = () => {
+    formBiChecking.openModal();
+  };
+
   const formHandleClose = async () => {
-    // await dispatch(
-    //   customerAction.setParams({
-    //     page: 1,
-    //     count: 10,
-    //     search: '',
-    //     order_by: 'id',
-    //     order_type: 'desc',
-    //   }),
-    // );
-    setFormData({ isEdit: false, initialData });
-    await formModal.closeModal();
+    await formBiChecking.closeModal();
+  };
+
+  const formHandleCloseReview = async () => {
+    await formCustomerReview.closeModal();
   };
 
   return (
@@ -553,13 +465,13 @@ export default function KurCustomer() {
                   sx={{ width: '180px' }}
                   startIcon={<AddIcon />}
                   onClick={() => {
-                    handleOpenAdd();
+                    console.log('add');
                   }}
                 >
                   Add Customer
                 </Button>
                 <Box
-                  width="90%"
+                  width="100%"
                   display="flex"
                   justifyContent="space-between"
                   gap="20px"
@@ -583,12 +495,52 @@ export default function KurCustomer() {
                       debounceSearch(e.target.value);
                     }}
                   />
-                  <Button
-                    endIcon={<KeyboardArrowDownIcon />}
-                    onClick={() => setOpenFilter((prev) => !prev)}
-                  >
-                    Filter
-                  </Button>
+                  <Box>
+                    <Button
+                      disabled={selected.length === 0}
+                      endIcon={<ArrowDownIcon />}
+                      aria-controls={open ? 'basic-menu' : undefined}
+                      aria-haspopup="true"
+                      aria-expanded={open ? 'true' : undefined}
+                      onClick={handleOpenBatchAction}
+                      sx={{
+                        '&:disabled': {
+                          bgcolor: '#e4e4e4',
+                          color: '#797979',
+                        },
+                        marginRight: '15px',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      Batch Action
+                    </Button>
+
+                    <Menu
+                      anchorEl={anchorEl}
+                      open={open}
+                      onClose={handleClose}
+                      PaperProps={{ sx: { minWidth: 130 } }}
+                      MenuListProps={{
+                        'aria-labelledby': 'basic-button',
+                      }}
+                    >
+                      <MenuItem
+                        onClick={
+                          // formBiChecking.openModal();
+                          handleBiChecking
+                        }
+                      >
+                        Bi Checking
+                      </MenuItem>
+                    </Menu>
+
+                    <Button
+                      endIcon={<ArrowDownIcon />}
+                      onClick={() => setOpenFilter((prev) => !prev)}
+                    >
+                      Filter
+                    </Button>
+                  </Box>
                 </Box>
               </Box>
             </Box>
@@ -610,14 +562,14 @@ export default function KurCustomer() {
                     id="type"
                     options={typeKur.data}
                     onChange={(e, value) => {
-                      // setTypeKurFilter(value);
-                      handleChangeType(value);
+                      // handleChangeType(value);
+                      console.log('changetype');
                     }}
-                    isOptionEqualToValue={(option: Type) => {
-                      return option.id === customerKur.stateFilter?.typeKur?.id;
-                    }}
+                    // isOptionEqualToValue={(option: Type) => {
+                    //   return option.id === customerKur.stateFilter?.typeKur?.id;
+                    // }}
                     getOptionLabel={(option) => `${option.name}`}
-                    value={customerKur?.stateFilter?.typeKur}
+                    // value={customerKur?.stateFilter?.typeKur}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -643,26 +595,17 @@ export default function KurCustomer() {
                     id="pasar-kur"
                     options={areaKur.data}
                     onChange={(e, value) => {
-                      handleChangeArea(value);
+                      // handleChangeArea(value);
+                      console.log('changearea');
                     }}
-                    // isOptionEqualToValue={(option: Area) => {
-                    //   const filtered =
-                    //     customerKur?.stateFilter?.areaKur?.filter(
-                    //       (el: Area) => el.id === option.id,
-                    //     );
-                    //   if (filtered) {
-                    //     return option.id === filtered[0]?.id;
-                    //   }
-                    //   return false;
-                    // }}
                     getOptionLabel={(option) => {
                       return `${option.title}`;
                     }}
-                    inputValue={inputValueArea}
-                    onInputChange={(_, newInputValue) => {
-                      setInputValueArea(newInputValue);
-                    }}
-                    value={customerKur?.stateFilter?.areaKur}
+                    // inputValue={inputValueArea}
+                    // onInputChange={(_, newInputValue) => {
+                    //   setInputValueArea(newInputValue);
+                    // }}
+                    // value={customerKur?.stateFilter?.areaKur}
                     limitTags={3}
                     renderInput={(params) => {
                       return (
@@ -715,17 +658,16 @@ export default function KurCustomer() {
                     data-testid="filter-credit-score-customer"
                     id="type"
                     options={creditScore.data}
-                    onChange={(e, value) => {
-                      // setTypeKurFilter(value);
-                      handleChangeCreditScore(value);
-                    }}
-                    isOptionEqualToValue={(option: UserCreditScore) => {
-                      return (
-                        option.id === customerKur.stateFilter?.creditScore?.id
-                      );
-                    }}
+                    // onChange={(e, value) => {
+                    //   handleChangeCreditScore(value);
+                    // }}
+                    // isOptionEqualToValue={(option: UserCreditScore) => {
+                    //   return (
+                    //     option.id === customerKur.stateFilter?.creditScore?.id
+                    //   );
+                    // }}
                     getOptionLabel={(option) => `${option.name}`}
-                    value={customerKur?.stateFilter?.creditScore}
+                    // value={customerKur?.stateFilter?.creditScore}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -745,13 +687,14 @@ export default function KurCustomer() {
                   >
                     <Button
                       onClick={() => {
-                        handleResetFilter();
+                        // handleResetFilter();
+                        console.log('reset');
                       }}
                       variant="text"
                     >
                       Reset
                     </Button>
-                    <Button onClick={handleApplyFilter}>Apply</Button>
+                    {/* <Button onClick={handleApplyFilter}>Apply</Button> */}
                   </Box>
                 </Grid>
               </Grid>
@@ -766,6 +709,21 @@ export default function KurCustomer() {
             boxShadow="0 3px 10px 0 rgba(0, 0, 0, 0.1)"
             data-testid="table-customer"
           >
+            <Box>
+              <Tabs.Container
+                value={userTab}
+                onChange={handleChangeKurHistoryTab}
+                aria-label="basic tabs example"
+                variant="fullWidth"
+                sx={{ mb: 1 }}
+              >
+                <Tabs.Item label="New" />
+                <Tabs.Item label="Bi-Checking" />
+                <Tabs.Item label="Komite Review" />
+                <Tabs.Item label="Location Check" />
+                {/* <Tabs.Item label="Final Review" /> */}
+              </Tabs.Container>
+            </Box>
             <Table
               data={customerKur.data}
               headCells={headCell}
@@ -778,12 +736,52 @@ export default function KurCustomer() {
               onChangeSort={(val) => handleChangeSort(val)}
               disableNumber
               loading={customerKur.loading}
+              enableCheckBox={userTab === 0}
+              selected={selected}
+              setSelected={(array: (string | number)[]) => {
+                setSelected(array);
+                setSelectedCustomer(() => {
+                  const addition: Customer[] = [];
+                  array.map((id) => {
+                    const obj: Customer | undefined = customerKur.data.find(
+                      (item: any) => item.id === id,
+                    );
+                    if (
+                      obj &&
+                      selectedCustomer.findIndex((item) => item.id === id) ===
+                        -1
+                    )
+                      return addition.push(obj);
+                  });
+                  const existing = selectedCustomer.filter(
+                    (item) => array.indexOf(item.id) !== -1,
+                  );
+                  return [...existing, ...addition];
+                });
+              }}
             />
           </Box>
         </Grid>
       </Grid>
-      <Modal open={formModal.open} title={formHead} onClose={formHandleClose}>
-        <FormCustomer onClose={formHandleClose} formData={formData} />
+      <Modal
+        open={formBiChecking.open}
+        title="Bi Cheking"
+        onClose={formHandleClose}
+      >
+        <FormBiChecking
+          onClose={formHandleClose}
+          biCheckingData={selectedCustomer}
+        />
+      </Modal>
+      <Modal
+        open={formCustomerReview.open}
+        title="Komite Review"
+        onClose={formHandleCloseReview}
+      >
+        <FormCustomerReview
+          id={selectedSingle}
+          onClose={formHandleCloseReview}
+        />
       </Modal>
     </Box>
   );

@@ -6,6 +6,8 @@ import {
   CustomerParams,
   CheckMerchantExistParams,
   UserCreditScore,
+  BiChecking,
+  ReviewCustomer,
 } from 'models/kur/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
@@ -19,12 +21,16 @@ interface CustomerInitialProps {
   params: CustomerParams;
   details: Customer | null;
   stateFilter?: {
-    typeKur?: Type | null;
-    areaKur?: Area[] | [];
-    creditScore?: UserCreditScore | null;
+    status: number;
   };
   loadingMerchantExist: boolean;
   merchantExistMsg: string;
+  customerSelect: {
+    data: Customer[];
+    params: CustomerParams;
+    totalCustomer: number;
+    isLoading: boolean;
+  };
 }
 const initialState: CustomerInitialProps = {
   data: [],
@@ -38,15 +44,25 @@ const initialState: CustomerInitialProps = {
     search: '',
     order_by: 'id',
     order_type: 'desc',
+    status: 1,
   },
   stateFilter: {
-    typeKur: null,
-    areaKur: [],
-    creditScore: null,
+    status: 1,
   },
   details: null,
   loadingMerchantExist: false,
   merchantExistMsg: '',
+  customerSelect: {
+    isLoading: false,
+    data: [],
+    params: {
+      page: 1,
+      count: 10,
+      search: '',
+      status: 1,
+    },
+    totalCustomer: 0,
+  },
 };
 
 const CustomerSlice = createSlice({
@@ -92,6 +108,19 @@ const CustomerSlice = createSlice({
         ...action.payload,
       };
     },
+    // bulk bi checking
+    bulkBiChecking(
+      state: CustomerInitialProps,
+      action: PayloadAction<BiChecking[]>,
+    ) {
+      state.loadingForm = true;
+    },
+    bulkBiCheckingSuccess(state: CustomerInitialProps) {
+      state.loadingForm = false;
+    },
+    bulkBiCheckingFailed(state: CustomerInitialProps) {
+      state.loadingForm = false;
+    },
     createCustomer(
       state: CustomerInitialProps,
       action: PayloadAction<CreateCustomer>,
@@ -113,9 +142,7 @@ const CustomerSlice = createSlice({
     setFilter(
       state: CustomerInitialProps,
       action: PayloadAction<{
-        typeKur: Type | null;
-        areaKur: Area[] | undefined;
-        creditScore: UserCreditScore | null;
+        status?: number;
       }>,
     ) {
       state.stateFilter = {
@@ -153,6 +180,43 @@ const CustomerSlice = createSlice({
     ) {
       state.loadingMerchantExist = false;
       state.merchantExistMsg = action.payload.data;
+    },
+    // Customer Select ================
+    fetchCustomerSelect(state, action: PayloadAction<CustomerParams>) {
+      state.customerSelect.isLoading = true;
+    },
+    stopLodingCustomerSelect(state) {
+      state.customerSelect.isLoading = false;
+    },
+    setCustomerSelectData(state, action: PayloadAction<Customer[]>) {
+      state.customerSelect.data = action.payload;
+    },
+    setCustomerSelectDataMerge(state, action: PayloadAction<Customer[]>) {
+      state.customerSelect.data = [
+        ...state.customerSelect.data,
+        ...action.payload,
+      ];
+    },
+    setCustomerSelectTotalData(state, action: PayloadAction<number>) {
+      state.customerSelect.totalCustomer = action.payload;
+    },
+    setParamsCustomerSelect(state, action: PayloadAction<CustomerParams>) {
+      state.customerSelect.params = {
+        ...state.customerSelect.params,
+        ...action.payload,
+      };
+    },
+    updateStatusCustomer(
+      state: CustomerInitialProps,
+      action: PayloadAction<ReviewCustomer>,
+    ) {
+      state.loadingForm = true;
+    },
+    updateStatusCustomerSuccess(state: CustomerInitialProps) {
+      state.loadingForm = false;
+    },
+    updateStatusCustomerFailed(state: CustomerInitialProps) {
+      state.loadingForm = false;
     },
   },
 });

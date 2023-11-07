@@ -23,7 +23,7 @@ import {
   MockMerchantId1,
   MockMerchantId2,
 } from './MockCustomer';
-import FormCustomer from '../components/form';
+import FormCustomer from '../../Verification/components/form';
 
 let formData: {
   isEdit: boolean;

@@ -12,6 +12,8 @@ import {
   CreateCustomerPayload,
   KurUserDocumentPayload,
   CheckMerchantExistParams,
+  BiChecking,
+  ReviewCustomer,
 } from 'models/kur/Customer';
 
 interface ImageUpdatePayload {
@@ -51,6 +53,116 @@ function* fetchData(params: PayloadAction<CustomerParams>) {
     yield put(customerAction.failedFetch());
   }
 }
+
+function* fetchDataCustomerSelect(params: PayloadAction<CustomerParams>) {
+  try {
+    const response: ListResponse<Customer> = yield call(
+      CustomerService.getAllCustomers,
+      params.payload,
+    );
+    yield put(customerAction.setCustomerSelectTotalData(response?.total || 0));
+    if ((params.payload?.page as number) > 1) {
+      yield put(customerAction.setCustomerSelectDataMerge(response.data));
+    } else {
+      yield put(customerAction.setCustomerSelectData(response.data));
+    }
+    yield put(customerAction.stopLodingCustomerSelect());
+  } catch (err) {
+    yield put(customerAction.stopLodingCustomerSelect());
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: 'Error get data',
+          message: 'interval server error',
+          severity: 'error',
+        }),
+      );
+    }
+    yield put(customerAction.failedFetch());
+  }
+}
+
+function* bulkBiChecking(payload: PayloadAction<BiChecking>) {
+  try {
+    const response: Response<string> = yield call(
+      CustomerService.bulkBiChecking as any,
+      payload.payload,
+    );
+
+    yield put(customerAction.bulkBiCheckingSuccess());
+    yield call(fetchData, {
+      type: customerAction.fetchData.type,
+      payload: {
+        page: 1,
+        count: 10,
+        search: '',
+        status: 1,
+      },
+    });
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Success process BI Checking',
+        severity: 'success',
+      }),
+    );
+  } catch (error) {
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Failed to process BI Checking',
+        message: error as string,
+        severity: 'error',
+      }),
+    );
+    yield put(customerAction.bulkBiCheckingFailed());
+    console.log(`Failed to create bi checking: `, error);
+  }
+}
+
+function* updateStatusCustomer(payload: PayloadAction<ReviewCustomer>) {
+  try {
+    const params: CustomerParams = yield select((state) => state.customer);
+    yield call(CustomerService.updateStatusCustomer, payload.payload);
+    yield put(customerAction.fetchData(params));
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Customer Approved',
+        severity: 'success',
+      }),
+    );
+    // yield put(SupplierAction.updateSupplierSuccess({ error: false }));
+  } catch (err) {
+    const headMessage = 'Failed Approve Customer';
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: headMessage,
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: headMessage,
+          message: 'internal server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+// old
 
 function* createCustomer(payload: PayloadAction<CreateCustomer>) {
   try {
@@ -446,4 +558,13 @@ export default function* customerKurSagas() {
   yield takeLatest(customerAction.editCustomer.type, editCustomer);
   yield takeLatest(customerAction.fetchDataDetail.type, fetchDataDetail);
   yield takeLatest(customerAction.checkMerchantExist.type, checkMerchantExist);
+  yield takeLatest(
+    customerAction.fetchCustomerSelect.type,
+    fetchDataCustomerSelect,
+  );
+  yield takeLatest(customerAction.bulkBiChecking.type, bulkBiChecking);
+  yield takeLatest(
+    customerAction.updateStatusCustomer.type,
+    updateStatusCustomer,
+  );
 }
