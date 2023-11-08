@@ -92,7 +92,7 @@ export const HeaderContainer = styled(Box)<Pick<HeaderProps, 'open'>>`
   flex-direction: row;
   align-items: center;
   height: 63px;
-  width: 236px;
+  width: 266px;
   background-color: #fff;
   padding: 20px 16px 20px 18px;
   box-shadow: ${(p) =>

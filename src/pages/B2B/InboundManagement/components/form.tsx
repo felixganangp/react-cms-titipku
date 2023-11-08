@@ -170,9 +170,6 @@ export default function FormInbound({ onClose }: FormProps) {
                   onChange={(e, value) => {
                     setFieldValue('supplier', value?.id);
                   }}
-                  // isOptionEqualToValue={(option, values) => {
-                  //   return option.id === values.id;
-                  // }}
                   getOptionLabel={(option) => option.name}
                   value={
                     supplier.data.filter(

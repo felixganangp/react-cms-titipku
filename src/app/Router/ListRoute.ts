@@ -17,10 +17,14 @@ const KurRequestDetails = lazy(
   () => import('pages/KurManagement/Request/Details'),
 );
 const KurCustomerManagement = lazy(
-  () => import('pages/KurManagement/Customer'),
+  () => import('pages/KurManagement/Customer/Customer'),
 );
 const KurCustomerDetailsManagement = lazy(
-  () => import('pages/KurManagement/Customer/Details'),
+  () => import('pages/KurManagement/Customer/Customer/Details'),
+);
+
+const KurCustomerVerification = lazy(
+  () => import('pages/KurManagement/Customer/Verification'),
 );
 
 const KurInvoiceManagement = lazy(() => import('pages/KurManagement/Invoice'));
@@ -109,6 +113,13 @@ const ListRoute: RouteProps[] = [
     name: 'Customer',
     comp: KurCustomerDetailsManagement,
     path: '/kur/customer/:id',
+    index: true,
+    auth: 'Private',
+  },
+  {
+    name: 'Verification',
+    comp: KurCustomerVerification,
+    path: '/kur/verification',
     index: true,
     auth: 'Private',
   },

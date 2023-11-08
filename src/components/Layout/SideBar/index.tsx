@@ -10,115 +10,23 @@ import { useAppSelector } from 'store/hooks';
 import { Child, FilteredMenu } from 'models/Menu';
 import B2B from 'components/Icon/B2B';
 import Menu from './Menu';
+import { sidebarDataDev, sidebarDataProd } from './listFilteredMenu';
 
 interface SideBarProps {
   open: boolean;
   setOpen(arg0: boolean): void;
 }
 
-const drawerWidthOpen = 236;
+const drawerWidthOpen = 266;
 const paddingIconButton = 10;
 const marginIconButton = 14;
 const iconFontSize = 20;
 const drawerWidthClose =
   (paddingIconButton + marginIconButton) * 2 + iconFontSize;
 
-export const sidebarData: FilteredMenu[] = [
-  {
-    id: 56,
-    title: 'Serpong Fresh',
-    path: '',
-    icon: <B2B />,
-    child: [
-      {
-        id: 57,
-        title: 'Inventory',
-        path: '/b2b/inventory',
-        child: [],
-      },
-      {
-        id: 63,
-        title: 'Inbound',
-        path: '/b2b/inbound',
-        child: [],
-      },
-      {
-        id: 64,
-        title: 'Setting',
-        path: '',
-        child: [
-          {
-            id: 60,
-            title: 'Category Management',
-            path: '/b2b/category',
-          },
-          {
-            id: 61,
-            title: 'Unit of Measurement',
-            path: '/b2b/uom',
-          },
-          {
-            id: 62,
-            title: 'Supplier Management',
-            path: '/b2b/supplier',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    id: 48,
-    title: 'KUR',
-    path: '',
-    icon: <KurIcon />,
-    child: [
-      {
-        id: 52,
-        title: 'Request',
-        path: '/kur/request',
-        child: [],
-      },
-      {
-        id: 53,
-        title: 'Payment',
-        path: '/kur/payment',
-        child: [],
-      },
-      {
-        id: 54,
-        title: 'Invoice Management',
-        path: '/kur/invoice',
-        child: [],
-      },
-      {
-        id: 51,
-        title: 'Customer',
-        path: '/kur/customer',
-        child: [],
-      },
-    ],
-  },
-  {
-    id: 47,
-    title: 'Admin Panel',
-    path: '',
-    icon: <AdminPanelIcon />,
-    child: [
-      {
-        id: 49,
-        title: 'Role User',
-        path: '/role-user',
-        child: [],
-      },
-      {
-        id: 50,
-        title: 'Role Access',
-        path: '/role-access',
-        child: [],
-      },
-    ],
-  },
-];
+const isProduction = import.meta.env.PROD;
+
+export const sidebarData = isProduction ? sidebarDataProd : sidebarDataDev;
 
 function SideBar({ open, setOpen }: SideBarProps) {
   const theme = useTheme();

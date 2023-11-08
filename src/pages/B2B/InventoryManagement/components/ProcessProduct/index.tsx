@@ -422,10 +422,6 @@ export default function ProcessProduct({
             );
           }}
           onSubmit={(e) => {
-            // formik.setFieldValue('target_products', [
-            //   ...formik.values.target_products,
-            //   { stock_amount: null, id: null },
-            // ]);
             formik.setValues({
               ...formik.values,
               target_products: [
@@ -433,9 +429,6 @@ export default function ProcessProduct({
                 { stock_amount: 0, id: e[0] },
               ],
             });
-            // setSelectedExistingData(
-            //   productSelect.data.filter((val) => e.includes(val.id))[0],
-            // );
           }}
           loading={productSelect.isLoading}
           title="Product"
