@@ -1,4 +1,6 @@
+/* eslint-disable import/no-cycle */
 import { lazy } from 'react';
+import { FinaceRouters } from './FinaceRouter';
 
 const Home = lazy(() => import('pages/Home'));
 const NotFound = lazy(() => import('pages/NotFound'));
@@ -44,7 +46,7 @@ const CategoryManagement = lazy(() => import('pages/B2B/CategoryManagement'));
 const InboundManagement = lazy(() => import('pages/B2B/InboundManagement'));
 const SupplierManagement = lazy(() => import('pages/B2B/SupplierManagement'));
 
-interface RouteProps {
+export interface RouteProps {
   path: string;
   index: boolean;
   comp: React.LazyExoticComponent<(props: any) => JSX.Element>;
@@ -74,6 +76,7 @@ const ListRoute: RouteProps[] = [
     index: true,
     auth: 'Public',
   },
+  ...FinaceRouters,
   {
     name: 'Role User',
     comp: RoleUser,

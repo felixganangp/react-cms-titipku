@@ -39,6 +39,8 @@
     "@mui/styled-engine": "^5.10.8",
     "@mui/x-date-pickers": "^5.0.15",
     "@reduxjs/toolkit": "^1.8.4",
+    "@tanstack/react-query": "^4.36.1",
+    "@tanstack/react-query-devtools": "^4.36.1",
     "@testing-library/dom": "^8.19.0",
     "@types/react-avatar-editor": "^13.0.0",
     "axios": "^1.2.2",

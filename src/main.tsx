@@ -11,6 +11,7 @@ import { persistStore } from 'redux-persist';
 import Theme from 'theme';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import RQProvider from './utils/queryProvider';
 
 const { PROD } = import.meta.env;
 const persistor = persistStore(store);
@@ -23,7 +24,9 @@ if (PROD) {
           <BrowserRouter>
             <ThemeProvider theme={Theme}>
               <CssBaseline />
-              <App />
+              <RQProvider>
+                <App />
+              </RQProvider>
             </ThemeProvider>
           </BrowserRouter>
         </PersistGate>
@@ -37,7 +40,9 @@ if (PROD) {
         <BrowserRouter>
           <ThemeProvider theme={Theme}>
             <CssBaseline />
-            <App />
+            <RQProvider>
+              <App />
+            </RQProvider>
           </ThemeProvider>
         </BrowserRouter>
       </PersistGate>

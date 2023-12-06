@@ -1,4 +1,4 @@
-function addCommas(value: number | string) {
+function numberSeperator(value: number | string) {
   let nStr = value?.toString();
   nStr += '';
   const x = nStr.split('.');
@@ -22,4 +22,4 @@ export const typeNumberValidate = (value: string) => {
   return parseInt(number);
 };
 
-export default addCommas;
+export default numberSeperator;
