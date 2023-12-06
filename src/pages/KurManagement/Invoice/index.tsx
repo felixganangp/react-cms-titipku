@@ -312,7 +312,7 @@ export default function Ivoice() {
       id: 'kur_user_type',
       label: 'KUR Type',
       align: 'left',
-      format: (val) => <Typography>{val.kur_user_type.name}</Typography>,
+      format: (val) => <Typography>{val.kur_user_type?.name}</Typography>,
     },
     {
       id: 'request_amount',

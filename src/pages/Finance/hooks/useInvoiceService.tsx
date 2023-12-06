@@ -2,7 +2,9 @@
 import { InvoiceParams } from 'models/finance/invoice';
 import {
   createInvoice,
+  getInstallmentSimulation,
   getInvoiceAll,
+  getInvoicePDF,
   setManualSettled,
 } from 'service/Finance/invoice';
 import { useFormik } from 'formik';
@@ -85,4 +87,12 @@ export function UseCreateInvoice() {
 
 export function UseSetManualSettled() {
   return useMutation(setManualSettled);
+}
+
+export function UseGetInvoicePDF() {
+  return useMutation(getInvoicePDF);
+}
+
+export function UseGetInstalmentSimulation() {
+  return useMutation(getInstallmentSimulation);
 }
