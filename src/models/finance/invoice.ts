@@ -32,10 +32,43 @@ export type InvoiceListType = {
   deleted_by_id: null;
   nota_image: string;
   user: User;
+  User?: User;
+  outstanding_amount?: number;
   paid_amount: number;
   due_date: number;
   last_paid: number;
   status: string;
+};
+
+export type InvoiceDetailsType = {
+  id: number;
+  user_id: number;
+  invoice_number: string;
+  invoice_type_id: number;
+  amount: number;
+  destination_bank: string;
+  destination_bank_account: string;
+  bank_transfer_fee: number;
+  transfer_date: number;
+  admin_fee: number;
+  discount: number;
+  invoice_restructure_id: null;
+  invoice_restructure_type_id: null;
+  created_at: number;
+  created_by_id: number;
+  updated_at: null;
+  updated_by_id: null;
+  deleted_at: null;
+  deleted_by_id: null;
+  nota_image: string;
+  User: User;
+  due_date: number;
+  interest_per_today: number;
+  expected_interest: number;
+  paid_amount: number;
+  outstanding_amount: number;
+  status: string;
+  dpd_amount: number;
 };
 
 export type User = {

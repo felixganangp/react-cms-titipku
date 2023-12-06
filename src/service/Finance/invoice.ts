@@ -1,5 +1,9 @@
 import http from 'utils/request';
-import { InvoiceListType, InvoiceParams } from 'models/finance/invoice';
+import {
+  InvoiceDetailsType,
+  InvoiceListType,
+  InvoiceParams,
+} from 'models/finance/invoice';
 import { ListResponse, Response } from 'models/fetch';
 
 export const getInvoiceAll = (params?: InvoiceParams) =>
@@ -8,6 +12,21 @@ export const getInvoiceAll = (params?: InvoiceParams) =>
       const respon = await http.get(`financing/invoice`, {
         params,
       });
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const getInvoiceDetails = (id?: string) =>
+  new Promise<Response<InvoiceDetailsType>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`financing/invoice/${id}`);
       if (respon.data) {
         resolve(respon.data);
       }

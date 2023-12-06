@@ -4,6 +4,7 @@ import {
   createInvoice,
   getInstallmentSimulation,
   getInvoiceAll,
+  getInvoiceDetails,
   getInvoicePDF,
   setManualSettled,
 } from 'service/Finance/invoice';
@@ -81,6 +82,17 @@ export function UseInvoiceService(setParams?: InvoiceParams) {
   };
 }
 
+export function useInvoiceDetails(idInvoice?: string) {
+  const queryInvoice = useQuery({
+    queryKey: ['invoice/details', idInvoice],
+    queryFn: () => getInvoiceDetails(idInvoice),
+  });
+
+  return {
+    ...queryInvoice,
+    details: queryInvoice?.data?.data,
+  };
+}
 export function UseCreateInvoice() {
   return useMutation(createInvoice);
 }
