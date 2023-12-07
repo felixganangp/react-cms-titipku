@@ -1,10 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useFormik } from 'formik';
 import UseParams from 'hooks/useParams';
 import { PaymentParams, SettlementParams } from 'models/finance/payment';
 import { useMemo } from 'react';
-import { getPaymentAll, getSettlementeAll } from 'service/Finance/payment';
+import {
+  createPayment,
+  getPaymentAll,
+  getSettlementeAll,
+} from 'service/Finance/payment';
 
 export const useGetSettlements = (setParams?: SettlementParams) => {
   const params = UseParams<SettlementParams>(setParams);
@@ -69,3 +73,7 @@ export const UseGetPeyement = (setParams?: PaymentParams) => {
     listData: paymentQuery.data?.data || [],
   };
 };
+
+export function UseCreatePayment() {
+  return useMutation(createPayment);
+}

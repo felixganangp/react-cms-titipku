@@ -42,7 +42,9 @@ export default function PaymentPage() {
             mb={2}
           >
             <Stack direction="row" alignItems="center" gap={2} flex={1}>
-              <Button startIcon={<Add />}>Create Payment</Button>
+              <Button startIcon={<Add />} onClick={paymentForm.openModal}>
+                Create Payment
+              </Button>
               <TextField
                 placeholder="Search for name or email"
                 size="small"
