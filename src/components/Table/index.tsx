@@ -183,7 +183,7 @@ function EnhancedTable<T extends Data>({
 
   return (
     <Box width="100%">
-      <TableContainer>
+      <TableContainer sx={{ maxHeight: props.maxHeight }}>
         <Table stickyHeader aria-labelledby="tableTitle" size="medium">
           <EnhancedTableHead
             numSelected={enableCheckBox ? selected.length : 0}

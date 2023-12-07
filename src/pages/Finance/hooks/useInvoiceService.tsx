@@ -2,7 +2,10 @@
 import { InvoiceParams } from 'models/finance/invoice';
 import {
   createInvoice,
+  getInstallmentSimulation,
   getInvoiceAll,
+  getInvoiceDetails,
+  getInvoicePDF,
   setManualSettled,
 } from 'service/Finance/invoice';
 import { useFormik } from 'formik';
@@ -79,10 +82,29 @@ export function UseInvoiceService(setParams?: InvoiceParams) {
   };
 }
 
+export function useInvoiceDetails(idInvoice?: string) {
+  const queryInvoice = useQuery({
+    queryKey: ['invoice/details', idInvoice],
+    queryFn: () => getInvoiceDetails(idInvoice),
+  });
+
+  return {
+    ...queryInvoice,
+    details: queryInvoice?.data?.data,
+  };
+}
 export function UseCreateInvoice() {
   return useMutation(createInvoice);
 }
 
 export function UseSetManualSettled() {
   return useMutation(setManualSettled);
+}
+
+export function UseGetInvoicePDF() {
+  return useMutation(getInvoicePDF);
+}
+
+export function UseGetInstalmentSimulation() {
+  return useMutation(getInstallmentSimulation);
 }

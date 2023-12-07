@@ -5,11 +5,12 @@ import {
   CreateCustomerPayload,
   BiChecking,
   ReviewCustomer,
+  Customer,
 } from 'models/kur/Customer';
-import { Response } from 'models/fetch';
+import { ListResponse, Response } from 'models/fetch';
 
 export const getAllCustomers = (params: CustomerParams) =>
-  new Promise<CustomerParams>(async (resolve, reject) => {
+  new Promise<ListResponse<Customer>>(async (resolve, reject) => {
     try {
       const respon = await http.get(`financing/user`, {
         params,

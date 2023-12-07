@@ -85,7 +85,7 @@ export default function KurCustomer({ onClose }: KURCustomerProps) {
       label: 'KUR Type',
       align: 'left',
       width: '95px',
-      format: (val) => <div>{val.kur_user_type.name}</div>,
+      format: (val) => <div>{val?.kur_user_type?.name}</div>,
       enableSort: true,
     },
     {
@@ -93,14 +93,14 @@ export default function KurCustomer({ onClose }: KURCustomerProps) {
       label: 'Merchant',
       align: 'left',
       width: '25%',
-      format: (val) => <div>{val.user.name}</div>,
+      format: (val) => <div>{val?.user?.name}</div>,
     },
     {
       id: 'pasar',
       label: 'Pasar',
       align: 'left',
       width: '25%',
-      format: (val) => <div>{val.user.area.name}</div>,
+      format: (val) => <div>{val?.user?.area?.name}</div>,
     },
     {
       id: 'action',

@@ -61,6 +61,7 @@ export interface EnhancedTableProps<T extends { id?: string | number }> {
   setSelected?: (array: (string | number)[]) => void;
   onChangeSort?: (order: TableOrder) => void;
   noDataComponent?: JSX.Element;
+  maxHeight?: number | string;
 }
 
 export type Align = 'inherit' | 'left' | 'center' | 'right' | 'justify';

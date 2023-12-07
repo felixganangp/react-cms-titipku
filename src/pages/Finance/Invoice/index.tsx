@@ -1,4 +1,7 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { useState } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import {
   Autocomplete,
@@ -23,6 +26,7 @@ import * as yup from 'yup';
 import Table from 'components/Table';
 import { HeadCells } from 'components/Table/types';
 import Modal from 'components/Modal';
+import { useNavigate } from 'react-router-dom';
 
 import Label from 'components/Label';
 import { InvoiceListType } from 'models/finance/invoice';
@@ -30,6 +34,7 @@ import moment from 'moment';
 import numberSeperator from 'utils/numberSeperator';
 import MenuList from 'components/MenuList';
 import { MoreVert } from '@mui/icons-material';
+import { base64toOpen } from 'utils/base64toDownload';
 import {
   InvoiceType,
   KurType,
@@ -37,19 +42,50 @@ import {
   UseCategoryListService,
 } from '../hooks/useConfigFinance';
 import FormInvoice from './Components/FormInvoice';
-import { UseInvoiceService } from '../hooks/useInvoiceService';
+import {
+  UseGetInvoicePDF,
+  UseInvoiceService,
+} from '../hooks/useInvoiceService';
+import FormSetManualSettled from './Components/FormSetManualSettled';
 
 export default function InvoicePage() {
+  const navigate = useNavigate();
+  // modal
+  const [invoiceDetail, setinvoiceDetail] = useState<InvoiceListType | null>(
+    null,
+  );
   const showFilter = useModal();
   const invoiceForm = useModal();
+  const [modalTypeSetManualSettled, setModalTypeSetManualSettled] = useState<
+    number | null
+  >(null);
+
   const queryInnvoice = UseInvoiceService();
   const queryArea = UseAreaListService();
+  const getInoivcePDF = UseGetInvoicePDF();
   // const queryCategory = UseCategoryListService();
 
   const headCells: HeadCells<InvoiceListType>[] = [
     {
       id: 'invoice_number',
       label: 'Invoice Number',
+      format: ({ invoice_number, user, id, created_at }) => {
+        return (
+          <Typography
+            variant="body1"
+            color="info.main"
+            sx={{ cursor: 'pointer' }}
+            onClick={() => {
+              navigate(`/finance/invoice/${id}`);
+            }}
+          >
+            {invoice_number ||
+              `INV/${moment(created_at * 1000).format('YYYY')}/${
+                user?.user_number
+              }/${id}`}
+          </Typography>
+        );
+      },
     },
     {
       id: 'status',
@@ -134,7 +170,9 @@ export default function InvoicePage() {
       format: ({ last_paid }) => {
         return (
           <Typography variant="body1">
-            Rp. {numberSeperator(last_paid || 0)}
+            {last_paid !== 0
+              ? moment(last_paid * 1000).format('DD/MM/YYYY')
+              : '-'}
           </Typography>
         );
       },
@@ -148,19 +186,41 @@ export default function InvoicePage() {
             menu={[
               {
                 label: 'Detail',
-                onClick: () => {},
-              },
-              {
-                label: 'Restructure',
-                onClick: () => {},
+                onClick: () => {
+                  navigate(`/finance/invoice/${value.id}`);
+                },
               },
               {
                 label: 'Cut Loss',
-                onClick: () => {},
+                onClick: () => {
+                  setModalTypeSetManualSettled(1);
+                  setinvoiceDetail(value);
+                },
               },
               {
                 label: 'Memo Internal',
-                onClick: () => {},
+                onClick: () => {
+                  setModalTypeSetManualSettled(2);
+                  setinvoiceDetail(value);
+                },
+              },
+              {
+                label: 'Restructure',
+                onClick: () => {
+                  setModalTypeSetManualSettled(3);
+                  setinvoiceDetail(value);
+                },
+              },
+              {
+                label: 'Generate PDF',
+                onClick: () => {
+                  getInoivcePDF.mutate(value.id.toString(), {
+                    onSuccess: (data) => {
+                      base64toOpen(data.data, `${value.invoice_number}.pdf`);
+                    },
+                    onError: (error) => {},
+                  });
+                },
               },
             ]}
           >
@@ -544,7 +604,7 @@ export default function InvoicePage() {
                   </Stack>
                 </FormLabel>
               </Grid>
-              <Grid item xs={12} md={6}>
+              <Grid item xs={12} md={12}>
                 <Stack
                   direction="row"
                   spacing={1}
@@ -574,6 +634,12 @@ export default function InvoicePage() {
             page={queryInnvoice.data?.page || 0}
             count={queryInnvoice.data?.count || 0}
             totalData={queryInnvoice.data?.total || 0}
+            onChangePage={(value) => {
+              queryInnvoice.handleChangeParams({
+                ...queryInnvoice.params,
+                page: value,
+              });
+            }}
           />
         </Card>
       </Stack>
@@ -582,7 +648,26 @@ export default function InvoicePage() {
         title="Create Invoice"
         onClose={invoiceForm.closeModal}
       >
-        <FormInvoice />
+        <FormInvoice onClose={invoiceForm.closeModal} />
+      </Modal>
+      <Modal
+        open={Boolean(modalTypeSetManualSettled)}
+        title={
+          modalTypeSetManualSettled === 1
+            ? 'Cut Loss'
+            : modalTypeSetManualSettled === 2
+            ? 'Memo Internal'
+            : modalTypeSetManualSettled === 3
+            ? 'Restructure'
+            : 'Set Manual lunas'
+        }
+        onClose={() => setModalTypeSetManualSettled(null)}
+      >
+        <FormSetManualSettled
+          typeId={modalTypeSetManualSettled || 0}
+          invoiceDetail={invoiceDetail || ({} as InvoiceListType)}
+          onClose={() => setModalTypeSetManualSettled(null)}
+        />
       </Modal>
     </Box>
   );
