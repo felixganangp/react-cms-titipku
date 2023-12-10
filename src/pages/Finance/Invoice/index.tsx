@@ -123,10 +123,10 @@ export default function InvoicePage() {
     {
       id: 'invoice_date',
       label: 'Invoice Date',
-      format: ({ created_at }) => {
+      format: ({ transfer_date }) => {
         return (
           <Typography variant="body1">
-            {moment(created_at * 1000).format('DD/MM/YYYY')}
+            {moment(transfer_date * 1000).format('DD/MM/YYYY')}
           </Typography>
         );
       },
@@ -174,6 +174,15 @@ export default function InvoicePage() {
               ? moment(last_paid * 1000).format('DD/MM/YYYY')
               : '-'}
           </Typography>
+        );
+      },
+    },
+    {
+      id: 'invoice_type',
+      label: 'Invoice Type',
+      format: ({ invoice_type }) => {
+        return (
+          <Typography variant="body1">{invoice_type?.name || '-'}</Typography>
         );
       },
     },

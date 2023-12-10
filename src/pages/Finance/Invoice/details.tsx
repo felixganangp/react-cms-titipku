@@ -64,7 +64,7 @@ export default function InvoiceDetails() {
                     `INV/${moment(
                       (invoiceDetails.details?.created_at || 0) * 1000,
                     ).format('YYYY')}/${
-                      invoiceDetails.details?.User?.user_number
+                      invoiceDetails.details?.user?.user_number
                     }/${invoiceDetails.details?.id}`}
                 </Typography>
               </Stack>
@@ -117,7 +117,7 @@ export default function InvoiceDetails() {
         <AccordionOnDetails defaultOpen title="Invoice">
           <Card>
             <Typography variant="h2" fontWeight="bold">
-              {invoiceDetails.details?.User.merchant_name}
+              {invoiceDetails.details?.user.merchant_name}
             </Typography>
             <Grid container spacing={2} mt={2}>
               <Grid item xs={6} sm={9}>
@@ -126,7 +126,7 @@ export default function InvoiceDetails() {
                     <Typography color="primary">Invoice Date</Typography>
                     <Typography>
                       {moment(
-                        (invoiceDetails.details?.created_at || 0) * 1000,
+                        (invoiceDetails.details?.transfer_date || 0) * 1000,
                       ).format('MMMM DD, YYYY')}
                     </Typography>
                   </Grid>
@@ -257,14 +257,14 @@ export default function InvoiceDetails() {
                     return (
                       <Box>
                         <Typography>
-                          {moment((val.payment?.paid_date || 0) * 1000).format(
-                            'MMMM DD, YYYY',
-                          )}
+                          {moment(
+                            (val.payment?.payment_date || 0) * 1000,
+                          ).format('MMMM DD, YYYY')}
                         </Typography>
                         <Typography variant="caption">
-                          {moment((val.payment?.paid_date || 0) * 1000).format(
-                            'HH:mm',
-                          )}
+                          {moment(
+                            (val.payment?.payment_date || 0) * 1000,
+                          ).format('HH:mm')}
                         </Typography>
                       </Box>
                     );
@@ -325,7 +325,6 @@ export default function InvoiceDetails() {
             // @ts-ignore
             ({
               ...invoiceDetails.details,
-              user: invoiceDetails.details?.User,
             } as InvoiceListType) || ({} as InvoiceListType)
           }
           onClose={() => setModalTypeSetManualSettled(null)}

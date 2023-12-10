@@ -24,6 +24,7 @@ export type InvoiceListType = {
   discount: number;
   invoice_restructure_id: null;
   invoice_restructure_type_id: null;
+  invoice_type: { id: number; name: string };
   created_at: number;
   created_by_id: number;
   updated_at: null;
@@ -61,7 +62,7 @@ export type InvoiceDetailsType = {
   deleted_at: null;
   deleted_by_id: null;
   nota_image: string;
-  User: User;
+  user: User;
   due_date: number;
   interest_per_today: number;
   expected_interest: number;
