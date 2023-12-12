@@ -65,62 +65,78 @@ export default function FormInvoice(props: FormInvoiceProps) {
       user: yup.object().nullable().required('Required'),
       loan_amount: yup.string().required('Required'),
       transfer_date: yup.mixed().nullable().required('Required'),
-      destination_bank: yup.object().when('invoice_type_id', {
-        is: (val: any) => val === '2',
+      destination_bank: yup.mixed().when('invoice_type_id', {
+        is: (val: any) => val === '1',
         then: yup.object().required('Required'),
       }),
       destination_bank_account: yup.string().when('invoice_type_id', {
-        is: (val: any) => val === '2',
+        is: (val: any) => val === '1',
         then: yup.string().required('Required'),
       }),
       bank_transfer_fee: yup.string().when('invoice_type_id', {
+        is: (val: any) => val === '1',
+        then: yup.string().required('Required'),
+      }),
+      installment_period: yup.string().when('invoice_type_id', {
         is: (val: any) => val === '2',
         then: yup.string().required('Required'),
       }),
-      installment_period: yup.string().required('Required'),
-      provision_installment_period: yup.string().required('Required'),
+      provision_installment_period: yup
+        .number()
+        .max(12, 'Max 36 period')
+        .required('Required'),
       nota_image: yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
-      const fd = new FormData();
-      const promises = Object.keys(values).map(async (key) => {
-        switch (key) {
-          case 'transfer_date':
-            // @ts-ignore
-            await fd.append('transfer_date', moment(values[key]).unix());
-            break;
-          case 'user':
-            // @ts-ignore
-            await fd.append('user_id', values.user.id);
-            break;
-          case 'destination_bank':
-            // @ts-ignore
-            await fd.append('destination_bank_id', values[key].code);
-            break;
-          default:
-            // @ts-ignore
-            await fd.append(key, values[key]);
-            break;
-        }
-      });
+      try {
+        const fd = new FormData();
+        const promises = Object.keys(values).map(async (key) => {
+          switch (key) {
+            case 'transfer_date':
+              // @ts-ignore
+              await fd.append('transfer_date', moment(values[key]).unix());
+              break;
+            case 'user':
+              // @ts-ignore
+              await fd.append('user_id', values.user.id);
+              break;
+            case 'destination_bank':
+              // @ts-ignore
+              if (values[key]?.code) {
+                // @ts-ignore
+                await fd.append('destination_bank', values[key].code);
+              }
+              break;
+            default:
+              // @ts-ignore
+              if (values[key]) {
+                // @ts-ignore
+                await fd.append(key, values[key]);
+              }
+              break;
+          }
+        });
 
-      await Promise.all(promises);
-      createInvoice.mutate(fd, {
-        onSuccess: (data) => {
-          props.onClose();
-          formik.resetForm();
-          toast.openToast({
-            severity: 'success',
-            headMsg: 'Success create invoice',
-          });
-        },
-        onError: (error) => {
-          toast.openToast({
-            severity: 'error',
-            headMsg: 'Failed create invoice',
-          });
-        },
-      });
+        await Promise.all(promises);
+        createInvoice.mutate(fd, {
+          onSuccess: (data) => {
+            props.onClose();
+            formik.resetForm();
+            toast.openToast({
+              severity: 'success',
+              headMsg: 'Success create invoice',
+            });
+          },
+          onError: (error) => {
+            toast.openToast({
+              severity: 'error',
+              headMsg: 'Failed create invoice',
+            });
+          },
+        });
+      } catch (error) {
+        console.log(error);
+      }
     },
   });
 
@@ -160,7 +176,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
             value={formik.values.invoice_type_id}
             onChange={formik.handleChange}
           >
-            <FormControlLabel value="1" control={<Radio />} label="Nornmal" />
+            <FormControlLabel value="1" control={<Radio />} label="Normal" />
             <FormControlLabel value="2" control={<Radio />} label="Cash" />
           </RadioGroup>
         </FormControl>
@@ -186,7 +202,14 @@ export default function FormInvoice(props: FormInvoiceProps) {
                 <Typography>Available Limit</Typography>
                 <Typography color="error">
                   {/* @ts-ignore */}
-                  Rp. {numberSeperator(formik.values.user?.limit_cash || 0)}
+                  Rp.{' '}
+                  {numberSeperator(
+                    (formik.values.invoice_type_id === '1'
+                      ? // @ts-ignore
+                        formik.values.user?.limit_plafon
+                      : // @ts-ignore
+                        formik.values.user?.limit_cash) || 0,
+                  )}
                 </Typography>
               </Stack>
               <IconButton
@@ -287,7 +310,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
             }}
           />
         </FormControl>
-        {formik.values.invoice_type_id === '2' && (
+        {formik.values.invoice_type_id === '1' && (
           <>
             <FormControl
               text="Destination Bank"
@@ -322,13 +345,13 @@ export default function FormInvoice(props: FormInvoiceProps) {
                     {...params}
                     name="bankName"
                     onBlur={formik.handleBlur}
-                    placeholder="Select your bank account"
+                    placeholder="Select your bank"
                   />
                 )}
               />
             </FormControl>
             <FormControl
-              text="Destination Bank"
+              text="Destination Bank Account"
               error={
                 formik.touched.destination_bank_account &&
                 Boolean(formik.errors.destination_bank_account)
@@ -341,7 +364,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
             >
               <TextField
                 fullWidth
-                placeholder="Insert Bank Account"
+                placeholder="Insert destination bank"
                 value={formik.values.destination_bank_account}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -384,68 +407,78 @@ export default function FormInvoice(props: FormInvoiceProps) {
             </FormControl>
           </>
         )}
-        <FormControl
-          text="Installment Period"
-          required
-          error={
-            formik.touched.installment_period &&
-            Boolean(formik.errors.installment_period)
-          }
-          helperText={
-            formik.touched.installment_period &&
-            formik.errors.installment_period &&
-            `${formik.errors.installment_period}`
-          }
-        >
+        {formik.values.invoice_type_id === '2' && (
           <>
-            <TextField
-              fullWidth
-              placeholder="Insert Installment Period"
-              value={formik.values.installment_period}
-              onChange={(e) => {
-                formik.handleChange(e);
-                const { value } = e.target;
+            <FormControl
+              text="Installment Period"
+              required
+              error={
+                formik.touched.installment_period &&
+                Boolean(formik.errors.installment_period)
+              }
+              helperText={
+                formik.touched.installment_period &&
+                formik.errors.installment_period &&
+                `${formik.errors.installment_period}`
+              }
+            >
+              <>
+                <TextField
+                  fullWidth
+                  placeholder="Insert Installment Period"
+                  value={formik.values.installment_period}
+                  onChange={(e) => {
+                    formik.handleChange(e);
+                    const { value } = e.target;
 
-                if (formik.values.loan_amount && formik.values.transfer_date) {
+                    if (
+                      formik.values.loan_amount &&
+                      formik.values.transfer_date
+                    ) {
+                      // @ts-ignore
+                      setInstallmentSimulation(value as number);
+                    }
+                  }}
+                  onBlur={formik.handleBlur}
+                  name="installment_period"
+                  type="number"
                   // @ts-ignore
-                  setInstallmentSimulation(value as number);
-                }
-              }}
-              onBlur={formik.handleBlur}
-              name="installment_period"
-              type="number"
-            />
-            <Stack spacing={2} mt={2}>
-              {simulationInstalment.isLoading && (
-                <Typography>Loading...</Typography>
-              )}
-              {simulation.map((item: any, index: number) => (
-                <Stack
-                  key={index}
-                  alignItems="center"
-                  justifyContent="space-between"
-                  direction="row"
-                  spacing={2}
-                  p={1}
-                  bgcolor="#dedede"
-                >
-                  <Stack>
-                    <Typography>Due Data</Typography>
-                    <Typography>
-                      {moment(item.due_date).format('DD MM YYYY')}
-                    </Typography>
-                  </Stack>
-                  <Stack>
-                    <Typography>Installment per Amount</Typography>
-                    <Typography>
-                      Rp. {numberSeperator(item?.amount || 0)}
-                    </Typography>
-                  </Stack>
+                  onWheel={(e) => e.target?.blur()}
+                />
+                <Stack spacing={2} mt={2}>
+                  {simulationInstalment.isLoading && (
+                    <Typography>Loading...</Typography>
+                  )}
+                  {simulation.map((item: any, index: number) => (
+                    <Stack
+                      key={index}
+                      alignItems="center"
+                      justifyContent="space-between"
+                      direction="row"
+                      spacing={2}
+                      p={1}
+                      bgcolor="#dedede"
+                    >
+                      <Stack>
+                        <Typography>Due Data</Typography>
+                        <Typography>
+                          {moment(item.due_date * 1000).format('DD-MM-YYYY')}
+                        </Typography>
+                      </Stack>
+                      <Stack>
+                        <Typography>Installment per Amount</Typography>
+                        <Typography>
+                          Rp. {numberSeperator(item?.amount || 0)}
+                        </Typography>
+                      </Stack>
+                    </Stack>
+                  ))}
                 </Stack>
-              ))}
-            </Stack>
+              </>
+            </FormControl>
           </>
-        </FormControl>
+        )}
+
         <FormControl
           text="Provision Installment Period"
           required
@@ -467,10 +500,12 @@ export default function FormInvoice(props: FormInvoiceProps) {
             onBlur={formik.handleBlur}
             name="provision_installment_period"
             type="number"
+            // @ts-ignore
+            onWheel={(e) => e.target?.blur()}
           />
         </FormControl>
         <FormControl
-          text="Provision Installment Period"
+          text="Note Image"
           required
           error={formik.touched.nota_image && Boolean(formik.errors.nota_image)}
           helperText={

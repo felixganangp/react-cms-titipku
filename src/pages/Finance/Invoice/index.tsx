@@ -90,6 +90,7 @@ export default function InvoicePage() {
     {
       id: 'status',
       label: 'Status',
+      align: 'center',
       format: ({ status }) => {
         const color =
           // eslint-disable-next-line no-nested-ternary
@@ -103,6 +104,15 @@ export default function InvoicePage() {
             {status}
           </Label>
         );
+      },
+    },
+    {
+      id: 'invoice_restructure_type',
+      label: 'Restructure Type',
+      align: 'center',
+      format: ({ invoice_restructure_type }) => {
+        return invoice_restructure_type.name;
+        // </Label>
       },
     },
     {
@@ -338,7 +348,7 @@ export default function InvoicePage() {
                       <TextField
                         {...params}
                         name="area"
-                        placeholder="Example: Pasar Modern BSD"
+                        placeholder="Select Pasar"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -418,7 +428,7 @@ export default function InvoicePage() {
                         <TextField
                           {...params}
                           name="grade"
-                          placeholder="Select Grade"
+                          placeholder="Select Invoice Type"
                           variant="outlined"
                         />
                       );
@@ -445,7 +455,7 @@ export default function InvoicePage() {
                         <TextField
                           {...params}
                           name="grade"
-                          placeholder="Select Grade"
+                          placeholder="Select Status"
                           variant="outlined"
                         />
                       );
