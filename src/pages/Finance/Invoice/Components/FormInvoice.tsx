@@ -66,15 +66,15 @@ export default function FormInvoice(props: FormInvoiceProps) {
       loan_amount: yup.string().required('Required'),
       transfer_date: yup.mixed().nullable().required('Required'),
       destination_bank: yup.mixed().when('invoice_type_id', {
-        is: (val: any) => val === '2',
+        is: (val: any) => val === '1',
         then: yup.object().required('Required'),
       }),
       destination_bank_account: yup.string().when('invoice_type_id', {
-        is: (val: any) => val === '2',
+        is: (val: any) => val === '1',
         then: yup.string().required('Required'),
       }),
       bank_transfer_fee: yup.string().when('invoice_type_id', {
-        is: (val: any) => val === '2',
+        is: (val: any) => val === '1',
         then: yup.string().required('Required'),
       }),
       installment_period: yup.string().when('invoice_type_id', {
@@ -310,7 +310,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
             }}
           />
         </FormControl>
-        {formik.values.invoice_type_id === '2' && (
+        {formik.values.invoice_type_id === '1' && (
           <>
             <FormControl
               text="Destination Bank"
@@ -345,13 +345,13 @@ export default function FormInvoice(props: FormInvoiceProps) {
                     {...params}
                     name="bankName"
                     onBlur={formik.handleBlur}
-                    placeholder="Select your bank account"
+                    placeholder="Select your bank"
                   />
                 )}
               />
             </FormControl>
             <FormControl
-              text="Destination Bank"
+              text="Destination Bank Account"
               error={
                 formik.touched.destination_bank_account &&
                 Boolean(formik.errors.destination_bank_account)
@@ -364,7 +364,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
             >
               <TextField
                 fullWidth
-                placeholder="Insert Bank Account"
+                placeholder="Insert destination bank"
                 value={formik.values.destination_bank_account}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -404,7 +404,11 @@ export default function FormInvoice(props: FormInvoiceProps) {
                   formik.setFieldValue('bank_transfer_fee', value);
                 }}
               />
-            </FormControl>{' '}
+            </FormControl>
+          </>
+        )}
+        {formik.values.invoice_type_id === '2' && (
+          <>
             <FormControl
               text="Installment Period"
               required
@@ -438,6 +442,8 @@ export default function FormInvoice(props: FormInvoiceProps) {
                   onBlur={formik.handleBlur}
                   name="installment_period"
                   type="number"
+                  // @ts-ignore
+                  onWheel={(e) => e.target?.blur()}
                 />
                 <Stack spacing={2} mt={2}>
                   {simulationInstalment.isLoading && (
@@ -494,10 +500,12 @@ export default function FormInvoice(props: FormInvoiceProps) {
             onBlur={formik.handleBlur}
             name="provision_installment_period"
             type="number"
+            // @ts-ignore
+            onWheel={(e) => e.target?.blur()}
           />
         </FormControl>
         <FormControl
-          text="Provision Installment Period"
+          text="Note Image"
           required
           error={formik.touched.nota_image && Boolean(formik.errors.nota_image)}
           helperText={

@@ -348,7 +348,7 @@ export default function InvoicePage() {
                       <TextField
                         {...params}
                         name="area"
-                        placeholder="Example: Pasar Modern BSD"
+                        placeholder="Select Pasar"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -428,7 +428,7 @@ export default function InvoicePage() {
                         <TextField
                           {...params}
                           name="grade"
-                          placeholder="Select Grade"
+                          placeholder="Select Invoice Type"
                           variant="outlined"
                         />
                       );
@@ -455,7 +455,7 @@ export default function InvoicePage() {
                         <TextField
                           {...params}
                           name="grade"
-                          placeholder="Select Grade"
+                          placeholder="Select Status"
                           variant="outlined"
                         />
                       );
