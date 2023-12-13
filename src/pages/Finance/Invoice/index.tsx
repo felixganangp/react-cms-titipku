@@ -116,6 +116,15 @@ export default function InvoicePage() {
       },
     },
     {
+      id: 'invoice_type',
+      label: 'Invoice Type',
+      format: ({ invoice_type }) => {
+        return (
+          <Typography variant="body1">{invoice_type?.name || '-'}</Typography>
+        );
+      },
+    },
+    {
       id: 'Name',
       label: 'Name',
       format: ({ user }) => {
@@ -184,15 +193,6 @@ export default function InvoicePage() {
               ? moment(last_paid * 1000).format('DD/MM/YYYY')
               : '-'}
           </Typography>
-        );
-      },
-    },
-    {
-      id: 'invoice_type',
-      label: 'Invoice Type',
-      format: ({ invoice_type }) => {
-        return (
-          <Typography variant="body1">{invoice_type?.name || '-'}</Typography>
         );
       },
     },
