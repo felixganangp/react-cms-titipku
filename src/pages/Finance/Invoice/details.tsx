@@ -15,6 +15,7 @@ import Table from 'components/Table';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import AccordionOnDetails from 'components/Accordion/SubDetailsPagesWrapper';
 import { useNavigate, useParams } from 'react-router-dom';
+import bankData from 'data/list-bank.json';
 
 import moment from 'moment';
 import numberSeperator from 'utils/numberSeperator';
@@ -194,6 +195,41 @@ export default function InvoiceDetails() {
                       )}
                     </Typography>
                   </Grid>
+                  {invoiceDetails.details?.invoice_type_id === 1 && (
+                    <>
+                      <Grid item sm={4}>
+                        <Typography color="primary">
+                          Bank Destination
+                        </Typography>
+                        <Typography>
+                          {bankData.data.find(
+                            (val) =>
+                              val.code.toLowerCase() ===
+                              invoiceDetails.details?.destination_bank?.toLowerCase(),
+                          )?.name || '-'}
+                        </Typography>
+                      </Grid>
+                      <Grid item sm={4}>
+                        <Typography color="primary">
+                          Bank Destination Account{' '}
+                        </Typography>
+                        <Typography>
+                          {invoiceDetails.details?.destination_bank_account}
+                        </Typography>
+                      </Grid>
+                      <Grid item sm={4}>
+                        <Typography color="primary">
+                          Bank Transfer Fee
+                        </Typography>
+                        <Typography>
+                          Rp{' '}
+                          {numberSeperator(
+                            invoiceDetails.details?.outstanding_amount || 0,
+                          )}
+                        </Typography>
+                      </Grid>
+                    </>
+                  )}
                   <Grid item sm={4}>
                     <Typography color="primary">Note Image</Typography>
                     <Box
@@ -218,19 +254,35 @@ export default function InvoiceDetails() {
                 </Grid>
               </Grid>
               <Grid item xs={6} sm={3}>
-                <Typography color="primary">Status</Typography>
-                <Label
-                  variant="filled"
-                  color={
-                    invoiceDetails.details?.status === 'Late'
-                      ? 'error'
-                      : invoiceDetails.details?.status === 'On Schedule'
-                      ? 'success'
-                      : 'info'
-                  }
-                >
-                  {invoiceDetails.details?.status}
-                </Label>
+                <Stack spacing={2} alignItems="start">
+                  <Stack>
+                    <Typography color="primary">Invoice Type</Typography>
+                    <Typography>
+                      {invoiceDetails.details?.invoice_type.name}
+                    </Typography>
+                  </Stack>
+                  <Stack>
+                    <Typography color="primary">Restructure Type</Typography>
+                    <Typography>
+                      {invoiceDetails.details?.invoice_restructure_type.name}
+                    </Typography>
+                  </Stack>
+                  <Stack>
+                    <Typography color="primary">Status</Typography>
+                    <Label
+                      variant="filled"
+                      color={
+                        invoiceDetails.details?.status === 'Late'
+                          ? 'error'
+                          : invoiceDetails.details?.status === 'On Schedule'
+                          ? 'success'
+                          : 'info'
+                      }
+                    >
+                      {invoiceDetails.details?.status}
+                    </Label>
+                  </Stack>
+                </Stack>
               </Grid>
             </Grid>
           </Card>
@@ -276,7 +328,7 @@ export default function InvoiceDetails() {
                   format: (val: any) => {
                     return (
                       <Typography>
-                        Rp {numberSeperator(val.payment?.amount || 0)}
+                        Rp {numberSeperator(val?.amount || 0)}
                       </Typography>
                     );
                   },

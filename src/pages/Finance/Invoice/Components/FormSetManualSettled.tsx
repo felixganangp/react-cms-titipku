@@ -24,6 +24,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers';
 import {
   UseGetInstalmentSimulation,
   UseSetManualSettled,
+  useInvoiceDetails,
 } from '../../hooks/useInvoiceService';
 
 type Props = {
@@ -36,6 +37,8 @@ export default function FormSetManualSettled({
   invoiceDetail,
   onClose,
 }: Props) {
+  const invoiceDetailsQuery = useInvoiceDetails(invoiceDetail.id);
+
   const toast = useToast();
   const mutationSetManualSettled = UseSetManualSettled();
 
@@ -171,9 +174,12 @@ export default function FormSetManualSettled({
             </Typography>
           </Stack>
           <Stack alignItems="end">
-            <Typography>Invoice Amount</Typography>
-            <Typography color="primary">
-              Rp. {numberSeperator(invoiceDetail?.amount || 0)}
+            <Typography>Remaining Bill</Typography>
+            <Typography color="error.main">
+              Rp.{' '}
+              {numberSeperator(
+                invoiceDetailsQuery?.details?.outstanding_amount || 0,
+              )}
             </Typography>
           </Stack>
         </Stack>

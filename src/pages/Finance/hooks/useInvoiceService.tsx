@@ -82,10 +82,11 @@ export function UseInvoiceService(setParams?: InvoiceParams) {
   };
 }
 
-export function useInvoiceDetails(idInvoice?: string) {
+export function useInvoiceDetails(idInvoice?: string | number) {
   const queryInvoice = useQuery({
     queryKey: ['invoice/details', idInvoice],
     queryFn: () => getInvoiceDetails(idInvoice),
+    enabled: !!idInvoice,
   });
 
   return {

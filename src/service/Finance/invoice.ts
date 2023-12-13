@@ -23,7 +23,7 @@ export const getInvoiceAll = (params?: InvoiceParams) =>
     }
   });
 
-export const getInvoiceDetails = (id?: string) =>
+export const getInvoiceDetails = (id?: string | number) =>
   new Promise<Response<InvoiceDetailsType>>(async (resolve, reject) => {
     try {
       const respon = await http.get(`financing/invoice/${id}`);

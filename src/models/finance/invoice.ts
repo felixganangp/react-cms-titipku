@@ -44,6 +44,8 @@ export type InvoiceListType = {
 
 export type InvoiceDetailsType = {
   id: number;
+  invoice_type: { id: number; name: string };
+  invoice_restructure_type: { id: number; name: string };
   user_id: number;
   invoice_number: string;
   invoice_type_id: number;
