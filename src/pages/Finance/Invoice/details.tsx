@@ -328,7 +328,7 @@ export default function InvoiceDetails() {
                   format: (val: any) => {
                     return (
                       <Typography>
-                        Rp {numberSeperator(val.payment?.amount || 0)}
+                        Rp {numberSeperator(val?.amount || 0)}
                       </Typography>
                     );
                   },
