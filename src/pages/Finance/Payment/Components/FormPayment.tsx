@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import { useCallback, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 
 import * as yup from 'yup';
@@ -17,11 +18,16 @@ import {
   Stack,
   TextField,
   Typography,
+  debounce,
 } from '@mui/material';
-import { Add, Delete } from '@mui/icons-material';
+import { Add, Delete, KeyboardArrowDown } from '@mui/icons-material';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
 import InputImage from 'components/InputImage';
-import { UseCreatePayment } from '../../hooks/usePaymentService';
+import {
+  UseCreatePayment,
+  UseGetPeyement,
+  UseGetSimulationPayment,
+} from '../../hooks/usePaymentService';
 
 import SelectCustomer from '../../Components/SelectCustomer';
 import { KurType } from '../../hooks/useConfigFinance';
@@ -36,6 +42,8 @@ type Props = {
 export default function FormPayment({ onClose }: Props) {
   const toast = useToast();
   const createPayment = UseCreatePayment();
+  const [simulation, setSimulation] = useState<any[]>([]);
+  const useGetPaymentSimulation = UseGetSimulationPayment();
   const customerModal = useModal();
 
   const formik = useFormik({
@@ -95,6 +103,38 @@ export default function FormPayment({ onClose }: Props) {
       });
     },
   });
+
+  const setSimulationPayment = useCallback(
+    debounce((values: any) => {
+      useGetPaymentSimulation.mutate(
+        {
+          amount: values.amount,
+          // @ts-ignore
+          user_id: values?.user?.id || 0,
+          payment_date: moment(values.payment_date).unix(),
+        },
+        {
+          onSuccess: (data) => {
+            // @ts-ignore
+            // setSimulation(data.data || []);c
+            setSimulation(data.data || []);
+          },
+        },
+      );
+    }, 1000),
+    [],
+  );
+
+  useEffect(() => {
+    if (
+      formik.values.amount &&
+      formik.values.user &&
+      formik.values.payment_date
+    ) {
+      setSimulationPayment(formik.values);
+    }
+  }, [formik.values.amount, formik.values.user, formik.values.payment_date]);
+
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Box p="24px">
@@ -198,26 +238,92 @@ export default function FormPayment({ onClose }: Props) {
             `${formik.errors.amount}`
           }
         >
-          <TextField
-            type="text"
-            name="amount"
-            placeholder="Insert Amount"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">Rp</InputAdornment>
-              ),
-            }}
-            fullWidth
-            autoComplete="off"
-            value={numberSeperator(formik.values.amount || '')}
-            onChange={(e) => {
-              const value = e.target.value
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
+          <>
+            <TextField
+              type="text"
+              name="amount"
+              placeholder="Insert Amount"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Rp</InputAdornment>
+                ),
+              }}
+              fullWidth
+              autoComplete="off"
+              value={numberSeperator(formik.values.amount || '')}
+              onChange={(e) => {
+                const value = e.target.value
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
 
-              formik.setFieldValue('amount', value);
-            }}
-          />
+                formik.setFieldValue('amount', value);
+              }}
+            />
+            <Stack
+              gap={1}
+              mt={2}
+              display={simulation.length > 0 ? 'block' : 'none'}
+            >
+              <Typography>Payment Simulation</Typography>
+              {simulation.map((item, index) => (
+                <Stack key={index}>
+                  <Stack
+                    gap="10px"
+                    p={1}
+                    bgcolor="#cecece"
+                    direction="row"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Stack>
+                      <Typography fontSize={14}>Invoice number</Typography>
+                      <Typography>{item.invoice_number}</Typography>
+                    </Stack>
+                    <Stack direction="row" gap={1}>
+                      <Box>
+                        <Typography fontSize={14}>Invoice Total</Typography>
+                        <Typography>
+                          Rp {numberSeperator(item?.invoice_total || 0)}
+                        </Typography>
+                      </Box>
+                      <Box>
+                        <Typography fontSize={14}>Status</Typography>
+                        <Typography>{item.status}</Typography>
+                      </Box>
+                    </Stack>
+                  </Stack>
+                  <Box bgcolor="#dedede" p={1}>
+                    <table>
+                      <tr>
+                        <td>Remain</td>
+                        <td>:</td>
+                        <td>Rp {numberSeperator(item?.detail?.remain || 0)}</td>
+                      </tr>
+                      <tr>
+                        <td>DPD</td>
+                        <td>:</td>
+                        <td>Rp {numberSeperator(item?.detail?.dpd || 0)}</td>
+                      </tr>
+                      <tr>
+                        <td>Interest</td>
+                        <td>:</td>
+                        <td>
+                          Rp {numberSeperator(item?.detail?.interest || 0)}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>Principal</td>
+                        <td>:</td>
+                        <td>
+                          Rp {numberSeperator(item?.detail?.principal || 0)}
+                        </td>
+                      </tr>
+                    </table>
+                  </Box>
+                </Stack>
+              ))}
+            </Stack>
+          </>
         </FormControl>
         <FormControl
           text="Payment Method"
