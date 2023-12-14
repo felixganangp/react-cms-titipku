@@ -160,7 +160,7 @@ export default function FormPayment({ onClose }: Props) {
                 <Typography>Available Limit</Typography>
                 <Typography color="error">
                   {/* @ts-ignore */}
-                  Rp. {numberSeperator(formik.values.user?.limit_cash || 0)}
+                  Rp. {numberSeperator(formik.values.user?.balance || 0)}
                 </Typography>
               </Stack>
               <IconButton
