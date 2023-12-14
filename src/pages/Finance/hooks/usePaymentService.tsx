@@ -7,6 +7,7 @@ import { useMemo } from 'react';
 import {
   createPayment,
   getPaymentAll,
+  getPaymentSimulation,
   getSettlementeAll,
 } from 'service/Finance/payment';
 
@@ -76,4 +77,8 @@ export const UseGetPeyement = (setParams?: PaymentParams) => {
 
 export function UseCreatePayment() {
   return useMutation(createPayment);
+}
+
+export function UseGetSimulationPayment() {
+  return useMutation(getPaymentSimulation);
 }

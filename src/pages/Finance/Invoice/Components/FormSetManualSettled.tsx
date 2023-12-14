@@ -417,7 +417,7 @@ export default function FormSetManualSettled({
                       <Stack>
                         <Typography>Due Data</Typography>
                         <Typography>
-                          {moment(item.due_date).format('DD MM YYYY')}
+                          {moment(item.due_date * 1000).format('DD-MM-YYYY')}
                         </Typography>
                       </Stack>
                       <Stack>
