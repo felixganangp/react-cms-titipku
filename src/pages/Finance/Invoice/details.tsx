@@ -224,7 +224,7 @@ export default function InvoiceDetails() {
                         <Typography>
                           Rp{' '}
                           {numberSeperator(
-                            invoiceDetails.details?.outstanding_amount || 0,
+                            invoiceDetails.details?.bank_transfer_fee || 0,
                           )}
                         </Typography>
                       </Grid>
@@ -304,7 +304,7 @@ export default function InvoiceDetails() {
                 },
                 {
                   id: 'paid',
-                  label: 'Paid Data',
+                  label: 'Paid Date',
                   format: (val: any) => {
                     return (
                       <Box>

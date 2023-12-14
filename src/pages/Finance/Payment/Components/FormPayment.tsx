@@ -117,7 +117,7 @@ export default function FormPayment({ onClose }: Props) {
           onSuccess: (data) => {
             // @ts-ignore
             // setSimulation(data.data || []);c
-            setSimulation(data.data || []);
+            setSimulation(data.data);
           },
         },
       );
@@ -259,13 +259,25 @@ export default function FormPayment({ onClose }: Props) {
                 formik.setFieldValue('amount', value);
               }}
             />
+            {simulation === null && (
+              <Stack
+                p={1}
+                mt={2}
+                bgcolor="#cecece"
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography>Tidak ada tagihan berjalan</Typography>
+              </Stack>
+            )}
             <Stack
               gap={1}
               mt={2}
-              display={simulation.length > 0 ? 'block' : 'none'}
+              display={simulation?.length > 0 ? 'block' : 'none'}
             >
-              <Typography>Payment Simulation</Typography>
-              {simulation.map((item, index) => (
+              <Typography mb={1}>Payment Simulation</Typography>
+              {simulation?.map((item, index) => (
                 <Stack key={index}>
                   <Stack
                     gap="10px"
@@ -294,6 +306,11 @@ export default function FormPayment({ onClose }: Props) {
                   </Stack>
                   <Box bgcolor="#dedede" p={1}>
                     <table>
+                      <tr>
+                        <td>Bank Transfer</td>
+                        <td>:</td>
+                        <td>Rp {numberSeperator(item?.bank_transfer || 0)}</td>
+                      </tr>
                       <tr>
                         <td>Remain</td>
                         <td>:</td>
