@@ -9,6 +9,7 @@ import {
   getPaymentAll,
   getPaymentSimulation,
   getSettlementeAll,
+  getpaymentDetails,
 } from 'service/Finance/payment';
 
 export const useGetSettlements = (setParams?: SettlementParams) => {
@@ -74,6 +75,19 @@ export const UseGetPeyement = (setParams?: PaymentParams) => {
     listData: paymentQuery.data?.data || [],
   };
 };
+
+export function usePaymentDetails(idPayment?: string | number) {
+  const queryInvoice = useQuery({
+    queryKey: ['payment/details', idPayment],
+    queryFn: () => getpaymentDetails(idPayment),
+    enabled: !!idPayment,
+  });
+
+  return {
+    ...queryInvoice,
+    details: queryInvoice?.data?.data,
+  };
+}
 
 export function UseCreatePayment() {
   return useMutation(createPayment);

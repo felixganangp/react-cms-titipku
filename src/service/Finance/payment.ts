@@ -71,3 +71,18 @@ export const getPaymentSimulation = (params: {
       reject(message);
     }
   });
+
+export const getpaymentDetails = (id?: string | number) =>
+  new Promise<Response<any>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`financing/payment/${id}`);
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });

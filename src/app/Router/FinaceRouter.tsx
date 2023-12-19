@@ -4,6 +4,7 @@ import type { RouteProps } from './ListRoute';
 const InvoicePage = lazy(() => import('pages/Finance/Invoice'));
 const InvoiceDetailsPage = lazy(() => import('pages/Finance/Invoice/details'));
 const PaymentPage = lazy(() => import('pages/Finance/Payment'));
+const PaymentDetailsPage = lazy(() => import('pages/Finance/Payment/details'));
 const KurCustomerManagement = lazy(
   () => import('pages/KurManagement/Customer/Customer'),
 );
@@ -33,6 +34,13 @@ export const FinaceRouters: RouteProps[] = [
     name: 'Invoice',
     comp: PaymentPage,
     path: '/finance/payment',
+    index: true,
+    auth: 'Private',
+  },
+  {
+    name: 'Invoice',
+    comp: PaymentDetailsPage,
+    path: '/finance/payment/:idPayment',
     index: true,
     auth: 'Private',
   },
