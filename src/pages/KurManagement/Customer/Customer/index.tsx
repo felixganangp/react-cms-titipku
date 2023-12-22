@@ -347,7 +347,7 @@ export default function KurCustomer() {
               {
                 label: 'Details',
                 onClick: () => {
-                  navigate(`/kur/customer/${val.id}`);
+                  navigate(`/finance/customer/${val.id}`);
                 },
                 dataId: 'button-details-customer',
               },

@@ -157,8 +157,8 @@ export default function FormPayment({ onClose }: Props) {
                 <Typography>{formik.values.user.merchant_name}</Typography>
               </Stack>
               <Stack>
-                <Typography>Available Limit</Typography>
-                <Typography color="error">
+                <Typography>Belance</Typography>
+                <Typography color="primary.main">
                   {/* @ts-ignore */}
                   Rp. {numberSeperator(formik.values.user?.balance || 0)}
                 </Typography>

@@ -211,6 +211,7 @@ export default function InvoicePage() {
               },
               {
                 label: 'Cut Loss',
+                hide: value.status === 'Paid Off',
                 onClick: () => {
                   setModalTypeSetManualSettled(1);
                   setinvoiceDetail(value);
@@ -218,6 +219,7 @@ export default function InvoicePage() {
               },
               {
                 label: 'Memo Internal',
+                hide: value.status === 'Paid Off',
                 onClick: () => {
                   setModalTypeSetManualSettled(2);
                   setinvoiceDetail(value);
@@ -225,6 +227,7 @@ export default function InvoicePage() {
               },
               {
                 label: 'Restructure',
+                hide: value.status === 'Paid Off',
                 onClick: () => {
                   setModalTypeSetManualSettled(3);
                   setinvoiceDetail(value);
