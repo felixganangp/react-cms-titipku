@@ -38,7 +38,7 @@ import {
 } from '../../hooks/useInvoiceService';
 
 type FormInvoiceProps = {
-  onClose: () => void;
+  onClose: (isSubmited: boolean) => void;
 };
 
 export default function FormInvoice(props: FormInvoiceProps) {
@@ -120,7 +120,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
         await Promise.all(promises);
         createInvoice.mutate(fd, {
           onSuccess: (data) => {
-            props.onClose();
+            props.onClose(true);
             formik.resetForm();
             toast.openToast({
               severity: 'success',
@@ -539,7 +539,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
           variant="text"
           color="error"
           onClick={() => {
-            props.onClose();
+            props.onClose(false);
             formik.resetForm();
           }}
         >

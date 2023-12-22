@@ -670,7 +670,14 @@ export default function InvoicePage() {
         title="Create Invoice"
         onClose={invoiceForm.closeModal}
       >
-        <FormInvoice onClose={invoiceForm.closeModal} />
+        <FormInvoice
+          onClose={(isSubmited) => {
+            if (isSubmited) {
+              queryInnvoice.refetch();
+            }
+            invoiceForm.closeModal();
+          }}
+        />
       </Modal>
       <Modal
         open={Boolean(modalTypeSetManualSettled)}
@@ -688,7 +695,12 @@ export default function InvoicePage() {
         <FormSetManualSettled
           typeId={modalTypeSetManualSettled || 0}
           invoiceDetail={invoiceDetail || ({} as InvoiceListType)}
-          onClose={() => setModalTypeSetManualSettled(null)}
+          onClose={(isSubmited) => {
+            if (isSubmited) {
+              queryInnvoice.refetch();
+            }
+            setModalTypeSetManualSettled(null);
+          }}
         />
       </Modal>
     </Box>

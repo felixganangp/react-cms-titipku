@@ -30,7 +30,7 @@ import {
 type Props = {
   typeId: number;
   invoiceDetail: InvoiceListType;
-  onClose: () => void;
+  onClose: (isSubmited: boolean) => void;
 };
 export default function FormSetManualSettled({
   typeId,
@@ -118,7 +118,7 @@ export default function FormSetManualSettled({
               severity: 'success',
               headMsg: `Success ${message}`,
             });
-            onClose();
+            onClose(true);
           },
           onError: (error) => {
             toast.openToast({
@@ -463,7 +463,7 @@ export default function FormSetManualSettled({
           boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
         }}
       >
-        <Button variant="text" color="error" onClick={onClose}>
+        <Button variant="text" color="error" onClick={() => onClose(false)}>
           Cancel
         </Button>
         <Button type="submit" color="primary">
