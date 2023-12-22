@@ -29,6 +29,7 @@ export function UseInvoiceService(setParams?: InvoiceParams) {
       max_invoice_date: undefined,
       min_due_date: undefined,
       max_due_date: undefined,
+      restructure_type_id: [],
     },
     onSubmit: (values) => {
       params.handleChangeParams({
@@ -79,6 +80,24 @@ export function UseInvoiceService(setParams?: InvoiceParams) {
       errors: { ...formik.errors, ...errorValidation },
     },
     listData: queryInvoice?.data?.data || [],
+    restructureList: [
+      {
+        id: 0,
+        name: 'Normal',
+      },
+      {
+        id: 1,
+        name: 'Cut Loss',
+      },
+      {
+        id: 2,
+        name: 'Memo Internal',
+      },
+      {
+        id: 3,
+        name: 'Restructure',
+      },
+    ],
   };
 }
 

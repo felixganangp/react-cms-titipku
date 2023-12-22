@@ -227,7 +227,9 @@ export default function InvoicePage() {
               },
               {
                 label: 'Restructure',
-                hide: value.status === 'Paid Off',
+                hide:
+                  value.status === 'Paid Off' &&
+                  value.invoice_type?.name !== 'Cash',
                 onClick: () => {
                   setModalTypeSetManualSettled(3);
                   setinvoiceDetail(value);
@@ -465,6 +467,42 @@ export default function InvoicePage() {
                     }}
                   />
                 </FormLabel>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <FormLabel text="Restructure Type">
+                  <Autocomplete
+                    id="filterGrade"
+                    onChange={(e, value) => {
+                      queryInnvoice.formikParams.setFieldValue(
+                        'restructure_type_id',
+                        value.map((val) => val.id),
+                      );
+                    }}
+                    multiple
+                    value={queryInnvoice.restructureList.filter(
+                      (val: { name: string; id: number }) =>
+                        queryInnvoice.formikParams.values.restructure_type_id.includes(
+                          // @ts-ignore
+                          val.id,
+                        ),
+                    )}
+                    options={queryInnvoice.restructureList}
+                    getOptionLabel={(option) => `${option.name}`}
+                    renderInput={(params) => {
+                      return (
+                        <TextField
+                          {...params}
+                          name="grade"
+                          placeholder="Select Restructure type"
+                          variant="outlined"
+                        />
+                      );
+                    }}
+                  />
+                </FormLabel>
+              </Grid>
+              <Grid item xs={12} md={8}>
+                <div />
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel text="Invoice Date Range">
