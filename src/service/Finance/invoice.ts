@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import http from 'utils/request';
 import {
   InvoiceDetailsType,
@@ -8,9 +9,20 @@ import { ListResponse, Response } from 'models/fetch';
 
 export const getInvoiceAll = (params?: InvoiceParams) =>
   new Promise<ListResponse<InvoiceListType>>(async (resolve, reject) => {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    // @ts-ingnore
+    const paramsRest = { ...params };
+    const { restructure_type_id } = paramsRest;
+    let costumeParams = '?';
+    if (restructure_type_id) {
+      restructure_type_id.forEach((val) => {
+        costumeParams += `restructure_type_id=${val}&`;
+      });
+      delete paramsRest.restructure_type_id;
+    }
     try {
-      const respon = await http.get(`financing/invoice`, {
-        params,
+      const respon = await http.get(`financing/invoice${costumeParams}`, {
+        params: paramsRest,
       });
       if (respon.data) {
         resolve(respon.data);
