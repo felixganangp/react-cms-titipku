@@ -74,18 +74,21 @@ export default function InvoiceDetails() {
               menu={[
                 {
                   label: 'Cut Loss',
+                  hide: invoiceDetails.details?.status === 'Paid Off',
                   onClick: () => {
                     setModalTypeSetManualSettled(1);
                   },
                 },
                 {
                   label: 'Memo Internal',
+                  hide: invoiceDetails.details?.status === 'Paid Off',
                   onClick: () => {
                     setModalTypeSetManualSettled(2);
                   },
                 },
                 {
                   label: 'Restructure',
+                  hide: invoiceDetails.details?.status === 'Paid Off',
                   onClick: () => {
                     setModalTypeSetManualSettled(3);
                   },
