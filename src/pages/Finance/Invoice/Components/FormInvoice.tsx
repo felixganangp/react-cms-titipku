@@ -200,7 +200,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
               </Stack>
               <Stack>
                 <Typography>Available Limit</Typography>
-                <Typography color="error">
+                <Typography color="primary.main">
                   {/* @ts-ignore */}
                   Rp.{' '}
                   {numberSeperator(
