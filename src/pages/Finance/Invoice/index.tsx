@@ -706,6 +706,14 @@ export default function InvoicePage() {
                 ...queryInnvoice.params,
                 page: value,
               });
+              // Create a new URLSearchParams instance
+              const queryParams = new URLSearchParams(window.location.search);
+
+              // Set the new page value
+              queryParams.set('page', value.toString());
+
+              // Update the URL search parameters
+              window.history.pushState({}, '', `?${queryParams.toString()}`);
             }}
           />
         </Card>
