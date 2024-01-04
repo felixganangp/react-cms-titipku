@@ -55,7 +55,7 @@ export default function InvoiceDetails() {
             <Stack>
               <Typography color="#626B79">Payment Detail</Typography>
               <Stack direction="row" alignItems="center">
-                <IconButton onClick={() => navigate('/finance/invoice')}>
+                <IconButton onClick={() => navigate(-1)}>
                   <ArrowBack />
                 </IconButton>
                 <Typography variant="titlePage">
