@@ -23,6 +23,7 @@ import Label from 'components/Label';
 import MenuList from 'components/MenuList';
 import { base64toOpen } from 'utils/base64toDownload';
 import Modal from 'components/Modal';
+import useToast from 'hooks/useToast';
 import useLoadingSpinner from 'hooks/useLoadingSpinner';
 import { InvoiceListType } from 'models/finance/invoice';
 
@@ -36,6 +37,7 @@ import { useGetSettlements } from '../hooks/usePaymentService';
 
 export default function InvoiceDetails() {
   const navigate = useNavigate();
+  const { openToast } = useToast();
   const { idInvoice } = useParams();
   const { setLoading } = useLoadingSpinner();
   const invoiceDetails = useInvoiceDetails(idInvoice);
@@ -106,6 +108,10 @@ export default function InvoiceDetails() {
                       {
                         onSuccess: (data) => {
                           setLoading(false);
+                          openToast({
+                            headMsg: 'Success to generate PDF',
+                            severity: 'success',
+                          });
                           base64toOpen(
                             data.data,
                             // @ts-ignore
@@ -113,6 +119,10 @@ export default function InvoiceDetails() {
                           );
                         },
                         onError: (error) => {
+                          openToast({
+                            headMsg: 'Failed to generate PDF',
+                            severity: 'error',
+                          });
                           setLoading(false);
                         },
                       },
@@ -309,7 +319,9 @@ export default function InvoiceDetails() {
                       <Typography
                         color="info.main"
                         sx={{ cursor: 'pointer' }}
-                        onClick={() => navigate(`/finance/payment/${val.id}`)}
+                        onClick={() =>
+                          navigate(`/finance/payment/${val?.payment?.id}`)
+                        }
                       >
                         {val.payment?.payment_number}
                       </Typography>

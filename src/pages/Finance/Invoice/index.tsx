@@ -35,6 +35,7 @@ import moment from 'moment';
 import numberSeperator from 'utils/numberSeperator';
 import MenuList from 'components/MenuList';
 import { MoreVert } from '@mui/icons-material';
+import useToast from 'hooks/useToast';
 import { base64toOpen } from 'utils/base64toDownload';
 import {
   InvoiceType,
@@ -51,6 +52,7 @@ import FormSetManualSettled from './Components/FormSetManualSettled';
 
 export default function InvoicePage() {
   const navigate = useNavigate();
+  const { openToast } = useToast();
   const { setLoading } = useLoadingSpinner();
   // modal
   const [invoiceDetail, setinvoiceDetail] = useState<InvoiceListType | null>(
@@ -241,13 +243,21 @@ export default function InvoicePage() {
                 label: 'Generate PDF',
                 onClick: () => {
                   setLoading(true);
+
                   getInoivcePDF.mutate(value.id.toString(), {
                     onSuccess: (data) => {
                       setLoading(false);
-
+                      openToast({
+                        headMsg: 'Success to generate PDF',
+                        severity: 'success',
+                      });
                       base64toOpen(data.data, `${value.invoice_number}.pdf`);
                     },
                     onError: (error) => {
+                      openToast({
+                        headMsg: 'Failed to generate PDF',
+                        severity: 'error',
+                      });
                       setLoading(false);
                     },
                   });
@@ -706,6 +716,14 @@ export default function InvoicePage() {
                 ...queryInnvoice.params,
                 page: value,
               });
+              // Create a new URLSearchParams instance
+              const queryParams = new URLSearchParams(window.location.search);
+
+              // Set the new page value
+              queryParams.set('page', value.toString());
+
+              // Update the URL search parameters
+              window.history.pushState({}, '', `?${queryParams.toString()}`);
             }}
           />
         </Card>

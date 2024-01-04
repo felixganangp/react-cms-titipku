@@ -16,16 +16,6 @@ import { useEffect, useMemo } from 'react';
 export function UseInvoiceService(setParams?: InvoiceParams) {
   const params = UseParams<InvoiceParams>(setParams);
 
-  // Parse the URL search parameters
-  const urlParams = new URLSearchParams(window.location.search);
-
-  // Get all values from the URL search parameters
-  const initialFilter = Array.from(urlParams).reduce((values, [key, value]) => {
-    // @ts-ignore
-    values[key] = value;
-    return values;
-  }, {});
-
   const queryInvoice = useQuery({
     queryKey: ['invoice', params.params],
     queryFn: () => getInvoiceAll(params.params),
@@ -72,6 +62,18 @@ export function UseInvoiceService(setParams?: InvoiceParams) {
   });
 
   useEffect(() => {
+    // Parse the URL search parameters
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Get all values from the URL search parameters
+    const initialFilter = Array.from(urlParams).reduce(
+      (values, [key, value]) => {
+        // @ts-ignore
+        values[key] = value;
+        return values;
+      },
+      {},
+    );
     if (Object.keys(initialFilter).length > 0) {
       const newValue = {
         ...formik.values,
