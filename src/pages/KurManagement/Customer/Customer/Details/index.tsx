@@ -509,7 +509,7 @@ export default function RoleUserDetails() {
           <Grid item xs={12}>
             <Card>
               <Menu>Kredit Usaha Rakyat</Menu>
-              <Link style={{ textDecoration: 'none' }} to="/kur/customer">
+              <Link style={{ textDecoration: 'none' }} to={-1}>
                 <BackButton
                   sx={{ '&:hover': { backgroundColor: '#ffff' } }}
                   startIcon={<ArrowBackIosIcon />}

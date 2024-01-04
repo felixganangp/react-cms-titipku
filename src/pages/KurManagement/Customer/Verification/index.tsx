@@ -205,7 +205,7 @@ export default function KurCustomerVerification() {
       id: 'pasar',
       label: 'Pasar',
       align: 'left',
-      format: (val: Customer) => <div>{val.merchant_name}</div>,
+      format: (val: Customer) => <div>{val.area_name}</div>,
     },
     {
       id: 'kur_user_type',
@@ -217,7 +217,7 @@ export default function KurCustomerVerification() {
     },
     {
       id: 'create_date',
-      label: 'Create Date',
+      label: 'Created Date',
       align: 'left',
       width: '100px',
       format: (val: Customer) => <div>{convertDate(val.created_at)}</div>,
