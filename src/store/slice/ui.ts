@@ -4,11 +4,13 @@ import { ToastProsp } from 'components/Toast';
 import { RootState } from 'store';
 
 interface UIState {
+  loadingSpinner: boolean;
   toast: ToastProsp;
   yellowToast: YellowToastProps;
 }
 
 const initialState: UIState = {
+  loadingSpinner: false,
   toast: {
     open: false,
     duration: 3000,
@@ -29,6 +31,9 @@ const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
+    setLoadingSpinner(state: UIState, action: PayloadAction<boolean>) {
+      state.loadingSpinner = action.payload;
+    },
     openToast(state: UIState, action: PayloadAction<ToastProsp>) {
       state.toast = {
         ...state.toast,

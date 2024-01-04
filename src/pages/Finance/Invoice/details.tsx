@@ -23,6 +23,7 @@ import Label from 'components/Label';
 import MenuList from 'components/MenuList';
 import { base64toOpen } from 'utils/base64toDownload';
 import Modal from 'components/Modal';
+import useLoadingSpinner from 'hooks/useLoadingSpinner';
 import { InvoiceListType } from 'models/finance/invoice';
 
 import { s } from 'vitest/dist/index-220c1d70';
@@ -36,6 +37,7 @@ import { useGetSettlements } from '../hooks/usePaymentService';
 export default function InvoiceDetails() {
   const navigate = useNavigate();
   const { idInvoice } = useParams();
+  const { setLoading } = useLoadingSpinner();
   const invoiceDetails = useInvoiceDetails(idInvoice);
   const getInoivcePDF = UseGetInvoicePDF();
   const settlementQuery = useGetSettlements({
@@ -57,7 +59,7 @@ export default function InvoiceDetails() {
             <Stack>
               <Typography color="#626B79">Invoice Detail</Typography>
               <Stack direction="row" alignItems="center">
-                <IconButton onClick={() => navigate('/finance/invoice')}>
+                <IconButton onClick={() => navigate(-1)}>
                   <ArrowBack />
                 </IconButton>
                 <Typography variant="titlePage">
@@ -96,18 +98,23 @@ export default function InvoiceDetails() {
                 {
                   label: 'Generate PDF',
                   onClick: () => {
+                    setLoading(true);
+
                     getInoivcePDF.mutate(
                       // @ts-ignore
                       invoiceDetails?.details.id.toString(),
                       {
                         onSuccess: (data) => {
+                          setLoading(false);
                           base64toOpen(
                             data.data,
                             // @ts-ignore
                             `${invoiceDetails?.details.invoice_number}.pdf`,
                           );
                         },
-                        onError: (error) => {},
+                        onError: (error) => {
+                          setLoading(false);
+                        },
                       },
                     );
                   },
@@ -299,7 +306,11 @@ export default function InvoiceDetails() {
                   label: 'No Payment',
                   format: (val: any) => {
                     return (
-                      <Typography color="info.main" sx={{ cursor: 'pointer' }}>
+                      <Typography
+                        color="info.main"
+                        sx={{ cursor: 'pointer' }}
+                        onClick={() => navigate(`/finance/payment/${val.id}`)}
+                      >
                         {val.payment?.payment_number}
                       </Typography>
                     );

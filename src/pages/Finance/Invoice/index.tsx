@@ -30,6 +30,7 @@ import { useNavigate } from 'react-router-dom';
 
 import Label from 'components/Label';
 import { InvoiceListType } from 'models/finance/invoice';
+import useLoadingSpinner from 'hooks/useLoadingSpinner';
 import moment from 'moment';
 import numberSeperator from 'utils/numberSeperator';
 import MenuList from 'components/MenuList';
@@ -50,6 +51,7 @@ import FormSetManualSettled from './Components/FormSetManualSettled';
 
 export default function InvoicePage() {
   const navigate = useNavigate();
+  const { setLoading } = useLoadingSpinner();
   // modal
   const [invoiceDetail, setinvoiceDetail] = useState<InvoiceListType | null>(
     null,
@@ -238,11 +240,16 @@ export default function InvoicePage() {
               {
                 label: 'Generate PDF',
                 onClick: () => {
+                  setLoading(true);
                   getInoivcePDF.mutate(value.id.toString(), {
                     onSuccess: (data) => {
+                      setLoading(false);
+
                       base64toOpen(data.data, `${value.invoice_number}.pdf`);
                     },
-                    onError: (error) => {},
+                    onError: (error) => {
+                      setLoading(false);
+                    },
                   });
                 },
               },
@@ -274,7 +281,7 @@ export default function InvoicePage() {
                 Create Invoice
               </Button>
               <TextField
-                placeholder="Search for name or email"
+                placeholder="Search for Invoice Number"
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth

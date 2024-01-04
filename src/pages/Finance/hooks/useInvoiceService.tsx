@@ -11,10 +11,21 @@ import {
 import { useFormik } from 'formik';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 export function UseInvoiceService(setParams?: InvoiceParams) {
   const params = UseParams<InvoiceParams>(setParams);
+
+  // Parse the URL search parameters
+  const urlParams = new URLSearchParams(window.location.search);
+
+  // Get all values from the URL search parameters
+  const initialFilter = Array.from(urlParams).reduce((values, [key, value]) => {
+    // @ts-ignore
+    values[key] = value;
+    return values;
+  }, {});
+
   const queryInvoice = useQuery({
     queryKey: ['invoice', params.params],
     queryFn: () => getInvoiceAll(params.params),
@@ -32,7 +43,7 @@ export function UseInvoiceService(setParams?: InvoiceParams) {
       restructure_type_id: [],
     },
     onSubmit: (values) => {
-      params.handleChangeParams({
+      const newValue = {
         ...values,
         page: 1,
         // @ts-ignore
@@ -43,9 +54,33 @@ export function UseInvoiceService(setParams?: InvoiceParams) {
         min_due_date: values.min_due_date?.unix() || undefined,
         // @ts-ignore
         max_due_date: values.max_due_date?.unix() || undefined,
-      });
+        status: (values.status || '').toLowerCase() || undefined,
+      };
+
+      params.handleChangeParams(newValue);
+      const queryParams = new URLSearchParams(
+        Object.fromEntries(
+          Object.entries(newValue).filter(
+            ([key, value]) => value !== undefined,
+          ),
+        ),
+      );
+
+      // Set the search property of the current URL
+      window.history.pushState({}, '', `?${queryParams.toString()}`);
     },
   });
+
+  useEffect(() => {
+    if (Object.keys(initialFilter).length > 0) {
+      const newValue = {
+        ...formik.values,
+        ...initialFilter,
+      };
+      formik.setValues(newValue);
+      params.handleChangeParams(newValue);
+    }
+  }, []);
 
   const errorValidation = useMemo(() => {
     const errors: any = {};
