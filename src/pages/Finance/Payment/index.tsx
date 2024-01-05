@@ -46,7 +46,7 @@ export default function PaymentPage() {
                 Create Payment
               </Button>
               <TextField
-                placeholder="Search for name or email"
+                placeholder="Search for Payment Number"
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
@@ -138,7 +138,7 @@ export default function PaymentPage() {
                           );
                         }}
                         minDate={
-                          paymentQuery.formikParams.values.max_payment_date
+                          paymentQuery.formikParams.values.min_payment_date
                         }
                         // maxDate={formik.values.max_date_created}
                         renderInput={(params) => {
@@ -244,6 +244,14 @@ export default function PaymentPage() {
                 ...paymentQuery.params,
                 page: value,
               });
+              // Create a new URLSearchParams instance
+              const queryParams = new URLSearchParams(window.location.search);
+
+              // Set the new page value
+              queryParams.set('page', value.toString());
+
+              // Update the URL search parameters
+              window.history.pushState({}, '', `?${queryParams.toString()}`);
             }}
           />
         </Card>
@@ -253,7 +261,14 @@ export default function PaymentPage() {
         onClose={paymentForm.closeModal}
         title="Create Payment"
       >
-        <FormPayment onClose={paymentForm.closeModal} />
+        <FormPayment
+          onClose={(isSubmitted) => {
+            paymentForm.closeModal();
+            if (isSubmitted) {
+              paymentQuery.refetch();
+            }
+          }}
+        />
       </Modal>
     </Box>
   );

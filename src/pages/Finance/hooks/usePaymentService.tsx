@@ -3,7 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useFormik } from 'formik';
 import UseParams from 'hooks/useParams';
 import { PaymentParams, SettlementParams } from 'models/finance/payment';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
   createPayment,
   getPaymentAll,
@@ -38,16 +38,50 @@ export const UseGetPeyement = (setParams?: PaymentParams) => {
       max_payment_date: undefined,
     },
     onSubmit: (values) => {
-      params.handleChangeParams({
+      const newValue = {
         ...values,
         page: 1,
         // @ts-ignore
         min_payment_date: values.min_invoice_date?.unix() || undefined,
         // @ts-ignore
         max_payment_date: values.max_payment_date?.unix() || undefined,
-      });
+      };
+      params.handleChangeParams(newValue);
+      const queryParams = new URLSearchParams(
+        Object.fromEntries(
+          Object.entries(newValue).filter(
+            ([key, value]) => value !== undefined,
+          ),
+        ),
+      );
+
+      // Set the search property of the current URL
+      window.history.pushState({}, '', `?${queryParams.toString()}`);
     },
   });
+
+  useEffect(() => {
+    // Parse the URL search parameters
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Get all values from the URL search parameters
+    const initialFilter = Array.from(urlParams).reduce(
+      (values, [key, value]) => {
+        // @ts-ignore
+        values[key] = value;
+        return values;
+      },
+      {},
+    );
+    if (Object.keys(initialFilter).length > 0) {
+      const newValue = {
+        ...formik.values,
+        ...initialFilter,
+      };
+      formik.setValues(newValue);
+      params.handleChangeParams(newValue);
+    }
+  }, []);
 
   const errorValidation = useMemo(() => {
     const errors: any = {};

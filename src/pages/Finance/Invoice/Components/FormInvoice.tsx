@@ -45,6 +45,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
   const toast = useToast();
   const [simulation, setSimulation] = useState([]);
   const customerModal = useModal();
+  const openDateSelect = useModal();
   const simulationInstalment = UseGetInstalmentSimulation();
   const createInvoice = UseCreateInvoice();
 
@@ -296,7 +297,11 @@ export default function FormInvoice(props: FormInvoiceProps) {
             inputFormat="MMM DD, YYYY"
             onChange={(value) => {
               formik.setFieldValue('transfer_date', value);
+              openDateSelect.toggleModal();
             }}
+            open={openDateSelect.open}
+            onOpen={openDateSelect.toggleModal}
+            onClose={openDateSelect.toggleModal}
             renderInput={(params) => {
               return (
                 <TextField
@@ -305,6 +310,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
                   placeholder="Select Grade"
                   variant="outlined"
                   fullWidth
+                  onClick={openDateSelect.toggleModal}
                 />
               );
             }}

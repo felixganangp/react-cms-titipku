@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useCallback, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
@@ -37,7 +38,7 @@ const paymentMethod = [
   { name: 'Cash', value: 'cash' },
 ];
 type Props = {
-  onClose: () => void;
+  onClose: (isSubmited: boolean) => void;
 };
 export default function FormPayment({ onClose }: Props) {
   const toast = useToast();
@@ -45,6 +46,7 @@ export default function FormPayment({ onClose }: Props) {
   const [simulation, setSimulation] = useState<any[]>([]);
   const useGetPaymentSimulation = UseGetSimulationPayment();
   const customerModal = useModal();
+  const openDateSelect = useModal();
 
   const formik = useFormik({
     initialValues: {
@@ -56,7 +58,10 @@ export default function FormPayment({ onClose }: Props) {
     },
     validationSchema: yup.object({
       user: yup.object().nullable().required('Required'),
-      amount: yup.string().required('Required'),
+      amount: yup
+        .string()
+        .max(12, 'Must be 12 characters or less')
+        .required('Required'),
       payment_date: yup.mixed().nullable().required('Required'),
       payment_method: yup.object().nullable().required('Required'),
       proof_of_payment: yup.mixed().required('Required'),
@@ -87,7 +92,7 @@ export default function FormPayment({ onClose }: Props) {
       await Promise.all(promises);
       createPayment.mutate(fd, {
         onSuccess: (data) => {
-          onClose();
+          onClose(true);
           formik.resetForm();
           toast.openToast({
             severity: 'success',
@@ -131,7 +136,13 @@ export default function FormPayment({ onClose }: Props) {
       formik.values.user &&
       formik.values.payment_date
     ) {
-      setSimulationPayment(formik.values);
+      if (
+        // @ts-ignore
+        (formik.values.user?.balance || 0) + parseInt(formik.values.amount) <=
+        0
+      ) {
+        setSimulationPayment(formik.values);
+      }
     }
   }, [formik.values.amount, formik.values.user, formik.values.payment_date]);
 
@@ -157,7 +168,7 @@ export default function FormPayment({ onClose }: Props) {
                 <Typography>{formik.values.user.merchant_name}</Typography>
               </Stack>
               <Stack>
-                <Typography>Belance</Typography>
+                <Typography>Balance</Typography>
                 <Typography color="primary.main">
                   {/* @ts-ignore */}
                   Rp. {numberSeperator(formik.values.user?.balance || 0)}
@@ -166,6 +177,7 @@ export default function FormPayment({ onClose }: Props) {
               <IconButton
                 onClick={() => {
                   formik.setFieldValue('user', null);
+                  setSimulation([]);
                 }}
               >
                 <Delete color="error" />
@@ -214,7 +226,11 @@ export default function FormPayment({ onClose }: Props) {
             inputFormat="MMM DD, YYYY"
             onChange={(value) => {
               formik.setFieldValue('payment_date', value);
+              openDateSelect.toggleModal();
             }}
+            open={openDateSelect.open}
+            onOpen={openDateSelect.toggleModal}
+            onClose={openDateSelect.toggleModal}
             renderInput={(params) => {
               return (
                 <TextField
@@ -223,6 +239,7 @@ export default function FormPayment({ onClose }: Props) {
                   placeholder="Select Payment Date"
                   variant="outlined"
                   fullWidth
+                  onClick={openDateSelect.toggleModal}
                 />
               );
             }}
@@ -258,6 +275,7 @@ export default function FormPayment({ onClose }: Props) {
 
                 formik.setFieldValue('amount', value);
               }}
+              onBlur={formik.handleBlur}
             />
             {simulation === null && (
               <Stack
@@ -415,7 +433,7 @@ export default function FormPayment({ onClose }: Props) {
           variant="text"
           color="error"
           onClick={() => {
-            onClose();
+            onClose(false);
             formik.resetForm();
           }}
         >
