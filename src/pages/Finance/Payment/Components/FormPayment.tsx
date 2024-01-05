@@ -1,3 +1,4 @@
+/* eslint-disable radix */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { useCallback, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
@@ -135,7 +136,13 @@ export default function FormPayment({ onClose }: Props) {
       formik.values.user &&
       formik.values.payment_date
     ) {
-      setSimulationPayment(formik.values);
+      if (
+        // @ts-ignore
+        (formik.values.user?.balance || 0) + parseInt(formik.values.amount) <=
+        0
+      ) {
+        setSimulationPayment(formik.values);
+      }
     }
   }, [formik.values.amount, formik.values.user, formik.values.payment_date]);
 
@@ -161,7 +168,7 @@ export default function FormPayment({ onClose }: Props) {
                 <Typography>{formik.values.user.merchant_name}</Typography>
               </Stack>
               <Stack>
-                <Typography>Belance</Typography>
+                <Typography>Balance</Typography>
                 <Typography color="primary.main">
                   {/* @ts-ignore */}
                   Rp. {numberSeperator(formik.values.user?.balance || 0)}
