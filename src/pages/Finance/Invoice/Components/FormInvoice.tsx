@@ -1,5 +1,6 @@
+/* eslint-disable radix */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import FormControl from 'components/FormLabel';
 import {
   Box,
@@ -64,15 +65,18 @@ export default function FormInvoice(props: FormInvoiceProps) {
     },
     validationSchema: yup.object({
       user: yup.object().nullable().required('Required'),
-      loan_amount: yup.string().required('Required'),
+      loan_amount: yup
+        .string()
+        .min(2, 'Please enter a minimum required amount.')
+        .required('Required'),
       transfer_date: yup.mixed().nullable().required('Required'),
       destination_bank: yup.mixed().when('invoice_type_id', {
         is: (val: any) => val === '1',
         then: yup.object().required('Required'),
       }),
-      destination_bank_account: yup.string().when('invoice_type_id', {
+      destination_bank_account: yup.number().when('invoice_type_id', {
         is: (val: any) => val === '1',
-        then: yup.string().required('Required'),
+        then: yup.number().typeError('Must be a number').required('Required'),
       }),
       bank_transfer_fee: yup.string().when('invoice_type_id', {
         is: (val: any) => val === '1',
@@ -84,6 +88,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
       }),
       provision_installment_period: yup
         .number()
+        .min(0, 'Min 0 period')
         .max(12, 'Max 36 period')
         .required('Required'),
       nota_image: yup.string().required('Required'),
@@ -160,6 +165,21 @@ export default function FormInvoice(props: FormInvoiceProps) {
     }, 2000),
     [formik.values],
   );
+
+  useEffect(() => {
+    if (
+      formik.values.loan_amount &&
+      formik.values.transfer_date &&
+      formik.values.installment_period
+    ) {
+      // @ts-ignore
+      setInstallmentSimulation(formik.values.installment_period as number);
+    }
+  }, [
+    formik.values.loan_amount,
+    formik.values.transfer_date,
+    formik.values.installment_period,
+  ]);
 
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
@@ -261,7 +281,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
         >
           <TextField
             type="text"
-            name="selling_price"
+            name="loan_amount"
             placeholder="Insert Loan Amount"
             InputProps={{
               startAdornment: (
@@ -271,12 +291,29 @@ export default function FormInvoice(props: FormInvoiceProps) {
             fullWidth
             autoComplete="off"
             value={numberSeperator(formik.values.loan_amount || '')}
+            onBlur={formik.handleBlur}
             onChange={(e) => {
               const value = e.target.value
                 .replace(/[^0-9.]/g, '')
                 .replace(/(\..*?)\..*/g, '$1');
 
               formik.setFieldValue('loan_amount', value);
+
+              const maxValue =
+                formik.values.invoice_type_id === '1'
+                  ? // @ts-ignore
+                    formik.values.user?.limit_plafon
+                  : // @ts-ignore
+                    formik.values.user?.limit_cash || 0;
+
+              if (parseInt(value) > maxValue) {
+                setTimeout(() => {
+                  formik.setFieldError(
+                    'loan_amount',
+                    `Maximal ${numberSeperator(maxValue)}`,
+                  );
+                }, 100);
+              }
             }}
           />
         </FormControl>
@@ -435,15 +472,6 @@ export default function FormInvoice(props: FormInvoiceProps) {
                   value={formik.values.installment_period}
                   onChange={(e) => {
                     formik.handleChange(e);
-                    const { value } = e.target;
-
-                    if (
-                      formik.values.loan_amount &&
-                      formik.values.transfer_date
-                    ) {
-                      // @ts-ignore
-                      setInstallmentSimulation(value as number);
-                    }
                   }}
                   onBlur={formik.handleBlur}
                   name="installment_period"
