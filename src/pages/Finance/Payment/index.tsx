@@ -261,7 +261,14 @@ export default function PaymentPage() {
         onClose={paymentForm.closeModal}
         title="Create Payment"
       >
-        <FormPayment onClose={paymentForm.closeModal} />
+        <FormPayment
+          onClose={(isSubmitted) => {
+            paymentForm.closeModal();
+            if (isSubmitted) {
+              paymentQuery.refetch();
+            }
+          }}
+        />
       </Modal>
     </Box>
   );

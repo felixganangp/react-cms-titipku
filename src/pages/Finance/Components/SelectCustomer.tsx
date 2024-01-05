@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Search } from '@mui/icons-material';
 import {
   Box,
@@ -28,10 +29,18 @@ type Props = {
 export default function SelectCustomer({ open, onClose, setSelected }: Props) {
   const queryCostomer = useCustomer({ status: 6 });
 
+  useEffect(() => {
+    if (!open) {
+      queryCostomer.handleSearch('');
+    }
+  }, [open]);
+
   return (
     <Modal open={open} onClose={onClose}>
       <Box sx={{ ...childModalStyle }}>
-        <Card sx={{ p: 2, maxHeight: '600px', overflow: 'auto' }}>
+        <Card
+          sx={{ p: 2, maxHeight: '600px', minWidth: 550, overflow: 'auto' }}
+        >
           <Stack spacing={2}>
             <Typography>Select Customer</Typography>
             <TextField
