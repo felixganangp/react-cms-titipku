@@ -8,6 +8,7 @@ import {
   Customer,
 } from 'models/kur/Customer';
 import { ListResponse, Response } from 'models/fetch';
+import { CustomerDetailType } from 'models/finance/customer';
 
 export const getAllCustomers = (params: CustomerParams) =>
   new Promise<ListResponse<Customer>>(async (resolve, reject) => {
@@ -120,7 +121,7 @@ export const updateStatusCustomer = (payload: ReviewCustomer) =>
   });
 
 export const getCustomersDetails = (id: number | string) =>
-  new Promise<CustomerParams>(async (resolve, reject) => {
+  new Promise<Response<CustomerDetailType>>(async (resolve, reject) => {
     try {
       const respon = await http.get(`financing/user/${id}`);
       if (respon.data) {

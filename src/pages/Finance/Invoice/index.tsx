@@ -49,6 +49,7 @@ import {
   UseInvoiceService,
 } from '../hooks/useInvoiceService';
 import FormSetManualSettled from './Components/FormSetManualSettled';
+import FormCustomer from '../Customer/Components/Form';
 
 export default function InvoicePage() {
   const navigate = useNavigate();
@@ -58,6 +59,7 @@ export default function InvoicePage() {
   const [invoiceDetail, setinvoiceDetail] = useState<InvoiceListType | null>(
     null,
   );
+  const createUserModal = useModal();
   const showFilter = useModal();
   const invoiceForm = useModal();
   const [modalTypeSetManualSettled, setModalTypeSetManualSettled] = useState<
