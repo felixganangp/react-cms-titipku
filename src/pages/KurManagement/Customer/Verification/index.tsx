@@ -50,6 +50,7 @@ import { Area } from 'models/Area';
 import { MerchantResp } from 'models/Merchant';
 import debounce from 'utils/debounce';
 import useToast from 'hooks/useToast';
+import FormCustomer from 'pages/Finance/Customer/Components/Form';
 import FormBiChecking from './components/form-bi-checking';
 import FormCustomerReview from './components/form-customer-review';
 
@@ -68,6 +69,7 @@ export default function KurCustomerVerification() {
   const creditScore = useAppSelector((state) => state.creditScore);
 
   // Batch Action
+  const createUserModal = useModal();
   const [selected, setSelected] = useState<(number | string)[]>([]);
   const [selectedSingle, setSelectedSingle] = useState<number | undefined>(0);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer[]>([]);
@@ -465,7 +467,7 @@ export default function KurCustomerVerification() {
                   sx={{ width: '180px' }}
                   startIcon={<AddIcon />}
                   onClick={() => {
-                    console.log('add');
+                    createUserModal.openModal();
                   }}
                 >
                   Add Customer
@@ -781,6 +783,20 @@ export default function KurCustomerVerification() {
         <FormCustomerReview
           id={selectedSingle}
           onClose={formHandleCloseReview}
+        />
+      </Modal>
+      <Modal
+        open={createUserModal.open}
+        onClose={createUserModal.closeModal}
+        title="Create Customer"
+      >
+        <FormCustomer
+          handleClose={(isSubmite) => {
+            if (isSubmite) {
+              dispatch(customerAction.fetchData(customerKur.params));
+            }
+            createUserModal.closeModal();
+          }}
         />
       </Modal>
     </Box>
