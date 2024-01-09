@@ -1,11 +1,6 @@
 /* eslint-disable radix */
 import React, { useEffect, useState } from 'react';
-
-import Card from '@mui/material/Card';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Modal from '@mui/material/Modal';
-import Typography from '@mui/material/Typography';
+import { Box, Grid, Card, Stack, Typography } from '@mui/material';
 import moment from 'moment';
 
 import DescDetails from 'components/DescDetails';
@@ -51,6 +46,8 @@ function StatusColor(string: string | undefined) {
 
   return color;
 }
+
+const Document = ['KTP', 'NIB', 'NPWP', 'SKU', 'KTP Pasangan', 'Surat Cerai'];
 
 interface ModalImageTypes {
   open: boolean;
@@ -705,71 +702,96 @@ export default function CustomerDetails() {
                   )}`}
                 />
               </Grid>
-              <Grid item xs={6} md={3}>
+              <Grid
+                item
+                xs={6}
+                md={3}
+                gap="20px"
+                display="flex"
+                flexDirection="column"
+                alignItems="start"
+              >
                 <DescDetails
-                  title="Lapak Name"
-                  icon={<StorefrontOutlinedIcon sx={{ color: '#008e58' }} />}
-                  content={customerKur.details?.limit_request_cash}
+                  title="Electricity"
+                  icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
+                  content={`RP ${digitFormatter.format(
+                    customerKur.details?.user_idir?.Electricity || 0,
+                  )}`}
+                />
+                <DescDetails
+                  title="Education Expense"
+                  icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
+                  content={`RP ${digitFormatter.format(
+                    customerKur.details?.user_idir?.EducationExpense || 0,
+                  )}`}
+                />
+                <DescDetails
+                  title="Household Expense"
+                  icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
+                  content={`RP ${digitFormatter.format(
+                    customerKur.details?.user_idir?.HouseholdExpense || 0,
+                  )}`}
+                />
+                <DescDetails
+                  title="Employee Expense"
+                  icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
+                  content={`RP ${digitFormatter.format(
+                    customerKur.details?.user_idir?.EmployeeExpense || 0,
+                  )}`}
                 />
               </Grid>
-              <Grid item xs={6} md={3}>
+              <Grid
+                item
+                xs={6}
+                md={3}
+                gap="20px"
+                display="flex"
+                flexDirection="column"
+                alignItems="start"
+              >
                 <DescDetails
-                  title="Lapak Area"
-                  content={customerKur.details?.limit_request_cash}
+                  title="Another Loan"
+                  icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
+                  content={`RP ${digitFormatter.format(
+                    customerKur.details?.user_idir?.AnotherLoan || 0,
+                  )}`}
                 />
               </Grid>
             </Grid>
-
-            {/* <Grid container spacing={5} mt="10px">
-              {customerKur.details?.kur_user_document?.map((val, i) => (
-                <Grid item xs={6} md={4} key={val.id}>
-                  <DescDetails
-                    title={renameDocument(val.document_type)}
-                    icon={
-                      <AddPhotoAlternateOutlinedIcon
-                        sx={{ color: '#008e58' }}
-                      />
-                    }
-                    content={val.document_number}
-                  />
-                  {val.document_filepath ? (
-                    <Box
-                      component="img"
-                      width="100%"
-                      height="242px"
-                      bgcolor="#cecece"
-                      borderRadius="3px"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      sx={{
-                        objectFit: 'contain',
-                        cursor: 'pointer',
-                      }}
-                      onClick={() => {
-                        handleViewDetailImage(true, val.document_filepath);
-                      }}
-                      src={val.document_filepath}
-                    />
-                  ) : (
-                    <Box
-                      width="100%"
-                      height="242px"
-                      bgcolor="#cecece"
-                      borderRadius="3px"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                    >
-                      <HideImageOutlinedIcon
-                        sx={{ fontSize: '60px', color: '#ffff' }}
-                      />
-                    </Box>
-                  )}
-                </Grid>
-              ))}
-            </Grid> */}
           </Box>
+        </SubDetailsPagesWrapper>
+
+        <SubDetailsPagesWrapper title="User Documents" defaultOpen>
+          <Stack direction="row" flexWrap="wrap" gap={2} p={1}>
+            {customerKur.details?.user_documents.map((val) => (
+              <Stack key={val.id} gap={0.6}>
+                <Typography
+                  fontSize={12}
+                  fontWeight="bold"
+                  color="primary.main"
+                >
+                  {Document[val.document_type_id]}
+                </Typography>
+                <Typography fontSize={16}>
+                  {val.document_number ? val.document_number : '-'}
+                </Typography>
+                <Box
+                  component="img"
+                  // onClick={() =>
+                  //   setImagePreview(VITE_APP_IMAGE_URL + val.image_filepath)
+                  // }
+                  src={val.image_filepath}
+                  sx={{
+                    aspectRatio: '1/1',
+                    border: 'unset',
+                    objectFit: 'contain',
+                    bgcolor: '#cecece',
+                  }}
+                  width="250px"
+                />
+              </Stack>
+            ))}
+          </Stack>
         </SubDetailsPagesWrapper>
 
         {/* <SubDetailsPagesWrapper title="KUR History" defaultOpen>

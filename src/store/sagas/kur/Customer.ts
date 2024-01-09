@@ -129,7 +129,9 @@ function* bulkBiChecking(payload: PayloadAction<BiChecking>) {
 
 function* updateStatusCustomer(payload: PayloadAction<ReviewCustomer>) {
   try {
-    const params: CustomerParams = yield select((state) => state.customer);
+    const params: CustomerParams = yield select(
+      (state) => state.customerKur.params,
+    );
     yield call(CustomerService.updateStatusCustomer, payload.payload);
     yield put(customerAction.fetchData(params));
     yield put(

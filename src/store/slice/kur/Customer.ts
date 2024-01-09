@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ListResponse, Response } from 'models/fetch';
 import {
-  CreateCustomer,
   Customer,
   CustomerParams,
   CheckMerchantExistParams,
   UserCreditScore,
   BiChecking,
   ReviewCustomer,
+  CustomerDetail,
 } from 'models/kur/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
@@ -19,7 +19,7 @@ interface CustomerInitialProps {
   error?: any;
   total: number | undefined;
   params: CustomerParams;
-  details: Customer | null;
+  details: CustomerDetail | null;
   stateFilter?: {
     status: number;
   };
@@ -94,7 +94,7 @@ const CustomerSlice = createSlice({
     },
     fetchDataDetailSuccess(
       state: CustomerInitialProps,
-      action: PayloadAction<Response<Customer>>,
+      action: PayloadAction<Response<CustomerDetail>>,
     ) {
       state.loading = false;
       state.details = action.payload.data;

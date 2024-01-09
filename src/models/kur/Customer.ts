@@ -126,7 +126,7 @@ export type CustomerStatusHistory = {
 };
 
 export interface Customer {
-  id?: number;
+  id: number;
   user_number: string;
   debtor_name: string;
   merchant_name: string;
@@ -182,6 +182,7 @@ export interface BiChecking {
 export interface BiCheckingCustomer {
   debtor_name: string;
   customer_number: string;
+  merchant_name: string;
   id: number | undefined;
   bi_checking_status_id: number;
   bi_checking_status_notes: string;
