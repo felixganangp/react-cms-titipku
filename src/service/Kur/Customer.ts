@@ -122,7 +122,7 @@ export const updateStatusCustomer = (payload: ReviewCustomer) =>
 export const getCustomersDetails = (id: number | string) =>
   new Promise<CustomerParams>(async (resolve, reject) => {
     try {
-      const respon = await http.get(`kur/user/${id}`);
+      const respon = await http.get(`financing/user/${id}`);
       if (respon.data) {
         resolve(respon.data);
       }

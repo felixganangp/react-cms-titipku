@@ -58,6 +58,11 @@ interface FormDataType {
   initialData: CreateCustomer;
 }
 
+interface FormReview {
+  title: string;
+  status: number;
+}
+
 export default function KurCustomerVerification() {
   const toast = useToast();
   const dispatch = useAppDispatch();
@@ -66,6 +71,10 @@ export default function KurCustomerVerification() {
   const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
   const creditScore = useAppSelector((state) => state.creditScore);
+  const [formReview, setFormReview] = useState<FormReview>({
+    title: '',
+    status: 3,
+  });
 
   // Batch Action
   const [selected, setSelected] = useState<(number | string)[]>([]);
@@ -81,8 +90,6 @@ export default function KurCustomerVerification() {
   };
 
   const handleVerify = async (id: number | undefined) => {
-    console.log();
-    // const formData = new FormData();
     const data: ReviewCustomer = {
       new_status: 6,
       komite_notes: '',
@@ -163,22 +170,15 @@ export default function KurCustomerVerification() {
     event: React.SyntheticEvent,
     newValue: number,
   ) => {
-    console.log(newValue);
     setUserTab(newValue);
     dispatch(
-      customerAction.fetchData({
-        status: newValue + 1,
+      customerAction.setParams({
+        status: newValue === 4 ? 7 : newValue + 1,
       }),
     );
+    dispatch(customerAction.fetchData(customerKur.params));
   };
   const headCell = [
-    {
-      id: 'id',
-      label: 'ID',
-      align: 'left',
-      format: (val: Customer) => <div>{val.id}</div>,
-      enableSort: true,
-    },
     {
       id: 'user_number',
       label: 'User Number',
@@ -205,7 +205,7 @@ export default function KurCustomerVerification() {
       id: 'pasar',
       label: 'Pasar',
       align: 'left',
-      format: (val: Customer) => <div>{val.merchant_name}</div>,
+      format: (val: Customer) => <div>{val.area_name}</div>,
     },
     {
       id: 'kur_user_type',
@@ -217,7 +217,7 @@ export default function KurCustomerVerification() {
     },
     {
       id: 'create_date',
-      label: 'Create Date',
+      label: 'Created Date',
       align: 'left',
       width: '100px',
       format: (val: Customer) => <div>{convertDate(val.created_at)}</div>,
@@ -254,6 +254,13 @@ export default function KurCustomerVerification() {
       ),
     },
     {
+      id: 'batch_id',
+      label: 'Batch',
+      align: 'left',
+      width: '100px',
+      format: (val: Customer) => <Typography>{val.batch_id}</Typography>,
+    },
+    {
       id: 'action',
       label: 'Action',
       align: 'left',
@@ -269,12 +276,14 @@ export default function KurCustomerVerification() {
                 dataId: 'button-details-customer',
               },
               {
-                label: `Approve`,
+                label: `Komite Review`,
                 onClick: () => {
                   setSelectedSingle(val.id);
+                  setFormReview({ status: 3, title: 'Komite Review' });
                   formCustomerReview.openModal();
                 },
                 dataId: 'button-review-customer',
+                hide: val.user_status_id !== 2,
               },
               {
                 label: `Verify`,
@@ -283,22 +292,17 @@ export default function KurCustomerVerification() {
                   handleVerify(val.id);
                 },
                 dataId: 'button-review-customer',
+                hide: val.user_status_id !== 4,
               },
               {
                 label: `Reject`,
                 onClick: () => {
-                  console.log('edit');
+                  setSelectedSingle(val.id);
+                  setFormReview({ status: 7, title: 'Reject User' });
+                  formCustomerReview.openModal();
                 },
-                dataId: 'button-edit-customer',
+                dataId: 'button-review-customer',
               },
-              // {
-              //   label: val.kur_user_status?.id === 3 ? 'Active' : 'Hold',
-              //   color: val.kur_user_status?.id === 3 ? '#008e58' : '#c10000',
-              //   onClick: () => {
-              //     handleHoldCustomer(val);
-              //   },
-              //   dataId: 'button-hold-customer',
-              // },
             ]}
           >
             <IconButton>
@@ -435,7 +439,7 @@ export default function KurCustomerVerification() {
     formBiChecking.openModal();
   };
 
-  const formHandleClose = async () => {
+  const formHandleCloseBiChecking = async () => {
     await formBiChecking.closeModal();
   };
 
@@ -478,7 +482,7 @@ export default function KurCustomerVerification() {
                 >
                   <TextField
                     data-testid="search-customer"
-                    placeholder="Search item"
+                    placeholder="Search customer"
                     size="small"
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px', flex: 1 }}
                     fullWidth
@@ -652,7 +656,7 @@ export default function KurCustomerVerification() {
                       marginBottom: 1,
                     }}
                   >
-                    Credit Score
+                    Batch
                   </Typography>
                   <Autocomplete
                     data-testid="filter-credit-score-customer"
@@ -720,8 +724,8 @@ export default function KurCustomerVerification() {
                 <Tabs.Item label="New" />
                 <Tabs.Item label="Bi-Checking" />
                 <Tabs.Item label="Komite Review" />
-                <Tabs.Item label="Location Check" />
-                {/* <Tabs.Item label="Final Review" /> */}
+                <Tabs.Item label="Final Review" />
+                <Tabs.Item label="Reject" />
               </Tabs.Container>
             </Box>
             <Table
@@ -734,7 +738,6 @@ export default function KurCustomerVerification() {
               orderType={customerKur.params.order_type}
               onChangePage={(val) => handleChangePage(val)}
               onChangeSort={(val) => handleChangeSort(val)}
-              disableNumber
               loading={customerKur.loading}
               enableCheckBox={userTab === 0}
               selected={selected}
@@ -765,21 +768,22 @@ export default function KurCustomerVerification() {
       </Grid>
       <Modal
         open={formBiChecking.open}
-        title="Bi Cheking"
-        onClose={formHandleClose}
+        title="Bi Checking"
+        onClose={formHandleCloseBiChecking}
       >
         <FormBiChecking
-          onClose={formHandleClose}
+          onClose={formHandleCloseBiChecking}
           biCheckingData={selectedCustomer}
         />
       </Modal>
       <Modal
         open={formCustomerReview.open}
-        title="Komite Review"
+        title={formReview.title}
         onClose={formHandleCloseReview}
       >
         <FormCustomerReview
           id={selectedSingle}
+          status={formReview.status}
           onClose={formHandleCloseReview}
         />
       </Modal>
