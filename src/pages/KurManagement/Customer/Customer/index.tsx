@@ -133,9 +133,6 @@ export default function KurCustomer() {
     dispatch(creditScoreAction.fetchData());
   }, []);
 
-  // const [typeKurFilter, setTypeKurFilter] = useState<Type | null>(null);
-  // const [areaKurFilter, setAreaKurFilter] = useState<Area[] | undefined>([]);
-  // const [searchKur, setSearchKur] = useState<string>('');
   const [inputValueArea, setInputValueArea] = useState('');
 
   const formModal = useModal();
