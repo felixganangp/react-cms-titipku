@@ -200,12 +200,12 @@ export interface ReviewCustomer {
   id: number | undefined;
 }
 
-// export interface ReviewCustomer {
-//   name: string;
-//   address: string;
-//   phone_number: string;
-//   id?: number;
-// }
+export interface CustomerParams extends ListParams {
+  user_type_id?: number | null;
+  area_id?: string | null;
+  batch_id?: number | null;
+  status?: number;
+}
 
 // old
 export interface KurUserStatus {
@@ -238,13 +238,6 @@ export interface KurUserDocument {
   document_filepath: string;
   document_number: string;
   is_exist: boolean;
-}
-
-export interface CustomerParams extends ListParams {
-  // kur_user_type_id?: number;
-  // area_ids?: string;
-  // credit_score?: number;
-  status?: number;
 }
 
 export interface BankList {

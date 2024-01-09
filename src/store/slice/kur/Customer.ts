@@ -21,7 +21,10 @@ interface CustomerInitialProps {
   params: CustomerParams;
   details: CustomerDetail | null;
   stateFilter?: {
-    status: number;
+    status?: number;
+    area_id?: Area[];
+    batch_id?: number | null;
+    user_type_id?: Type | null;
   };
   loadingMerchantExist: boolean;
   merchantExistMsg: string;
@@ -48,6 +51,9 @@ const initialState: CustomerInitialProps = {
   },
   stateFilter: {
     status: 1,
+    area_id: [],
+    batch_id: null,
+    user_type_id: null,
   },
   details: null,
   loadingMerchantExist: false,
@@ -142,7 +148,10 @@ const CustomerSlice = createSlice({
     setFilter(
       state: CustomerInitialProps,
       action: PayloadAction<{
-        status?: number;
+        status: number | undefined;
+        area_id: Area[] | undefined;
+        batch_id: number | null;
+        user_type_id: Type | null;
       }>,
     ) {
       state.stateFilter = {
