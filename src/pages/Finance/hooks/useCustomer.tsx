@@ -18,6 +18,7 @@ import {
   idirDataKey,
   initialValues,
   userDataKey,
+  Document,
 } from './constumer.config';
 
 export default function useCustomer(setParams: any) {
@@ -35,7 +36,7 @@ export default function useCustomer(setParams: any) {
   };
 }
 
-export function useCustomerDetails(id?: string) {
+export function useCustomerDetails(id?: string | number) {
   const queryCostumer = useQuery({
     queryKey: ['/finance/customer', id],
     queryFn: () => getCustomersDetails(id || ''),
@@ -54,7 +55,7 @@ export function useCreateCustomer({
   id,
   handleClose,
 }: {
-  id?: string;
+  id?: string | number;
   handleClose: (isSubmited: boolean) => void;
 }) {
   const { openToast } = useToast();

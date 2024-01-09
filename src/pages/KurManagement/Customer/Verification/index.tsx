@@ -93,8 +93,11 @@ export default function KurCustomerVerification() {
     },
   ];
 
-  // Batch Action
+  // create user
   const createUserModal = useModal();
+  const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
+
+  // Batch Action
   const [selected, setSelected] = useState<(number | string)[]>([]);
   const [selectedSingle, setSelectedSingle] = useState<number | undefined>(0);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer[]>([]);
@@ -259,6 +262,14 @@ export default function KurCustomerVerification() {
         <>
           <MenuList
             menu={[
+              {
+                label: 'Edit',
+                onClick: () => {
+                  createUserModal.openModal();
+                  setSelectedIdUser(val.id);
+                },
+                dataId: 'button-edit-customer',
+              },
               {
                 label: 'Details',
                 onClick: () => {
@@ -794,9 +805,10 @@ export default function KurCustomerVerification() {
       <Modal
         open={createUserModal.open}
         onClose={createUserModal.closeModal}
-        title="Create Customer"
+        title={selectedIdUser ? 'Update Customer' : 'Create Customer'}
       >
         <FormCustomer
+          id={selectedIdUser}
           handleClose={(isSubmite) => {
             if (isSubmite) {
               dispatch(customerAction.fetchData(customerKur.params));

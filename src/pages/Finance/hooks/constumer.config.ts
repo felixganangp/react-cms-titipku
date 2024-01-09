@@ -131,3 +131,12 @@ export const Type = {
   1: 'KUR WC',
   2: 'WC Titipku',
 };
+
+export const Document = {
+  1: 'KTP',
+  2: 'NIB',
+  3: 'NPWP',
+  4: 'SKU',
+  5: 'KTP Pasangan',
+  6: 'Surat Cerai',
+};

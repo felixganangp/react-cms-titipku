@@ -30,7 +30,7 @@ export default function FormCustomer({
   id,
   handleClose,
 }: {
-  id?: string;
+  id?: string | number;
   handleClose: (isSubmited: boolean) => void;
 }) {
   const [step, setStep] = useState<number>(1);
