@@ -59,14 +59,39 @@ interface FormDataType {
   initialData: CreateCustomer;
 }
 
+interface FormReview {
+  title: string;
+  status: number;
+}
+
+// interface CustomerType {
+//   id: number;
+//   name: string;
+// }
+
 export default function KurCustomerVerification() {
   const toast = useToast();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const customerKur = useAppSelector((state) => state.customerKur);
-  const typeKur = useAppSelector((state) => state.typeKur);
+  // const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
   const creditScore = useAppSelector((state) => state.creditScore);
+  const [formReview, setFormReview] = useState<FormReview>({
+    title: '',
+    status: 3,
+  });
+
+  const customerType: Type[] = [
+    {
+      id: 1,
+      name: 'KUR WC',
+    },
+    {
+      id: 2,
+      name: 'WC Titipku',
+    },
+  ];
 
   // Batch Action
   const createUserModal = useModal();
@@ -83,8 +108,6 @@ export default function KurCustomerVerification() {
   };
 
   const handleVerify = async (id: number | undefined) => {
-    console.log();
-    // const formData = new FormData();
     const data: ReviewCustomer = {
       new_status: 6,
       komite_notes: '',
@@ -108,42 +131,15 @@ export default function KurCustomerVerification() {
     customerKur.params.status,
   ]);
 
-  const initialData = {
-    idCustomer: '',
-    name: '',
-    kurType: null,
-    adminFee: '',
-    dpdRate: '',
-    birthDate: null,
-    phoneNumber: '',
-    email: '',
-    addressKtp: '',
-    addressDomisili: '',
-    pasarName: null,
-    merchantName: null,
-    nikKtp: '',
-    imageNik: '',
-    kkNumber: '',
-    imageKk: '',
-    npwp: '',
-    imageNpwp: '',
-    imageSKUsaha: '',
-    creditLimit: '',
-    bankName: null,
-    bankNumberPrimary: '',
-    nobuAccountNumber: '',
-    oldNikKtp: '',
-    oldKkNumber: '',
-    oldNpwp: '',
-    idImageNik: null,
-    idImageKk: null,
-    idImageNpwp: null,
-    idImageSKUsaha: null,
-    kurUserStatus: '',
-  };
+  const [inputValueArea, setInputValueArea] = useState('');
   const [openFilter, setOpenFilter] = useState(false);
+  useEffect(() => {
+    dispatch(typeAction.fetchData());
+    dispatch(areaAction.fetchData());
+    dispatch(creditScoreAction.fetchData());
+  }, []);
+
   const [userTab, setUserTab] = useState(0);
-  const [biCheckingData, setBiCheckingData] = useState<Customer[]>();
 
   const formBiChecking = useModal();
   const formCustomerReview = useModal();
@@ -165,22 +161,15 @@ export default function KurCustomerVerification() {
     event: React.SyntheticEvent,
     newValue: number,
   ) => {
-    console.log(newValue);
     setUserTab(newValue);
     dispatch(
-      customerAction.fetchData({
-        status: newValue + 1,
+      customerAction.setParams({
+        status: newValue === 4 ? 7 : newValue + 1,
       }),
     );
+    dispatch(customerAction.fetchData(customerKur.params));
   };
   const headCell = [
-    {
-      id: 'id',
-      label: 'ID',
-      align: 'left',
-      format: (val: Customer) => <div>{val.id}</div>,
-      enableSort: true,
-    },
     {
       id: 'user_number',
       label: 'User Number',
@@ -207,7 +196,7 @@ export default function KurCustomerVerification() {
       id: 'pasar',
       label: 'Pasar',
       align: 'left',
-      format: (val: Customer) => <div>{val.merchant_name}</div>,
+      format: (val: Customer) => <div>{val.area_name}</div>,
     },
     {
       id: 'kur_user_type',
@@ -219,7 +208,7 @@ export default function KurCustomerVerification() {
     },
     {
       id: 'create_date',
-      label: 'Create Date',
+      label: 'Created Date',
       align: 'left',
       width: '100px',
       format: (val: Customer) => <div>{convertDate(val.created_at)}</div>,
@@ -256,6 +245,13 @@ export default function KurCustomerVerification() {
       ),
     },
     {
+      id: 'batch_id',
+      label: 'Batch',
+      align: 'left',
+      width: '100px',
+      format: (val: Customer) => <Typography>{val.batch_id}</Typography>,
+    },
+    {
       id: 'action',
       label: 'Action',
       align: 'left',
@@ -271,12 +267,14 @@ export default function KurCustomerVerification() {
                 dataId: 'button-details-customer',
               },
               {
-                label: `Approve`,
+                label: `Komite Review`,
                 onClick: () => {
                   setSelectedSingle(val.id);
+                  setFormReview({ status: 3, title: 'Komite Review' });
                   formCustomerReview.openModal();
                 },
                 dataId: 'button-review-customer',
+                hide: val.user_status_id !== 2,
               },
               {
                 label: `Verify`,
@@ -285,22 +283,17 @@ export default function KurCustomerVerification() {
                   handleVerify(val.id);
                 },
                 dataId: 'button-review-customer',
+                hide: val.user_status_id !== 4,
               },
               {
                 label: `Reject`,
                 onClick: () => {
-                  console.log('edit');
+                  setSelectedSingle(val.id);
+                  setFormReview({ status: 7, title: 'Reject User' });
+                  formCustomerReview.openModal();
                 },
-                dataId: 'button-edit-customer',
+                dataId: 'button-review-customer',
               },
-              // {
-              //   label: val.kur_user_status?.id === 3 ? 'Active' : 'Hold',
-              //   color: val.kur_user_status?.id === 3 ? '#008e58' : '#c10000',
-              //   onClick: () => {
-              //     handleHoldCustomer(val);
-              //   },
-              //   dataId: 'button-hold-customer',
-              // },
             ]}
           >
             <IconButton>
@@ -313,20 +306,26 @@ export default function KurCustomerVerification() {
   ];
 
   const handleChangePage = (value: number) => {
-    let payload: {
-      status?: number;
-    } = {
-      status: 1,
-    };
+    // let payload: {
+    //   status?: number;
+    //   userTypeId?: number || null;
+    //   areaId: Area[];
+    //   batchId: number || null;
+    // } = {
+    //   status: 1,
+    //   userTypeId: 1,
+    //   areaId: [],
+    //   batchId: 1,
+    // };
 
-    if (customerKur.params.status) {
-      payload = {
-        ...payload,
-        status: customerKur.stateFilter?.status,
-      };
-    }
+    // if (customerKur.params.status) {
+    //   payload = {
+    //     ...payload,
+    //     status: customerKur.stateFilter?.status,
+    //   };
+    // }
 
-    dispatch(customerAction.setFilter(payload));
+    // dispatch(customerAction.setFilter(payload));
 
     dispatch(
       customerAction.setParams({
@@ -346,25 +345,38 @@ export default function KurCustomerVerification() {
   //   );
   // };
 
-  // const handleChangeArea = (value: Area[]) => {
-  //   const payload: CustomerParams = {
-  //     page: 1,
-  //   };
-  //   if (value.length > 0) {
-  //     const ids = value.map((el) => el.id);
-  //     const areas = ids.toString();
-  //     payload.area_ids = areas;
-  //   } else {
-  //     payload.area_ids = undefined;
-  //   }
-  //   dispatch(
-  //     customerAction.setFilter({
-  //       typeKur: customerKur.stateFilter?.typeKur || null,
-  //       areaKur: value,
-  //       creditScore: customerKur.stateFilter?.creditScore || null,
-  //     }),
-  //   );
-  // };
+  const handleChangeBatch = (value: number | null) => {
+    dispatch(
+      customerAction.setFilter({
+        status: customerKur.stateFilter?.status || undefined,
+        area_id: customerKur.stateFilter?.area_id,
+        user_type_id: customerKur.stateFilter?.user_type_id || null,
+        batch_id: value,
+      }),
+    );
+  };
+
+  const handleChangeArea = (value: Area[]) => {
+    dispatch(
+      customerAction.setFilter({
+        status: customerKur.stateFilter?.status || undefined,
+        area_id: value,
+        user_type_id: customerKur.stateFilter?.user_type_id || null,
+        batch_id: customerKur.stateFilter?.batch_id || null,
+      }),
+    );
+  };
+
+  const handleChangeType = (value: Type | null) => {
+    dispatch(
+      customerAction.setFilter({
+        status: customerKur.stateFilter?.status || undefined,
+        area_id: customerKur.stateFilter?.area_id,
+        user_type_id: value,
+        batch_id: customerKur.stateFilter?.batch_id || null,
+      }),
+    );
+  };
 
   const handleSearch = (value: string) => {
     dispatch(
@@ -388,48 +400,53 @@ export default function KurCustomerVerification() {
     );
   };
 
-  // const handleApplyFilter = () => {
-  //   const payloadParams = {
-  //     ...customerKur.params,
-  //     page: 1,
-  //     kur_user_type_id: customerKur.stateFilter?.typeKur?.id,
-  //     credit_score: customerKur.stateFilter?.creditScore?.id,
-  //   };
-  //   if (
-  //     customerKur.stateFilter?.areaKur &&
-  //     customerKur.stateFilter?.areaKur.length > 0
-  //   ) {
-  //     const ids = customerKur.stateFilter?.areaKur.map((el: Area) => el.id);
-  //     const areas = ids.toString();
-  //     payloadParams.area_ids = areas;
-  //   } else {
-  //     payloadParams.area_ids = undefined;
-  //   }
-  //   dispatch(customerAction.setParams(payloadParams));
-  //   dispatch(customerAction.fetchData(payloadParams));
-  // };
+  const handleApplyFilter = () => {
+    const payloadParams = {
+      ...customerKur.params,
+      page: 1,
+      user_type_id: customerKur.stateFilter?.user_type_id
+        ? customerKur.stateFilter?.user_type_id.id
+        : null,
+      batch_id: customerKur.stateFilter?.batch_id
+        ? customerKur.stateFilter?.batch_id
+        : null,
+    };
+    if (
+      customerKur.stateFilter?.area_id &&
+      customerKur.stateFilter?.area_id.length > 0
+    ) {
+      const ids = customerKur.stateFilter?.area_id.map((el: Area) => el.id);
+      const areas = ids.toString();
+      payloadParams.area_id = areas;
+    } else {
+      payloadParams.area_id = undefined;
+    }
+    dispatch(customerAction.setParams(payloadParams));
+    dispatch(customerAction.fetchData(payloadParams));
+  };
 
-  // const handleResetFilter = async () => {
-  //   const params: CustomerParams = {
-  //     ...customerKur.params,
-  //     page: 1,
-  //     count: 10,
-  //     order_by: 'id',
-  //     order_type: 'desc',
-  //     kur_user_type_id: undefined,
-  //     credit_score: undefined,
-  //     area_ids: undefined,
-  //   };
-  //   await dispatch(
-  //     customerAction.setFilter({
-  //       areaKur: [],
-  //       typeKur: null,
-  //       creditScore: null,
-  //     }),
-  //   );
-  //   await dispatch(customerAction.setParams(params));
-  //   await dispatch(customerAction.fetchData(params));
-  // };
+  const handleResetFilter = async () => {
+    const params: CustomerParams = {
+      ...customerKur.params,
+      page: 1,
+      count: 10,
+      order_by: 'id',
+      order_type: 'desc',
+      user_type_id: undefined,
+      batch_id: undefined,
+      area_id: undefined,
+    };
+    await dispatch(
+      customerAction.setFilter({
+        area_id: [],
+        user_type_id: null,
+        batch_id: null,
+        status: 1,
+      }),
+    );
+    await dispatch(customerAction.setParams(params));
+    await dispatch(customerAction.fetchData(params));
+  };
 
   const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
 
@@ -437,7 +454,7 @@ export default function KurCustomerVerification() {
     formBiChecking.openModal();
   };
 
-  const formHandleClose = async () => {
+  const formHandleCloseBiChecking = async () => {
     await formBiChecking.closeModal();
   };
 
@@ -480,7 +497,7 @@ export default function KurCustomerVerification() {
                 >
                   <TextField
                     data-testid="search-customer"
-                    placeholder="Search item"
+                    placeholder="Search customer"
                     size="small"
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px', flex: 1 }}
                     fullWidth
@@ -562,21 +579,22 @@ export default function KurCustomerVerification() {
                   <Autocomplete
                     data-testid="filter-type-customer"
                     id="type"
-                    options={typeKur.data}
+                    options={customerType}
                     onChange={(e, value) => {
-                      // handleChangeType(value);
-                      console.log('changetype');
+                      handleChangeType(value);
                     }}
-                    // isOptionEqualToValue={(option: Type) => {
-                    //   return option.id === customerKur.stateFilter?.typeKur?.id;
-                    // }}
+                    isOptionEqualToValue={(option: Type) => {
+                      return (
+                        option.id === customerKur.stateFilter?.user_type_id?.id
+                      );
+                    }}
                     getOptionLabel={(option) => `${option.name}`}
-                    // value={customerKur?.stateFilter?.typeKur}
+                    value={customerKur?.stateFilter?.user_type_id}
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         name="type"
-                        placeholder="Select Type of KUR"
+                        placeholder="Select Customer Type"
                       />
                     )}
                   />
@@ -597,17 +615,16 @@ export default function KurCustomerVerification() {
                     id="pasar-kur"
                     options={areaKur.data}
                     onChange={(e, value) => {
-                      // handleChangeArea(value);
-                      console.log('changearea');
+                      handleChangeArea(value);
                     }}
                     getOptionLabel={(option) => {
                       return `${option.title}`;
                     }}
-                    // inputValue={inputValueArea}
-                    // onInputChange={(_, newInputValue) => {
-                    //   setInputValueArea(newInputValue);
-                    // }}
-                    // value={customerKur?.stateFilter?.areaKur}
+                    inputValue={inputValueArea}
+                    onInputChange={(_, newInputValue) => {
+                      setInputValueArea(newInputValue);
+                    }}
+                    value={customerKur?.stateFilter?.area_id}
                     limitTags={3}
                     renderInput={(params) => {
                       return (
@@ -654,29 +671,19 @@ export default function KurCustomerVerification() {
                       marginBottom: 1,
                     }}
                   >
-                    Credit Score
+                    Batch
                   </Typography>
-                  <Autocomplete
-                    data-testid="filter-credit-score-customer"
-                    id="type"
-                    options={creditScore.data}
-                    // onChange={(e, value) => {
-                    //   handleChangeCreditScore(value);
-                    // }}
-                    // isOptionEqualToValue={(option: UserCreditScore) => {
-                    //   return (
-                    //     option.id === customerKur.stateFilter?.creditScore?.id
-                    //   );
-                    // }}
-                    getOptionLabel={(option) => `${option.name}`}
-                    // value={customerKur?.stateFilter?.creditScore}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="type"
-                        placeholder="Select Credit Score"
-                      />
-                    )}
+                  {/* batch id goes here */}
+                  <TextField
+                    placeholder="Batch customer"
+                    size="small"
+                    type="number"
+                    sx={{ bgcolor: '#fafafa', maxWidth: '560px', flex: 1 }}
+                    fullWidth
+                    defaultValue={customerKur.params.search}
+                    onChange={(e) => {
+                      handleChangeBatch(+e.target.value);
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -689,14 +696,13 @@ export default function KurCustomerVerification() {
                   >
                     <Button
                       onClick={() => {
-                        // handleResetFilter();
-                        console.log('reset');
+                        handleResetFilter();
                       }}
                       variant="text"
                     >
                       Reset
                     </Button>
-                    {/* <Button onClick={handleApplyFilter}>Apply</Button> */}
+                    <Button onClick={handleApplyFilter}>Apply</Button>
                   </Box>
                 </Grid>
               </Grid>
@@ -722,8 +728,8 @@ export default function KurCustomerVerification() {
                 <Tabs.Item label="New" />
                 <Tabs.Item label="Bi-Checking" />
                 <Tabs.Item label="Komite Review" />
-                <Tabs.Item label="Location Check" />
-                {/* <Tabs.Item label="Final Review" /> */}
+                <Tabs.Item label="Final Review" />
+                <Tabs.Item label="Reject" />
               </Tabs.Container>
             </Box>
             <Table
@@ -736,7 +742,6 @@ export default function KurCustomerVerification() {
               orderType={customerKur.params.order_type}
               onChangePage={(val) => handleChangePage(val)}
               onChangeSort={(val) => handleChangeSort(val)}
-              disableNumber
               loading={customerKur.loading}
               enableCheckBox={userTab === 0}
               selected={selected}
@@ -767,21 +772,22 @@ export default function KurCustomerVerification() {
       </Grid>
       <Modal
         open={formBiChecking.open}
-        title="Bi Cheking"
-        onClose={formHandleClose}
+        title="Bi Checking"
+        onClose={formHandleCloseBiChecking}
       >
         <FormBiChecking
-          onClose={formHandleClose}
+          onClose={formHandleCloseBiChecking}
           biCheckingData={selectedCustomer}
         />
       </Modal>
       <Modal
         open={formCustomerReview.open}
-        title="Komite Review"
+        title={formReview.title}
         onClose={formHandleCloseReview}
       >
         <FormCustomerReview
           id={selectedSingle}
+          status={formReview.status}
           onClose={formHandleCloseReview}
         />
       </Modal>

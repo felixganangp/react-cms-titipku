@@ -10,6 +10,7 @@ import { customerAction } from 'store/slice/kur/Customer';
 
 interface FormTypes {
   id: number | undefined;
+  status: number;
   onClose: () => void;
 }
 
@@ -19,21 +20,14 @@ const initialValues: ReviewCustomer = {
   id: 0,
 };
 
-export default function Form({ id, onClose }: FormTypes) {
+export default function Form({ id, status, onClose }: FormTypes) {
   const dispatch = useAppDispatch();
-  const { loadingForm } = useAppSelector((state) => state.customerKur);
-
-  // useEffect(() => {
-  //   if (loadingForm) {
-  //     onClose();
-  //   }
-  // }, [loadingForm]);
 
   const formik = useFormik({
     initialValues,
     onSubmit: (values) => {
       const payload: ReviewCustomer = {
-        new_status: values.new_status,
+        new_status: status,
         komite_notes: values.komite_notes,
         id,
       };
@@ -41,7 +35,7 @@ export default function Form({ id, onClose }: FormTypes) {
       onClose();
     },
     validationSchema: yup.object({
-      komite_notes: yup.string(),
+      komite_notes: yup.string().required('Please Insert Notes'),
     }),
     enableReinitialize: true,
   });
@@ -92,7 +86,7 @@ export default function Form({ id, onClose }: FormTypes) {
           onClick={() => {
             formik.handleSubmit();
           }}
-          // disabled={isLoading || !formik.isValid}
+          disabled={!formik.isValid}
         >
           Submit
         </Button>

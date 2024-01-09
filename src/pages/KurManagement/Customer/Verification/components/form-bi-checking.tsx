@@ -11,7 +11,6 @@ import { object } from 'yup';
 import { useState, useEffect } from 'react';
 import useModal from 'hooks/useModal';
 import Autocomplete from '@mui/material/Autocomplete';
-import CircularProgress from '@mui/material/CircularProgress';
 import TrashIcon from 'components/Icon/Trash';
 import * as yup from 'yup';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
@@ -65,6 +64,7 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
       temp.push({
         debtor_name: data.debtor_name,
         customer_number: data.user_number,
+        merchant_name: data.merchant_name,
         id: data.id,
         bi_checking_status_id: 1,
         bi_checking_status_notes: '',
@@ -82,14 +82,14 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
   }, [biCheckingData]);
 
   const modalSelectCustomer = useModal();
-  //  customer select;
   useEffect(() => {
-    dispatch(customerAction.fetchCustomerSelect(customerSelect.params));
-  }, [customerSelect.params]);
-
-  useEffect(() => {
-    dispatch(customerAction.fetchData({ search: searchCustomer }));
-  }, [searchCustomer]);
+    dispatch(
+      customerAction.fetchCustomerSelect({
+        status: 1,
+        search: customerSelect.params.search,
+      }),
+    );
+  }, [customerSelect.params.search]);
 
   const [errorRsp, setErrorRsp] = useState({ error: false, message: '' });
 
@@ -102,6 +102,7 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
           customers: yup
             .array()
             .required('Please select merchant')
+            .min(1, 'Please select merchant')
             .of(
               yup.object().shape({
                 id: yup.number(),
@@ -110,16 +111,15 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
                   .min(1, 'Please select status')
                   .required('Please select status'),
                 bi_checking_status_notes: yup
-                  .string()
-                  .test(
-                    'len',
-                    'Maximal character length for notes are 5',
-                    (val: string | undefined) =>
-                      val === undefined || val?.length <= 5,
-                  ),
+                  .mixed()
+                  .when('bi_checking_status_id', {
+                    is: (value: number) => {
+                      return value !== 1;
+                    },
+                    then: yup.string().required('Notes is required'),
+                  }),
               }),
-            )
-            .min(1, 'Please select merchant'),
+            ),
         })}
         onSubmit={async (values, formikHelpers) => {
           const payload: BiChecking[] = [];
@@ -175,9 +175,9 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
                           <Stack direction="row" gap={4}>
                             <Stack gap={1} width="90%">
                               <Typography>
-                                {cust.debtor_name}({cust.customer_number})
+                                {cust.customer_number} - {cust.debtor_name}
                               </Typography>
-                              <Typography>{cust.customer_number}</Typography>
+                              <Typography>{cust.merchant_name}</Typography>
                               <Box>
                                 <FormLabel text="Status" required>
                                   <Autocomplete
@@ -232,7 +232,7 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
                                     type="text"
                                     name={`customers[${index}].bi_checking_status_notes`}
                                     placeholder="Insert notes"
-                                    // value={cust.bi_checking_status_notes}
+                                    value={cust.bi_checking_status_notes}
                                     fullWidth
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -284,6 +284,7 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
                           customerAction.setParamsCustomerSelect({
                             page: 1,
                             search: '',
+                            status: 1,
                           }),
                         );
                       }}
@@ -292,6 +293,7 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
                           customerAction.setParamsCustomerSelect({
                             page: 1,
                             search: e,
+                            status: 1,
                           }),
                         );
                       }}
@@ -320,8 +322,10 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
                         ...values.customers.map((val) => val.id || 0),
                       ]}
                       renderItem={(val) => (
-                        <Stack direction="column" gap={1} alignItems="center">
-                          <Typography>{val.debtor_name}</Typography>
+                        <Stack direction="column" gap={1}>
+                          <Typography>
+                            {val.user_number} - {val.debtor_name}
+                          </Typography>
                           <Typography>{val.merchant_name}</Typography>
                         </Stack>
                       )}
@@ -353,14 +357,8 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
                 boxShadow: '3px 0px 10px rgba(0, 0, 0, 0.1)',
               }}
             >
-              <Button
-                type="submit"
-                disabled={
-                  !(isValid && dirty) || customer.loadingForm || errorRsp.error
-                }
-                color="primary"
-              >
-                Save
+              <Button type="submit" disabled={!isValid} color="primary">
+                Submit
               </Button>
             </Box>
             {/* <pre>{JSON.stringify(values.customers, null, 2)}</pre> */}
