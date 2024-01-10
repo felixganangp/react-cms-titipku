@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useFormik } from 'formik';
 import UseParams from 'hooks/useParams';
 import { PaymentParams, SettlementParams } from 'models/finance/payment';
+import moment from 'moment';
 import { useEffect, useMemo } from 'react';
 import {
   createPayment,
@@ -42,7 +43,7 @@ export const UseGetPeyement = (setParams?: PaymentParams) => {
         ...values,
         page: 1,
         // @ts-ignore
-        min_payment_date: values.min_invoice_date?.unix() || undefined,
+        min_payment_date: values.min_payment_date?.unix() || undefined,
         // @ts-ignore
         max_payment_date: values.max_payment_date?.unix() || undefined,
       };
@@ -69,6 +70,7 @@ export const UseGetPeyement = (setParams?: PaymentParams) => {
       (values, [key, value]) => {
         // @ts-ignore
         values[key] = value;
+
         return values;
       },
       {},
@@ -78,7 +80,17 @@ export const UseGetPeyement = (setParams?: PaymentParams) => {
         ...formik.values,
         ...initialFilter,
       };
-      formik.setValues(newValue);
+      formik.setValues({
+        ...newValue,
+        // @ts-ignore
+        min_payment_date: newValue.min_payment_date
+          ? moment.unix(newValue.min_payment_date)
+          : undefined,
+        // @ts-ignore
+        max_payment_date: newValue.max_payment_date
+          ? moment.unix(newValue.max_payment_date)
+          : undefined,
+      });
       params.handleChangeParams(newValue);
     }
   }, []);

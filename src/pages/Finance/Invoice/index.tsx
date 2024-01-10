@@ -49,6 +49,7 @@ import {
   UseInvoiceService,
 } from '../hooks/useInvoiceService';
 import FormSetManualSettled from './Components/FormSetManualSettled';
+import FormCustomer from '../Customer/Components/Form';
 
 export default function InvoicePage() {
   const navigate = useNavigate();
@@ -58,6 +59,7 @@ export default function InvoicePage() {
   const [invoiceDetail, setinvoiceDetail] = useState<InvoiceListType | null>(
     null,
   );
+  const createUserModal = useModal();
   const showFilter = useModal();
   const invoiceForm = useModal();
   const [modalTypeSetManualSettled, setModalTypeSetManualSettled] = useState<
@@ -295,7 +297,7 @@ export default function InvoicePage() {
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
-                defaultValue={queryInnvoice.searchValue}
+                value={queryInnvoice.searchValue}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -305,7 +307,10 @@ export default function InvoicePage() {
                 }}
                 onChange={(event) => {
                   queryInnvoice.handleSearch(event.target.value);
-                  // debounceSearch(event.target.value);
+                  queryInnvoice.handleToSetSearchParams(
+                    'search',
+                    event.target.value,
+                  );
                 }}
               />
             </Stack>
@@ -716,14 +721,7 @@ export default function InvoicePage() {
                 ...queryInnvoice.params,
                 page: value,
               });
-              // Create a new URLSearchParams instance
-              const queryParams = new URLSearchParams(window.location.search);
-
-              // Set the new page value
-              queryParams.set('page', value.toString());
-
-              // Update the URL search parameters
-              window.history.pushState({}, '', `?${queryParams.toString()}`);
+              queryInnvoice.handleToSetSearchParams('page', value.toString());
             }}
           />
         </Card>

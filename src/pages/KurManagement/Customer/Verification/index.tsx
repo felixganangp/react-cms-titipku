@@ -50,6 +50,7 @@ import { Area } from 'models/Area';
 import { MerchantResp } from 'models/Merchant';
 import debounce from 'utils/debounce';
 import useToast from 'hooks/useToast';
+import FormCustomer from 'pages/Finance/Customer/Components/Form';
 import FormBiChecking from './components/form-bi-checking';
 import FormCustomerReview from './components/form-customer-review';
 
@@ -91,6 +92,10 @@ export default function KurCustomerVerification() {
       name: 'WC Titipku',
     },
   ];
+
+  // create user
+  const createUserModal = useModal();
+  const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
 
   // Batch Action
   const [selected, setSelected] = useState<(number | string)[]>([]);
@@ -257,6 +262,14 @@ export default function KurCustomerVerification() {
         <>
           <MenuList
             menu={[
+              {
+                label: 'Edit',
+                onClick: () => {
+                  createUserModal.openModal();
+                  setSelectedIdUser(val.id);
+                },
+                dataId: 'button-edit-customer',
+              },
               {
                 label: 'Details',
                 onClick: () => {
@@ -482,7 +495,7 @@ export default function KurCustomerVerification() {
                   sx={{ width: '180px' }}
                   startIcon={<AddIcon />}
                   onClick={() => {
-                    console.log('add');
+                    createUserModal.openModal();
                   }}
                 >
                   Add Customer
@@ -779,6 +792,21 @@ export default function KurCustomerVerification() {
           id={selectedSingle}
           status={formReview.status}
           onClose={formHandleCloseReview}
+        />
+      </Modal>
+      <Modal
+        open={createUserModal.open}
+        onClose={createUserModal.closeModal}
+        title={selectedIdUser ? 'Update Customer' : 'Create Customer'}
+      >
+        <FormCustomer
+          id={selectedIdUser}
+          handleClose={(isSubmite) => {
+            if (isSubmite) {
+              dispatch(customerAction.fetchData(customerKur.params));
+            }
+            createUserModal.closeModal();
+          }}
         />
       </Modal>
     </Box>
