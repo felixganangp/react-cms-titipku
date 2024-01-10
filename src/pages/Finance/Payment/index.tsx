@@ -50,7 +50,7 @@ export default function PaymentPage() {
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
-                defaultValue={paymentQuery.searchValue}
+                value={paymentQuery.searchValue}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -60,6 +60,11 @@ export default function PaymentPage() {
                 }}
                 onChange={(event) => {
                   paymentQuery.handleSearch(event.target.value);
+                  paymentQuery.handleToSetSearchParams(
+                    'search',
+                    event.target.value,
+                  );
+
                   // debounceSearch(event.target.value);
                 }}
               />
@@ -103,7 +108,7 @@ export default function PaymentPage() {
                           return (
                             <TextField
                               {...params}
-                              name="grade"
+                              name="min_payment_date"
                               placeholder="Select Date Payment"
                               variant="outlined"
                               fullWidth
@@ -244,14 +249,7 @@ export default function PaymentPage() {
                 ...paymentQuery.params,
                 page: value,
               });
-              // Create a new URLSearchParams instance
-              const queryParams = new URLSearchParams(window.location.search);
-
-              // Set the new page value
-              queryParams.set('page', value.toString());
-
-              // Update the URL search parameters
-              window.history.pushState({}, '', `?${queryParams.toString()}`);
+              paymentQuery.handleToSetSearchParams('page', value.toString());
             }}
           />
         </Card>
