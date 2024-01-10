@@ -175,11 +175,31 @@ export default function CustomerDetails() {
   };
 
   const countDiffDate = (start: number | undefined) => {
-    const date1 = new Date((start || 1) * 1000);
-    const date2 = new Date(Date.now());
-    const years = date2.getFullYear() - date1.getFullYear();
-    const months = date2.getMonth() - date1.getMonth();
-    return `${years} year(s) ${months} month(s)`;
+    const month = Math.round(
+      (new Date().getTime() - (start || 0) * 1000) / 1000 / 60 / 60 / 24 / 30,
+    );
+    const year = Math.round(
+      (new Date().getTime() - (start || 0) * 1000) /
+        1000 /
+        60 /
+        60 /
+        24 /
+        365.25,
+    );
+    return `${month} month(s) ${year} year(s)`;
+  };
+
+  const getLimit = () => {
+    if (customerKur.details?.user_status_id !== 6) {
+      return {
+        invoice: customerKur.details?.limit_request_plafon,
+        cash: customerKur.details?.limit_request_cash,
+      };
+    }
+    return {
+      invoice: customerKur.details?.limit_plafon,
+      cash: customerKur.details?.limit_cash,
+    };
   };
 
   const headCellRequest: HeadCells<RequestKUR>[] = [
@@ -640,8 +660,9 @@ export default function CustomerDetails() {
                 flexDirection="column"
                 alignItems="start"
               >
-                {/* <DescDetails
-                  title="Created Date"
+                <DescDetails
+                  title="Join Date"
+                  icon={<CalendarMonth sx={{ color: '#008e58' }} />}
                   content={
                     customerKur.details?.created_at
                       ? moment
@@ -649,16 +670,22 @@ export default function CustomerDetails() {
                           .format('MMM DD, YYYY hh:mm A')
                       : '-'
                   }
-                /> */}
-                <DescDetails
-                  title="Credit Limit Plafon"
-                  icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
-                  content={customerKur.details?.limit_request_plafon}
                 />
                 <DescDetails
-                  title="Credit Limit Cash"
+                  title={`Limit ${
+                    customerKur.details?.user_status_id !== 6 ? 'Request' : ''
+                  } Plafon`}
                   icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
-                  content={customerKur.details?.limit_request_cash}
+                  content={`RP ${digitFormatter.format(
+                    getLimit().invoice || 0,
+                  )}`}
+                />
+                <DescDetails
+                  title={`Limit ${
+                    customerKur.details?.user_status_id !== 6 ? 'Request' : ''
+                  } Cash`}
+                  icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
+                  content={`RP ${digitFormatter.format(getLimit().cash || 0)}`}
                 />
               </Grid>
             </Grid>
@@ -794,7 +821,7 @@ export default function CustomerDetails() {
           </Stack>
         </SubDetailsPagesWrapper>
 
-        {/* <SubDetailsPagesWrapper title="KUR History" defaultOpen>
+        <SubDetailsPagesWrapper title="KUR History" defaultOpen>
           <Box p="20px">
             <Tabs.Container
               value={kurHistoryTab}
@@ -838,7 +865,7 @@ export default function CustomerDetails() {
               />
             )}
           </Box>
-        </SubDetailsPagesWrapper> */}
+        </SubDetailsPagesWrapper>
         {/* <Modal
           open={modalImage.open}
           onClose={() => setModalImage({ open: false, filePath: null })}

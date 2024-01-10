@@ -632,14 +632,6 @@ export default function KurCustomerVerification() {
                             name="type"
                             placeholder="Select Pasar"
                             variant="outlined"
-                            // InputProps={{
-                            //   ...params.InputProps,
-                            //   startAdornment: !areaKurFilter && (
-                            //     <InputAdornment position="start">
-                            //       <SearchIcon />
-                            //     </InputAdornment>
-                            //   ),
-                            // }}
                           />
                         </>
                       );
@@ -671,14 +663,14 @@ export default function KurCustomerVerification() {
                   >
                     Batch
                   </Typography>
-                  {/* batch id goes here */}
                   <TextField
                     placeholder="Batch customer"
                     size="small"
                     type="number"
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px', flex: 1 }}
                     fullWidth
-                    defaultValue={customerKur.params.search}
+                    defaultValue={customerKur.params.batch_id}
+                    value={customerKur?.stateFilter?.batch_id || ''}
                     onChange={(e) => {
                       handleChangeBatch(+e.target.value);
                     }}
