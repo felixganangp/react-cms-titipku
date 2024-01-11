@@ -60,6 +60,7 @@ export default function FormPayment({ onClose }: Props) {
       user: yup.object().nullable().required('Required'),
       amount: yup
         .string()
+        .min(2, 'Month cant be less than 10')
         .max(12, 'Must be 12 characters or less')
         .required('Required'),
       payment_date: yup.mixed().nullable().required('Required'),
@@ -439,7 +440,11 @@ export default function FormPayment({ onClose }: Props) {
         >
           Cancel
         </Button>
-        <Button type="submit" color="primary">
+        <Button
+          type="submit"
+          color="primary"
+          disabled={!formik.isValid || useGetPaymentSimulation.isLoading}
+        >
           Submit
         </Button>
       </Box>

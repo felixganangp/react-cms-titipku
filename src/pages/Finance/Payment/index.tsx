@@ -178,7 +178,7 @@ export default function PaymentPage() {
                     variant="text"
                     onClick={() => {
                       paymentQuery.formikParams.resetForm();
-                      paymentQuery.handleResetFilter();
+                      paymentQuery.handleResetFilter({ whiteList: ['search'] });
                     }}
                   >
                     Reset

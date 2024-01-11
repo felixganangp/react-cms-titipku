@@ -25,18 +25,41 @@ export default function UseParams<T>(props?: T & ListParams) {
   const handleChangeParams = useCallback((dataParams: T & ListParams) => {
     setParams({ ...params, ...dataParams });
     if (dataParams.search) {
-      console.log(dataParams.search);
       setSearchValue(dataParams.search);
     }
   }, []);
 
-  const handleResetFilter = useCallback(() => {
-    setSearchValue('');
-    setParams({ page: 1, count: 10, ...(props as T & ListParams) });
+  const handleResetFilter = useCallback(
+    (config?: { whiteList: string[] }) => {
+      const resetParams = { page: 1, count: 10, ...(props as T & ListParams) };
+      const whiteListParams = Object.keys(params)
+        .filter((key) => (config?.whiteList || [])?.includes(key))
+        .reduce((obj, key) => {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          obj[key] = params[key];
+          return obj;
+        }, {} as T & ListParams);
 
-    // Update the URL search parameters
-    window.history.pushState({}, '', `${window.location.pathname}`);
-  }, []);
+      if (!config?.whiteList?.includes('search')) {
+        setSearchValue('');
+      }
+
+      setParams({ ...resetParams, ...whiteListParams });
+      // Update the URL search parameters
+      const queryParams = new URLSearchParams(
+        Object.fromEntries(
+          Object.entries(whiteListParams).filter(
+            ([key, value]) => value !== undefined,
+          ),
+        ),
+      );
+
+      // Set the search property of the current URL
+      window.history.pushState({}, '', `?${queryParams.toString()}`);
+    },
+    [params],
+  );
 
   const handleToSetSearchParams = (name: string, value: string) => {
     // Create a new URLSearchParams instance
