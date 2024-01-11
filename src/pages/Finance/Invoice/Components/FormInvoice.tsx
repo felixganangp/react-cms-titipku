@@ -72,7 +72,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
       transfer_date: yup.mixed().nullable().required('Required'),
       destination_bank: yup.mixed().when('invoice_type_id', {
         is: (val: any) => val === '1',
-        then: yup.object().required('Required'),
+        then: yup.object().nullable().required('Required'),
       }),
       destination_bank_account: yup.number().when('invoice_type_id', {
         is: (val: any) => val === '1',
@@ -141,7 +141,10 @@ export default function FormInvoice(props: FormInvoiceProps) {
           },
         });
       } catch (error) {
-        console.log(error);
+        toast.openToast({
+          severity: 'error',
+          headMsg: 'Failed create invoice',
+        });
       }
     },
   });
@@ -181,6 +184,27 @@ export default function FormInvoice(props: FormInvoiceProps) {
     formik.values.installment_period,
   ]);
 
+  useEffect(() => {
+    const maxValue =
+      formik.values.invoice_type_id === '1'
+        ? // @ts-ignore
+          formik.values.user?.limit_plafon
+        : // @ts-ignore
+          formik.values.user?.limit_cash || 0;
+
+    if (parseInt(formik.values.loan_amount) > maxValue) {
+      setTimeout(() => {
+        formik.setFieldError(
+          'loan_amount',
+          `Maximal ${numberSeperator(maxValue)}`,
+        );
+      }, 100);
+    }
+  }, [
+    formik.values.loan_amount,
+    formik.values.invoice_type_id,
+    formik.values.user,
+  ]);
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Box p="24px">
@@ -579,7 +603,11 @@ export default function FormInvoice(props: FormInvoiceProps) {
         >
           Cancel
         </Button>
-        <Button type="submit" color="primary">
+        <Button
+          type="submit"
+          color="primary"
+          disabled={!formik.isValid || createInvoice.isLoading}
+        >
           Submit
         </Button>
       </Box>
