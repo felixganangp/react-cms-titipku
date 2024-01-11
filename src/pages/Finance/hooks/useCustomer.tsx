@@ -70,6 +70,7 @@ export function useCreateCustomer({
 
   const formik = useFormik({
     initialValues,
+    validateOnMount: true,
     onSubmit: async (value) => {
       const formData = new FormData();
       /// user_data ====================
@@ -178,33 +179,100 @@ export function useCreateCustomer({
     validationSchema: yup.object({
       debtor_name: yup.string().required('This field is required'),
       merchant_name: yup.string().required('This field is required'),
-      nik: yup.string().required('This field is required'),
-      nib: yup.string().required('This field is required'),
-      npwp: yup.string().required('This field is required'),
-      phone_number: yup.string().required('This field is required'),
-      family_phone_number: yup.string().required('This field is required'),
-      area: yup.mixed().required('This field is required'),
-      category_jelajah: yup.mixed().required('This field is required'),
-      marriage_status: yup.string().required('This field is required'),
-      limit_request_plafon: yup.string().required('This field is required'),
-      limit_request_cash: yup.string().required('This field is required'),
+      nik: yup
+        .string()
+        .min(16, 'must be at least 16 characters')
+        .max(16, 'must be at least 16 characters')
+        .required('This field is required'),
+      nib: yup
+        .string()
+        .min(13, 'Phone number must be at least 13 characters')
+        .max(13, 'Phone number must be at least 13 characters')
+        .required('This field is required'),
+      npwp: yup
+        .string()
+        .min(16, 'must be at least 16 characters')
+        .max(16, 'must be at least 16 characters')
+        .required('This field is required'),
+      phone_number: yup
+        .string()
+        .min(8, 'Phone number must be at least 8 characters')
+        .max(15, 'Phone number must be at least 15 characters')
+        .required('This field is required'),
+      family_phone_number: yup
+        .string()
+        .min(8, 'Phone number must be at least 8 characters')
+        .max(15, 'Phone number must be at least 15 characters')
+        .required('This field is required'),
+      area: yup.mixed().nullable().required('This field is required'),
+      category_jelajah: yup
+        .mixed()
+        .nullable()
+        .required('This field is required'),
+      marriage_status: yup
+        .string()
+        .nullable()
+        .required('This field is required'),
+      limit_request_plafon: yup
+        .string()
+        .min(2, 'Month cant be less than 10')
+        .max(12, 'Must be 12 characters or less')
+        .required('This field is required'),
+      limit_request_cash: yup
+        .string()
+        .min(2, 'Month cant be less than 10')
+        .max(12, 'Must be 12 characters or less')
+        .required('This field is required'),
       business_lifetime: yup.string().required('This field is required'),
       user_type_id: yup.string().required('This field is required'),
-      gmv: yup.string().required('This field is required'),
-      office_rent: yup.string().required('This field is required'),
-      electricity: yup.string().required('This field is required'),
-      education_expenses: yup.string().required('This field is required'),
-      household_expenses: yup.string().required('This field is required'),
-      employee_expenses: yup.string().required('This field is required'),
-      another_loan: yup.string().required('This field is required'),
+      gmv: yup
+        .string()
+        .min(2, 'Month cant be less than 10')
+        .max(12, 'Must be 12 characters or less')
+        .required('This field is required'),
+      office_rent: yup
+        .string()
+        .min(2, 'Month cant be less than 10')
+        .max(12, 'Must be 12 characters or less')
+        .required('This field is required'),
+      electricity: yup
+        .string()
+        .min(2, 'Month cant be less than 10')
+        .max(12, 'Must be 12 characters or less')
+        .required('This field is required'),
+      education_expenses: yup
+        .string()
+        .min(2, 'Month cant be less than 10')
+        .max(12, 'Must be 12 characters or less')
+        .required('This field is required'),
+      household_expenses: yup
+        .string()
+        .min(2, 'Month cant be less than 10')
+        .max(12, 'Must be 12 characters or less')
+        .required('This field is required'),
+      employee_expenses: yup
+        .string()
+        .min(2, 'Month cant be less than 10')
+        .max(12, 'Must be 12 characters or less')
+        .required('This field is required'),
+      another_loan: yup
+        .string()
+        .min(2, 'Month cant be less than 10')
+        .max(12, 'Must be 12 characters or less')
+        .required('This field is required'),
       cash_out_purpose: yup.string().required('This field is required'),
-      nik_image: yup.mixed().required('This field is required'),
-      npwp_image: yup.mixed().required('This field is required'),
-      sku_image: yup.mixed().required('This field is required'),
-      nib_image: yup.mixed().required('This field is required'),
+      nik_image: yup.mixed().nullable().required('This field is required'),
+      npwp_image: yup.mixed().nullable().required('This field is required'),
+      sku_image: yup.mixed().nullable().required('This field is required'),
+      nib_image: yup.mixed().nullable().required('This field is required'),
       nik_partner: yup.string().when('marriage_status', {
         is: 'kawin',
-        then: () => yup.string().required('This field is required'),
+        then: () =>
+          yup
+            .string()
+            .min(16, 'must be at least 16 characters')
+            .max(16, 'must be at least 16 characters')
+            .required('This field is required'),
       }),
       nik_partner_image: yup.string().when('marriage_status', {
         is: 'kawin',
