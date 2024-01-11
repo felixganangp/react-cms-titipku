@@ -697,7 +697,9 @@ export default function InvoicePage() {
                     variant="text"
                     onClick={() => {
                       queryInnvoice.formikParams.resetForm();
-                      queryInnvoice.handleResetFilter();
+                      queryInnvoice.handleResetFilter({
+                        whiteList: ['search'],
+                      });
                     }}
                   >
                     Reset

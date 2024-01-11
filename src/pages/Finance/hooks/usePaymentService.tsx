@@ -41,6 +41,7 @@ export const UseGetPeyement = (setParams?: PaymentParams) => {
     onSubmit: (values) => {
       const newValue = {
         ...values,
+        search: params.params.search,
         page: 1,
         // @ts-ignore
         min_payment_date: values.min_payment_date?.unix() || undefined,
