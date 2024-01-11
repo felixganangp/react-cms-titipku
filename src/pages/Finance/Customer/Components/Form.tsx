@@ -21,6 +21,7 @@ import {
 } from 'service/Finance/config';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
 import moment from 'moment';
+import useModal from 'hooks/useModal';
 import InputImage from 'components/InputImage';
 import { useCreateCustomer, useCustomerDetails } from '../../hooks/useCustomer';
 import { step1Key, step2Key, Type } from '../../hooks/constumer.config';
@@ -33,6 +34,7 @@ export default function FormCustomer({
   id?: string | number;
   handleClose: (isSubmited: boolean) => void;
 }) {
+  const openCalender = useModal();
   const [step, setStep] = useState<number>(1);
   const areaParams = UseParams({ count: 25 });
   const areaQuery = useQuery({
@@ -59,6 +61,7 @@ export default function FormCustomer({
         return {
           label: 'Cancel',
           onClick: () => {
+            handleClose(false);
             // confirmCancelModal.on();
           },
         };
@@ -182,7 +185,15 @@ export default function FormCustomer({
             fullWidth
             placeholder="Input phone number"
             name="phone_number"
-            onBlur={formik.handleBlur}
+            onBlur={(e) => {
+              formik.handleBlur(e);
+              if (e.target.value[0] !== '8') {
+                formik.setFieldError(
+                  'phone_number',
+                  'Phone number must start with 8',
+                );
+              }
+            }}
             value={formik.values.phone_number}
             error={
               formik.touched.phone_number && Boolean(formik.errors.phone_number)
@@ -222,7 +233,15 @@ export default function FormCustomer({
             fullWidth
             placeholder="Input family phone number"
             name="family_phone_number"
-            onBlur={formik.handleBlur}
+            onBlur={(e) => {
+              formik.handleBlur(e);
+              if (e.target.value[0] !== '8') {
+                formik.setFieldError(
+                  'phone_number',
+                  'Phone number must start with 8',
+                );
+              }
+            }}
             value={formik.values.family_phone_number}
             error={
               formik.touched.family_phone_number &&
@@ -347,9 +366,11 @@ export default function FormCustomer({
         >
           <DesktopDatePicker
             maxDate={moment()}
+            open={openCalender.open}
             onOpen={() => {
               formik.setFieldTouched('business_lifetime');
             }}
+            onClose={openCalender.closeModal}
             onChange={(value) => {
               formik.setFieldValue('business_lifetime', value?.unix());
             }}
@@ -370,6 +391,7 @@ export default function FormCustomer({
               return (
                 <TextField
                   {...params}
+                  onClick={openCalender.toggleModal}
                   name="business_lifetime"
                   onBlur={formik.handleBlur}
                   placeholder="Select Grade"
@@ -385,13 +407,10 @@ export default function FormCustomer({
           text="User type"
           required
           error={
-            formik.touched.business_lifetime &&
-            Boolean(formik.errors.business_lifetime)
+            formik.touched.user_type_id && Boolean(formik.errors.user_type_id)
           }
           helperText={
-            formik.touched.business_lifetime
-              ? formik.errors.business_lifetime
-              : ''
+            formik.touched.user_type_id ? formik.errors.user_type_id : ''
           }
         >
           <Autocomplete
@@ -754,7 +773,9 @@ export default function FormCustomer({
         <FormControl
           text="Another Loan"
           required
-          error={formik.touched.gmv && Boolean(formik.errors.gmv)}
+          error={
+            formik.touched.another_loan && Boolean(formik.errors.another_loan)
+          }
           helperText={
             formik.touched.another_loan ? formik.errors.another_loan : ''
           }
