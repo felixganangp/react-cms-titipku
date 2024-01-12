@@ -60,7 +60,7 @@ export default function FormPayment({ onClose }: Props) {
       user: yup.object().nullable().required('Required'),
       amount: yup
         .string()
-        .min(2, 'Month cant be less than 10')
+        .min(2, 'Amonth cant be less than 10')
         .max(12, 'Must be 12 characters or less')
         .required('Required'),
       payment_date: yup.mixed().nullable().required('Required'),

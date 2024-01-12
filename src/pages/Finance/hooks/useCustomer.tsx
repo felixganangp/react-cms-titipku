@@ -215,49 +215,49 @@ export function useCreateCustomer({
         .required('This field is required'),
       limit_request_plafon: yup
         .string()
-        .min(2, 'Month cant be less than 10')
+        .min(2, 'Cant be less than 10')
         .max(12, 'Must be 12 characters or less')
         .required('This field is required'),
       limit_request_cash: yup
         .string()
-        .min(2, 'Month cant be less than 10')
+        .min(2, 'Cant be less than 10')
         .max(12, 'Must be 12 characters or less')
         .required('This field is required'),
       business_lifetime: yup.string().required('This field is required'),
       user_type_id: yup.string().required('This field is required'),
       gmv: yup
         .string()
-        .min(2, 'Month cant be less than 10')
+        .min(2, 'Cant be less than 10')
         .max(12, 'Must be 12 characters or less')
         .required('This field is required'),
       office_rent: yup
         .string()
-        .min(2, 'Month cant be less than 10')
+        .min(2, 'Cant be less than 10')
         .max(12, 'Must be 12 characters or less')
         .required('This field is required'),
       electricity: yup
         .string()
-        .min(2, 'Month cant be less than 10')
+        .min(2, 'Cant be less than 10')
         .max(12, 'Must be 12 characters or less')
         .required('This field is required'),
       education_expenses: yup
         .string()
-        .min(2, 'Month cant be less than 10')
+        .min(2, 'Cant be less than 10')
         .max(12, 'Must be 12 characters or less')
         .required('This field is required'),
       household_expenses: yup
         .string()
-        .min(2, 'Month cant be less than 10')
+        .min(2, 'Cant be less than 10')
         .max(12, 'Must be 12 characters or less')
         .required('This field is required'),
       employee_expenses: yup
         .string()
-        .min(2, 'Month cant be less than 10')
+        .min(2, 'Cant be less than 10')
         .max(12, 'Must be 12 characters or less')
         .required('This field is required'),
       another_loan: yup
         .string()
-        .min(2, 'Month cant be less than 10')
+        .min(2, 'Cant be less than 10')
         .max(12, 'Must be 12 characters or less')
         .required('This field is required'),
       cash_out_purpose: yup.string().required('This field is required'),
