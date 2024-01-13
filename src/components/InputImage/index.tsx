@@ -9,11 +9,11 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
-import Resizer from 'react-image-file-resizer';
 import ClearIcon from '@mui/icons-material/Clear';
 import useToast from 'hooks/useToast';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import ImageCrop from '../ImageCrop';
+import { createResizedImage } from './resize';
 
 interface ImageCustomerProps {
   imageCustomer: boolean | undefined;
@@ -70,7 +70,7 @@ function InputImage({
         setImageFile(newFiles[0]);
       } else {
         try {
-          Resizer.imageFileResizer(
+          createResizedImage(
             newFiles[0],
             1500,
             1500,
@@ -84,6 +84,20 @@ function InputImage({
             400,
             400,
           );
+          // Resizer.imageFileResizer(
+          //   newFiles[0],
+          //   1500,
+          //   1500,
+          //   'JPEG',
+          //   90,
+          //   0,
+          //   (blob) => {
+          //     onChange(blob as any);
+          //   },
+          //   'blob',
+          //   400,
+          //   400,
+          // );
         } catch (err) {
           console.log(err);
           openToast({
