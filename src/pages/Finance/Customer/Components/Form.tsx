@@ -116,6 +116,7 @@ export default function FormCustomer({
       element.scrollIntoView({ behavior: 'smooth' });
     }
   }, [step]);
+
   return (
     <Box p="24px">
       <div id="top" />
@@ -187,12 +188,6 @@ export default function FormCustomer({
             name="phone_number"
             onBlur={(e) => {
               formik.handleBlur(e);
-              if (e.target.value[0] !== '8') {
-                formik.setFieldError(
-                  'phone_number',
-                  'Phone number must start with 8',
-                );
-              }
             }}
             value={formik.values.phone_number}
             error={
@@ -235,12 +230,6 @@ export default function FormCustomer({
             name="family_phone_number"
             onBlur={(e) => {
               formik.handleBlur(e);
-              if (e.target.value[0] !== '8') {
-                formik.setFieldError(
-                  'phone_number',
-                  'Phone number must start with 8',
-                );
-              }
             }}
             value={formik.values.family_phone_number}
             error={
@@ -1088,7 +1077,7 @@ export default function FormCustomer({
               />
             </FormControl>
             <FormControl
-              text="KTP Partener"
+              text="KTP Partner"
               required
               error={Boolean(formik.errors.nik_partner_image)}
               helperText={formik.errors.nik_partner_image}
