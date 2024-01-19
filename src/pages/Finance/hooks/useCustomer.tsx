@@ -192,8 +192,8 @@ export function useCreateCustomer({
         .required('This field is required'),
       nib: yup
         .string()
-        .min(13, 'Phone number must be at least 13 characters')
-        .max(13, 'Phone number must be at least 13 characters')
+        .min(13, 'Nib must be at least 13 characters')
+        .max(13, 'Nib must be at least 13 characters')
         .required('This field is required'),
       npwp: yup
         .string()
@@ -240,37 +240,37 @@ export function useCreateCustomer({
       business_lifetime: yup.string().required('This field is required'),
       user_type_id: yup.string().nullable().required('This field is required'),
       gmv: yup
-        .string()
+        .number()
         .min(1, 'Cant be less than 1')
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
       office_rent: yup
-        .string()
+        .number()
         .min(1, 'Cant be less than 1')
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
       electricity: yup
-        .string()
+        .number()
         .min(1, 'Cant be less than 1')
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
       education_expenses: yup
-        .string()
+        .number()
         .min(1, 'Cant be less than 1')
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
       household_expenses: yup
-        .string()
+        .number()
         .min(1, 'Cant be less than 1')
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
       employee_expenses: yup
-        .string()
+        .number()
         .min(1, 'Cant be less than 1')
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
       another_loan: yup
-        .string()
+        .number()
         .min(1, 'Cant be less than 1')
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
