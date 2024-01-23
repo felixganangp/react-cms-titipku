@@ -36,6 +36,7 @@ export function UseInvoiceService(setParams?: InvoiceParams) {
       const newValue = {
         ...values,
         page: 1,
+        search: params.params.search,
         // @ts-ignore
         min_invoice_date: values.min_invoice_date?.unix() || undefined,
         // @ts-ignore

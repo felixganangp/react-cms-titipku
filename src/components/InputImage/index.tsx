@@ -9,10 +9,11 @@ import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
-
 import ClearIcon from '@mui/icons-material/Clear';
+import useToast from 'hooks/useToast';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import ImageCrop from '../ImageCrop';
+import { createResizedImage } from './resize';
 
 interface ImageCustomerProps {
   imageCustomer: boolean | undefined;
@@ -49,6 +50,7 @@ function InputImage({
   onClear,
   imageCustomer,
 }: Props) {
+  const { openToast } = useToast();
   const [imageCrop, setImageCrop] = useState<any>(false);
   const [imageFile, setImageFile] = useState<File | undefined>(undefined);
   const fileInputField = useRef<HTMLInputElement>(null);
@@ -67,7 +69,43 @@ function InputImage({
         setImageCrop(true);
         setImageFile(newFiles[0]);
       } else {
-        onChange(newFiles[0]);
+        try {
+          createResizedImage(
+            newFiles[0],
+            1500,
+            1500,
+            'JPEG',
+            90,
+            0,
+            (blob) => {
+              onChange(blob as any);
+            },
+            'blob',
+            400,
+            400,
+          );
+          // Resizer.imageFileResizer(
+          //   newFiles[0],
+          //   1500,
+          //   1500,
+          //   'JPEG',
+          //   90,
+          //   0,
+          //   (blob) => {
+          //     onChange(blob as any);
+          //   },
+          //   'blob',
+          //   400,
+          //   400,
+          // );
+        } catch (err) {
+          console.log(err);
+          openToast({
+            severity: 'error',
+            headMsg: 'Failed to upload image',
+          });
+        }
+        // onChange(newFiles[0]);
       }
     }
   };

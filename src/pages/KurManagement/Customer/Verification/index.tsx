@@ -214,7 +214,9 @@ export default function KurCustomerVerification() {
       label: 'Created Date',
       align: 'left',
       width: '100px',
-      format: (val: Customer) => <div>{convertDate(val.created_at)}</div>,
+      format: (val: Customer) => (
+        <div>{moment(val.created_at * 1000).format('DD/MM/YYYY')}</div>
+      ),
     },
     {
       id: 'status',

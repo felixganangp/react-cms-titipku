@@ -89,7 +89,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
       provision_installment_period: yup
         .number()
         .min(0, 'Min 0 period')
-        .max(12, 'Max 36 period')
+        .max(36, 'Max 36 period')
         .required('Required'),
       nota_image: yup.string().required('Required'),
     }),
@@ -184,27 +184,6 @@ export default function FormInvoice(props: FormInvoiceProps) {
     formik.values.installment_period,
   ]);
 
-  useEffect(() => {
-    const maxValue =
-      formik.values.invoice_type_id === '1'
-        ? // @ts-ignore
-          formik.values.user?.limit_plafon
-        : // @ts-ignore
-          formik.values.user?.limit_cash || 0;
-
-    if (parseInt(formik.values.loan_amount) > maxValue) {
-      setTimeout(() => {
-        formik.setFieldError(
-          'loan_amount',
-          `Maximal ${numberSeperator(maxValue)}`,
-        );
-      }, 100);
-    }
-  }, [
-    formik.values.loan_amount,
-    formik.values.invoice_type_id,
-    formik.values.user,
-  ]);
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Box p="24px">
@@ -315,7 +294,24 @@ export default function FormInvoice(props: FormInvoiceProps) {
             fullWidth
             autoComplete="off"
             value={numberSeperator(formik.values.loan_amount || '')}
-            onBlur={formik.handleBlur}
+            onBlur={(e) => {
+              formik.handleBlur(e);
+              const maxValue =
+                formik.values.invoice_type_id === '1'
+                  ? // @ts-ignore
+                    formik.values.user?.limit_plafon
+                  : // @ts-ignore
+                    formik.values.user?.limit_cash || 0;
+
+              if (parseInt(formik.values.loan_amount) > maxValue) {
+                setTimeout(() => {
+                  formik.setFieldError(
+                    'loan_amount',
+                    `Maximal ${numberSeperator(maxValue)}`,
+                  );
+                }, 100);
+              }
+            }}
             onChange={(e) => {
               const value = e.target.value
                 .replace(/[^0-9.]/g, '')
