@@ -68,6 +68,17 @@ export default function KurCustomer() {
   //   customerKur.params.status,
   // ]);
 
+  const customerType: Type[] = [
+    {
+      id: 1,
+      name: 'KUR WC',
+    },
+    {
+      id: 2,
+      name: 'WC Titipku',
+    },
+  ];
+
   useEffect(() => {
     dispatch(
       customerAction.fetchData({
@@ -311,18 +322,23 @@ export default function KurCustomer() {
   const handleChangeType = (value: Type | null) => {
     dispatch(
       customerAction.setFilter({
-        typeKur: value,
-        areaKur: customerKur.stateFilter?.areaKur,
-        creditScore: customerKur.stateFilter?.creditScore || null,
+        status: customerKur.stateFilter?.status || undefined,
+        area_id: customerKur.stateFilter?.area_id,
+        user_type_id: value,
+        batch_id: customerKur.stateFilter?.batch_id || null,
       }),
     );
-    // dispatch(
-    //   customerAction.setParams({
-    //     page: 1,
-    //     kur_user_type_id: value?.id,
-    //   }),
-    // );
   };
+
+  // const handleChangeType = (value: Type | null) => {
+  //   dispatch(
+  //     customerAction.setFilter({
+  //       typeKur: value,
+  //       areaKur: customerKur.stateFilter?.areaKur,
+  //       creditScore: customerKur.stateFilter?.creditScore || null,
+  //     }),
+  //   );
+  // };
 
   const handleChangeCreditScore = (value: UserCreditScore | null) => {
     dispatch(
@@ -341,18 +357,19 @@ export default function KurCustomer() {
     if (value.length > 0) {
       const ids = value.map((el) => el.id);
       const areas = ids.toString();
-      payload.area_ids = areas;
+      payload.area_id = areas;
     } else {
-      payload.area_ids = undefined;
+      payload.area_id = undefined;
     }
-    dispatch(
-      customerAction.setFilter({
-        typeKur: customerKur.stateFilter?.typeKur || null,
-        areaKur: value,
-        creditScore: customerKur.stateFilter?.creditScore || null,
-      }),
-    );
-    // dispatch(customerAction.setParams(payload));
+    // dispatch(
+    // customerAction.setFilter({
+    // area_id: value,
+    // typeKur: customerKur.stateFilter?.typeKur || '',
+    // areaKur: value,
+    // creditScore: customerKur.stateFilter?.creditScore || '',
+    // }),
+    // );
+    dispatch(customerAction.setParams(payload));
   };
 
   const handleSearch = (value: string) => {
@@ -377,22 +394,46 @@ export default function KurCustomer() {
     );
   };
 
+  // const handleApplyFilter = () => {
+  //   const payloadParams = {
+  //     ...customerKur.params,
+  //     page: 1,
+  //     kur_user_type_id: customerKur.stateFilter?.typeKur?.id,
+  //     credit_score: customerKur.stateFilter?.creditScore?.id,
+  //   };
+  //   if (
+  //     customerKur.stateFilter?.areaKur &&
+  //     customerKur.stateFilter?.areaKur.length > 0
+  //   ) {
+  //     const ids = customerKur.stateFilter?.areaKur.map((el: Area) => el.id);
+  //     const areas = ids.toString();
+  //     payloadParams.area_ids = areas;
+  //   } else {
+  //     payloadParams.area_ids = undefined;
+  //   }
+  //   dispatch(customerAction.setParams(payloadParams));
+  //   dispatch(customerAction.fetchData(payloadParams));
+  // };
+
   const handleApplyFilter = () => {
     const payloadParams = {
       ...customerKur.params,
       page: 1,
-      kur_user_type_id: customerKur.stateFilter?.typeKur?.id,
-      credit_score: customerKur.stateFilter?.creditScore?.id,
+      status: 6,
     };
+    if (customerKur.stateFilter?.user_type_id) {
+      payloadParams.user_type_id = customerKur.stateFilter?.user_type_id.id;
+    }
+    if (customerKur.stateFilter?.batch_id) {
+      payloadParams.batch_id = customerKur.stateFilter?.batch_id;
+    }
     if (
-      customerKur.stateFilter?.areaKur &&
-      customerKur.stateFilter?.areaKur.length > 0
+      customerKur.stateFilter?.area_id &&
+      customerKur.stateFilter?.area_id.length > 0
     ) {
-      const ids = customerKur.stateFilter?.areaKur.map((el: Area) => el.id);
+      const ids = customerKur.stateFilter?.area_id.map((el: Area) => el.id);
       const areas = ids.toString();
-      payloadParams.area_ids = areas;
-    } else {
-      payloadParams.area_ids = undefined;
+      payloadParams.area_id = areas;
     }
     dispatch(customerAction.setParams(payloadParams));
     dispatch(customerAction.fetchData(payloadParams));
@@ -403,22 +444,21 @@ export default function KurCustomer() {
       ...customerKur.params,
       page: 1,
       count: 10,
-      order_by: 'id',
-      order_type: 'desc',
-      kur_user_type_id: undefined,
-      credit_score: undefined,
-      area_ids: undefined,
+      status: 6,
+      user_type_id: null,
+      batch_id: null,
+      area_id: null,
     };
     await dispatch(
       customerAction.setFilter({
-        areaKur: [],
-        typeKur: null,
-        creditScore: null,
+        area_id: [],
+        user_type_id: null,
+        batch_id: null,
+        status: 6,
       }),
     );
     await dispatch(customerAction.setParams(params));
     await dispatch(customerAction.fetchData(params));
-    // await handleApplyFilter();
   };
 
   const debounceSearch = useCallback(debounce(handleSearch, 1000), []);
@@ -472,7 +512,7 @@ export default function KurCustomer() {
                 >
                   <TextField
                     data-testid="search-customer"
-                    placeholder="Search item"
+                    placeholder="Search Customer"
                     size="small"
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px', flex: 1 }}
                     fullWidth
@@ -511,24 +551,26 @@ export default function KurCustomer() {
                   >
                     Type
                   </Typography>
+
                   <Autocomplete
                     data-testid="filter-type-customer"
                     id="type"
-                    options={typeKur.data}
+                    options={customerType}
                     onChange={(e, value) => {
-                      // setTypeKurFilter(value);
                       handleChangeType(value);
                     }}
                     isOptionEqualToValue={(option: Type) => {
-                      return option.id === customerKur.stateFilter?.typeKur?.id;
+                      return (
+                        option.id === customerKur.stateFilter?.user_type_id?.id
+                      );
                     }}
                     getOptionLabel={(option) => `${option.name}`}
-                    value={customerKur?.stateFilter?.typeKur}
+                    value={customerKur?.stateFilter?.user_type_id}
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         name="type"
-                        placeholder="Select Type of KUR"
+                        placeholder="Select Customer Type"
                       />
                     )}
                   />
@@ -607,7 +649,7 @@ export default function KurCustomer() {
                     )}
                   />
                 </Grid>
-                <Grid item xs={4}>
+                {/* <Grid item xs={4}>
                   <Typography
                     sx={{
                       fontSize: '14px',
@@ -622,7 +664,6 @@ export default function KurCustomer() {
                     id="type"
                     options={creditScore.data}
                     onChange={(e, value) => {
-                      // setTypeKurFilter(value);
                       handleChangeCreditScore(value);
                     }}
                     isOptionEqualToValue={(option: UserCreditScore) => {
@@ -640,7 +681,7 @@ export default function KurCustomer() {
                       />
                     )}
                   />
-                </Grid>
+                </Grid> */}
                 <Grid item xs={12}>
                   <Box
                     sx={{

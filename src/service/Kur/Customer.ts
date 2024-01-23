@@ -12,10 +12,32 @@ import { CustomerDetailType } from 'models/finance/customer';
 
 export const getAllCustomers = (params: CustomerParams) =>
   new Promise<ListResponse<Customer>>(async (resolve, reject) => {
-    try {
-      const respon = await http.get(`financing/user`, {
-        params,
+    Object.keys(params).forEach((key: string) => {
+      if (params[key] === null) {
+        delete params[key];
+      }
+    });
+    let objString = '';
+    if (params.area_id && params.area_id !== '') {
+      const tempArea: string[] = params.area_id.split(',');
+      const arrayArea: string[] = [];
+      tempArea.forEach((element) => {
+        arrayArea.push(`&area_id=${element}`);
       });
+      delete params.area_id;
+      objString = `?${new URLSearchParams(params).toString()}${arrayArea.join(
+        '',
+      )}`;
+      console.log('objString1', objString);
+    } else {
+      delete params.area_id;
+      objString = `?${new URLSearchParams(params).toString()}`;
+    }
+    try {
+      // const respon = await http.get(`financing/user`, {
+      //   params,
+      // });
+      const respon = await http.get(`financing/user${objString}`);
       if (respon.data) {
         resolve(respon.data);
       }

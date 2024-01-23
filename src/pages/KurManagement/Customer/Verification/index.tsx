@@ -415,22 +415,21 @@ export default function KurCustomerVerification() {
     const payloadParams = {
       ...customerKur.params,
       page: 1,
-      user_type_id: customerKur.stateFilter?.user_type_id
-        ? customerKur.stateFilter?.user_type_id.id
-        : null,
-      batch_id: customerKur.stateFilter?.batch_id
-        ? customerKur.stateFilter?.batch_id
-        : null,
     };
+    if (customerKur.stateFilter?.user_type_id) {
+      payloadParams.user_type_id = customerKur.stateFilter?.user_type_id.id;
+    }
+    if (customerKur.stateFilter?.batch_id) {
+      payloadParams.batch_id = customerKur.stateFilter?.batch_id;
+    }
     if (
       customerKur.stateFilter?.area_id &&
       customerKur.stateFilter?.area_id.length > 0
     ) {
       const ids = customerKur.stateFilter?.area_id.map((el: Area) => el.id);
+      console.log('ids', ids);
       const areas = ids.toString();
       payloadParams.area_id = areas;
-    } else {
-      payloadParams.area_id = undefined;
     }
     dispatch(customerAction.setParams(payloadParams));
     dispatch(customerAction.fetchData(payloadParams));
@@ -441,11 +440,11 @@ export default function KurCustomerVerification() {
       ...customerKur.params,
       page: 1,
       count: 10,
-      order_by: 'id',
-      order_type: 'desc',
-      user_type_id: undefined,
-      batch_id: undefined,
-      area_id: undefined,
+      // order_by: 'id',
+      // order_type: 'desc',
+      user_type_id: null,
+      batch_id: null,
+      area_id: null,
     };
     await dispatch(
       customerAction.setFilter({
