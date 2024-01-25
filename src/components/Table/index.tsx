@@ -206,6 +206,7 @@ function EnhancedTable<T extends Data>({
               props.data.map((row: T, index: number) => {
                 const isItemSelected = isSelected(row.id);
                 const labelId = `enhanced-table-checkbox-${index}`;
+                const bgcolor = row?.table_color || '#fff';
                 return (
                   <TableRow
                     hover
@@ -220,7 +221,7 @@ function EnhancedTable<T extends Data>({
                       <TableCell
                         padding="checkbox"
                         sx={[
-                          { border: 'none', bgcolor: '#fff' },
+                          { border: 'none', bgcolor },
                           countTotalSticky !== 0
                             ? {
                                 position: 'sticky',
@@ -247,8 +248,8 @@ function EnhancedTable<T extends Data>({
                           {
                             border: 'none',
                             whiteSpace: 'pre-line',
-                            bgcolor: '#fff',
                             minWidth: '50px',
+                            bgcolor,
                           },
                           countTotalSticky !== 0
                             ? {
@@ -275,7 +276,7 @@ function EnhancedTable<T extends Data>({
                             whiteSpace: 'pre-line',
                             fontSize: '14px',
                             color: '#232933',
-                            bgcolor: '#fff',
+                            bgcolor,
                           },
                           val.isSticky
                             ? {

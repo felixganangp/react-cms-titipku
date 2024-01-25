@@ -1,6 +1,7 @@
 /* eslint-disable import/no-cycle */
 import { lazy } from 'react';
 import { FinaceRouters } from './FinaceRouter';
+import { MerchantsRouters } from './MarchantDepo';
 
 const Home = lazy(() => import('pages/Home'));
 const NotFound = lazy(() => import('pages/NotFound'));
@@ -77,6 +78,7 @@ const ListRoute: RouteProps[] = [
     auth: 'Public',
   },
   ...FinaceRouters,
+  ...MerchantsRouters,
   {
     name: 'Role User',
     comp: RoleUser,
