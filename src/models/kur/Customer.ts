@@ -200,6 +200,11 @@ export interface ReviewCustomer {
   id: number | undefined;
 }
 
+export interface VerifyCustomer {
+  new_status: number;
+  id: number | undefined;
+}
+
 export interface CustomerParams extends ListParams {
   user_type_id?: number | null;
   area_id?: string | null;
