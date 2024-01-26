@@ -14,6 +14,7 @@ import {
   CheckMerchantExistParams,
   BiChecking,
   ReviewCustomer,
+  VerifyCustomer,
 } from 'models/kur/Customer';
 
 interface ImageUpdatePayload {
@@ -140,9 +141,44 @@ function* updateStatusCustomer(payload: PayloadAction<ReviewCustomer>) {
         severity: 'success',
       }),
     );
-    // yield put(SupplierAction.updateSupplierSuccess({ error: false }));
   } catch (err) {
     const headMessage = 'Failed Approve Customer';
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: headMessage,
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: headMessage,
+          message: 'internal server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* verifyCustomer(payload: PayloadAction<VerifyCustomer>) {
+  try {
+    const params: CustomerParams = yield select(
+      (state) => state.customerKur.params,
+    );
+    yield call(CustomerService.verifyCustomer, payload.payload);
+    yield put(customerAction.fetchData(params));
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Customer Verified',
+        severity: 'success',
+      }),
+    );
+  } catch (err) {
+    const headMessage = 'Failed Verify Customer';
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
@@ -569,4 +605,5 @@ export default function* customerKurSagas() {
     customerAction.updateStatusCustomer.type,
     updateStatusCustomer,
   );
+  yield takeLatest(customerAction.verifyCustomer.type, verifyCustomer);
 }

@@ -5,6 +5,7 @@ import {
   CreateCustomerPayload,
   BiChecking,
   ReviewCustomer,
+  VerifyCustomer,
   Customer,
 } from 'models/kur/Customer';
 import { ListResponse, Response } from 'models/fetch';
@@ -12,11 +13,6 @@ import { CustomerDetailType } from 'models/finance/customer';
 
 export const getAllCustomers = (params: CustomerParams) =>
   new Promise<ListResponse<Customer>>(async (resolve, reject) => {
-    Object.keys(params).forEach((key: string) => {
-      if (params[key] === null) {
-        delete params[key];
-      }
-    });
     let objString = '';
     if (params.area_id && params.area_id !== '') {
       const tempArea: string[] = params.area_id.split(',');
@@ -24,14 +20,25 @@ export const getAllCustomers = (params: CustomerParams) =>
       tempArea.forEach((element) => {
         arrayArea.push(`&area_id=${element}`);
       });
-      delete params.area_id;
-      objString = `?${new URLSearchParams(params).toString()}${arrayArea.join(
-        '',
-      )}`;
-      console.log('objString1', objString);
+      const queryParams = new URLSearchParams(
+        Object.fromEntries(
+          Object.entries(params).filter(
+            ([key, value]) => value !== undefined && key !== 'area_id',
+          ),
+        ),
+      );
+      objString = `?${new URLSearchParams(
+        queryParams,
+      ).toString()}${arrayArea.join('')}`;
     } else {
-      delete params.area_id;
-      objString = `?${new URLSearchParams(params).toString()}`;
+      const queryParams = new URLSearchParams(
+        Object.fromEntries(
+          Object.entries(params).filter(
+            ([key, value]) => value !== undefined && key !== 'area_id',
+          ),
+        ),
+      );
+      objString = `?${new URLSearchParams(queryParams).toString()}`;
     }
     try {
       // const respon = await http.get(`financing/user`, {
@@ -127,6 +134,26 @@ export const updateStatusCustomer = (payload: ReviewCustomer) =>
       const formData = new FormData();
       const userData = {
         komite_notes: payload.komite_notes,
+        new_status: payload.new_status,
+      };
+      await formData.append('user_data', JSON.stringify(userData));
+      const respon = await http.put(`financing/user/${payload.id}`, formData);
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const verifyCustomer = (payload: VerifyCustomer) =>
+  new Promise<VerifyCustomer>(async (resolve, reject) => {
+    try {
+      const formData = new FormData();
+      const userData = {
         new_status: payload.new_status,
       };
       await formData.append('user_data', JSON.stringify(userData));

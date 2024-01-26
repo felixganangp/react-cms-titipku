@@ -8,6 +8,7 @@ import {
   BiChecking,
   ReviewCustomer,
   CustomerDetail,
+  VerifyCustomer,
 } from 'models/kur/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
@@ -225,6 +226,18 @@ const CustomerSlice = createSlice({
       state.loadingForm = false;
     },
     updateStatusCustomerFailed(state: CustomerInitialProps) {
+      state.loadingForm = false;
+    },
+    verifyCustomer(
+      state: CustomerInitialProps,
+      action: PayloadAction<VerifyCustomer>,
+    ) {
+      state.loadingForm = true;
+    },
+    verifyCustomerSuccess(state: CustomerInitialProps) {
+      state.loadingForm = false;
+    },
+    verifyCustomerFailed(state: CustomerInitialProps) {
       state.loadingForm = false;
     },
   },
