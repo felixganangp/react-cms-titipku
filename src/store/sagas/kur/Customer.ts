@@ -124,11 +124,18 @@ function* bulkBiChecking(payload: PayloadAction<BiChecking>) {
       }),
     );
     yield put(customerAction.bulkBiCheckingFailed());
-    console.log(`Failed to create bi checking: `, error);
   }
 }
 
 function* updateStatusCustomer(payload: PayloadAction<ReviewCustomer>) {
+  const successMessage =
+    payload.payload.new_status === 7
+      ? 'Customer Rejected'
+      : 'Reviewed by Committee';
+  const failMessage =
+    payload.payload.new_status === 7
+      ? 'Failed Reject Customer'
+      : 'Failed Review Customer';
   try {
     const params: CustomerParams = yield select(
       (state) => state.customerKur.params,
@@ -137,12 +144,12 @@ function* updateStatusCustomer(payload: PayloadAction<ReviewCustomer>) {
     yield put(customerAction.fetchData(params));
     yield put(
       uiAction.openToast({
-        headMsg: 'Customer Approved',
+        headMsg: `${successMessage}`,
         severity: 'success',
       }),
     );
   } catch (err) {
-    const headMessage = 'Failed Approve Customer';
+    const headMessage = `${failMessage}`;
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
@@ -309,7 +316,6 @@ function* createCustomer(payload: PayloadAction<CreateCustomer>) {
       }),
     );
     yield put(customerAction.createCustomerFailed());
-    console.log(`Failed to create user: `, error);
   }
 }
 
@@ -535,7 +541,6 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       }),
     );
     yield put(customerAction.createCustomerFailed());
-    console.log(`Failed to update user: `, error);
   }
 }
 
@@ -586,7 +591,6 @@ function* checkMerchantExist(params: PayloadAction<CheckMerchantExistParams>) {
     //   }),
     // );
     // yield put(roleUserAction.addOrEditRoleUserSuccess({ error: true }));
-    console.log(`Failed to create user: `, error);
   }
 }
 

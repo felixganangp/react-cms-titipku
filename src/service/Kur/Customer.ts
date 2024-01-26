@@ -132,10 +132,11 @@ export const updateStatusCustomer = (payload: ReviewCustomer) =>
   new Promise<ReviewCustomer>(async (resolve, reject) => {
     try {
       const formData = new FormData();
-      const userData = {
-        komite_notes: payload.komite_notes,
-        new_status: payload.new_status,
-      };
+      const userData = Object.fromEntries(
+        Object.entries(payload).filter(
+          ([key, value]) => value !== null && key !== 'id',
+        ),
+      );
       await formData.append('user_data', JSON.stringify(userData));
       const respon = await http.put(`financing/user/${payload.id}`, formData);
       if (respon.data) {

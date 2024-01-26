@@ -279,6 +279,15 @@ export default function KurCustomerVerification() {
                 hide: val.user_status_id !== 2,
               },
               {
+                label: `Bi Checking`,
+                onClick: () => {
+                  setSelectedCustomer([val]);
+                  formBiChecking.openModal();
+                },
+                dataId: 'button-review-customer',
+                hide: val.user_status_id !== 1,
+              },
+              {
                 label: `Verify`,
                 onClick: () => {
                   setSelectedSingle(val.id);
@@ -308,27 +317,6 @@ export default function KurCustomerVerification() {
   ];
 
   const handleChangePage = (value: number) => {
-    // let payload: {
-    //   status?: number;
-    //   userTypeId?: number || null;
-    //   areaId: Area[];
-    //   batchId: number || null;
-    // } = {
-    //   status: 1,
-    //   userTypeId: 1,
-    //   areaId: [],
-    //   batchId: 1,
-    // };
-
-    // if (customerKur.params.status) {
-    //   payload = {
-    //     ...payload,
-    //     status: customerKur.stateFilter?.status,
-    //   };
-    // }
-
-    // dispatch(customerAction.setFilter(payload));
-
     dispatch(
       customerAction.setParams({
         ...customerKur.params,
