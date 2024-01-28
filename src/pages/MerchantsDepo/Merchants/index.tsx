@@ -141,7 +141,15 @@ export default function MerchantsPages() {
               >
                 Filter
               </Button>
-              <MenuList menu={[]}>
+              <MenuList
+                menu={[
+                  {
+                    label: 'Delete 2 Items',
+                    color: 'error',
+                    onClick: () => {},
+                  },
+                ]}
+              >
                 <Button
                   endIcon={<KeyboardArrowDown />}
                   //   variant="outlined"

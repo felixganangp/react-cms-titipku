@@ -3,6 +3,9 @@ import type { RouteProps } from './ListRoute';
 
 const MerchantsList = lazy(() => import('pages/MerchantsDepo/Merchants'));
 const MerchantsForm = lazy(() => import('pages/MerchantsDepo/Merchants/Form'));
+const MercheantsDetails = lazy(
+  () => import('pages/MerchantsDepo/Merchants/details'),
+);
 const QrisList = lazy(() => import('pages/MerchantsDepo/Qris'));
 
 export const MerchantsRouters: RouteProps[] = [
@@ -10,6 +13,13 @@ export const MerchantsRouters: RouteProps[] = [
     name: 'Merchants',
     comp: MerchantsList,
     path: '/depo/merchants',
+    index: true,
+    auth: 'Private',
+  },
+  {
+    name: 'Merchants Info',
+    comp: MercheantsDetails,
+    path: '/depo/merchants/:id',
     index: true,
     auth: 'Private',
   },
