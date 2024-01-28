@@ -23,7 +23,7 @@ import FormLabel from 'components/FormLabel';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { useNavigate } from 'react-router-dom';
 
-export default function MerchantsPages() {
+export default function MerchantsQrisPages() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const showFilter = useModal();
@@ -44,49 +44,15 @@ export default function MerchantsPages() {
       label: 'Merchant Name',
     },
     {
-      id: 'type',
-      label: 'Merchant Name',
-    },
-    {
-      id: 'Limit',
+      id: 'Amount',
       enableSort: true,
       label: 'Limit',
-    },
-    {
-      id: 'Balance',
-      enableSort: true,
-      label: 'Balance',
-    },
-    {
-      id: 'total_gmv',
-      enableSort: true,
-      label: 'Total GMV',
     },
     {
       id: 'Action',
       label: 'Action',
       format: (value) => (
-        <MenuList
-          menu={[
-            {
-              label: 'Detail',
-              onClick: () => {
-                navigate('/depo/merchants/id');
-              },
-            },
-            {
-              label: 'Edit',
-              onClick: () => {
-                navigate('/depo/merchants/form/id');
-              },
-            },
-            {
-              label: 'Delete',
-              color: 'error',
-              onClick: () => {},
-            },
-          ]}
-        >
+        <MenuList menu={[]}>
           <IconButton>
             <MoreVert />
           </IconButton>
@@ -172,26 +138,6 @@ export default function MerchantsPages() {
                         {...params}
                         name="Merchant"
                         placeholder="Select Merchant Name"
-                        // error={
-                        //   formik.touched.area && Boolean(formik.errors.area)
-                        // }
-                      />
-                    )}
-                  />
-                </FormLabel>
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <FormLabel text="Merchant Name">
-                  <Autocomplete
-                    options={[]}
-                    // onBlur={() => {
-                    //   formik.setFieldTouched('area');
-                    // }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="Type"
-                        placeholder="Select Status"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
