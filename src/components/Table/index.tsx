@@ -22,6 +22,7 @@ import CodeIcon from '@mui/icons-material/Code';
 import ArrowTopDown from 'components/Icon/ArrowTopDown';
 import PrevIcon from '@mui/icons-material/KeyboardDoubleArrowLeftOutlined';
 import NextIcon from '@mui/icons-material/KeyboardDoubleArrowRightOutlined';
+import { Radio } from '@mui/material';
 
 import EnhancedTableHead from './TableHead';
 import { EnhancedTableProps, Align } from './types';
@@ -57,6 +58,7 @@ export interface Data {
 function EnhancedTable<T extends Data>({
   disableNumber = false,
   enableCheckBox = false,
+  enableRadio = false,
   onChangeSort,
   selected = [],
   setSelected = () => [],
@@ -85,6 +87,7 @@ function EnhancedTable<T extends Data>({
     id: string | number | undefined,
   ) => {
     if (!id) return null;
+    if (enableRadio) return setSelected([id]);
     const selectedIndex = selected.indexOf(id);
     let newSelected: (string | number)[] = [];
 
@@ -107,7 +110,7 @@ function EnhancedTable<T extends Data>({
   const isSelected = (id: string | number | undefined) => {
     if (!id) return false;
 
-    return enableCheckBox ? selected.indexOf(id) !== -1 : false;
+    return enableCheckBox || enableRadio ? selected.indexOf(id) !== -1 : false;
   };
 
   // Avoid a layout jump when reaching the last page with empty rows.
@@ -124,6 +127,9 @@ function EnhancedTable<T extends Data>({
     }
 
     if (enableCheckBox) {
+      col += 1;
+    }
+    if (enableRadio) {
       col += 1;
     }
 
@@ -164,6 +170,10 @@ function EnhancedTable<T extends Data>({
       countIndeSticky += 1;
     }
 
+    if (enableRadio) {
+      countIndeSticky += 1;
+    }
+
     if (!disableNumber) {
       countIndeSticky += 1;
     }
@@ -187,6 +197,8 @@ function EnhancedTable<T extends Data>({
         <Table stickyHeader aria-labelledby="tableTitle" size="medium">
           <EnhancedTableHead
             numSelected={enableCheckBox ? selected.length : 0}
+            enableCheckBox={enableCheckBox}
+            enableRadio={enableRadio}
             orderType={orderType}
             orderBy={orderBy}
             onSelectAllClick={handleSelectAllClick}
@@ -194,7 +206,6 @@ function EnhancedTable<T extends Data>({
             rowCount={props.data.length}
             headCells={headCell}
             bgHeader={props.bgHeader}
-            enableCheckBox={enableCheckBox}
             disableNumber={disableNumber}
             countLeftSticky={countLeftSticky}
             countTotalSticky={countTotalSticky}
@@ -241,6 +252,27 @@ function EnhancedTable<T extends Data>({
                         />
                       </TableCell>
                     )}
+                    {!props.loading && enableRadio && (
+                      <TableCell
+                        padding="checkbox"
+                        sx={[
+                          { border: 'none', bgcolor },
+                          countTotalSticky !== 0
+                            ? {
+                                position: 'sticky',
+                                left: 0,
+                                zIndex: 10,
+                              }
+                            : {},
+                        ]}
+                      >
+                        <Radio
+                          checked={isItemSelected}
+                          onClick={(event) => handleClick(event, row.id)}
+                        />
+                      </TableCell>
+                    )}
+
                     {!props.loading && !disableNumber && (
                       <TableCell
                         padding="checkbox"

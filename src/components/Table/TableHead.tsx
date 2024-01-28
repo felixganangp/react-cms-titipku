@@ -16,6 +16,7 @@ export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
     numSelected,
     rowCount,
     enableCheckBox,
+    enableRadio,
     disableNumber,
     onRequestSort,
     countLeftSticky,
@@ -64,6 +65,23 @@ export default function EnhancedTableHead<T>(props: EnhancedTableHeadProps<T>) {
                 'aria-label': 'select all desserts',
               }}
             />
+          </TableCell>
+        )}
+        {enableRadio && (
+          <TableCell
+            padding="checkbox"
+            sx={[
+              { bgcolor: props.bgHeader || '#ebeff3' },
+              countTotalSticky !== 0
+                ? {
+                    position: 'sticky',
+                    left: 0,
+                    zIndex: 10,
+                  }
+                : {},
+            ]}
+          >
+            <div />
           </TableCell>
         )}
         {!disableNumber && (

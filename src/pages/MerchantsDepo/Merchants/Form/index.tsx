@@ -23,9 +23,9 @@ import FormLabel from 'components/FormLabel';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { useNavigate } from 'react-router-dom';
 
-export default function MerchantsPages() {
-  const navigate = useNavigate();
+export default function MerchantForm() {
   const [selected, setSelected] = useState<(string | number)[]>([]);
+  const navigate = useNavigate();
   const showFilter = useModal();
 
   const headCells: HeadCells<any>[] = [
@@ -62,38 +62,8 @@ export default function MerchantsPages() {
       enableSort: true,
       label: 'Total GMV',
     },
-    {
-      id: 'Action',
-      label: 'Action',
-      format: (value) => (
-        <MenuList
-          menu={[
-            {
-              label: 'Detail',
-              onClick: () => {
-                navigate('/depo/merchants/id');
-              },
-            },
-            {
-              label: 'Edit',
-              onClick: () => {
-                navigate('/depo/merchants/form/id');
-              },
-            },
-            {
-              label: 'Delete',
-              color: 'error',
-              onClick: () => {},
-            },
-          ]}
-        >
-          <IconButton>
-            <MoreVert />
-          </IconButton>
-        </MenuList>
-      ),
-    },
   ];
+
   return (
     <Box p="20px" bgcolor="#F5F7FA">
       <Stack spacing={2}>
@@ -105,12 +75,6 @@ export default function MerchantsPages() {
             mb={2}
           >
             <Stack direction="row" alignItems="center" gap={2} flex={1}>
-              <Button
-                startIcon={<Add />}
-                onClick={() => navigate('/depo/merchants/form')}
-              >
-                Add New
-              </Button>
               <TextField
                 placeholder="Search for Invoice Number"
                 size="small"
@@ -141,23 +105,6 @@ export default function MerchantsPages() {
               >
                 Filter
               </Button>
-              <MenuList
-                menu={[
-                  {
-                    label: 'Delete 2 Items',
-                    color: 'error',
-                    onClick: () => {},
-                  },
-                ]}
-              >
-                <Button
-                  endIcon={<KeyboardArrowDown />}
-                  //   variant="outlined"
-                  //   onClick={showFilter.toggleModal}
-                >
-                  Action
-                </Button>
-              </MenuList>
             </Stack>
           </Stack>
           <Collapse in={showFilter.open}>
@@ -168,6 +115,26 @@ export default function MerchantsPages() {
               mt={2}
               // onSubmit={queryInnvoice.formikParams.handleSubmit}
             >
+              <Grid item xs={12} md={5}>
+                <FormLabel text="Pasar">
+                  <Autocomplete
+                    options={[]}
+                    // onBlur={() => {
+                    //   formik.setFieldTouched('area');
+                    // }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="Merchant"
+                        placeholder="Select Pasar"
+                        // error={
+                        //   formik.touched.area && Boolean(formik.errors.area)
+                        // }
+                      />
+                    )}
+                  />
+                </FormLabel>
+              </Grid>
               <Grid item xs={12} md={5}>
                 <FormLabel text="Merchant Name">
                   <Autocomplete
@@ -187,78 +154,6 @@ export default function MerchantsPages() {
                     )}
                   />
                 </FormLabel>
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <FormLabel text="Merchant Name">
-                  <Autocomplete
-                    options={[]}
-                    // onBlur={() => {
-                    //   formik.setFieldTouched('area');
-                    // }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="Type"
-                        placeholder="Select Status"
-                        // error={
-                        //   formik.touched.area && Boolean(formik.errors.area)
-                        // }
-                      />
-                    )}
-                  />
-                </FormLabel>
-              </Grid>
-              <Grid item xs={12} md={4}>
-                <FormLabel text="Join Date">
-                  <DesktopDatePicker
-                    // value={
-                    //   queryInnvoice.formikParams.values.max_invoice_date || null
-                    // }
-                    value={null}
-                    onChange={() => {}}
-                    inputFormat="DD/MM/YYYY"
-                    // onChange={(value) => {
-                    //   queryInnvoice.formikParams.setFieldValue(
-                    //     'max_invoice_date',
-                    //     value,
-                    //   );
-                    // }}
-                    // minDate={queryInnvoice.formikParams.values.min_invoice_date}
-                    // maxDate={formik.values.max_date_created}
-                    renderInput={(params) => {
-                      return (
-                        <TextField
-                          {...params}
-                          name="grade"
-                          placeholder="Select Grade"
-                          variant="outlined"
-                          fullWidth
-                        />
-                      );
-                    }}
-                  />
-                </FormLabel>
-              </Grid>
-              <Grid item xs={12} md={12}>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  alignItems="center"
-                  justifyContent="end"
-                >
-                  <Button
-                    variant="text"
-                    onClick={() => {
-                      // queryInnvoice.formikParams.resetForm();
-                      // queryInnvoice.handleResetFilter({
-                      //   whiteList: ['search'],
-                      // });
-                    }}
-                  >
-                    Reset
-                  </Button>
-                  <Button type="submit">Apply</Button>
-                </Stack>
               </Grid>
             </Grid>
           </Collapse>
@@ -286,7 +181,7 @@ export default function MerchantsPages() {
             setSelected={(e) => {
               setSelected(e);
             }}
-            enableCheckBox
+            enableRadio
             orderBy="total_gmv"
             // loading={queryInnvoice.isLoading}
             // page={queryInnvoice.data?.page || 0}
@@ -300,6 +195,17 @@ export default function MerchantsPages() {
             //   queryInnvoice.handleToSetSearchParams('page', value.toString());
             // }}
           />
+          <Stack direction="row" gap={2}>
+            <Button variant="text" color="error" onClick={() => navigate(-1)}>
+              Back
+            </Button>
+            <Button
+              sx={{ borderRadius: '4px' }}
+              // onClick={showFilter.toggleModal}
+            >
+              Next
+            </Button>
+          </Stack>
         </Card>
       </Stack>
     </Box>

@@ -29,6 +29,7 @@ export interface EnhancedTableHeadProps<T> {
   orderBy: string | number | null | undefined;
   numSelected: number;
   rowCount: number;
+  enableRadio?: boolean;
   enableCheckBox: boolean;
   headCells: Array<HeadCells<T>>;
   bgHeader?: string;
@@ -42,6 +43,7 @@ export interface EnhancedTableHeadProps<T> {
 
 export interface EnhancedTableProps<T extends { id?: string | number }> {
   enableCheckBox?: boolean;
+  enableRadio?: boolean;
   disableNumber?: boolean;
   loading?: boolean;
   orderType?: Order;

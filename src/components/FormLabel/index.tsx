@@ -12,7 +12,7 @@ interface FormControlPros {
   error?: boolean | undefined;
 }
 
-const FormControl = (props: FormControlPros) => (
+const FormLabel = (props: FormControlPros) => (
   <Box width="100%" mt={0.5} mb={2}>
     <Typography
       sx={{ mb: '5px', color: '#232933', fontSize: '14px', fontWeight: 500 }}
@@ -43,10 +43,10 @@ const FormControl = (props: FormControlPros) => (
   </Box>
 );
 
-FormControl.defaultProps = {
+FormLabel.defaultProps = {
   required: false,
   helperText: '',
   error: false,
 };
 
-export default FormControl;
+export default FormLabel;
