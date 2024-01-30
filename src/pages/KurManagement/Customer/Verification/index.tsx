@@ -87,7 +87,12 @@ export default function KurCustomerVerification() {
     },
   ];
 
-  // create user
+  const [userTab, setUserTab] = useState(0);
+
+  const formBiChecking = useModal();
+  const formCustomerReview = useModal();
+  const verifyModal = useModal();
+
   const createUserModal = useModal();
   const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
 
@@ -110,6 +115,7 @@ export default function KurCustomerVerification() {
       id: selectedSingle,
     };
     dispatch(customerAction.verifyCustomer(payload));
+    verifyModal.closeModal();
   };
 
   useEffect(() => {
@@ -129,12 +135,6 @@ export default function KurCustomerVerification() {
     dispatch(areaAction.fetchData());
     dispatch(creditScoreAction.fetchData());
   }, []);
-
-  const [userTab, setUserTab] = useState(0);
-
-  const formBiChecking = useModal();
-  const formCustomerReview = useModal();
-  const verifyModal = useModal();
 
   const convertDate = (date: number) => {
     const d = new Date(0); // The 0 there is the key, which sets the date to the epoch
@@ -390,15 +390,18 @@ export default function KurCustomerVerification() {
     }
     if (customerKur.stateFilter?.batch_id) {
       payloadParams.batch_id = customerKur.stateFilter?.batch_id;
+    } else {
+      payloadParams.batch_id = undefined;
     }
     if (
       customerKur.stateFilter?.area_id &&
       customerKur.stateFilter?.area_id.length > 0
     ) {
       const ids = customerKur.stateFilter?.area_id.map((el: Area) => el.id);
-      console.log('ids', ids);
       const areas = ids.toString();
       payloadParams.area_id = areas;
+    } else {
+      payloadParams.area_id = null;
     }
     dispatch(customerAction.setParams(payloadParams));
     dispatch(customerAction.fetchData(payloadParams));
