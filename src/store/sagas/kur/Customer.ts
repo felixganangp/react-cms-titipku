@@ -468,18 +468,6 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
         document_filepath: `/${payloadImageSku[0]}`,
       };
     }
-
-    // const jsDate = payload.payload.birthDate?.date.valueOf();
-    // const convertBirthDate = jsDate && +jsDate / 1000;
-    // let jsDate;
-    // if (typeof payload.payload.birthDate !== 'string') {
-    //   // eslint-disable-next-line no-underscore-dangle
-    //   jsDate = payload.payload.birthDate?._d;
-    // } else {
-    //   jsDate = new Date(payload.payload.birthDate);
-    // }
-    // // eslint-disable-next-line no-unsafe-optional-chaining
-    // const convertBirthDate = jsDate && jsDate?.getTime() / 1000;
     const jsDate = payload.payload.birthDate;
     // eslint-disable-next-line no-unsafe-optional-chaining
     const convertBirthDate = jsDate && jsDate?.valueOf() / 1000;
