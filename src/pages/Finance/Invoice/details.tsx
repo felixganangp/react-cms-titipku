@@ -151,6 +151,13 @@ export default function InvoiceDetails() {
                       ).format('MMMM DD, YYYY')}
                     </Typography>
                   </Grid>
+
+                  <Grid item sm={4}>
+                    <Typography color="primary">Debtor Name</Typography>
+                    <Typography>
+                      {invoiceDetails.details?.user.merchant_name}
+                    </Typography>
+                  </Grid>
                   <Grid item sm={4}>
                     <Typography color="primary">Interest per Today</Typography>
                     <Typography>
@@ -190,13 +197,6 @@ export default function InvoiceDetails() {
                       {numberSeperator(
                         invoiceDetails.details?.paid_amount || 0,
                       )}
-                    </Typography>
-                  </Grid>
-                  <Grid item sm={4}>
-                    <Typography color="primary">Admin Fee</Typography>
-                    <Typography>
-                      Rp{' '}
-                      {numberSeperator(invoiceDetails.details?.admin_fee || 0)}
                     </Typography>
                   </Grid>
                   <Grid item sm={4}>
