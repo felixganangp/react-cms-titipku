@@ -113,7 +113,7 @@ export const docDataKey = [
   'nib_image',
   'nik_partner_image',
   'divorce_papers_image',
-  'geotag_image',
+  // 'geotag_image',
 ];
 
 // {
