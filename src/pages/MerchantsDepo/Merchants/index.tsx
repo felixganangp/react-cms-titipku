@@ -22,45 +22,78 @@ import useModal from 'hooks/useModal';
 import FormLabel from 'components/FormLabel';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { useNavigate } from 'react-router-dom';
+import numberSeperator from 'utils/numberSeperator';
+import { useMerchantDepoList, useMerchantList } from '../Hooks/useMerchant';
 
 export default function MerchantsPages() {
+  const merchantQuery = useMerchantDepoList();
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const showFilter = useModal();
 
   const headCells: HeadCells<any>[] = [
-    {
-      id: 'rank',
-      label: 'Rank',
-      format: (value) => `#${value.rank}`,
-    },
+    // {
+    //   id: 'rank',
+    //   label: 'Rank',
+    //   format: (value) => `#${value.rank}`,
+    // },
     {
       id: 'Join Date',
       label: 'Join Date',
-      format: (value) => moment().format('DD MMM YYYY'),
+      format: (value) => moment(value.join_date * 1000).format('DD MMM YYYY'),
     },
     {
-      id: 'Merch_name',
+      id: 'merchant_name',
       label: 'Merchant Name',
+      format: (value) => {
+        const isNew = false && (
+          <Typography
+            color="primary"
+            component="span"
+            fontWeight="bold"
+            fontSize="14px"
+          >
+            [NEW]{' '}
+          </Typography>
+        );
+        return (
+          <Typography>
+            {isNew}
+            {value.merchant_name}
+          </Typography>
+        );
+      },
     },
     {
       id: 'type',
       label: 'Merchant Name',
     },
     {
-      id: 'Limit',
+      id: 'limit',
       enableSort: true,
       label: 'Limit',
+      format: (value) => {
+        if (!value.limit) return <Typography>-</Typography>;
+        return <Typography>Rp {numberSeperator(value.limit)}</Typography>;
+      },
     },
     {
-      id: 'Balance',
+      id: 'balance',
       enableSort: true,
       label: 'Balance',
+      format: (value) => {
+        if (!value.balance) return <Typography>-</Typography>;
+        return <Typography>Rp {numberSeperator(value.balance)}</Typography>;
+      },
     },
     {
       id: 'total_gmv',
       enableSort: true,
       label: 'Total GMV',
+      format: (value) => {
+        if (!value.total_gmv) return <Typography>-</Typography>;
+        return <Typography>Rp {numberSeperator(value.total_gmv)}</Typography>;
+      },
     },
     {
       id: 'Action',
@@ -266,39 +299,34 @@ export default function MerchantsPages() {
         <Card>
           <Table
             headCells={headCells}
-            data={[
-              { rank: 1, id: 'skdldslk', 'Join Date': '2021-10-10' },
-              {
-                rank: 1,
-                id: 'skdldslk',
-                'Join Date': '2021-10-10',
-                table_color: '#F9EBE7',
-              },
-              {
-                rank: 1,
-                id: 'skdldslk',
-                'Join Date': '2021-10-10',
-                table_color: '#FDF1DA',
-              },
-              { rank: 1, id: 'skdldslk', 'Join Date': '2021-10-10' },
-            ]}
+            data={merchantQuery.listData}
             selected={selected}
             setSelected={(e) => {
               setSelected(e);
             }}
             enableCheckBox
-            orderBy="total_gmv"
-            // loading={queryInnvoice.isLoading}
-            // page={queryInnvoice.data?.page || 0}
-            // count={queryInnvoice.data?.count || 0}
-            // totalData={queryInnvoice.data?.total || 0}
-            // onChangePage={(value) => {
-            //   queryInnvoice.handleChangeParams({
-            //     ...queryInnvoice.params,
-            //     page: value,
-            //   });
-            //   queryInnvoice.handleToSetSearchParams('page', value.toString());
-            // }}
+            orderBy={merchantQuery.params.order_by}
+            orderType={merchantQuery.params.order_type}
+            loading={merchantQuery.isLoading}
+            page={merchantQuery.data?.page || 0}
+            count={merchantQuery.data?.count || 0}
+            totalData={merchantQuery.data?.total || 0}
+            onChangeSort={(value) => {
+              merchantQuery.handleChangeParams({
+                ...merchantQuery.params,
+                order_by: value.orderBy,
+                order_type: value.orderType,
+              });
+              merchantQuery.handleToSetSearchParams('order_by', value.id);
+              merchantQuery.handleToSetSearchParams('order_type', value.order);
+            }}
+            onChangePage={(value) => {
+              merchantQuery.handleChangeParams({
+                ...merchantQuery.params,
+                page: value,
+              });
+              merchantQuery.handleToSetSearchParams('page', value.toString());
+            }}
           />
         </Card>
       </Stack>
