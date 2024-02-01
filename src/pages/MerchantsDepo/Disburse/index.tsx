@@ -29,7 +29,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import {
   UseDisburseService,
   DisburseStatus,
-} from '../hooks/useDisburseService';
+} from '../Hooks/useDisburseService';
 
 export default function DisbursePages() {
   const navigate = useNavigate();
