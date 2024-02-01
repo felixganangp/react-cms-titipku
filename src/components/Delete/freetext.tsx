@@ -8,7 +8,7 @@ interface ChangeStatusProps {
   onClose: () => void;
 }
 
-export default function Delete({
+export default function DeleteModal({
   headerText,
   desc,
   onSubmit,

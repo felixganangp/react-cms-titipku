@@ -22,45 +22,80 @@ import useModal from 'hooks/useModal';
 import FormLabel from 'components/FormLabel';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { useNavigate } from 'react-router-dom';
+import numberSeperator from 'utils/numberSeperator';
+import { useMutation } from '@tanstack/react-query';
+import { postMerchant } from 'service/MerchantDepo/Merchant';
+import { useMerchantList } from '../../Hooks/useMerchant';
 
 export default function MerchantForm() {
+  const merchantQuery = useMerchantList();
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const navigate = useNavigate();
   const showFilter = useModal();
+  const { mutate } = useMutation(postMerchant);
 
   const headCells: HeadCells<any>[] = [
-    {
-      id: 'rank',
-      label: 'Rank',
-      format: (value) => `#${value.rank}`,
-    },
+    // {
+    //   id: 'rank',
+    //   label: 'Rank',
+    //   format: (value) => `#${value.rank}`,
+    // },
     {
       id: 'Join Date',
       label: 'Join Date',
-      format: (value) => moment().format('DD MMM YYYY'),
+      format: (value) => moment(value.join_date * 1000).format('DD MMM YYYY'),
     },
     {
-      id: 'Merch_name',
+      id: 'area_name',
       label: 'Merchant Name',
+      width: '200px',
     },
     {
-      id: 'type',
+      id: 'merchant_name',
       label: 'Merchant Name',
+      width: '200px',
+      format: (value) => {
+        const isNew = false && (
+          <Typography
+            color="primary"
+            component="span"
+            fontWeight="bold"
+            fontSize="14px"
+          >
+            [NEW]{' '}
+          </Typography>
+        );
+        return (
+          <Typography>
+            {isNew}
+            {value.merchant_name}
+          </Typography>
+        );
+      },
     },
     {
-      id: 'Limit',
+      id: 'last_month_gmv',
       enableSort: true,
-      label: 'Limit',
+      label: 'Last Month GMV',
+      format: (value) => {
+        if (!value.last_month_gmv) return <Typography>-</Typography>;
+        return (
+          <Typography>Rp {numberSeperator(value.last_month_gmv)}</Typography>
+        );
+      },
     },
     {
-      id: 'Balance',
+      id: 'last_month_total_tx',
       enableSort: true,
-      label: 'Balance',
-    },
-    {
-      id: 'total_gmv',
-      enableSort: true,
-      label: 'Total GMV',
+      label: 'Last Month Total Transaction',
+      format: (value) => {
+        if (!value.last_month_total_tx) return <Typography>-</Typography>;
+        return (
+          <Typography>
+            Rp {numberSeperator(value.last_month_total_tx)}
+          </Typography>
+        );
+      },
     },
   ];
 
@@ -161,47 +196,50 @@ export default function MerchantForm() {
         <Card>
           <Table
             headCells={headCells}
-            data={[
-              { rank: 1, id: 'skdldslk', 'Join Date': '2021-10-10' },
-              {
-                rank: 1,
-                id: 'skdldslk',
-                'Join Date': '2021-10-10',
-                table_color: '#F9EBE7',
-              },
-              {
-                rank: 1,
-                id: 'skdldslk',
-                'Join Date': '2021-10-10',
-                table_color: '#FDF1DA',
-              },
-              { rank: 1, id: 'skdldslk', 'Join Date': '2021-10-10' },
-            ]}
+            data={merchantQuery.listData.map((item) => ({
+              ...item,
+              table_color: '#F9EBE7',
+            }))}
             selected={selected}
             setSelected={(e) => {
               setSelected(e);
             }}
             enableRadio
             orderBy="total_gmv"
-            // loading={queryInnvoice.isLoading}
-            // page={queryInnvoice.data?.page || 0}
-            // count={queryInnvoice.data?.count || 0}
-            // totalData={queryInnvoice.data?.total || 0}
-            // onChangePage={(value) => {
-            //   queryInnvoice.handleChangeParams({
-            //     ...queryInnvoice.params,
-            //     page: value,
-            //   });
-            //   queryInnvoice.handleToSetSearchParams('page', value.toString());
-            // }}
+            loading={merchantQuery.isLoading}
+            page={merchantQuery.data?.page || 0}
+            count={merchantQuery.data?.count || 0}
+            totalData={merchantQuery.data?.total || 0}
+            onChangePage={(value) => {
+              merchantQuery.handleChangeParams({
+                ...merchantQuery.params,
+                page: value,
+              });
+              merchantQuery.handleToSetSearchParams('page', value.toString());
+            }}
           />
           <Stack direction="row" gap={2}>
-            <Button variant="text" color="error" onClick={() => navigate(-1)}>
+            <Button
+              variant="text"
+              color="error"
+              onClick={() => navigate('/depo/merchants/')}
+            >
               Back
             </Button>
             <Button
               sx={{ borderRadius: '4px' }}
               // onClick={showFilter.toggleModal}
+              onClick={() => {
+                // mutate(
+                //   {},
+                //   {
+                //     onSuccess: () => {
+                //       navigate(-1);
+                //     },
+                //     onError: () => {},
+                //   },
+                // );
+              }}
             >
               Next
             </Button>

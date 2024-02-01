@@ -1,14 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+import useToast from 'hooks/useToast';
 import { DisburseParams } from 'models/merchantDepo/disburse';
-import {
-  createInvoice,
-  getInstallmentSimulation,
-  getInvoiceAll,
-  getInvoiceDetails,
-  getInvoicePDF,
-  setManualSettled,
-} from 'service/Finance/invoice';
-import { getAllDisburse } from 'service/MerchantDepo/disburse';
+import { getAllDisburse, deleteDisburse } from 'service/MerchantDepo/disburse';
 import { useFormik } from 'formik';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
@@ -19,7 +12,7 @@ export const DisburseStatus = {
   2: 'Transferred',
 };
 
-export function UseDisburseService(setParams?: DisburseParams) {
+export function UseDisburse(setParams?: DisburseParams) {
   const params = UseParams<DisburseParams>(setParams);
 
   const queryDisburse = useQuery({
@@ -32,6 +25,7 @@ export function UseDisburseService(setParams?: DisburseParams) {
       status: undefined,
       start_date: undefined,
       end_date: undefined,
+      jelajah_id: undefined,
     },
     onSubmit: (values) => {
       const newValue = {
@@ -43,7 +37,8 @@ export function UseDisburseService(setParams?: DisburseParams) {
         // @ts-ignore
         end_date: values.end_date?.unix() || undefined,
         // @ts-ignore
-        status: (values.status || '').toLowerCase() || undefined,
+        status: (values.status || '').trim().toLowerCase() || undefined,
+        jelajah_id: values.jelajah_id || undefined,
       };
 
       params.handleChangeParams(newValue);
@@ -109,3 +104,21 @@ export function UseDisburseService(setParams?: DisburseParams) {
     listData: queryDisburse?.data?.data || [],
   };
 }
+
+export const useDeleteDisburse = () => {
+  const { openToast } = useToast();
+  return useMutation(deleteDisburse, {
+    onSuccess: () => {
+      openToast({
+        severity: 'success',
+        headMsg: 'Delete Disburse Success',
+      });
+    },
+    onError: (e) => {
+      openToast({
+        severity: 'error',
+        headMsg: typeof e === 'string' ? e : 'Delete Disburse Success',
+      });
+    },
+  });
+};

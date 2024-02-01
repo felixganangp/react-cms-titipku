@@ -9,13 +9,14 @@ import {
   Button,
   TextField,
   InputAdornment,
-  Menu,
+  Modal,
   IconButton,
   Collapse,
   Grid,
   Autocomplete,
 } from '@mui/material';
 import Table from 'components/Table';
+import DeleteModal from 'components/Delete/freetext';
 import moment from 'moment';
 import { useState } from 'react';
 import useModal from 'hooks/useModal';
@@ -27,16 +28,21 @@ import Label from 'components/Label';
 import SearchIcon from '@mui/icons-material/Search';
 
 import {
-  UseDisburseService,
+  UseDisburse,
   DisburseStatus,
-} from '../Hooks/useDisburseService';
+  useDeleteDisburse,
+} from '../Hooks/useDisburse';
+import { useMerchantFilterList } from '../Hooks/useMerchant';
 
 export default function DisbursePages() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const showFilter = useModal();
+  const modalDelete = useModal();
 
-  const queryDisburse = UseDisburseService();
+  const queryDisburse = UseDisburse();
+  const queryMerchantFilter = useMerchantFilterList();
+  const deleteDisburse = useDeleteDisburse();
 
   const headCells: HeadCells<any>[] = [
     {
@@ -120,12 +126,15 @@ export default function DisbursePages() {
             {
               label: 'Delete',
               color: 'error',
-              onClick: () => {},
+              onClick: () => {
+                setSelected([value.id]);
+                modalDelete.openModal();
+              },
             },
             {
               label: 'Update to Transfer',
               color: 'error',
-              hide: value.status !== 'Waiting',
+              hide: value.status !== 'On Process',
               onClick: () => {},
             },
           ]}
@@ -187,14 +196,17 @@ export default function DisbursePages() {
               <MenuList
                 menu={[
                   {
-                    label: 'Delete 2 Items',
+                    label: `Delete ${selected.length} Items`,
                     color: 'error',
-                    onClick: () => {},
+                    onClick: () => {
+                      modalDelete.openModal();
+                    },
                   },
                 ]}
               >
                 <Button
                   endIcon={<KeyboardArrowDown />}
+                  disabled={selected.length === 0}
                   //   variant="outlined"
                   //   onClick={showFilter.toggleModal}
                 >
@@ -212,17 +224,52 @@ export default function DisbursePages() {
               onSubmit={queryDisburse.formikParams.handleSubmit}
             >
               <Grid item xs={12} md={4}>
-                <FormLabel text="Merchant Name">
+                <FormLabel text="Pasar">
                   <Autocomplete
-                    options={[]}
+                    options={
+                      queryMerchantFilter.listData.map((val) => ({
+                        id: val.id,
+                        name: val.merchant_name,
+                      })) || []
+                    }
+                    noOptionsText={
+                      !queryMerchantFilter.searchValue
+                        ? 'Type to search merchant'
+                        : 'No option'
+                    }
+                    inputValue={queryMerchantFilter.searchValue}
+                    onInputChange={(_, newInputValue) => {
+                      queryMerchantFilter.handleSearch(newInputValue);
+                    }}
+                    loading={queryMerchantFilter.isFetching}
+                    getOptionLabel={(item) => item.name}
+                    value={
+                      queryMerchantFilter.listData
+                        .map((val) => ({
+                          id: val.id,
+                          name: val.merchant_name,
+                        }))
+                        .find(
+                          (val) =>
+                            val.id ===
+                            queryDisburse.formikParams.values.jelajah_id,
+                        ) || null
+                    }
+                    // value={queryInnvoice}
+                    onChange={(e, value) =>
+                      queryDisburse.formikParams.setFieldValue(
+                        'jelajah_id',
+                        value?.id,
+                      )
+                    }
                     // onBlur={() => {
                     //   formik.setFieldTouched('area');
                     // }}
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        name="Merchant"
-                        placeholder="Select Merchant Name"
+                        name="area"
+                        placeholder="Select Merchant"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -395,6 +442,24 @@ export default function DisbursePages() {
           />
         </Card>
       </Stack>
+      <Modal open={modalDelete.open} onClose={modalDelete.closeModal}>
+        <DeleteModal
+          onClose={modalDelete.closeModal}
+          headerText="Delete  Disburse"
+          desc={<>Are you sure want to delete {selected.length} Disburse(s)?</>}
+          onSubmit={() => {
+            deleteDisburse.mutate(
+              { ids: selected },
+              {
+                onSuccess: () => {
+                  queryDisburse.refetch();
+                  modalDelete.closeModal();
+                },
+              },
+            );
+          }}
+        />
+      </Modal>
     </Box>
   );
 }

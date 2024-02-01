@@ -92,9 +92,21 @@ export const sidebarDataDev: FilteredMenu[] = [
     icon: <KurIcon />,
     child: [
       {
+        id: 72,
+        title: 'Merchants',
+        path: '/depo/merchants',
+        child: [],
+      },
+      {
         id: 73,
         title: 'Disburse',
         path: '/depo/disburse',
+        child: [],
+      },
+      {
+        id: 74,
+        title: 'QRIS',
+        path: '/depo/qris',
         child: [],
       },
     ],
