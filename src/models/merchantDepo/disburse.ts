@@ -1,0 +1,89 @@
+import { ListParams } from '../fetch';
+
+export interface DisburseParams extends ListParams {
+  start_date?: string;
+  end_date?: string;
+  status?: string;
+}
+
+export type DisburseListType = {
+  id: number;
+  date: number;
+  due_date: number;
+  dpd: number;
+  merchant_name: string;
+  padi_date: number;
+  account_number: string;
+  amount: number;
+  transfer_amount: number;
+  status: string;
+};
+
+export type InvoiceDetailsType = {
+  id: number;
+  invoice_type: { id: number; name: string };
+  invoice_restructure_type: { id: number; name: string };
+  user_id: number;
+  invoice_number: string;
+  invoice_type_id: number;
+  amount: number;
+  destination_bank: string;
+  destination_bank_account: string;
+  bank_transfer_fee: number;
+  transfer_date: number;
+  admin_fee: number;
+  discount: number;
+  invoice_restructure_id: null;
+  invoice_restructure_type_id: null;
+  created_at: number;
+  created_by_id: number;
+  updated_at: null;
+  updated_by_id: null;
+  deleted_at: null;
+  deleted_by_id: null;
+  nota_image: string;
+  user: User;
+  due_date: number;
+  interest_per_today: number;
+  expected_interest: number;
+  paid_amount: number;
+  outstanding_amount: number;
+  status: string;
+  dpd_amount: number;
+};
+
+export type User = {
+  id: number;
+  user_number: string;
+  debtor_name: string;
+  merchant_name: string;
+  request_number: string;
+  phone_number: string;
+  family_phone_number: string;
+  business_lifetime: number;
+  marriage_status: string;
+  marriage_partner_name: string;
+  limit_request_plafon: number;
+  limit_request_cash: number;
+  limit_plafon: number;
+  limit_cash: number;
+  user_type_id: number;
+  user_status_id: number;
+  bi_checking_status_id: null;
+  bi_checking_notes: null;
+  komite_notes: null;
+  is_merchant_titipku: boolean;
+  area_id: number;
+  area_name: string;
+  created_by: number;
+  last_co_id: null;
+  last_komite_id: null;
+  last_admin_id: null;
+  category_jelajah_id: number;
+  category_jelajah_name: string;
+  batch_id: number;
+  balance: number;
+  created_at: number;
+  updated_at: number;
+  deleted_at: null;
+};

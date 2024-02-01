@@ -48,49 +48,6 @@ export const sidebarDataDev: FilteredMenu[] = [
       },
     ],
   },
-  // {
-  //   id: 48,
-  //   title: 'KUR',
-  //   path: '',
-  //   icon: <KurIcon />,
-  //   child: [
-  //     {
-  //       id: 52,
-  //       title: 'Request',
-  //       path: '/kur/request',
-  //       child: [],
-  //     },
-  //     {
-  //       id: 53,
-  //       title: 'Payment',
-  //       path: '/kur/payment',
-  //       child: [],
-  //     },
-  //     {
-  //       id: 54,
-  //       title: 'Invoice Management',
-  //       path: '/kur/invoice',
-  //       child: [],
-  //     },
-  //     {
-  //       id: 51,
-  //       title: 'Customer Management',
-  //       path: '',
-  //       child: [
-  //         {
-  //           id: 54,
-  //           title: 'Customer',
-  //           path: '/kur/customer',
-  //         },
-  //         {
-  //           id: 54,
-  //           title: 'Verification',
-  //           path: '/kur/verification',
-  //         },
-  //       ],
-  //     },
-  //   ],
-  // },
   {
     id: 48,
     title: 'Finance',
@@ -125,6 +82,20 @@ export const sidebarDataDev: FilteredMenu[] = [
             path: '/finance/verification',
           },
         ],
+      },
+    ],
+  },
+  {
+    id: 70,
+    title: 'Andalan & Depo',
+    path: '',
+    icon: <KurIcon />,
+    child: [
+      {
+        id: 73,
+        title: 'Disburse',
+        path: '/depo/disburse',
+        child: [],
       },
     ],
   },

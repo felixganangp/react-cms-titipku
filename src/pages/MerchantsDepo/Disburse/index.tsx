@@ -24,11 +24,19 @@ import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { useNavigate } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
 import Label from 'components/Label';
+import SearchIcon from '@mui/icons-material/Search';
+
+import {
+  UseDisburseService,
+  DisburseStatus,
+} from '../hooks/useDisburseService';
 
 export default function DisbursePages() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const showFilter = useModal();
+
+  const queryDisburse = UseDisburseService();
 
   const headCells: HeadCells<any>[] = [
     {
@@ -46,7 +54,7 @@ export default function DisbursePages() {
       label: 'DPD',
     },
     {
-      id: 'merch_name',
+      id: 'merchant_name',
       label: 'Merchant Name',
     },
     {
@@ -55,7 +63,7 @@ export default function DisbursePages() {
       format: (value) => moment().format('DD MMM YYYY'),
     },
     {
-      id: 'account',
+      id: 'account_number',
       label: 'Account Number',
     },
     {
@@ -70,7 +78,7 @@ export default function DisbursePages() {
       },
     },
     {
-      id: 'amount_trf',
+      id: 'transfer_amount',
       label: 'Amount',
       format: ({ amount_trf }) => {
         return (
@@ -87,7 +95,7 @@ export default function DisbursePages() {
       format: ({ status }) => {
         const color =
           // eslint-disable-next-line no-nested-ternary
-          status === 'Waiting'
+          status === 'On Process'
             ? 'warning'
             : status === 'Transferred'
             ? 'success'
@@ -142,30 +150,30 @@ export default function DisbursePages() {
             <Stack direction="row" alignItems="center" gap={2} flex={1}>
               <Button
                 startIcon={<Add />}
-                onClick={() => navigate('/depo/merchants/form')}
+                onClick={() => navigate('/depo/disburse/form')}
               >
                 Add New
               </Button>
               <TextField
-                placeholder="Search Item"
+                placeholder="Search items"
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
-                // value={queryInnvoice.searchValue}
+                value={queryDisburse.searchValue}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Search />
+                      <SearchIcon />
                     </InputAdornment>
                   ),
                 }}
-                // onChange={(event) => {
-                //   queryInnvoice.handleSearch(event.target.value);
-                //   queryInnvoice.handleToSetSearchParams(
-                //     'search',
-                //     event.target.value,
-                //   );
-                // }}
+                onChange={(event) => {
+                  queryDisburse.handleSearch(event.target.value);
+                  queryDisburse.handleToSetSearchParams(
+                    'search',
+                    event.target.value,
+                  );
+                }}
               />
             </Stack>
             <Stack direction="row" alignItems="center" gap={2}>
@@ -201,7 +209,7 @@ export default function DisbursePages() {
               spacing={2}
               component="form"
               mt={2}
-              // onSubmit={queryInnvoice.formikParams.handleSubmit}
+              onSubmit={queryDisburse.formikParams.handleSubmit}
             >
               <Grid item xs={12} md={4}>
                 <FormLabel text="Merchant Name">
@@ -223,55 +231,121 @@ export default function DisbursePages() {
                   />
                 </FormLabel>
               </Grid>
-              <Grid item xs={12} md={2}>
+              <Grid item xs={12} md={4}>
                 <FormLabel text="Status">
                   <Autocomplete
-                    options={[]}
-                    // onBlur={() => {
-                    //   formik.setFieldTouched('area');
-                    // }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="Type"
-                        placeholder="Select Status"
-                        // error={
-                        //   formik.touched.area && Boolean(formik.errors.area)
-                        // }
-                      />
-                    )}
-                  />
-                </FormLabel>
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <FormLabel text="Date">
-                  <DesktopDatePicker
-                    // value={
-                    //   queryInnvoice.formikParams.values.max_invoice_date || null
-                    // }
-                    value={null}
-                    onChange={() => {}}
-                    inputFormat="DD/MM/YYYY"
-                    // onChange={(value) => {
-                    //   queryInnvoice.formikParams.setFieldValue(
-                    //     'max_invoice_date',
-                    //     value,
-                    //   );
-                    // }}
-                    // minDate={queryInnvoice.formikParams.values.min_invoice_date}
-                    // maxDate={formik.values.max_date_created}
+                    id="filterStatus"
+                    value={
+                      queryDisburse.formikParams.values.status
+                        ? {
+                            id: queryDisburse.formikParams.values.status,
+                            name: DisburseStatus[
+                              queryDisburse.formikParams.values.status
+                            ],
+                          }
+                        : null
+                    }
+                    options={Object.keys(DisburseStatus).map((val) => ({
+                      id: val,
+                      // @ts-ignore
+                      name: DisburseStatus[val],
+                    }))}
+                    onChange={(e, value) => {
+                      // handleChangeGrade(value);
+                      queryDisburse.formikParams.setFieldValue(
+                        'status',
+                        value?.id,
+                      );
+                    }}
+                    getOptionLabel={(option) => `${option.name}`}
                     renderInput={(params) => {
                       return (
                         <TextField
                           {...params}
-                          name="grade"
-                          placeholder="Select Grade"
+                          name="status"
+                          placeholder="Select Status"
                           variant="outlined"
-                          fullWidth
                         />
                       );
                     }}
                   />
+                </FormLabel>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <FormLabel text="Disburse Date Range">
+                  <Stack direction="row" spacing={1} alignItems="start">
+                    <Stack spacing={1} width="100%">
+                      <DesktopDatePicker
+                        value={
+                          queryDisburse.formikParams.values.start_date || null
+                        }
+                        inputFormat="DD/MM/YYYY"
+                        onChange={(value) => {
+                          queryDisburse.formikParams.setFieldValue(
+                            'start_date',
+                            value,
+                          );
+                        }}
+                        maxDate={queryDisburse.formikParams.values.end_date}
+                        // maxDate={formik.values.max_date_created}
+                        renderInput={(params) => {
+                          return (
+                            <TextField
+                              {...params}
+                              name="grade"
+                              placeholder="Select Grade"
+                              variant="outlined"
+                              fullWidth
+                            />
+                          );
+                        }}
+                      />
+                      {queryDisburse.formikParams.errors.start_date && (
+                        <Typography color="error.main">
+                          {queryDisburse.formikParams.errors.start_date}
+                        </Typography>
+                      )}
+                    </Stack>
+                    <Box
+                      sx={{
+                        width: '20px',
+                        borderBottom: '1px solid #000',
+                        pt: 2,
+                      }}
+                    />
+                    <Stack spacing={1} width="100%">
+                      <DesktopDatePicker
+                        value={
+                          queryDisburse.formikParams.values.end_date || null
+                        }
+                        inputFormat="DD/MM/YYYY"
+                        onChange={(value) => {
+                          queryDisburse.formikParams.setFieldValue(
+                            'end_date',
+                            value,
+                          );
+                        }}
+                        minDate={queryDisburse.formikParams.values.start_date}
+                        // maxDate={formik.values.max_date_created}
+                        renderInput={(params) => {
+                          return (
+                            <TextField
+                              {...params}
+                              name="grade"
+                              placeholder="Select Date"
+                              variant="outlined"
+                              fullWidth
+                            />
+                          );
+                        }}
+                      />
+                      {queryDisburse.formikParams.errors.end_date && (
+                        <Typography color="error.main">
+                          {queryDisburse.formikParams.errors.end_date}
+                        </Typography>
+                      )}
+                    </Stack>
+                  </Stack>
                 </FormLabel>
               </Grid>
               <Grid item xs={12} md={12}>
@@ -284,10 +358,10 @@ export default function DisbursePages() {
                   <Button
                     variant="text"
                     onClick={() => {
-                      // queryInnvoice.formikParams.resetForm();
-                      // queryInnvoice.handleResetFilter({
-                      //   whiteList: ['search'],
-                      // });
+                      queryDisburse.formikParams.resetForm();
+                      queryDisburse.handleResetFilter({
+                        whiteList: ['search'],
+                      });
                     }}
                   >
                     Reset
@@ -301,49 +375,23 @@ export default function DisbursePages() {
         <Card>
           <Table
             headCells={headCells}
-            data={[
-              {
-                date: '2021-10-10',
-                due_date: 1,
-                dpd: 1,
-                merch_name:
-                  'LP - 03 Toko Joni Tahu Tempe (Pasar Modern Paramount)',
-                paid_date: '2021-10-10',
-                account: 'BCA - 293958292',
-                amount: 1200000,
-                amount_trf: 1100000,
-                status: 'Transferred',
-              },
-              {
-                date: '2021-10-10',
-                due_date: 1,
-                dpd: 1,
-                merch_name:
-                  'LP - 99 Toko JoJon Ayam Kuing (Pasar Modern Bintaro)',
-                paid_date: '2021-10-10',
-                account: 'BCA - 293958292',
-                amount: 1000000,
-                amount_trf: 900000,
-                status: 'Waiting',
-              },
-            ]}
+            data={queryDisburse.listData || []}
             selected={selected}
             setSelected={(e) => {
               setSelected(e);
             }}
             enableCheckBox
-            orderBy="total_gmv"
-            // loading={queryInnvoice.isLoading}
-            // page={queryInnvoice.data?.page || 0}
-            // count={queryInnvoice.data?.count || 0}
-            // totalData={queryInnvoice.data?.total || 0}
-            // onChangePage={(value) => {
-            //   queryInnvoice.handleChangeParams({
-            //     ...queryInnvoice.params,
-            //     page: value,
-            //   });
-            //   queryInnvoice.handleToSetSearchParams('page', value.toString());
-            // }}
+            loading={queryDisburse.isLoading}
+            page={queryDisburse.data?.page || 0}
+            count={queryDisburse.data?.count || 0}
+            totalData={queryDisburse.data?.total || 0}
+            onChangePage={(value) => {
+              queryDisburse.handleChangeParams({
+                ...queryDisburse.params,
+                page: value,
+              });
+              queryDisburse.handleToSetSearchParams('page', value.toString());
+            }}
           />
         </Card>
       </Stack>
