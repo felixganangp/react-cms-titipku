@@ -436,6 +436,7 @@ export default function KurCustomerVerification() {
 
   const formHandleCloseBiChecking = async () => {
     await formBiChecking.closeModal();
+    setSelectedCustomer([]);
   };
 
   const formHandleCloseReview = async () => {

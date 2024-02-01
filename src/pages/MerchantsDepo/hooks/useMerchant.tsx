@@ -6,6 +6,7 @@ import {
   deleteMerchant,
   getMerchantDepoList,
   getMerchantList,
+  getMerchantFilterList,
 } from 'service/MerchantDepo/Merchant';
 
 export const useMerchantDepoList = (setParams?: MerchantParams) => {
@@ -31,6 +32,19 @@ export const useMerchantList = (setParams?: MerchantParams) => {
     ...params,
     ...querySettlement,
     listData: querySettlement.data?.data || [],
+  };
+};
+
+export const useMerchantFilterList = (setParams?: MerchantParams) => {
+  const params = UseParams<MerchantParams>(setParams);
+  const queryMerchantFilter = useQuery({
+    queryKey: ['merchantFilter', params.params],
+    queryFn: () => getMerchantFilterList(params.params),
+  });
+  return {
+    ...params,
+    ...queryMerchantFilter,
+    listData: queryMerchantFilter.data?.data || [],
   };
 };
 
