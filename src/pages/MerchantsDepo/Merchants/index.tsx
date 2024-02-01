@@ -1,3 +1,5 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import MenuList from 'components/MenuList';
 import { HeadCells } from 'components/Table/types';
 import { Add, KeyboardArrowDown, MoreVert, Search } from '@mui/icons-material';
@@ -14,6 +16,7 @@ import {
   Collapse,
   Grid,
   Autocomplete,
+  Modal,
 } from '@mui/material';
 import Table from 'components/Table';
 import moment from 'moment';
@@ -23,13 +26,20 @@ import FormLabel from 'components/FormLabel';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { useNavigate } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
-import { useMerchantDepoList, useMerchantList } from '../Hooks/useMerchant';
+import DeleteModal from 'components/Delete/freetext';
+import {
+  useDeleteMerchant,
+  useMerchantDepoList,
+  useMerchantList,
+} from '../Hooks/useMerchant';
 
 export default function MerchantsPages() {
   const merchantQuery = useMerchantDepoList();
+  const deleteMerchant = useDeleteMerchant();
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const showFilter = useModal();
+  const modalDelete = useModal();
 
   const headCells: HeadCells<any>[] = [
     // {
@@ -116,7 +126,10 @@ export default function MerchantsPages() {
             {
               label: 'Delete',
               color: 'error',
-              onClick: () => {},
+              onClick: () => {
+                setSelected([value.id]);
+                modalDelete.openModal();
+              },
             },
           ]}
         >
@@ -177,14 +190,17 @@ export default function MerchantsPages() {
               <MenuList
                 menu={[
                   {
-                    label: 'Delete 2 Items',
+                    label: `Delete ${selected.length} Items`,
                     color: 'error',
-                    onClick: () => {},
+                    onClick: () => {
+                      modalDelete.openModal();
+                    },
                   },
                 ]}
               >
                 <Button
                   endIcon={<KeyboardArrowDown />}
+                  disabled={selected.length === 0}
                   //   variant="outlined"
                   //   onClick={showFilter.toggleModal}
                 >
@@ -222,7 +238,7 @@ export default function MerchantsPages() {
                 </FormLabel>
               </Grid>
               <Grid item xs={12} md={3}>
-                <FormLabel text="Merchant Name">
+                <FormLabel text="Merchant Type">
                   <Autocomplete
                     options={[]}
                     // onBlur={() => {
@@ -299,7 +315,20 @@ export default function MerchantsPages() {
         <Card>
           <Table
             headCells={headCells}
-            data={merchantQuery.listData}
+            data={merchantQuery.listData.map((item) => {
+              const tenPecent = (item.limit * 10) / 100;
+              const fivePecent = (item.limit * 5) / 100;
+              return {
+                ...item,
+                table_color:
+                  tenPecent >= item.balance
+                    ? '#F9EBE7'
+                    : fivePecent >= item.balance
+                    ? '#FFF3CD'
+                    : '#fff',
+                id: item.jelajah_id,
+              };
+            })}
             selected={selected}
             setSelected={(e) => {
               setSelected(e);
@@ -317,8 +346,15 @@ export default function MerchantsPages() {
                 order_by: value.orderBy,
                 order_type: value.orderType,
               });
-              merchantQuery.handleToSetSearchParams('order_by', value.id);
-              merchantQuery.handleToSetSearchParams('order_type', value.order);
+              merchantQuery.handleToSetSearchParams(
+                'order_by',
+                // @ts-ignore
+                value.orderBy || '',
+              );
+              merchantQuery.handleToSetSearchParams(
+                'order_type',
+                value.orderType,
+              );
             }}
             onChangePage={(value) => {
               merchantQuery.handleChangeParams({
@@ -330,6 +366,26 @@ export default function MerchantsPages() {
           />
         </Card>
       </Stack>
+      <Modal open={modalDelete.open} onClose={modalDelete.closeModal}>
+        <DeleteModal
+          onClose={modalDelete.closeModal}
+          headerText="Delete  Merchant"
+          desc={
+            <>Are you sure want to delete {selected.length} item Merchant?</>
+          }
+          onSubmit={() => {
+            deleteMerchant.mutate(
+              { ids: selected },
+              {
+                onSuccess: () => {
+                  merchantQuery.refetch();
+                  modalDelete.closeModal();
+                },
+              },
+            );
+          }}
+        />
+      </Modal>
     </Box>
   );
 }

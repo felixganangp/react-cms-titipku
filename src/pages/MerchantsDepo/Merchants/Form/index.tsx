@@ -23,6 +23,8 @@ import FormLabel from 'components/FormLabel';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { useNavigate } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
+import { useMutation } from '@tanstack/react-query';
+import { postMerchant } from 'service/MerchantDepo/Merchant';
 import { useMerchantList } from '../../Hooks/useMerchant';
 
 export default function MerchantForm() {
@@ -30,6 +32,7 @@ export default function MerchantForm() {
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const navigate = useNavigate();
   const showFilter = useModal();
+  const { mutate } = useMutation(postMerchant);
 
   const headCells: HeadCells<any>[] = [
     // {
@@ -216,12 +219,27 @@ export default function MerchantForm() {
             }}
           />
           <Stack direction="row" gap={2}>
-            <Button variant="text" color="error" onClick={() => navigate(-1)}>
+            <Button
+              variant="text"
+              color="error"
+              onClick={() => navigate('/depo/merchants/')}
+            >
               Back
             </Button>
             <Button
               sx={{ borderRadius: '4px' }}
               // onClick={showFilter.toggleModal}
+              onClick={() => {
+                // mutate(
+                //   {},
+                //   {
+                //     onSuccess: () => {
+                //       navigate(-1);
+                //     },
+                //     onError: () => {},
+                //   },
+                // );
+              }}
             >
               Next
             </Button>
