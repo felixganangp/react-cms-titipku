@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import MenuList from 'components/MenuList';
 import { HeadCells } from 'components/Table/types';
 import { Add, KeyboardArrowDown, MoreVert, Search } from '@mui/icons-material';
@@ -31,8 +32,8 @@ import {
   UseDisburse,
   DisburseStatus,
   useDeleteDisburse,
-} from '../Hooks/useDisburse';
-import { useMerchantFilterList } from '../Hooks/useMerchant';
+} from '../hooks/useDisburse';
+import { useMerchantFilterList } from '../hooks/useMerchant';
 
 export default function DisbursePages() {
   const navigate = useNavigate();

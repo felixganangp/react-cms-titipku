@@ -1,6 +1,11 @@
-import MenuList from 'components/MenuList';
+/* eslint-disable no-nested-ternary */
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+// import MenuList from 'components/MenuList';
 import { HeadCells } from 'components/Table/types';
-import { Add, KeyboardArrowDown, MoreVert, Search } from '@mui/icons-material';
+import { KeyboardArrowDown, Search } from '@mui/icons-material';
 import {
   Box,
   Stack,
@@ -9,58 +14,79 @@ import {
   Button,
   TextField,
   InputAdornment,
-  Menu,
-  IconButton,
   Collapse,
   Grid,
   Autocomplete,
 } from '@mui/material';
 import Table from 'components/Table';
-import moment from 'moment';
+// import moment from 'moment';
 import { useState } from 'react';
 import useModal from 'hooks/useModal';
 import FormLabel from 'components/FormLabel';
-import { DesktopDatePicker } from '@mui/x-date-pickers';
+// import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { useNavigate } from 'react-router-dom';
+import numberSeperator from 'utils/numberSeperator';
+
+import { useMerchantDepoList } from '../../hooks/useMerchant';
 
 export default function DisburseForm() {
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const navigate = useNavigate();
   const showFilter = useModal();
 
+  const queryMerchant = useMerchantDepoList();
+
   const headCells: HeadCells<any>[] = [
     {
-      id: 'rank',
-      label: 'Rank',
-      format: (value) => `#${value.rank}`,
+      id: 'pasar',
+      label: 'Pasar',
+      format: (value) => `Pasar Random`,
     },
+
     {
-      id: 'Join Date',
-      label: 'Join Date',
-      format: (value) => moment().format('DD MMM YYYY'),
-    },
-    {
-      id: 'Merch_name',
+      id: 'merchant_name',
       label: 'Merchant Name',
+      format: (value) => {
+        const isNew = false && (
+          <Typography
+            color="primary"
+            component="span"
+            fontWeight="bold"
+            fontSize="14px"
+          >
+            [NEW]{' '}
+          </Typography>
+        );
+        return (
+          <Typography>
+            {isNew}
+            {value.merchant_name}
+          </Typography>
+        );
+      },
     },
     {
-      id: 'type',
-      label: 'Merchant Name',
-    },
-    {
-      id: 'Limit',
+      id: 'limit',
       enableSort: true,
       label: 'Limit',
+      format: (value) => {
+        if (!value.limit) return <Typography>-</Typography>;
+        return <Typography>Rp {numberSeperator(value.limit)}</Typography>;
+      },
     },
     {
-      id: 'Balance',
+      id: 'balance',
       enableSort: true,
       label: 'Balance',
+      format: (value) => {
+        if (!value.balance) return <Typography>-</Typography>;
+        return <Typography>Rp {numberSeperator(value.balance)}</Typography>;
+      },
     },
     {
-      id: 'total_gmv',
+      id: 'average_daily_transaction',
+      label: 'Average Daily Transaction',
       enableSort: true,
-      label: 'Total GMV',
     },
   ];
 
@@ -76,7 +102,7 @@ export default function DisburseForm() {
           >
             <Stack direction="row" alignItems="center" gap={2} flex={1}>
               <TextField
-                placeholder="Search for Invoice Number"
+                placeholder="Search Merchant"
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
@@ -161,39 +187,54 @@ export default function DisburseForm() {
         <Card>
           <Table
             headCells={headCells}
-            data={[
-              { rank: 1, id: 'skdldslk', 'Join Date': '2021-10-10' },
-              {
-                rank: 1,
-                id: 'skdldslk',
-                'Join Date': '2021-10-10',
-                table_color: '#F9EBE7',
-              },
-              {
-                rank: 1,
-                id: 'skdldslk',
-                'Join Date': '2021-10-10',
-                table_color: '#FDF1DA',
-              },
-              { rank: 1, id: 'skdldslk', 'Join Date': '2021-10-10' },
-            ]}
+            data={queryMerchant.listData.map((item) => {
+              const tenPecent = item.limit * 0.1;
+              const fivePecent = item.limit * 0.05;
+              return {
+                ...item,
+                table_color:
+                  tenPecent >= item.balance
+                    ? '#F9EBE7'
+                    : fivePecent >= item.balance
+                    ? '#FFF3CD'
+                    : '#fff',
+                id: item.jelajah_id,
+              };
+            })}
             selected={selected}
             setSelected={(e) => {
               setSelected(e);
             }}
             enableRadio
-            orderBy="total_gmv"
-            // loading={queryInnvoice.isLoading}
-            // page={queryInnvoice.data?.page || 0}
-            // count={queryInnvoice.data?.count || 0}
-            // totalData={queryInnvoice.data?.total || 0}
-            // onChangePage={(value) => {
-            //   queryInnvoice.handleChangeParams({
-            //     ...queryInnvoice.params,
-            //     page: value,
-            //   });
-            //   queryInnvoice.handleToSetSearchParams('page', value.toString());
-            // }}
+            orderBy={queryMerchant.params.order_by}
+            orderType={queryMerchant.params.order_type}
+            loading={queryMerchant.isLoading}
+            page={queryMerchant.data?.page || 0}
+            count={queryMerchant.data?.count || 0}
+            totalData={queryMerchant.data?.total || 0}
+            onChangeSort={(value) => {
+              queryMerchant.handleChangeParams({
+                ...queryMerchant.params,
+                order_by: value.orderBy,
+                order_type: value.orderType,
+              });
+              queryMerchant.handleToSetSearchParams(
+                'order_by',
+                // @ts-ignore
+                value.orderBy || '',
+              );
+              queryMerchant.handleToSetSearchParams(
+                'order_type',
+                value.orderType,
+              );
+            }}
+            onChangePage={(value) => {
+              queryMerchant.handleChangeParams({
+                ...queryMerchant.params,
+                page: value,
+              });
+              queryMerchant.handleToSetSearchParams('page', value.toString());
+            }}
           />
           <Stack direction="row" gap={2}>
             <Button variant="text" color="error" onClick={() => navigate(-1)}>

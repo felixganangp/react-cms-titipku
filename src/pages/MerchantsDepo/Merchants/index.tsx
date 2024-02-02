@@ -31,7 +31,7 @@ import {
   useDeleteMerchant,
   useMerchantDepoList,
   useMerchantList,
-} from '../Hooks/useMerchant';
+} from '../hooks/useMerchant';
 
 export default function MerchantsPages() {
   const merchantQuery = useMerchantDepoList();

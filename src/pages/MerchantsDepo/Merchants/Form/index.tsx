@@ -25,7 +25,7 @@ import { useNavigate } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
 import { useMutation } from '@tanstack/react-query';
 import { postMerchant } from 'service/MerchantDepo/Merchant';
-import { useMerchantList } from '../../Hooks/useMerchant';
+import { useMerchantList } from '../../hooks/useMerchant';
 
 export default function MerchantForm() {
   const merchantQuery = useMerchantList();
