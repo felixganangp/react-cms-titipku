@@ -2,7 +2,7 @@
 import useToast from 'hooks/useToast';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
-import { MerchantParams } from 'models/MerchantDepo/Merchant';
+import { MerchantParams } from 'models/merchantDepo/Merchant';
 import {
   deleteMerchant,
   detailsMerchant,
