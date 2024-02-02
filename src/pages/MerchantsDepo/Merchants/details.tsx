@@ -19,7 +19,7 @@ import {
   Autocomplete,
   TextField,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import MerchantAndalan from 'assets/merchant-andalan.svg';
 import MerchantDepo from 'assets/merchant-deposit.svg';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
@@ -32,10 +32,16 @@ import FormLabel from 'components/FormLabel';
 import Table from 'components/Table';
 import { HeadCells } from 'components/Table/types';
 import moment from 'moment';
+import numberSeperator from 'utils/numberSeperator';
+import { useMerchantDetails } from '../hooks/useMerchant';
 
 export default function MercheantsDetails() {
+  const { id } = useParams();
+  const merchantDetails = useMerchantDetails(id);
+  const details = merchantDetails.data?.data;
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
+
   const headCells: HeadCells<any>[] = [
     {
       id: 'Date',
@@ -95,10 +101,26 @@ export default function MercheantsDetails() {
           <Box p="10px">
             <Stack direction="row" alignItems="center" gap="10px">
               <Typography variant="h3" fontWeight="bold">
-                LP - 03 Toko Joni Tahu Tempe (Pasar Modern Paramount) Deposit
+                {details?.merchant_name}
               </Typography>
-              <Box component="img" src={MerchantAndalan} />
-              <Box component="img" src={MerchantDepo} />
+              <Box
+                component="img"
+                src={MerchantAndalan}
+                display={
+                  details?.depo_type_id === 1 || details?.depo_type_id === 2
+                    ? 'block'
+                    : 'none'
+                }
+              />
+              <Box
+                component="img"
+                src={MerchantDepo}
+                display={
+                  details?.depo_type_id === 1 || details?.depo_type_id === 3
+                    ? 'block'
+                    : 'none'
+                }
+              />
             </Stack>
             <Stack
               borderBottom="1px solid #E0E0E0"
@@ -114,7 +136,7 @@ export default function MercheantsDetails() {
                       Balance
                     </Typography>
                     <Typography variant="h3" fontWeight={600} color="red">
-                      RP 190,000
+                      Rp {numberSeperator(details?.balance || 0)}
                     </Typography>
                   </Box>
                 </Grid>
@@ -124,7 +146,7 @@ export default function MercheantsDetails() {
                       Total Transaction
                     </Typography>
                     <Typography variant="h3" fontWeight={600}>
-                      2
+                      {details?.total_transaction}
                     </Typography>
                   </Box>
                 </Grid>
@@ -134,7 +156,7 @@ export default function MercheantsDetails() {
                       Total Disburse
                     </Typography>
                     <Typography variant="h3" fontWeight={600}>
-                      2
+                      {details?.total_disburse}
                     </Typography>
                   </Box>
                 </Grid>
@@ -144,7 +166,7 @@ export default function MercheantsDetails() {
                       Rank
                     </Typography>
                     <Typography variant="h3" fontWeight={600}>
-                      #2
+                      #{details?.rank}
                     </Typography>
                   </Box>
                 </Grid>
@@ -154,7 +176,7 @@ export default function MercheantsDetails() {
                       Activity Score
                     </Typography>
                     <Typography variant="h3" fontWeight={600}>
-                      45/100
+                      {details?.score}/100
                     </Typography>
                   </Box>
                 </Grid>
@@ -163,81 +185,100 @@ export default function MercheantsDetails() {
             <Grid container spacing={2} mt={2}>
               <Grid item xs={6} md={2.4}>
                 <DescriptionDetail
-                  title="Role Access Name"
+                  title="Merchant Status"
                   icon={<FiberManualRecordIcon sx={{ color: '#008e58' }} />}
-                  content="name"
+                  content={details?.should_paid ? 'Active' : 'Inactive'}
                 />
               </Grid>
               <Grid item xs={6} md={2.4}>
                 <DescriptionDetail
                   title="Merchant ID"
                   icon={<Person2Outlined sx={{ color: '#008e58' }} />}
-                  content="name"
+                  content={details?.jelajah_id}
                 />
               </Grid>
               <Grid item xs={6} md={2.4}>
                 <DescriptionDetail
                   title="Limit"
                   icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
-                  content="name"
+                  content={`Rp ${numberSeperator(details?.limit || 0)}`}
                 />
               </Grid>
               <Grid item xs={6} md={2.4}>
                 <DescriptionDetail
                   title="Primary Account Name "
-                  content="name"
+                  content={details?.bank_account_name}
                 />
               </Grid>
               <Grid item xs={6} md={2.4}>
-                <DescriptionDetail title="NOBU Account Name " content="name" />
+                <DescriptionDetail
+                  title="NOBU Account Name "
+                  content={details?.nobu_account_name}
+                />
               </Grid>
               <Grid item xs={6} md={2.4}>
                 <DescriptionDetail
                   title="Join Date"
                   icon={<CalendarToday sx={{ color: '#008e58' }} />}
-                  content="name"
+                  content={moment((details?.created_at || 0) * 1000).format(
+                    'DD MMM YYYY',
+                  )}
                 />
               </Grid>
               <Grid item xs={6} md={2.4}>
                 <DescriptionDetail
                   title="Phone Number"
                   icon={<PhoneIcon sx={{ color: '#008e58' }} />}
-                  content="name"
+                  content={details?.phone_number}
                 />
               </Grid>
               <Grid item xs={6} md={2.4}>
-                <DescriptionDetail title="Admin Fee" content="name" />
+                <DescriptionDetail
+                  title="Admin Fee"
+                  content={`${details?.admin_fee}%`}
+                />
               </Grid>
               <Grid item xs={6} md={2.4}>
                 <DescriptionDetail
                   title="Primary Account Number "
-                  content="name"
+                  content={details?.bank_account_number}
                 />
               </Grid>
               <Grid item xs={6} md={2.4}>
                 <DescriptionDetail
                   title="NOBU Account Number "
-                  content="name"
+                  content={details?.nobu_account_number}
                 />
               </Grid>
               <Grid item xs={6} md={2.4}>
                 <DescriptionDetail
                   title="Join Date Andalan & Depo"
                   icon={<CalendarToday sx={{ color: '#008e58' }} />}
-                  content="name"
+                  content={moment((details?.join_date || 0) * 1000).format(
+                    'DD MMM YYYY',
+                  )}
                 />
               </Grid>
               <Grid item xs={6} md={2.4}>
                 <div />
               </Grid>
               <Grid item xs={6} md={2.4}>
-                <DescriptionDetail title="Discount" content="name" />
+                <DescriptionDetail
+                  title="Discount"
+                  content={`${details?.depo_discount}%`}
+                />
               </Grid>
               <Grid item xs={6} md={2.4}>
-                <DescriptionDetail title="Branch Office" content="name" />
+                <DescriptionDetail
+                  title="Branch Office"
+                  content={details?.bank_branch_office}
+                />
               </Grid>
               <Grid item xs={6} md={2.4}>
-                <DescriptionDetail title="QRIS Merchant ID" content="name" />
+                <DescriptionDetail
+                  title="QRIS Merchant ID"
+                  content={details?.qris_ready}
+                />
               </Grid>
             </Grid>
           </Box>

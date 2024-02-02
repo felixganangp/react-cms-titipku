@@ -33,7 +33,7 @@ import {
   DisburseStatus,
   useDeleteDisburse,
 } from '../hooks/useDisburse';
-import { useMerchantFilterList } from '../hooks/useMerchant';
+import { UseFilterMerchentListService } from '../hooks/useConfigMerchant';
 
 export default function DisbursePages() {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ export default function DisbursePages() {
   const modalDelete = useModal();
 
   const queryDisburse = UseDisburse();
-  const queryMerchantFilter = useMerchantFilterList();
+  const queryMerchantFilter = UseFilterMerchentListService();
   const deleteDisburse = useDeleteDisburse();
 
   const headCells: HeadCells<any>[] = [

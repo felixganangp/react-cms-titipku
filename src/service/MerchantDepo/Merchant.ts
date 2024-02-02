@@ -1,11 +1,30 @@
 import http from 'utils/request';
 import { ListResponse, Response } from 'models/fetch';
-import { MerchantList, MerchantParams } from 'models/MerchantDepo/Merchant';
+import {
+  MerchantDetails,
+  MerchantList,
+  MerchantParams,
+} from 'models/merchantDepo/Merchant';
 
 export const getMerchantDepoList = (params?: MerchantParams) =>
   new Promise<ListResponse<MerchantList>>(async (resolve, reject) => {
+    const paramsRest = { ...params };
+    let costumeParams = '?';
+    if (paramsRest.jelajah_id) {
+      paramsRest.jelajah_id.forEach((val, index) => {
+        costumeParams += `jelajah_id=${val}${
+          index === (paramsRest?.jelajah_id?.length || 0) - 1 ? '' : '&'
+        }`;
+      });
+      delete paramsRest.jelajah_id;
+    }
     try {
-      const respon = await http.get(`merchant-depo/merchant-depo`, { params });
+      const respon = await http.get(
+        `merchant-depo/merchant-depo${costumeParams}`,
+        {
+          params: paramsRest,
+        },
+      );
       if (respon.data) {
         resolve(respon.data);
       }
@@ -19,8 +38,35 @@ export const getMerchantDepoList = (params?: MerchantParams) =>
 
 export const getMerchantList = (params?: MerchantParams) =>
   new Promise<ListResponse<MerchantList>>(async (resolve, reject) => {
+    const paramsRest = { ...params };
+    let costumeParams = '?';
+    if (paramsRest.jelajah_id) {
+      paramsRest.jelajah_id.forEach((val, index) => {
+        costumeParams += `jelajah_id=${val}${
+          index === (paramsRest?.jelajah_id?.length || 0) - 1 ? '' : '&'
+        }`;
+      });
+      delete paramsRest.jelajah_id;
+    }
     try {
-      const respon = await http.get(`merchant-depo/merchant`, { params });
+      const respon = await http.get(`merchant-depo/merchant${costumeParams}`, {
+        params: paramsRest,
+      });
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const detailsMerchant = (id?: number | string) =>
+  new Promise<Response<MerchantDetails>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`merchant-depo/merchant-depo/${id}`);
       if (respon.data) {
         resolve(respon.data);
       }
