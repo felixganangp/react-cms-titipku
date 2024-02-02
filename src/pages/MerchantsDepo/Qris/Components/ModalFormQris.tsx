@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import numberSeperator from 'utils/numberSeperator';
 import {
   Autocomplete,
@@ -27,6 +27,9 @@ export default function ModalFormQris({
   handleClose,
   data,
 }: ModalFormQrisProps) {
+  const [stepSaveSearch, setStepSaveSearch] = useState({
+    merchantList: 0,
+  });
   const isUpdate = Boolean(data);
   const filterMerchantDepoList = UseFilterMerchentDepoListService({
     count: 20,
@@ -115,7 +118,12 @@ export default function ModalFormQris({
             }
             inputValue={filterMerchantDepoList.searchValue}
             onInputChange={(_, newInputValue) => {
-              filterMerchantDepoList.handleSearch(newInputValue);
+              if (stepSaveSearch.merchantList === 0) {
+                filterMerchantDepoList.setSearchValue(newInputValue);
+                setStepSaveSearch({ ...stepSaveSearch, merchantList: 1 });
+              } else {
+                filterMerchantDepoList.handleSearch(newInputValue);
+              }
             }}
             loading={filterMerchantDepoList.isFetching}
             getOptionLabel={(item) => item.name}
