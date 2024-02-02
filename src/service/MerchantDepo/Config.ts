@@ -1,6 +1,6 @@
 import http from 'utils/request';
 import { ListParams, ListResponse, Response } from 'models/fetch';
-import { ConfigType } from 'models/MerchantDepo/Config';
+import { ConfigType } from 'models/merchantDepo/Config';
 
 export const getAllAreaMerchantDepo = (params?: ListParams) =>
   new Promise<ListResponse<ConfigType>>(async (resolve, reject) => {

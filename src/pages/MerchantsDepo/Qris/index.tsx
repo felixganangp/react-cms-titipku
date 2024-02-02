@@ -27,7 +27,7 @@ import ModalComp from 'components/Modal';
 import numberSeperator from 'utils/numberSeperator';
 import { useNavigate } from 'react-router-dom';
 import DeleteModal from 'components/Delete/freetext';
-import { QrisList } from 'models/MerchantDepo/Qris';
+import { QrisList } from 'models/merchantDepo/Qris';
 import { useDeleteQris, useQrisList } from '../hooks/useQris';
 import { UseFilterMerchentDepoListService } from '../hooks/useConfigMerchant';
 import ModalFormQris from './Components/ModalFormQris';

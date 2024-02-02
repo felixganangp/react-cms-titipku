@@ -27,7 +27,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { useNavigate } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
 import DeleteModal from 'components/Delete/freetext';
-import { MerchantList } from 'models/MerchantDepo/Merchant';
+import { MerchantList } from 'models/merchantDepo/Merchant';
 import {
   useDeleteMerchantDepo,
   useMerchantDepoList,
