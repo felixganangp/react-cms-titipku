@@ -35,6 +35,9 @@ import ModalFormQris from './Components/ModalFormQris';
 export default function MerchantsQrisPages() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
+  const [editSelected, setEditSelected] = useState<
+    (QrisList & { id: number; merchant_name: string }) | undefined
+  >(undefined);
 
   const qrisQuery = useQrisList();
   const filterMerchantDepoList = UseFilterMerchentDepoListService();
@@ -68,7 +71,10 @@ export default function MerchantsQrisPages() {
           menu={[
             {
               label: 'Edit',
-              onClick: () => {},
+              onClick: () => {
+                setEditSelected(value);
+                modalForm.toggleModal();
+              },
             },
             {
               label: 'Delete',
@@ -210,7 +216,7 @@ export default function MerchantsQrisPages() {
                 </FormLabel>
               </Grid>
               <Grid item xs={12} md={4}>
-                <FormLabel text="Join Date">
+                <FormLabel text="Date">
                   <Stack direction="row" spacing={1} alignItems="start">
                     <Stack spacing={1} width="100%">
                       <DesktopDatePicker
@@ -350,7 +356,15 @@ export default function MerchantsQrisPages() {
         title="Create Qris"
         onClose={modalForm.closeModal}
       >
-        <ModalFormQris />
+        <ModalFormQris
+          data={editSelected}
+          handleClose={(isSubmited) => {
+            if (isSubmited) {
+              qrisQuery.refetch();
+            }
+            modalForm.closeModal();
+          }}
+        />
       </ModalComp>
     </Box>
   );
