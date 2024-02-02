@@ -27,12 +27,12 @@ import numberSeperator from 'utils/numberSeperator';
 import { useMutation } from '@tanstack/react-query';
 import { postMerchant } from 'service/MerchantDepo/Merchant';
 import Modal from 'components/Modal';
-import { useMerchantList } from '../../Hooks/useMerchant';
+import { useMerchantList } from '../../hooks/useMerchant';
 import ModalFormMerchantDepo from './components/ModalForm';
 import {
   UseFilterMerchentListService,
   UseAreaListService,
-} from '../../Hooks/useConfigMerchant';
+} from '../../hooks/useConfigMerchant';
 
 export default function MerchantForm() {
   const navigate = useNavigate();

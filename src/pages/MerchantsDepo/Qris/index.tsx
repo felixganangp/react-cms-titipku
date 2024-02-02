@@ -23,12 +23,14 @@ import { useState } from 'react';
 import useModal from 'hooks/useModal';
 import FormLabel from 'components/FormLabel';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
-import { QrisList } from 'models/MerchantDepo/Qris';
+import ModalComp from 'components/Modal';
 import numberSeperator from 'utils/numberSeperator';
 import { useNavigate } from 'react-router-dom';
 import DeleteModal from 'components/Delete/freetext';
-import { useDeleteQris, useQrisList } from '../Hooks/useQris';
-import { UseFilterMerchentDepoListService } from '../Hooks/useConfigMerchant';
+import { QrisList } from 'models/MerchantDepo/Qris';
+import { useDeleteQris, useQrisList } from '../hooks/useQris';
+import { UseFilterMerchentDepoListService } from '../hooks/useConfigMerchant';
+import ModalFormQris from './Components/ModalFormQris';
 
 export default function MerchantsQrisPages() {
   const navigate = useNavigate();
@@ -40,6 +42,7 @@ export default function MerchantsQrisPages() {
 
   const showFilter = useModal();
   const modalDelete = useModal();
+  const modalForm = useModal();
 
   const headCells: HeadCells<QrisList>[] = [
     {
@@ -95,7 +98,7 @@ export default function MerchantsQrisPages() {
             <Stack direction="row" alignItems="center" gap={2} flex={1}>
               <Button
                 startIcon={<Add />}
-                // onClick={() => navigate('/depo/merchants/form')}
+                onClick={() => modalForm.toggleModal()}
               >
                 Add New
               </Button>
@@ -342,6 +345,13 @@ export default function MerchantsQrisPages() {
           }}
         />
       </Modal>
+      <ModalComp
+        open={modalForm.open}
+        title="Create Qris"
+        onClose={modalForm.closeModal}
+      >
+        <ModalFormQris />
+      </ModalComp>
     </Box>
   );
 }
