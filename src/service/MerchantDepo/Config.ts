@@ -58,18 +58,20 @@ export const getAllFilterMerchantDepo = (params?: ListParams) =>
   );
 
 export const getAllFilterMerchant = (params?: ListParams) =>
-  new Promise<ListResponse<ConfigType>>(async (resolve, reject) => {
-    try {
-      const respon = await http.get(`merchant-depo/merchant/filter`, {
-        params,
-      });
-      if (respon.data) {
-        resolve(respon.data);
+  new Promise<ListResponse<{ id: number; merchant_name: string }>>(
+    async (resolve, reject) => {
+      try {
+        const respon = await http.get(`merchant-depo/merchant/filter`, {
+          params,
+        });
+        if (respon.data) {
+          resolve(respon.data);
+        }
+      } catch (err: any) {
+        const message: string = err.response
+          ? `${err.response.data.message}`
+          : 'Oops, something wrong with our server, please try again later.';
+        reject(message);
       }
-    } catch (err: any) {
-      const message: string = err.response
-        ? `${err.response.data.message}`
-        : 'Oops, something wrong with our server, please try again later.';
-      reject(message);
-    }
-  });
+    },
+  );

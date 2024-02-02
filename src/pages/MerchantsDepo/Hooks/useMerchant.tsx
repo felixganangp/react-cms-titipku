@@ -94,7 +94,62 @@ export const useMerchantList = (setParams?: MerchantParams) => {
     queryKey: ['merchant-depo/merchant', params.params],
     queryFn: () => getMerchantList(params.params),
   });
+
+  const formik = useFormik({
+    initialValues: {
+      area_id: undefined,
+      jelajah_id: [],
+    },
+    onSubmit: (values) => {
+      const newValue = {
+        ...values,
+        page: 1,
+        search: params.params.search,
+      };
+      params.handleChangeParams(newValue);
+      const queryParams = new URLSearchParams(
+        // @ts-ignore
+        Object.fromEntries(
+          Object.entries(newValue).filter(
+            ([key, value]) => value !== undefined,
+          ),
+        ),
+      );
+
+      // Set the search property of the current URL
+      window.history.pushState({}, '', `?${queryParams.toString()}`);
+    },
+  });
+
+  useEffect(() => {
+    // Parse the URL search parameters
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Get all values from the URL search parameters
+    const initialFilter = Array.from(urlParams).reduce(
+      (values, [key, value]) => {
+        // @ts-ignore
+        if (key === 'jelajah_id') {
+          // @ts-ignore
+          value = value.split(',').map((item) => parseInt(item, 10));
+        }
+        // @ts-ignore
+        values[key] = value;
+        return values;
+      },
+      {},
+    );
+    if (Object.keys(initialFilter).length > 0) {
+      const newValue = {
+        ...formik.values,
+        ...initialFilter,
+      };
+      formik.setValues(newValue);
+      params.handleChangeParams(newValue);
+    }
+  }, []);
   return {
+    formik,
     ...params,
     ...query,
     listData: query.data?.data || [],

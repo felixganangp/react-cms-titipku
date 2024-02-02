@@ -257,7 +257,6 @@ export default function MerchantsPages() {
                       )}
                     multiple
                     onChange={(e, value) => {
-                      console.log(value);
                       merchantQuery.formik.setFieldValue(
                         'jelajah_id',
                         value.map((val) => val.id),

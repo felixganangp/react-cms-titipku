@@ -20,7 +20,7 @@ export function UseAreaListService(setParams?: ListParams) {
   const params = UseParams(setParams);
 
   const query = useQuery({
-    queryKey: ['merchant-depo/type', params.params],
+    queryKey: ['merchant-depo/area', params.params],
     queryFn: () => getAllAreaMerchantDepo(params.params),
   });
   return { ...query, ...params, listData: query?.data?.data || [] };

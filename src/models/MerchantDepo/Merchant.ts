@@ -4,6 +4,7 @@ export interface MerchantParams extends ListParams {
   start_join_date?: string | number;
   depo_type_id?: number;
   jelajah_id?: number[];
+  area_id?: number;
 }
 
 export interface MerchantList {

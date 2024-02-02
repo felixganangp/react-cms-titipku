@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import MenuList from 'components/MenuList';
 import { HeadCells } from 'components/Table/types';
 import { Add, KeyboardArrowDown, MoreVert, Search } from '@mui/icons-material';
@@ -28,13 +29,22 @@ import { postMerchant } from 'service/MerchantDepo/Merchant';
 import Modal from 'components/Modal';
 import { useMerchantList } from '../../Hooks/useMerchant';
 import ModalFormMerchantDepo from './components/ModalForm';
+import {
+  UseFilterMerchentListService,
+  UseAreaListService,
+} from '../../Hooks/useConfigMerchant';
 
 export default function MerchantForm() {
-  const merchantQuery = useMerchantList();
-  const [selected, setSelected] = useState<(string | number)[]>([]);
   const navigate = useNavigate();
+  const [selected, setSelected] = useState<(string | number)[]>([]);
+
+  const merchantQuery = useMerchantList();
+  const areaQuery = UseAreaListService();
+  const filterMerchantQuery = UseFilterMerchentListService();
+
   const showFilter = useModal();
   const modalForm = useModal();
+
   const { mutate } = useMutation(postMerchant);
 
   const headCells: HeadCells<any>[] = [
@@ -113,7 +123,7 @@ export default function MerchantForm() {
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
-                // value={queryInnvoice.searchValue}
+                value={merchantQuery.searchValue}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -121,13 +131,13 @@ export default function MerchantForm() {
                     </InputAdornment>
                   ),
                 }}
-                // onChange={(event) => {
-                //   queryInnvoice.handleSearch(event.target.value);
-                //   queryInnvoice.handleToSetSearchParams(
-                //     'search',
-                //     event.target.value,
-                //   );
-                // }}
+                onChange={(event) => {
+                  merchantQuery.handleSearch(event.target.value);
+                  merchantQuery.handleToSetSearchParams(
+                    'search',
+                    event.target.value,
+                  );
+                }}
               />
             </Stack>
             <Stack direction="row" alignItems="center" gap={2}>
@@ -146,20 +156,46 @@ export default function MerchantForm() {
               spacing={2}
               component="form"
               mt={2}
-              // onSubmit={queryInnvoice.formikParams.handleSubmit}
+              onSubmit={merchantQuery.formik.handleSubmit}
             >
               <Grid item xs={12} md={5}>
                 <FormLabel text="Pasar">
                   <Autocomplete
-                    options={[]}
-                    // onBlur={() => {
-                    //   formik.setFieldTouched('area');
-                    // }}
+                    options={areaQuery.listData.map((val) => ({
+                      id: val.id,
+                      name: val.title,
+                    }))}
+                    noOptionsText={
+                      !areaQuery.searchValue
+                        ? 'Type to search area name'
+                        : 'No option'
+                    }
+                    inputValue={areaQuery.searchValue}
+                    onInputChange={(_, newInputValue) => {
+                      areaQuery.handleSearch(newInputValue);
+                    }}
+                    loading={areaQuery.isFetching}
+                    getOptionLabel={(item) => item.name}
+                    value={
+                      areaQuery.listData
+                        .map((val) => ({
+                          id: val.id,
+                          name: val.title,
+                        }))
+                        .find(
+                          (val) =>
+                            // @ts-ignore
+                            merchantQuery.formik.values.area_id === val.id,
+                        ) || null
+                    }
+                    onChange={(e, value) => {
+                      merchantQuery.formik.setFieldValue('area_id', value?.id);
+                    }}
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        name="Merchant"
-                        placeholder="Select Pasar"
+                        name="Area"
+                        placeholder="Select Area"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -171,10 +207,37 @@ export default function MerchantForm() {
               <Grid item xs={12} md={5}>
                 <FormLabel text="Merchant Name">
                   <Autocomplete
-                    options={[]}
-                    // onBlur={() => {
-                    //   formik.setFieldTouched('area');
-                    // }}
+                    options={filterMerchantQuery.listData.map((val) => ({
+                      id: val.id,
+                      name: val.merchant_name,
+                    }))}
+                    noOptionsText={
+                      !filterMerchantQuery.searchValue
+                        ? 'Type to search merchant name'
+                        : 'No option'
+                    }
+                    inputValue={filterMerchantQuery.searchValue}
+                    onInputChange={(_, newInputValue) => {
+                      filterMerchantQuery.handleSearch(newInputValue);
+                    }}
+                    loading={filterMerchantQuery.isFetching}
+                    getOptionLabel={(item) => item.name}
+                    value={filterMerchantQuery.listData
+                      .map((val) => ({
+                        id: val.id,
+                        name: val.merchant_name,
+                      }))
+                      .filter((val) =>
+                        // @ts-ignore
+                        merchantQuery.formik.values.jelajah_id.includes(val.id),
+                      )}
+                    multiple
+                    onChange={(e, value) => {
+                      merchantQuery.formik.setFieldValue(
+                        'jelajah_id',
+                        value.map((val) => val.id),
+                      );
+                    }}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -187,6 +250,27 @@ export default function MerchantForm() {
                     )}
                   />
                 </FormLabel>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  justifyContent="end"
+                >
+                  <Button
+                    variant="text"
+                    onClick={() => {
+                      merchantQuery.formik.resetForm();
+                      merchantQuery.handleResetFilter({
+                        whiteList: ['search'],
+                      });
+                    }}
+                  >
+                    Reset
+                  </Button>
+                  <Button type="submit">Apply</Button>
+                </Stack>
               </Grid>
             </Grid>
           </Collapse>
