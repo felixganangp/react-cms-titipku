@@ -5,6 +5,7 @@ import UseParams from 'hooks/useParams';
 import { MerchantParams } from 'models/MerchantDepo/Merchant';
 import {
   deleteMerchant,
+  detailsMerchant,
   getMerchantDepoList,
   getMerchantList,
 } from 'service/MerchantDepo/Merchant';
@@ -171,5 +172,13 @@ export const useDeleteMerchantDepo = () => {
         headMsg: typeof e === 'string' ? e : 'Delete Merchant Success',
       });
     },
+  });
+};
+
+export const useMerchantDetails = (id?: number | string) => {
+  return useQuery({
+    queryKey: ['merchant-depo/merchant', id],
+    queryFn: () => detailsMerchant(id),
+    enabled: !!id,
   });
 };

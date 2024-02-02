@@ -125,13 +125,13 @@ export default function MerchantsPages() {
             {
               label: 'Detail',
               onClick: () => {
-                navigate('/depo/merchants/id');
+                navigate(`/depo/merchants/${value.jelajah_id}`);
               },
             },
             {
               label: 'Edit',
               onClick: () => {
-                navigate('/depo/merchants/form/id');
+                navigate(`/depo/merchants/form/${value.jelajah_id}`);
               },
             },
             {

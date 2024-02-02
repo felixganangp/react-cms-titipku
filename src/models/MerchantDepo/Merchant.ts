@@ -18,3 +18,31 @@ export interface MerchantList {
   average_daily_transaction: number;
   is_new: boolean;
 }
+
+export interface MerchantDetails {
+  jelajah_id: number;
+  depo_discount: number;
+  should_paid: boolean;
+  created_at: number;
+  updated_at: null;
+  deleted_at: null;
+  limit: number;
+  provision_fee: number;
+  admin_fee: number;
+  join_date: number;
+  depo_type_id: number;
+  bank_name: string;
+  bank_branch_office: string;
+  bank_account_name: string;
+  bank_account_number: string;
+  nobu_account_name: string;
+  nobu_account_number: string;
+  qris_ready: boolean;
+  merchant_name: string;
+  phone_number: string;
+  balance: number;
+  total_transaction: number;
+  total_disburse: number;
+  rank: number;
+  score: number;
+}
