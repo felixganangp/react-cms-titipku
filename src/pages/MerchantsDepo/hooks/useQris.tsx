@@ -3,11 +3,16 @@ import useToast from 'hooks/useToast';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
 import { MerchantParams } from 'models/merchantDepo/Merchant';
-import { deleteQris, getAllQris } from 'service/MerchantDepo/Qris';
+import {
+  deleteQris,
+  getAllQris,
+  postQris,
+  updateQris,
+} from 'service/MerchantDepo/Qris';
 import { useFormik } from 'formik';
 import { useEffect } from 'react';
 import moment from 'moment';
-import { QrisParams } from 'models/merchantDepo/Qris';
+import { QrisParams, QrisForm } from 'models/merchantDepo/Qris';
 import * as Yup from 'yup';
 
 export const useQrisList = (setParams?: QrisParams) => {
@@ -133,6 +138,42 @@ export const useDeleteQris = () => {
       openToast({
         severity: 'error',
         headMsg: typeof e === 'string' ? e : 'Delete Transaction Success',
+      });
+    },
+  });
+};
+
+export const usePostQrisService = () => {
+  const { openToast } = useToast();
+  return useMutation(postQris, {
+    onSuccess: () => {
+      openToast({
+        severity: 'success',
+        headMsg: 'Create Transaction Success',
+      });
+    },
+    onError: (e) => {
+      openToast({
+        severity: 'error',
+        headMsg: typeof e === 'string' ? e : 'Failed Create Transaction',
+      });
+    },
+  });
+};
+
+export const useUpdateQrisService = () => {
+  const { openToast } = useToast();
+  return useMutation(updateQris, {
+    onSuccess: () => {
+      openToast({
+        severity: 'success',
+        headMsg: 'Update Transaction Success',
+      });
+    },
+    onError: (e) => {
+      openToast({
+        severity: 'error',
+        headMsg: typeof e === 'string' ? e : 'Update Transaction Success',
       });
     },
   });
