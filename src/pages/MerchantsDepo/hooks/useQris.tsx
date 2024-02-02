@@ -8,7 +8,7 @@ import {
   getAllQris,
   postQris,
   updateQris,
-} from 'service/MerchantDepo/Qris';
+} from 'service/merchantDepo/Qris';
 import { useFormik } from 'formik';
 import { useEffect } from 'react';
 import moment from 'moment';
