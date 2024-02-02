@@ -4,7 +4,7 @@ import {
   MerchantDetails,
   MerchantList,
   MerchantParams,
-} from 'models/MerchantDepo/Merchant';
+} from 'models/merchantDepo/Merchant';
 
 export const getMerchantDepoList = (params?: MerchantParams) =>
   new Promise<ListResponse<MerchantList>>(async (resolve, reject) => {

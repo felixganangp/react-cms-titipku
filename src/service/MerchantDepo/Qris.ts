@@ -1,6 +1,6 @@
 import http from 'utils/request';
 import { ListParams, ListResponse, Response } from 'models/fetch';
-import { QrisForm, QrisList, QrisParams } from 'models/MerchantDepo/Qris';
+import { QrisForm, QrisList, QrisParams } from 'models/merchantDepo/Qris';
 
 export const getAllQris = (params?: QrisParams) =>
   new Promise<ListResponse<QrisList>>(async (resolve, reject) => {
