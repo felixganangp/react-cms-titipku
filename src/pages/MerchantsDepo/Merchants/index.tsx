@@ -32,12 +32,12 @@ import {
   useDeleteMerchantDepo,
   useMerchantDepoList,
   useMerchantList,
-} from '../Hooks/useMerchant';
+} from '../hooks/useMerchant';
 import {
   UseAreaListService,
   UseFilterMerchentDepoListService,
   UseTypeListService,
-} from '../Hooks/useConfigMerchant';
+} from '../hooks/useConfigMerchant';
 
 export default function MerchantsPages() {
   const navigate = useNavigate();

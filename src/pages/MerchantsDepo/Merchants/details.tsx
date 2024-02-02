@@ -33,7 +33,7 @@ import Table from 'components/Table';
 import { HeadCells } from 'components/Table/types';
 import moment from 'moment';
 import numberSeperator from 'utils/numberSeperator';
-import { useMerchantDetails } from '../Hooks/useMerchant';
+import { useMerchantDetails } from '../hooks/useMerchant';
 
 export default function MercheantsDetails() {
   const { id } = useParams();

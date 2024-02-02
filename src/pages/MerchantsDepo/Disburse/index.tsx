@@ -31,8 +31,8 @@ import {
   UseDisburse,
   DisburseStatus,
   useDeleteDisburse,
-} from '../Hooks/useDisburse';
-import { useMerchantFilterList } from '../Hooks/useMerchant';
+} from '../hooks/useDisburse';
+import { useMerchantFilterList } from '../hooks/useMerchant';
 
 export default function DisbursePages() {
   const navigate = useNavigate();

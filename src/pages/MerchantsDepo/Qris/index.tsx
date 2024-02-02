@@ -28,8 +28,8 @@ import numberSeperator from 'utils/numberSeperator';
 import { useNavigate } from 'react-router-dom';
 import DeleteModal from 'components/Delete/freetext';
 import { QrisList } from 'models/MerchantDepo/Qris';
-import { useDeleteQris, useQrisList } from '../Hooks/useQris';
-import { UseFilterMerchentDepoListService } from '../Hooks/useConfigMerchant';
+import { useDeleteQris, useQrisList } from '../hooks/useQris';
+import { UseFilterMerchentDepoListService } from '../hooks/useConfigMerchant';
 import ModalFormQris from './Components/ModalFormQris';
 
 export default function MerchantsQrisPages() {
