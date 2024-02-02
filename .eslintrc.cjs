@@ -28,6 +28,8 @@ module.exports = {
   },
   plugins: ['react', '@typescript-eslint', 'prettier'],
   rules: {
+    '@typescript-eslint/ban-ts-ignore': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
     'prettier/prettier': ['error', prettierOptions],
     'no-async-promise-executor': 0,
     'react/function-component-definition': 0,

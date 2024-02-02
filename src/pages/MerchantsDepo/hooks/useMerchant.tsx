@@ -8,6 +8,7 @@ import {
   detailsMerchant,
   getMerchantDepoList,
   getMerchantList,
+  getMerchantFilterList,
 } from 'service/MerchantDepo/Merchant';
 import { useFormik } from 'formik';
 import { useEffect } from 'react';

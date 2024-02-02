@@ -41,18 +41,18 @@ import {
   Customer,
   CustomerParams,
   CreateCustomer,
-  UserCreditScore,
   ReviewCustomer,
+  VerifyCustomer,
 } from 'models/kur/Customer';
 import * as customerService from 'service/Kur/Customer';
 import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
-import { MerchantResp } from 'models/Merchant';
 import debounce from 'utils/debounce';
 import useToast from 'hooks/useToast';
 import FormCustomer from 'pages/Finance/Customer/Components/Form';
 import FormBiChecking from './components/form-bi-checking';
 import FormCustomerReview from './components/form-customer-review';
+import Verify from './components/verify';
 
 interface FormDataType {
   isEdit: boolean;
@@ -64,17 +64,11 @@ interface FormReview {
   status: number;
 }
 
-// interface CustomerType {
-//   id: number;
-//   name: string;
-// }
-
 export default function KurCustomerVerification() {
   const toast = useToast();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const customerKur = useAppSelector((state) => state.customerKur);
-  // const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
   const creditScore = useAppSelector((state) => state.creditScore);
   const [formReview, setFormReview] = useState<FormReview>({
@@ -93,7 +87,12 @@ export default function KurCustomerVerification() {
     },
   ];
 
-  // create user
+  const [userTab, setUserTab] = useState(0);
+
+  const formBiChecking = useModal();
+  const formCustomerReview = useModal();
+  const verifyModal = useModal();
+
   const createUserModal = useModal();
   const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
 
@@ -110,18 +109,13 @@ export default function KurCustomerVerification() {
     setAnchorEl(null);
   };
 
-  const handleVerify = async (id: number | undefined) => {
-    const data: ReviewCustomer = {
+  const handleSubmitVerify = async () => {
+    const payload: VerifyCustomer = {
       new_status: 6,
-      komite_notes: '',
-      id,
+      id: selectedSingle,
     };
-    const updateUser = await customerService.updateStatusCustomer(data);
-    toast.openToast({
-      headMsg: 'Customer Verified',
-      severity: 'success',
-    });
-    // customerService.updateStatusCustomer(id, formData);
+    dispatch(customerAction.verifyCustomer(payload));
+    verifyModal.closeModal();
   };
 
   useEffect(() => {
@@ -141,11 +135,6 @@ export default function KurCustomerVerification() {
     dispatch(areaAction.fetchData());
     dispatch(creditScoreAction.fetchData());
   }, []);
-
-  const [userTab, setUserTab] = useState(0);
-
-  const formBiChecking = useModal();
-  const formCustomerReview = useModal();
 
   const convertDate = (date: number) => {
     const d = new Date(0); // The 0 there is the key, which sets the date to the epoch
@@ -170,7 +159,7 @@ export default function KurCustomerVerification() {
         status: newValue === 4 ? 7 : newValue + 1,
       }),
     );
-    dispatch(customerAction.fetchData(customerKur.params));
+    dispatch(customerAction.fetchData({ area_id: '', ...customerKur.params }));
   };
   const headCell = [
     {
@@ -290,10 +279,19 @@ export default function KurCustomerVerification() {
                 hide: val.user_status_id !== 2,
               },
               {
+                label: `Bi Checking`,
+                onClick: () => {
+                  setSelectedCustomer([val]);
+                  formBiChecking.openModal();
+                },
+                dataId: 'button-review-customer',
+                hide: val.user_status_id !== 1,
+              },
+              {
                 label: `Verify`,
                 onClick: () => {
                   setSelectedSingle(val.id);
-                  handleVerify(val.id);
+                  verifyModal.openModal();
                 },
                 dataId: 'button-review-customer',
                 hide: val.user_status_id !== 4,
@@ -319,27 +317,6 @@ export default function KurCustomerVerification() {
   ];
 
   const handleChangePage = (value: number) => {
-    // let payload: {
-    //   status?: number;
-    //   userTypeId?: number || null;
-    //   areaId: Area[];
-    //   batchId: number || null;
-    // } = {
-    //   status: 1,
-    //   userTypeId: 1,
-    //   areaId: [],
-    //   batchId: 1,
-    // };
-
-    // if (customerKur.params.status) {
-    //   payload = {
-    //     ...payload,
-    //     status: customerKur.stateFilter?.status,
-    //   };
-    // }
-
-    // dispatch(customerAction.setFilter(payload));
-
     dispatch(
       customerAction.setParams({
         ...customerKur.params,
@@ -347,16 +324,6 @@ export default function KurCustomerVerification() {
       }),
     );
   };
-
-  // const handleChangeCreditScore = (value: UserCreditScore | null) => {
-  //   dispatch(
-  //     customerAction.setFilter({
-  //       typeKur: customerKur.stateFilter?.typeKur || null,
-  //       areaKur: customerKur.stateFilter?.areaKur,
-  //       creditScore: value,
-  //     }),
-  //   );
-  // };
 
   const handleChangeBatch = (value: number | null) => {
     dispatch(
@@ -423,15 +390,18 @@ export default function KurCustomerVerification() {
     }
     if (customerKur.stateFilter?.batch_id) {
       payloadParams.batch_id = customerKur.stateFilter?.batch_id;
+    } else {
+      payloadParams.batch_id = undefined;
     }
     if (
       customerKur.stateFilter?.area_id &&
       customerKur.stateFilter?.area_id.length > 0
     ) {
       const ids = customerKur.stateFilter?.area_id.map((el: Area) => el.id);
-      console.log('ids', ids);
       const areas = ids.toString();
       payloadParams.area_id = areas;
+    } else {
+      payloadParams.area_id = null;
     }
     dispatch(customerAction.setParams(payloadParams));
     dispatch(customerAction.fetchData(payloadParams));
@@ -442,11 +412,9 @@ export default function KurCustomerVerification() {
       ...customerKur.params,
       page: 1,
       count: 10,
-      // order_by: 'id',
-      // order_type: 'desc',
-      user_type_id: null,
-      batch_id: null,
-      area_id: null,
+      user_type_id: undefined,
+      batch_id: undefined,
+      area_id: undefined,
     };
     await dispatch(
       customerAction.setFilter({
@@ -468,6 +436,7 @@ export default function KurCustomerVerification() {
 
   const formHandleCloseBiChecking = async () => {
     await formBiChecking.closeModal();
+    setSelectedCustomer([]);
   };
 
   const formHandleCloseReview = async () => {
@@ -808,6 +777,16 @@ export default function KurCustomerVerification() {
             }
             createUserModal.closeModal();
           }}
+        />
+      </Modal>
+      <Modal
+        open={verifyModal.open}
+        onClose={verifyModal.closeModal}
+        title="Verify Customer"
+      >
+        <Verify
+          onSubmit={handleSubmitVerify}
+          onClose={verifyModal.closeModal}
         />
       </Modal>
     </Box>

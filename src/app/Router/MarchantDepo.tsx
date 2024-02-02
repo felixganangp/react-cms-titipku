@@ -7,6 +7,8 @@ const MercheantsDetails = lazy(
   () => import('pages/MerchantsDepo/Merchants/details'),
 );
 const QrisList = lazy(() => import('pages/MerchantsDepo/Qris'));
+const DisburseList = lazy(() => import('pages/MerchantsDepo/Disburse'));
+const DisburseForm = lazy(() => import('pages/MerchantsDepo/Disburse/Form'));
 
 export const MerchantsRouters: RouteProps[] = [
   {
@@ -41,6 +43,21 @@ export const MerchantsRouters: RouteProps[] = [
     name: 'Merchants Qris',
     comp: QrisList,
     path: '/depo/qris',
+    index: true,
+    auth: 'Private',
+  },
+  {
+    name: 'Disburse',
+    comp: DisburseList,
+    path: '/depo/disburse',
+    index: true,
+    auth: 'Private',
+  },
+
+  {
+    name: 'Disburse Form',
+    comp: DisburseForm,
+    path: '/depo/disburse/form',
     index: true,
     auth: 'Private',
   },

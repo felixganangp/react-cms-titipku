@@ -15,9 +15,10 @@ import TrashIcon from 'components/Icon/Trash';
 import * as yup from 'yup';
 import { useAppDispatch, useAppSelector } from 'store/hooks';
 import FormLabel from 'components/FormLabel';
-import SelectItem from 'components/SelectItem';
+// import SelectItem from 'components/SelectItem';
 import { customerAction } from 'store/slice/kur/Customer';
 import { BiChecking, BiCheckingCustomer, Customer } from 'models/kur/Customer';
+import SelectCustomer from '../../../../Finance/Components/SelectCustomer';
 
 // const initalValues: BiCheckingCustomer[] = [];
 
@@ -37,6 +38,7 @@ interface FormProps {
 export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
   const dispatch = useAppDispatch();
   const customer = useAppSelector((state) => state.customerKur);
+  const customerModal = useModal();
   const customerSelect = useAppSelector(
     (state) => state.customerKur.customerSelect,
   );
@@ -135,8 +137,10 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
           try {
             await dispatch(customerAction.bulkBiChecking(payload));
             await formikHelpers.resetForm();
+            values.customers = [];
             await onClose();
           } catch (error: any) {
+            values.customers = [];
             const errMsg = error;
             setErrorRsp({ error: true, message: errMsg });
           }
@@ -269,78 +273,33 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
                       ))}
 
                     <Button
-                      onClick={modalSelectCustomer.openModal}
+                      onClick={() => customerModal.toggleModal()}
                       type="button"
                       color="primary"
                     >
                       Add Merchant
                     </Button>
-                    {/* pop up select */}
-                    <SelectItem
-                      open={modalSelectCustomer.open}
-                      onClose={() => {
-                        modalSelectCustomer.closeModal();
-                        dispatch(
-                          customerAction.setParamsCustomerSelect({
-                            page: 1,
-                            search: '',
-                            status: 1,
-                          }),
+                    <SelectCustomer
+                      open={customerModal.open}
+                      onClose={customerModal.closeModal}
+                      status={1}
+                      setSelected={(e) => {
+                        const isValueExist = values.customers.find(
+                          (data) => data.id === e.id,
                         );
-                      }}
-                      onChangeSearch={(e) => {
-                        dispatch(
-                          customerAction.setParamsCustomerSelect({
-                            page: 1,
-                            search: e,
-                            status: 1,
-                          }),
-                        );
-                      }}
-                      onSubmit={(e) => {
-                        const obj = customerSelect.data.find(
-                          (o) => o.id === e[0],
-                        );
-                        push({
-                          debtor_name: obj?.debtor_name,
-                          customer_number: obj?.user_number,
-                          id: obj?.id,
-                          bi_checking_status_id: 1,
-                          bi_checking_status_notes: '',
-                          bi_checking_status: {
-                            id: 1,
-                            name: 'Conforming',
-                          },
-                        });
-                      }}
-                      loading={customerSelect.isLoading}
-                      title="Customer"
-                      // multiple
-                      value={[]}
-                      data={customerSelect.data}
-                      hidenData={[
-                        ...values.customers.map((val) => val.id || 0),
-                      ]}
-                      renderItem={(val) => (
-                        <Stack direction="column" gap={1}>
-                          <Typography>
-                            {val.user_number} - {val.debtor_name}
-                          </Typography>
-                          <Typography>{val.merchant_name}</Typography>
-                        </Stack>
-                      )}
-                      showMore={
-                        Math.ceil(
-                          customerSelect.totalCustomer /
-                            (customerSelect.params?.count || 0),
-                        ) > (customerSelect.params?.page || 0)
-                      }
-                      onShowmore={() => {
-                        dispatch(
-                          customerAction.setParamsCustomerSelect({
-                            page: 1 + (customerSelect.params?.page || 0),
-                          }),
-                        );
+                        if (!isValueExist) {
+                          push({
+                            debtor_name: e?.debtor_name,
+                            customer_number: e?.user_number,
+                            id: e?.id,
+                            bi_checking_status_id: 1,
+                            bi_checking_status_notes: '',
+                            bi_checking_status: {
+                              id: 1,
+                              name: 'Conforming',
+                            },
+                          });
+                        }
                       }}
                     />
                   </Stack>
@@ -361,7 +320,6 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
                 Submit
               </Button>
             </Box>
-            {/* <pre>{JSON.stringify(values.customers, null, 2)}</pre> */}
           </Form>
         )}
       </Formik>

@@ -451,6 +451,7 @@ export default function FormPayment({ onClose }: Props) {
       <SelectCustomer
         open={customerModal.open}
         onClose={customerModal.closeModal}
+        status={6}
         setSelected={(e) => {
           formik.setFieldValue('user', e);
         }}

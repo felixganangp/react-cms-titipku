@@ -128,13 +128,13 @@ export function useCreateCustomer({
         docDataKey.map(async (val) => {
           // @ts-ignore
           if (value[val] && typeof value[val] !== 'string') {
-            if (val === 'geotag_image') {
-              return await Promise.all(
-                value[val].map(async (val: any) => {
-                  await formData.append('geotag_image', val);
-                }),
-              );
-            }
+            // if (val === 'geotag_image') {
+            //   return await Promise.all(
+            //     value[val].map(async (val: any) => {
+            //       await formData.append('geotag_image', val);
+            //     }),
+            //   );
+            // }
             // @ts-ignore
             await formData.append(val, value[val]);
           }
@@ -155,6 +155,11 @@ export function useCreateCustomer({
               console.log(value);
             },
             onError: (value) => {
+              openToast({
+                headMsg: 'Failed update user',
+                message: '',
+                severity: 'error',
+              });
               console.log(value);
             },
           },
@@ -171,6 +176,11 @@ export function useCreateCustomer({
             console.log(value);
           },
           onError: (value) => {
+            openToast({
+              headMsg: 'Failed update user',
+              message: '',
+              severity: 'error',
+            });
             console.log(value);
           },
         });
@@ -349,9 +359,9 @@ export function useCreateCustomer({
         employee_expenses: detail.user_idir.EmployeeExpense,
         another_loan: detail.user_idir.AnotherLoan,
         cash_out_purpose: detail.user_idir.CashOutPurpose,
-        geotag_image: detail.user_geotag_images.map(
-          (val) => val.image_filepath,
-        ),
+        // geotag_image: detail.user_geotag_images.map(
+        //   (val) => val.image_filepath,
+        // ),
       };
       Object.keys(Document).map((val) => {
         const doc = detail.user_documents.find(

@@ -196,7 +196,13 @@ export interface BiCheckingStatus {
 
 export interface ReviewCustomer {
   new_status: number;
-  komite_notes: string;
+  komite_notes: string | null;
+  reject_notes: string | null;
+  id: number | undefined;
+}
+
+export interface VerifyCustomer {
+  new_status: number;
   id: number | undefined;
 }
 

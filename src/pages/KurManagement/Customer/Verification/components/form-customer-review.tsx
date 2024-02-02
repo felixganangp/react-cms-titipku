@@ -17,6 +17,7 @@ interface FormTypes {
 const initialValues: ReviewCustomer = {
   new_status: 3,
   komite_notes: '',
+  reject_notes: '',
   id: 0,
 };
 
@@ -28,7 +29,8 @@ export default function Form({ id, status, onClose }: FormTypes) {
     onSubmit: (values) => {
       const payload: ReviewCustomer = {
         new_status: status,
-        komite_notes: values.komite_notes,
+        komite_notes: status === 7 ? null : values.komite_notes,
+        reject_notes: status === 7 ? values.komite_notes : null,
         id,
       };
       dispatch(customerAction.updateStatusCustomer(payload));

@@ -25,9 +25,15 @@ type Props = {
   open: boolean;
   onClose: () => void;
   setSelected: (value: any) => void;
+  status: number | null;
 };
-export default function SelectCustomer({ open, onClose, setSelected }: Props) {
-  const queryCostomer = useCustomer({ status: 6 });
+export default function SelectCustomer({
+  open,
+  onClose,
+  setSelected,
+  status,
+}: Props) {
+  const queryCostomer = useCustomer({ status });
 
   useEffect(() => {
     if (!open) {
@@ -61,8 +67,16 @@ export default function SelectCustomer({ open, onClose, setSelected }: Props) {
             <Table
               headCells={[
                 {
+                  id: 'user_number',
+                  label: 'User Number',
+                },
+                {
                   id: 'merchant_name',
-                  label: 'Name',
+                  label: 'Merchant Name',
+                },
+                {
+                  id: 'debtor_name',
+                  label: 'Debtor Name',
                 },
                 {
                   id: 'phone_number',

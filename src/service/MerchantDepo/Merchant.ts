@@ -78,6 +78,23 @@ export const detailsMerchant = (id?: number | string) =>
     }
   });
 
+export const getMerchantFilterList = (params?: MerchantParams) =>
+  new Promise<ListResponse<MerchantList>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`merchant-depo/merchant-depo/filter`, {
+        params,
+      });
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
 export const postMerchant = (data?: any) =>
   new Promise<ListResponse<MerchantList>>(async (resolve, reject) => {
     try {

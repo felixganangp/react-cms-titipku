@@ -14,6 +14,7 @@ import {
   CheckMerchantExistParams,
   BiChecking,
   ReviewCustomer,
+  VerifyCustomer,
 } from 'models/kur/Customer';
 
 interface ImageUpdatePayload {
@@ -123,11 +124,18 @@ function* bulkBiChecking(payload: PayloadAction<BiChecking>) {
       }),
     );
     yield put(customerAction.bulkBiCheckingFailed());
-    console.log(`Failed to create bi checking: `, error);
   }
 }
 
 function* updateStatusCustomer(payload: PayloadAction<ReviewCustomer>) {
+  const successMessage =
+    payload.payload.new_status === 7
+      ? 'Customer Rejected'
+      : 'Reviewed by Committee';
+  const failMessage =
+    payload.payload.new_status === 7
+      ? 'Failed Reject Customer'
+      : 'Failed Review Customer';
   try {
     const params: CustomerParams = yield select(
       (state) => state.customerKur.params,
@@ -136,13 +144,48 @@ function* updateStatusCustomer(payload: PayloadAction<ReviewCustomer>) {
     yield put(customerAction.fetchData(params));
     yield put(
       uiAction.openToast({
-        headMsg: 'Customer Approved',
+        headMsg: `${successMessage}`,
         severity: 'success',
       }),
     );
-    // yield put(SupplierAction.updateSupplierSuccess({ error: false }));
   } catch (err) {
-    const headMessage = 'Failed Approve Customer';
+    const headMessage = `${failMessage}`;
+    if (typeof err === 'string') {
+      const error = err as string;
+      yield put(
+        uiAction.openToast({
+          headMsg: headMessage,
+          message: error,
+          severity: 'error',
+        }),
+      );
+    } else {
+      yield put(
+        uiAction.openToast({
+          headMsg: headMessage,
+          message: 'internal server error',
+          severity: 'error',
+        }),
+      );
+    }
+  }
+}
+
+function* verifyCustomer(payload: PayloadAction<VerifyCustomer>) {
+  try {
+    const params: CustomerParams = yield select(
+      (state) => state.customerKur.params,
+    );
+    yield call(CustomerService.verifyCustomer, payload.payload);
+    yield put(customerAction.fetchData(params));
+    yield put(
+      uiAction.openToast({
+        headMsg: 'Customer Verified',
+        severity: 'success',
+      }),
+    );
+  } catch (err) {
+    const headMessage = 'Failed Verify Customer';
     if (typeof err === 'string') {
       const error = err as string;
       yield put(
@@ -273,7 +316,6 @@ function* createCustomer(payload: PayloadAction<CreateCustomer>) {
       }),
     );
     yield put(customerAction.createCustomerFailed());
-    console.log(`Failed to create user: `, error);
   }
 }
 
@@ -426,18 +468,6 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
         document_filepath: `/${payloadImageSku[0]}`,
       };
     }
-
-    // const jsDate = payload.payload.birthDate?.date.valueOf();
-    // const convertBirthDate = jsDate && +jsDate / 1000;
-    // let jsDate;
-    // if (typeof payload.payload.birthDate !== 'string') {
-    //   // eslint-disable-next-line no-underscore-dangle
-    //   jsDate = payload.payload.birthDate?._d;
-    // } else {
-    //   jsDate = new Date(payload.payload.birthDate);
-    // }
-    // // eslint-disable-next-line no-unsafe-optional-chaining
-    // const convertBirthDate = jsDate && jsDate?.getTime() / 1000;
     const jsDate = payload.payload.birthDate;
     // eslint-disable-next-line no-unsafe-optional-chaining
     const convertBirthDate = jsDate && jsDate?.valueOf() / 1000;
@@ -499,7 +529,6 @@ function* editCustomer(payload: PayloadAction<CreateCustomer>) {
       }),
     );
     yield put(customerAction.createCustomerFailed());
-    console.log(`Failed to update user: `, error);
   }
 }
 
@@ -550,7 +579,6 @@ function* checkMerchantExist(params: PayloadAction<CheckMerchantExistParams>) {
     //   }),
     // );
     // yield put(roleUserAction.addOrEditRoleUserSuccess({ error: true }));
-    console.log(`Failed to create user: `, error);
   }
 }
 
@@ -569,4 +597,5 @@ export default function* customerKurSagas() {
     customerAction.updateStatusCustomer.type,
     updateStatusCustomer,
   );
+  yield takeLatest(customerAction.verifyCustomer.type, verifyCustomer);
 }
