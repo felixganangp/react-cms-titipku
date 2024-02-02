@@ -38,9 +38,8 @@ export default function DisburseForm() {
 
   const headCells: HeadCells<any>[] = [
     {
-      id: 'pasar',
+      id: 'area_name',
       label: 'Pasar',
-      format: (value) => `Pasar Random`,
     },
 
     {
@@ -87,6 +86,14 @@ export default function DisburseForm() {
       id: 'average_daily_transaction',
       label: 'Average Daily Transaction',
       enableSort: true,
+      format: (value) => {
+        if (!value.average_daily_transaction) return <Typography>-</Typography>;
+        return (
+          <Typography>
+            Rp {numberSeperator(value.average_daily_transaction)}
+          </Typography>
+        );
+      },
     },
   ];
 
@@ -141,7 +148,7 @@ export default function DisburseForm() {
               mt={2}
               // onSubmit={queryInnvoice.formikParams.handleSubmit}
             >
-              <Grid item xs={12} md={5}>
+              <Grid item xs={12} md={4}>
                 <FormLabel text="Pasar">
                   <Autocomplete
                     options={[]}
@@ -161,8 +168,28 @@ export default function DisburseForm() {
                   />
                 </FormLabel>
               </Grid>
-              <Grid item xs={12} md={5}>
+              <Grid item xs={12} md={4}>
                 <FormLabel text="Merchant Name">
+                  <Autocomplete
+                    options={[]}
+                    // onBlur={() => {
+                    //   formik.setFieldTouched('area');
+                    // }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="Merchant"
+                        placeholder="Select Merchant Name"
+                        // error={
+                        //   formik.touched.area && Boolean(formik.errors.area)
+                        // }
+                      />
+                    )}
+                  />
+                </FormLabel>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <FormLabel text="Condition">
                   <Autocomplete
                     options={[]}
                     // onBlur={() => {

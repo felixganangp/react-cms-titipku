@@ -133,7 +133,7 @@ export default function DisbursePages() {
               },
             },
             {
-              label: 'Update to Transfer',
+              label: 'Update to Transferred',
               color: 'error',
               hide: value.status !== 'On Process',
               onClick: () => {},
@@ -225,7 +225,7 @@ export default function DisbursePages() {
               onSubmit={queryDisburse.formikParams.handleSubmit}
             >
               <Grid item xs={12} md={4}>
-                <FormLabel text="Pasar">
+                <FormLabel text="Merchant Name">
                   <Autocomplete
                     options={
                       queryMerchantFilter.listData.map((val) => ({
@@ -270,7 +270,7 @@ export default function DisbursePages() {
                       <TextField
                         {...params}
                         name="area"
-                        placeholder="Select Merchant"
+                        placeholder="Select Merchant Name"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -279,7 +279,7 @@ export default function DisbursePages() {
                   />
                 </FormLabel>
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={2}>
                 <FormLabel text="Status">
                   <Autocomplete
                     id="filterStatus"
@@ -320,7 +320,7 @@ export default function DisbursePages() {
                 </FormLabel>
               </Grid>
               <Grid item xs={12} md={6}>
-                <FormLabel text="Disburse Date Range">
+                <FormLabel text="Date">
                   <Stack direction="row" spacing={1} alignItems="start">
                     <Stack spacing={1} width="100%">
                       <DesktopDatePicker
