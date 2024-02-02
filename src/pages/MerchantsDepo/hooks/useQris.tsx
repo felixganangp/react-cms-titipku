@@ -2,12 +2,12 @@
 import useToast from 'hooks/useToast';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
-import { MerchantParams } from 'models/MerchantDepo/Merchant';
+import { MerchantParams } from 'models/merchantDepo/Merchant';
 import { deleteQris, getAllQris } from 'service/MerchantDepo/Qris';
 import { useFormik } from 'formik';
 import { useEffect } from 'react';
 import moment from 'moment';
-import { QrisParams } from 'models/MerchantDepo/Qris';
+import { QrisParams } from 'models/merchantDepo/Qris';
 import * as Yup from 'yup';
 
 export const useQrisList = (setParams?: QrisParams) => {
