@@ -2,6 +2,8 @@ import { ListParams } from '../fetch';
 
 export interface MerchantParams extends ListParams {
   start_join_date?: string | number;
+  depo_type_id?: number;
+  jelajah_id?: number[];
 }
 
 export interface MerchantList {
@@ -13,4 +15,5 @@ export interface MerchantList {
   balance: number;
   total_gmv: number;
   average_daily_transaction: number;
+  is_new: boolean;
 }

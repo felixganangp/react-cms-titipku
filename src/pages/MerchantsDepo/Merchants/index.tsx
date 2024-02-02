@@ -27,21 +27,32 @@ import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { useNavigate } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
 import DeleteModal from 'components/Delete/freetext';
+import { MerchantList } from 'models/MerchantDepo/Merchant';
 import {
-  useDeleteMerchant,
+  useDeleteMerchantDepo,
   useMerchantDepoList,
   useMerchantList,
 } from '../Hooks/useMerchant';
+import {
+  UseAreaListService,
+  UseFilterMerchentDepoListService,
+  UseTypeListService,
+} from '../Hooks/useConfigMerchant';
 
 export default function MerchantsPages() {
-  const merchantQuery = useMerchantDepoList();
-  const deleteMerchant = useDeleteMerchant();
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
+
+  const merchantQuery = useMerchantDepoList();
+  const typeMerchantList = UseTypeListService();
+  const filterMerchantDepoList = UseFilterMerchentDepoListService();
+  const deleteMerchant = useDeleteMerchantDepo();
+
+  const openDateJoinFilter = useModal();
   const showFilter = useModal();
   const modalDelete = useModal();
 
-  const headCells: HeadCells<any>[] = [
+  const headCells: HeadCells<MerchantList>[] = [
     // {
     //   id: 'rank',
     //   label: 'Rank',
@@ -50,13 +61,13 @@ export default function MerchantsPages() {
     {
       id: 'Join Date',
       label: 'Join Date',
-      format: (value) => moment(value.join_date * 1000).format('DD MMM YYYY'),
+      format: (value) => moment(value.join_date * 100).format('DD MMM YYYY'),
     },
     {
       id: 'merchant_name',
       label: 'Merchant Name',
       format: (value) => {
-        const isNew = false && (
+        const isNew = value.is_new && (
           <Typography
             color="primary"
             component="span"
@@ -76,7 +87,7 @@ export default function MerchantsPages() {
     },
     {
       id: 'type',
-      label: 'Merchant Name',
+      label: 'Type',
     },
     {
       id: 'limit',
@@ -127,7 +138,7 @@ export default function MerchantsPages() {
               label: 'Delete',
               color: 'error',
               onClick: () => {
-                setSelected([value.id]);
+                setSelected([value.jelajah_id]);
                 modalDelete.openModal();
               },
             },
@@ -162,7 +173,7 @@ export default function MerchantsPages() {
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
-                // value={queryInnvoice.searchValue}
+                value={merchantQuery.searchValue}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -170,13 +181,13 @@ export default function MerchantsPages() {
                     </InputAdornment>
                   ),
                 }}
-                // onChange={(event) => {
-                //   queryInnvoice.handleSearch(event.target.value);
-                //   queryInnvoice.handleToSetSearchParams(
-                //     'search',
-                //     event.target.value,
-                //   );
-                // }}
+                onChange={(event) => {
+                  merchantQuery.handleSearch(event.target.value);
+                  merchantQuery.handleToSetSearchParams(
+                    'search',
+                    event.target.value,
+                  );
+                }}
               />
             </Stack>
             <Stack direction="row" alignItems="center" gap={2}>
@@ -215,15 +226,43 @@ export default function MerchantsPages() {
               spacing={2}
               component="form"
               mt={2}
-              // onSubmit={queryInnvoice.formikParams.handleSubmit}
+              onSubmit={merchantQuery.formik.handleSubmit}
             >
               <Grid item xs={12} md={5}>
                 <FormLabel text="Merchant Name">
                   <Autocomplete
-                    options={[]}
-                    // onBlur={() => {
-                    //   formik.setFieldTouched('area');
-                    // }}
+                    options={filterMerchantDepoList.listData.map((val) => ({
+                      id: val.id,
+                      name: val.merchant_name,
+                    }))}
+                    noOptionsText={
+                      !filterMerchantDepoList.searchValue
+                        ? 'Type to search merchant name'
+                        : 'No option'
+                    }
+                    inputValue={filterMerchantDepoList.searchValue}
+                    onInputChange={(_, newInputValue) => {
+                      filterMerchantDepoList.handleSearch(newInputValue);
+                    }}
+                    loading={filterMerchantDepoList.isFetching}
+                    getOptionLabel={(item) => item.name}
+                    value={filterMerchantDepoList.listData
+                      .map((val) => ({
+                        id: val.id,
+                        name: val.merchant_name,
+                      }))
+                      .filter((val) =>
+                        // @ts-ignore
+                        merchantQuery.formik.values.jelajah_id.includes(val.id),
+                      )}
+                    multiple
+                    onChange={(e, value) => {
+                      console.log(value);
+                      merchantQuery.formik.setFieldValue(
+                        'jelajah_id',
+                        value.map((val) => val.id),
+                      );
+                    }}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -240,15 +279,25 @@ export default function MerchantsPages() {
               <Grid item xs={12} md={3}>
                 <FormLabel text="Merchant Type">
                   <Autocomplete
-                    options={[]}
-                    // onBlur={() => {
-                    //   formik.setFieldTouched('area');
-                    // }}
+                    options={typeMerchantList.listData}
+                    getOptionLabel={(option) => option.description}
+                    value={
+                      typeMerchantList.listData.find(
+                        (val) =>
+                          val.id === merchantQuery.formik.values.depo_type_id,
+                      ) || null
+                    }
+                    onChange={(e, value) =>
+                      merchantQuery.formik.setFieldValue(
+                        'depo_type_id',
+                        value?.id,
+                      )
+                    }
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         name="Type"
-                        placeholder="Select Status"
+                        placeholder="Select Type"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -260,20 +309,19 @@ export default function MerchantsPages() {
               <Grid item xs={12} md={4}>
                 <FormLabel text="Join Date">
                   <DesktopDatePicker
-                    // value={
-                    //   queryInnvoice.formikParams.values.max_invoice_date || null
-                    // }
-                    value={null}
-                    onChange={() => {}}
+                    value={merchantQuery.formik.values.start_join_date || null}
+                    onChange={(value) => {
+                      merchantQuery.formik.setFieldValue(
+                        'start_join_date',
+                        value,
+                      );
+                      openDateJoinFilter.toggleModal();
+                    }}
                     inputFormat="DD/MM/YYYY"
-                    // onChange={(value) => {
-                    //   queryInnvoice.formikParams.setFieldValue(
-                    //     'max_invoice_date',
-                    //     value,
-                    //   );
-                    // }}
-                    // minDate={queryInnvoice.formikParams.values.min_invoice_date}
-                    // maxDate={formik.values.max_date_created}
+                    maxDate={moment()}
+                    open={openDateJoinFilter.open}
+                    onOpen={openDateJoinFilter.toggleModal}
+                    onClose={openDateJoinFilter.toggleModal}
                     renderInput={(params) => {
                       return (
                         <TextField
@@ -282,6 +330,7 @@ export default function MerchantsPages() {
                           placeholder="Select Grade"
                           variant="outlined"
                           fullWidth
+                          onClick={openDateJoinFilter.toggleModal}
                         />
                       );
                     }}
@@ -298,10 +347,10 @@ export default function MerchantsPages() {
                   <Button
                     variant="text"
                     onClick={() => {
-                      // queryInnvoice.formikParams.resetForm();
-                      // queryInnvoice.handleResetFilter({
-                      //   whiteList: ['search'],
-                      // });
+                      merchantQuery.formik.resetForm();
+                      merchantQuery.handleResetFilter({
+                        whiteList: ['search'],
+                      });
                     }}
                   >
                     Reset

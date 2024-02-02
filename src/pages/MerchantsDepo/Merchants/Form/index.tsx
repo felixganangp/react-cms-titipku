@@ -25,13 +25,16 @@ import { useNavigate } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
 import { useMutation } from '@tanstack/react-query';
 import { postMerchant } from 'service/MerchantDepo/Merchant';
+import Modal from 'components/Modal';
 import { useMerchantList } from '../../Hooks/useMerchant';
+import ModalFormMerchantDepo from './components/ModalForm';
 
 export default function MerchantForm() {
   const merchantQuery = useMerchantList();
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const navigate = useNavigate();
   const showFilter = useModal();
+  const modalForm = useModal();
   const { mutate } = useMutation(postMerchant);
 
   const headCells: HeadCells<any>[] = [
@@ -46,16 +49,11 @@ export default function MerchantForm() {
       format: (value) => moment(value.join_date * 1000).format('DD MMM YYYY'),
     },
     {
-      id: 'area_name',
-      label: 'Merchant Name',
-      width: '200px',
-    },
-    {
       id: 'merchant_name',
       label: 'Merchant Name',
       width: '200px',
       format: (value) => {
-        const isNew = false && (
+        const isNew = value.is_new && (
           <Typography
             color="primary"
             component="span"
@@ -198,7 +196,6 @@ export default function MerchantForm() {
             headCells={headCells}
             data={merchantQuery.listData.map((item) => ({
               ...item,
-              table_color: '#F9EBE7',
             }))}
             selected={selected}
             setSelected={(e) => {
@@ -228,8 +225,10 @@ export default function MerchantForm() {
             </Button>
             <Button
               sx={{ borderRadius: '4px' }}
+              disabled={selected.length === 0}
               // onClick={showFilter.toggleModal}
               onClick={() => {
+                modalForm.openModal();
                 // mutate(
                 //   {},
                 //   {
@@ -246,6 +245,13 @@ export default function MerchantForm() {
           </Stack>
         </Card>
       </Stack>
+      <Modal
+        open={modalForm.open}
+        title="Create Invoice"
+        onClose={modalForm.closeModal}
+      >
+        <ModalFormMerchantDepo />
+      </Modal>
     </Box>
   );
 }
