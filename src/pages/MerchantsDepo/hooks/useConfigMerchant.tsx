@@ -4,7 +4,7 @@ import {
   getAllFilterMerchant,
   getAllFilterMerchantDepo,
   getAllTypeMerchantDepo,
-} from 'service/merchantDepo/Config';
+} from 'service/MerchantDepo/Config';
 import { useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
 

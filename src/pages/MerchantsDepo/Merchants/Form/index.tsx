@@ -25,7 +25,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { useNavigate } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
 import { useMutation } from '@tanstack/react-query';
-import { postMerchant } from 'service/merchantDepo/Merchant';
+import { postMerchant } from 'service/MerchantDepo/Merchant';
 import Modal from 'components/Modal';
 import { useMerchantList } from '../../hooks/useMerchant';
 import ModalFormMerchantDepo from './components/ModalForm';

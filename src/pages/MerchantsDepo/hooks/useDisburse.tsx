@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import useToast from 'hooks/useToast';
 import { DisburseParams } from 'models/merchantDepo/disburse';
-import { getAllDisburse, deleteDisburse } from 'service/merchantDepo/Disburse';
+import { getAllDisburse, deleteDisburse } from 'service/MerchantDepo/Disburse';
 import { useFormik } from 'formik';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';

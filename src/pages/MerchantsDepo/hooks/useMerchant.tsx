@@ -9,7 +9,7 @@ import {
   getMerchantDepoList,
   getMerchantList,
   getMerchantFilterList,
-} from 'service/merchantDepo/Merchant';
+} from 'service/MerchantDepo/Merchant';
 import { useFormik } from 'formik';
 import { useEffect } from 'react';
 import moment from 'moment';
