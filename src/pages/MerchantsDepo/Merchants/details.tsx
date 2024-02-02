@@ -42,6 +42,9 @@ export default function MercheantsDetails() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
 
+  const isDepo = details?.depo_type_id === 1 || details?.depo_type_id === 3;
+  const isAndalan = details?.depo_type_id === 2 || details?.depo_type_id === 3;
+
   const headCells: HeadCells<any>[] = [
     {
       id: 'Date',
@@ -105,18 +108,18 @@ export default function MercheantsDetails() {
               </Typography>
               <Box
                 component="img"
-                src={MerchantAndalan}
+                src={MerchantDepo}
                 display={
-                  details?.depo_type_id === 1 || details?.depo_type_id === 2
+                  details?.depo_type_id === 1 || details?.depo_type_id === 3
                     ? 'block'
                     : 'none'
                 }
               />
               <Box
                 component="img"
-                src={MerchantDepo}
+                src={MerchantAndalan}
                 display={
-                  details?.depo_type_id === 1 || details?.depo_type_id === 3
+                  details?.depo_type_id === 2 || details?.depo_type_id === 3
                     ? 'block'
                     : 'none'
                 }
@@ -197,20 +200,37 @@ export default function MercheantsDetails() {
                   content={details?.jelajah_id}
                 />
               </Grid>
-              <Grid item xs={6} md={2.4}>
-                <DescriptionDetail
-                  title="Limit"
-                  icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
-                  content={`Rp ${numberSeperator(details?.limit || 0)}`}
-                />
+              <Grid
+                item
+                xs={6}
+                md={2.4}
+                sx={{ opacity: isDepo ? '100%' : '0%' }}
+              >
+                {isDepo && (
+                  <DescriptionDetail
+                    title="Limit"
+                    icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
+                    content={`Rp ${numberSeperator(details?.limit || 0)}`}
+                  />
+                )}
               </Grid>
-              <Grid item xs={6} md={2.4}>
+              <Grid
+                item
+                xs={6}
+                md={2.4}
+                sx={{ opacity: isDepo ? '100%' : '0%' }}
+              >
                 <DescriptionDetail
                   title="Primary Account Name "
                   content={details?.bank_account_name}
                 />
               </Grid>
-              <Grid item xs={6} md={2.4}>
+              <Grid
+                item
+                xs={6}
+                md={2.4}
+                sx={{ opacity: isDepo ? '100%' : '0%' }}
+              >
                 <DescriptionDetail
                   title="NOBU Account Name "
                   content={details?.nobu_account_name}
@@ -250,11 +270,18 @@ export default function MercheantsDetails() {
                   content={details?.nobu_account_number}
                 />
               </Grid>
-              <Grid item xs={6} md={2.4}>
+              <Grid
+                item
+                xs={6}
+                md={2.4}
+                sx={{
+                  opacity: (details?.join_date || 0) !== 0 ? '100%' : '0%',
+                }}
+              >
                 <DescriptionDetail
                   title="Join Date Andalan & Depo"
                   icon={<CalendarToday sx={{ color: '#008e58' }} />}
-                  content={moment((details?.join_date || 0) * 1000).format(
+                  content={moment((details?.join_date || 0) * 100).format(
                     'DD MMM YYYY',
                   )}
                 />
@@ -262,19 +289,34 @@ export default function MercheantsDetails() {
               <Grid item xs={6} md={2.4}>
                 <div />
               </Grid>
-              <Grid item xs={6} md={2.4}>
+              <Grid
+                item
+                xs={6}
+                md={2.4}
+                sx={{ opacity: isAndalan ? '100%' : '0%' }}
+              >
                 <DescriptionDetail
                   title="Discount"
                   content={`${details?.depo_discount}%`}
                 />
               </Grid>
-              <Grid item xs={6} md={2.4}>
+              <Grid
+                item
+                xs={6}
+                md={2.4}
+                sx={{ opacity: isDepo ? '100%' : '0%' }}
+              >
                 <DescriptionDetail
                   title="Branch Office"
                   content={details?.bank_branch_office}
                 />
               </Grid>
-              <Grid item xs={6} md={2.4}>
+              <Grid
+                item
+                xs={6}
+                md={2.4}
+                sx={{ opacity: isDepo ? '100%' : '0%' }}
+              >
                 <DescriptionDetail
                   title="QRIS Merchant ID"
                   content={details?.qris_ready}

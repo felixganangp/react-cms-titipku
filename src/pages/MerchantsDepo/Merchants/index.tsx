@@ -88,6 +88,7 @@ export default function MerchantsPages() {
     {
       id: 'type',
       label: 'Type',
+      format: (value) => value.type.replace('Andalan', 'Andalan Titipku'),
     },
     {
       id: 'limit',
@@ -279,7 +280,9 @@ export default function MerchantsPages() {
                 <FormLabel text="Merchant Type">
                   <Autocomplete
                     options={typeMerchantList.listData}
-                    getOptionLabel={(option) => option.description}
+                    getOptionLabel={(option) =>
+                      option.description.replace('Andalan', 'Andalan Titipku')
+                    }
                     value={
                       typeMerchantList.listData.find(
                         (val) =>

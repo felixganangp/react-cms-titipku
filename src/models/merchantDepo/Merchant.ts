@@ -45,4 +45,9 @@ export interface MerchantDetails {
   total_disburse: number;
   rank: number;
   score: number;
+  area_name: string;
+  qris_merchant_id: number;
+  last_month_gmv: number;
+  last_month_trx: number;
+  is_active: boolean;
 }
