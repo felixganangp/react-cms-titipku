@@ -329,13 +329,13 @@ export default function MerchantForm() {
           </Stack>
         </Card>
       </Stack>
-      <Modal
+      {/* <Modal
         open={modalForm.open}
         title="Create Invoice"
         onClose={modalForm.closeModal}
       >
         <ModalFormMerchantDepo />
-      </Modal>
+      </Modal> */}
     </Box>
   );
 }
