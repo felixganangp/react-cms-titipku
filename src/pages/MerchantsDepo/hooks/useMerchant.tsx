@@ -9,6 +9,8 @@ import {
   getMerchantDepoList,
   getMerchantList,
   getMerchantFilterList,
+  postMerchant,
+  updateMerchant,
 } from 'service/MerchantDepo/Merchant';
 import { useFormik } from 'formik';
 import { useEffect } from 'react';
@@ -170,7 +172,7 @@ export const useDeleteMerchantDepo = () => {
     onError: (e) => {
       openToast({
         severity: 'error',
-        headMsg: typeof e === 'string' ? e : 'Delete Merchant Success',
+        headMsg: typeof e === 'string' ? e : 'Delete Merchant Failed',
       });
     },
   });
@@ -181,5 +183,41 @@ export const useMerchantDetails = (id?: number | string) => {
     queryKey: ['merchant-depo/merchant', id],
     queryFn: () => detailsMerchant(id),
     enabled: !!id,
+  });
+};
+
+export const useCreateMerchantDepo = () => {
+  const { openToast } = useToast();
+  return useMutation(postMerchant, {
+    onSuccess: () => {
+      openToast({
+        severity: 'success',
+        headMsg: 'Create Merchant Success',
+      });
+    },
+    onError: (e) => {
+      openToast({
+        severity: 'error',
+        headMsg: typeof e === 'string' ? e : 'Create Merchant Failed',
+      });
+    },
+  });
+};
+
+export const useUpdateMerchantDepo = () => {
+  const { openToast } = useToast();
+  return useMutation(updateMerchant, {
+    onSuccess: () => {
+      openToast({
+        severity: 'success',
+        headMsg: 'Create Merchant Success',
+      });
+    },
+    onError: (e) => {
+      openToast({
+        severity: 'error',
+        headMsg: typeof e === 'string' ? e : 'Create Merchant Failed',
+      });
+    },
   });
 };

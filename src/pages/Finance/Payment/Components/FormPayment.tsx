@@ -391,7 +391,7 @@ export default function FormPayment({ onClose }: Props) {
                 {...params}
                 name="bankName"
                 onBlur={formik.handleBlur}
-                placeholder="Select your bank account"
+                placeholder="Seleck bank account"
               />
             )}
           />

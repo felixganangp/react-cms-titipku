@@ -272,9 +272,8 @@ describe('Form Customer Component Add', async () => {
     });
 
     // LIST BANK KUR
-    const inputElementKurListBank = screen.getByPlaceholderText(
-      /Select your bank account/i,
-    );
+    const inputElementKurListBank =
+      screen.getByPlaceholderText(/Seleck bank account/i);
     await act(async () => {
       await fireEvent.blur(inputElementKurListBank);
     });
@@ -984,7 +983,7 @@ describe('Form Customer Component Add', async () => {
   //   // const inputElementCreditLimit =
   //   //   screen.getByPlaceholderText(/Input credit limit/i);
   //   // const inputElementBankAccount = screen.getByPlaceholderText(
-  //   //   /Select your bank account/i,
+  //   //   /Seleck bank account/i,
   //   // );
   //   // const inputElementBankAccountNumber = screen.getByPlaceholderText(
   //   //   'Bank account number',

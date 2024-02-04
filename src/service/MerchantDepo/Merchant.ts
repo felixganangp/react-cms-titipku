@@ -37,7 +37,16 @@ export const getMerchantDepoList = (params?: MerchantParams) =>
   });
 
 export const getMerchantList = (params?: MerchantParams) =>
-  new Promise<ListResponse<MerchantList>>(async (resolve, reject) => {
+  new Promise<
+    ListResponse<{
+      area_name: string;
+      id: number;
+      join_date: number;
+      last_month_gmv: number;
+      last_month_total_trx: number;
+      merchant_name: string;
+    }>
+  >(async (resolve, reject) => {
     const paramsRest = { ...params };
     let costumeParams = '?';
     if (paramsRest.jelajah_id) {
@@ -110,10 +119,10 @@ export const postMerchant = (data?: any) =>
     }
   });
 
-export const updateMerchant = (data?: any) =>
+export const updateMerchant = ({ data, id }: any) =>
   new Promise<ListResponse<MerchantList>>(async (resolve, reject) => {
     try {
-      const respon = await http.put(`merchant-depo/merchant-depo`, data);
+      const respon = await http.put(`merchant-depo/merchant-depo/${id}`, data);
       if (respon.data) {
         resolve(respon.data);
       }

@@ -104,7 +104,8 @@ export default function MercheantsDetails() {
           <Box p="10px">
             <Stack direction="row" alignItems="center" gap="10px">
               <Typography variant="h3" fontWeight="bold">
-                {details?.merchant_name}
+                {details?.merchant_name}{' '}
+                {details?.merchant_name ? `(${details?.area_name})` : ''}
               </Typography>
               <Box
                 component="img"
@@ -190,7 +191,7 @@ export default function MercheantsDetails() {
                 <DescriptionDetail
                   title="Merchant Status"
                   icon={<FiberManualRecordIcon sx={{ color: '#008e58' }} />}
-                  content={details?.should_paid ? 'Active' : 'Inactive'}
+                  content={details?.is_active ? 'Active' : 'Inactive'}
                 />
               </Grid>
               <Grid item xs={6} md={2.4}>
@@ -200,17 +201,18 @@ export default function MercheantsDetails() {
                   content={details?.jelajah_id}
                 />
               </Grid>
-              <Grid
-                item
-                xs={6}
-                md={2.4}
-                sx={{ opacity: isDepo ? '100%' : '0%' }}
-              >
+              <Grid item xs={6} md={2.4}>
                 {isDepo && (
                   <DescriptionDetail
                     title="Limit"
                     icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
                     content={`Rp ${numberSeperator(details?.limit || 0)}`}
+                  />
+                )}
+                {isAndalan && !isDepo && (
+                  <DescriptionDetail
+                    title="Discount"
+                    content={`${details?.depo_discount}%`}
                   />
                 )}
               </Grid>
@@ -258,13 +260,23 @@ export default function MercheantsDetails() {
                   content={`${details?.admin_fee}%`}
                 />
               </Grid>
-              <Grid item xs={6} md={2.4}>
+              <Grid
+                item
+                xs={6}
+                md={2.4}
+                sx={{ opacity: isDepo ? '100%' : '0%' }}
+              >
                 <DescriptionDetail
-                  title="Primary Account Number "
+                  title="Primary Account Number"
                   content={details?.bank_account_number}
                 />
               </Grid>
-              <Grid item xs={6} md={2.4}>
+              <Grid
+                item
+                xs={6}
+                md={2.4}
+                sx={{ opacity: isDepo ? '100%' : '0%' }}
+              >
                 <DescriptionDetail
                   title="NOBU Account Number "
                   content={details?.nobu_account_number}
@@ -289,16 +301,14 @@ export default function MercheantsDetails() {
               <Grid item xs={6} md={2.4}>
                 <div />
               </Grid>
-              <Grid
-                item
-                xs={6}
-                md={2.4}
-                sx={{ opacity: isAndalan ? '100%' : '0%' }}
-              >
-                <DescriptionDetail
-                  title="Discount"
-                  content={`${details?.depo_discount}%`}
-                />
+              <Grid item xs={6} md={2.4}>
+                {!isAndalan ||
+                  (details?.depo_type_id === 3 && (
+                    <DescriptionDetail
+                      title="Discount"
+                      content={`${details?.depo_discount}%`}
+                    />
+                  ))}
               </Grid>
               <Grid
                 item
@@ -315,11 +325,11 @@ export default function MercheantsDetails() {
                 item
                 xs={6}
                 md={2.4}
-                sx={{ opacity: isDepo ? '100%' : '0%' }}
+                sx={{ opacity: isDepo && details.qris_ready ? '100%' : '0%' }}
               >
                 <DescriptionDetail
                   title="QRIS Merchant ID"
-                  content={details?.qris_ready}
+                  content={details?.qris_merchant_id}
                 />
               </Grid>
             </Grid>
