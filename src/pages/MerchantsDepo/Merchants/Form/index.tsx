@@ -106,7 +106,7 @@ export default function MerchantForm() {
       },
     },
     {
-      id: 'last_month_total_tx',
+      id: 'last_month_total_trx',
       enableSort: true,
       label: 'Last Month Total Transaction',
       format: (value) => {
@@ -132,7 +132,7 @@ export default function MerchantForm() {
           >
             <Stack direction="row" alignItems="center" gap={2} flex={1}>
               <TextField
-                placeholder="Search for Invoice Number"
+                placeholder="Search Merchant"
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
@@ -208,7 +208,7 @@ export default function MerchantForm() {
                       <TextField
                         {...params}
                         name="Area"
-                        placeholder="Select Area"
+                        placeholder="Select Pasar"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -255,7 +255,7 @@ export default function MerchantForm() {
                       <TextField
                         {...params}
                         name="Merchant"
-                        placeholder="Select Merchant Name"
+                        placeholder="Name of Merchant"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -299,11 +299,28 @@ export default function MerchantForm() {
               setSelected(e);
             }}
             enableRadio
-            orderBy="total_gmv"
+            orderBy={merchantQuery.params.sort_by}
+            orderType={merchantQuery.params.sort_type}
             loading={merchantQuery.isLoading}
             page={merchantQuery.data?.page || 0}
             count={merchantQuery.data?.count || 0}
             totalData={merchantQuery.data?.total || 0}
+            onChangeSort={(value) => {
+              merchantQuery.handleChangeParams({
+                ...merchantQuery.params,
+                sort_by: value.orderBy,
+                sort_type: value.orderType,
+              });
+              merchantQuery.handleToSetSearchParams(
+                'sort_by',
+                // @ts-ignore
+                value.orderBy || '',
+              );
+              merchantQuery.handleToSetSearchParams(
+                'sort_type',
+                value.orderType,
+              );
+            }}
             onChangePage={(value) => {
               merchantQuery.handleChangeParams({
                 ...merchantQuery.params,

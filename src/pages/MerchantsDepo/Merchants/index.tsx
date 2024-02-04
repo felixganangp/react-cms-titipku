@@ -54,11 +54,11 @@ export default function MerchantsPages() {
   const modalDelete = useModal();
 
   const headCells: HeadCells<MerchantList>[] = [
-    // {
-    //   id: 'rank',
-    //   label: 'Rank',
-    //   format: (value) => `#${value.rank}`,
-    // },
+    {
+      id: 'rank',
+      label: 'Rank',
+      format: (value) => (value?.rank ? `#${value?.rank || '-'}` : '-'),
+    },
     {
       id: 'Join Date',
       label: 'Join Date',
@@ -158,7 +158,7 @@ export default function MerchantsPages() {
     if (!modalDelete.open) {
       setSelected([]);
     }
-  }, [modalDelete]);
+  }, [modalDelete.open]);
 
   return (
     <Box p="20px" bgcolor="#F5F7FA">

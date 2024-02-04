@@ -11,10 +11,12 @@ import {
   getMerchantFilterList,
   postMerchant,
   updateMerchant,
+  getMerchantDepoLimitHistoryList,
 } from 'service/MerchantDepo/Merchant';
 import { useFormik } from 'formik';
 import { useEffect } from 'react';
 import moment from 'moment';
+import { ListParams } from 'models/fetch';
 
 export const useMerchantDepoList = (setParams?: MerchantParams) => {
   const params = UseParams<MerchantParams>(setParams);
@@ -81,6 +83,10 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
         // @ts-ignore
         start_join_date: newValue.start_join_date
           ? moment(newValue.start_join_date * 1000)
+          : undefined,
+        // @ts-ignore
+        end_join_date: newValue.end_join_date
+          ? moment(newValue.end_join_date * 1000)
           : undefined,
       });
       params.handleChangeParams(newValue);
@@ -224,3 +230,14 @@ export const useUpdateMerchantDepo = () => {
     },
   });
 };
+
+export function useGetLimitHistory(id?: string, setParams?: ListParams) {
+  const params = UseParams(setParams);
+
+  const query = useQuery({
+    queryKey: ['merchant-depo/merchant-depo/filter', params.params],
+    queryFn: () => getMerchantDepoLimitHistoryList(id, params.params),
+    enabled: !!id,
+  });
+  return { ...query, ...params, listData: query?.data?.data || [] };
+}

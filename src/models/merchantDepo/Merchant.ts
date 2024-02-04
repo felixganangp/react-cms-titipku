@@ -8,6 +8,7 @@ export interface MerchantParams extends ListParams {
 }
 
 export interface MerchantList {
+  rank: number;
   jelajah_id: number;
   join_date: number;
   merchant_name: string;

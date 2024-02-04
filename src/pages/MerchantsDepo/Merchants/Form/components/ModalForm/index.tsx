@@ -23,6 +23,9 @@ import {
   useUpdateMerchantDepo,
 } from 'pages/MerchantsDepo/hooks/useMerchant';
 import { useNavigate } from 'react-router-dom';
+import useModal from 'hooks/useModal';
+import Modal from 'components/Modal';
+import HistoryLimit from '../HistoryLimit';
 
 type ModalFormMerchantDepoProps = {
   handleClose: (isSubmited?: boolean) => void;
@@ -46,6 +49,8 @@ export default function ModalFormMerchantDepo({
   const createMerchant = useCreateMerchantDepo();
   const updateMerchant = useUpdateMerchantDepo();
   const merchantDetails = useMerchantDetails(id);
+
+  const showHistory = useModal();
 
   const formik = useFormik({
     initialValues: {
@@ -193,6 +198,14 @@ export default function ModalFormMerchantDepo({
     formik.values?.merchant_depo_type_id === 2 ||
     formik.values?.merchant_depo_type_id === 3;
 
+  const merchantName = `${
+    initCreateData?.merchant_name || merchantDetails.data?.data.merchant_name
+  } ${
+    initCreateData?.area_name || merchantDetails.data?.data.area_name
+      ? `(${initCreateData?.area_name || merchantDetails.data?.data.area_name})`
+      : ''
+  }`;
+
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Box p="24px">
@@ -204,17 +217,7 @@ export default function ModalFormMerchantDepo({
             fullWidth
             autoComplete="off"
             disabled
-            value={`${
-              initCreateData?.merchant_name ||
-              merchantDetails.data?.data.area_name
-            } ${
-              initCreateData?.area_name || merchantDetails.data?.data.area_name
-                ? `(${
-                    initCreateData?.area_name ||
-                    merchantDetails.data?.data.area_name
-                  })`
-                : ''
-            }`}
+            value={merchantName}
           />
         </FormControl>
         <FormControl text="Last Month GMV" required>
@@ -299,7 +302,10 @@ export default function ModalFormMerchantDepo({
                   <InputAdornment position="start">Rp</InputAdornment>
                 ),
                 endAdornment: isUpdate && (
-                  <InputAdornment position="end">
+                  <InputAdornment
+                    position="end"
+                    onClick={showHistory.toggleModal}
+                  >
                     <Button variant="text">History</Button>
                   </InputAdornment>
                 ),
@@ -615,6 +621,13 @@ export default function ModalFormMerchantDepo({
           Submit
         </Button>
       </Box>
+      <Modal
+        title="Limit History"
+        open={showHistory.open}
+        onClose={showHistory.closeModal}
+      >
+        <HistoryLimit merchantName={merchantName} id={id} />
+      </Modal>
     </Box>
   );
 }

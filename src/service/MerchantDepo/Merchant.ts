@@ -1,5 +1,5 @@
 import http from 'utils/request';
-import { ListResponse, Response } from 'models/fetch';
+import { ListParams, ListResponse, Response } from 'models/fetch';
 import {
   MerchantDetails,
   MerchantList,
@@ -18,6 +18,7 @@ export const getMerchantDepoList = (params?: MerchantParams) =>
       });
       delete paramsRest.jelajah_id;
     }
+    if (costumeParams.length <= 1) costumeParams = '';
     try {
       const respon = await http.get(
         `merchant-depo/merchant-depo${costumeParams}`,
@@ -57,6 +58,7 @@ export const getMerchantList = (params?: MerchantParams) =>
       });
       delete paramsRest.jelajah_id;
     }
+    if (costumeParams.length <= 1) costumeParams = '';
     try {
       const respon = await http.get(`merchant-depo/merchant${costumeParams}`, {
         params: paramsRest,
@@ -138,6 +140,29 @@ export const deleteMerchant = (data?: { ids: (number | string)[] }) =>
   new Promise<ListResponse<MerchantList>>(async (resolve, reject) => {
     try {
       const respon = await http.delete(`merchant-depo/merchant-depo`, { data });
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const getMerchantDepoLimitHistoryList = (
+  id?: string,
+  params?: ListParams,
+) =>
+  new Promise<ListResponse<MerchantList>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(
+        `merchant-depo/merchant-depo/limit-history/${id}`,
+        {
+          params,
+        },
+      );
       if (respon.data) {
         resolve(respon.data);
       }

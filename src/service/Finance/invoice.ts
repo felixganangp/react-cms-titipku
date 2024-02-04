@@ -20,6 +20,8 @@ export const getInvoiceAll = (params?: InvoiceParams) =>
       });
       delete paramsRest.restructure_type_id;
     }
+    if (costumeParams.length <= 1) costumeParams = '';
+
     try {
       const respon = await http.get(`financing/invoice${costumeParams}`, {
         params: paramsRest,

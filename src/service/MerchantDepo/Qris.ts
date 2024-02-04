@@ -14,6 +14,7 @@ export const getAllQris = (params?: QrisParams) =>
       });
       delete paramsRest.jelajah_id;
     }
+    if (costumeParams.length <= 1) costumeParams = '';
     try {
       const respon = await http.get(`merchant-depo/qris${costumeParams}`, {
         params: paramsRest,
