@@ -31,6 +31,8 @@ export interface ListParams {
   search?: string | undefined | null;
   order_by?: string | number | null;
   order_type?: 'asc' | 'desc';
+  sort_by?: string | number | null;
+  sort_type?: 'asc' | 'desc';
 }
 
 export interface ErrorRespons {

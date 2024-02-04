@@ -25,6 +25,7 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
   const formik = useFormik({
     initialValues: {
       start_join_date: undefined,
+      end_join_date: undefined,
       depo_type_id: undefined,
       jelajah_id: [],
     },
@@ -35,6 +36,8 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
         search: params.params.search,
         // @ts-ignore
         start_join_date: values.start_join_date?.unix() || undefined,
+        // @ts-ignore
+        end_join_date: values.start_join_date?.unix() || undefined,
       };
       params.handleChangeParams(newValue);
       const queryParams = new URLSearchParams(
