@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import Table from 'components/Table';
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useModal from 'hooks/useModal';
 import FormLabel from 'components/FormLabel';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
@@ -46,6 +46,8 @@ export default function MerchantsQrisPages() {
   const showFilter = useModal();
   const modalDelete = useModal();
   const modalForm = useModal();
+  const startDateOpen = useModal();
+  const endDateOpen = useModal();
 
   const headCells: HeadCells<QrisList>[] = [
     {
@@ -80,6 +82,7 @@ export default function MerchantsQrisPages() {
               label: 'Delete',
               onClick: () => {
                 setSelected([value.id]);
+                modalDelete.openModal();
               },
             },
           ]}
@@ -91,6 +94,13 @@ export default function MerchantsQrisPages() {
       ),
     },
   ];
+
+  useEffect(() => {
+    if (!modalDelete.open) {
+      setSelected([]);
+    }
+  }, [modalDelete.open]);
+
   return (
     <Box p="20px" bgcolor="#F5F7FA">
       <Stack spacing={2}>
@@ -224,9 +234,12 @@ export default function MerchantsQrisPages() {
                         inputFormat="DD/MM/YYYY"
                         onChange={(value) => {
                           qrisQuery.formik.setFieldValue('start_date', value);
+                          startDateOpen.toggleModal();
                         }}
+                        open={startDateOpen.open}
+                        onOpen={startDateOpen.toggleModal}
+                        onClose={startDateOpen.toggleModal}
                         maxDate={qrisQuery.formik.values.end_date}
-                        // maxDate={formik.values.max_date_created}
                         renderInput={(params) => {
                           return (
                             <TextField
@@ -235,6 +248,7 @@ export default function MerchantsQrisPages() {
                               placeholder="Select Grade"
                               variant="outlined"
                               fullWidth
+                              onClick={startDateOpen.toggleModal}
                             />
                           );
                         }}
@@ -258,9 +272,13 @@ export default function MerchantsQrisPages() {
                         inputFormat="DD/MM/YYYY"
                         onChange={(value) => {
                           qrisQuery.formik.setFieldValue('end_date', value);
+                          endDateOpen.toggleModal();
                         }}
                         minDate={qrisQuery.formik.values.start_date}
-                        // maxDate={formik.values.max_date_created}
+                        maxDate={moment()}
+                        open={endDateOpen.open}
+                        onOpen={endDateOpen.toggleModal}
+                        onClose={endDateOpen.toggleModal}
                         renderInput={(params) => {
                           return (
                             <TextField
@@ -269,6 +287,7 @@ export default function MerchantsQrisPages() {
                               placeholder="Select Grade"
                               variant="outlined"
                               fullWidth
+                              onClick={endDateOpen.toggleModal}
                             />
                           );
                         }}
@@ -292,10 +311,10 @@ export default function MerchantsQrisPages() {
                   <Button
                     variant="text"
                     onClick={() => {
-                      // qrisQuery.formik.resetForm();
-                      // qrisQuery.handleResetFilter({
-                      //   whiteList: ['search'],
-                      // });
+                      qrisQuery.formik.resetForm();
+                      qrisQuery.handleResetFilter({
+                        whiteList: ['search'],
+                      });
                     }}
                   >
                     Reset

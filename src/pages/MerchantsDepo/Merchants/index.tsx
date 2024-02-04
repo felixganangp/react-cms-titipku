@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import Table from 'components/Table';
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useModal from 'hooks/useModal';
 import FormLabel from 'components/FormLabel';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
@@ -153,6 +153,13 @@ export default function MerchantsPages() {
       ),
     },
   ];
+
+  useEffect(() => {
+    if (!modalDelete.open) {
+      setSelected([]);
+    }
+  }, [modalDelete]);
+
   return (
     <Box p="20px" bgcolor="#F5F7FA">
       <Stack spacing={2}>
@@ -325,7 +332,7 @@ export default function MerchantsPages() {
                           openDateJoinFilter.toggleModal();
                         }}
                         inputFormat="DD/MM/YYYY"
-                        maxDate={moment()}
+                        maxDate={merchantQuery.formik.values.end_join_date}
                         open={openDateJoinFilter.open}
                         onOpen={openDateJoinFilter.toggleModal}
                         onClose={openDateJoinFilter.toggleModal}
@@ -369,6 +376,7 @@ export default function MerchantsPages() {
                         }}
                         inputFormat="DD/MM/YYYY"
                         maxDate={moment()}
+                        minDate={merchantQuery.formik.values.start_join_date}
                         open={openEndDateJoinFilter.open}
                         onOpen={openEndDateJoinFilter.toggleModal}
                         onClose={openEndDateJoinFilter.toggleModal}

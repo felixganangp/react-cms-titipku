@@ -138,6 +138,10 @@ export default function CategoryPage() {
     },
   ];
 
+  useEffect(() => {
+    if (!deleteModal.open) setSelected(null);
+  }, [deleteModal.open]);
+
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <Stack direction="row" justifyContent="space-between" alignItems="center">

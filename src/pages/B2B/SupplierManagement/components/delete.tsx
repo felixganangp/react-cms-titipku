@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 
 interface ChangeStatusProps {
-  headerText: JSX.Element | string;
+  headerText?: JSX.Element | string;
   desc: JSX.Element | string;
   onSubmit: () => void;
   onClose: () => void;
