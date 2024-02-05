@@ -20,19 +20,19 @@ export default function HistoryLimit({
       id: 'updatedAt',
       label: 'Updated At',
       format: (value) =>
-        moment(value?.updatedAt ? value?.updatedAt : undefined).format(
+        moment(value?.created_at ? value?.created_at : undefined).format(
           'DD MMM YYYY ',
         ),
     },
     {
       id: 'Old limit',
       label: 'Old Limit',
-      format: (value) => `Rp ${numberSeperator(value?.old_limit || '0')}`,
+      format: (value) => `Rp ${numberSeperator(value?.new_value || '0')}`,
     },
     {
       id: 'New Limit',
       label: 'New Limit',
-      format: (value) => `Rp ${numberSeperator(value?.new_limit || '0')}`,
+      format: (value) => `Rp ${numberSeperator(value?.new_value || '0')}`,
     },
   ];
   return (
