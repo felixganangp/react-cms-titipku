@@ -26,7 +26,9 @@ import FormLabel from 'components/FormLabel';
 // import { DesktopDatePicker } from '@mui/x-date-pickers';
 import { useNavigate } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
-
+import {
+  UseAreaListService,
+} from '../../hooks/useConfigMerchant';
 import { useMerchantDepoList } from '../../hooks/useMerchant';
 
 export default function DisburseForm() {
@@ -35,6 +37,7 @@ export default function DisburseForm() {
   const showFilter = useModal();
 
   const queryMerchant = useMerchantDepoList();
+  const queryArea = UseAreaListService();
 
   const headCells: HeadCells<any>[] = [
     {
@@ -151,15 +154,41 @@ export default function DisburseForm() {
               <Grid item xs={12} md={4}>
                 <FormLabel text="Pasar">
                   <Autocomplete
-                    options={[]}
-                    // onBlur={() => {
-                    //   formik.setFieldTouched('area');
-                    // }}
+                    options={queryArea.listData.map((val) => ({
+                      id: val.id,
+                      name: val.title,
+                    }))}
+                    noOptionsText={
+                      !queryArea.searchValue
+                        ? 'Type to search area name'
+                        : 'No option'
+                    }
+                    inputValue={queryArea.searchValue}
+                    onInputChange={(_, newInputValue) => {
+                      queryArea.handleSearch(newInputValue);
+                    }}
+                    loading={queryArea.isFetching}
+                    getOptionLabel={(item) => item.name}
+                    value={
+                      queryArea.listData
+                        .map((val) => ({
+                          id: val.id,
+                          name: val.title,
+                        }))
+                        .find(
+                          (val) =>
+                            // @ts-ignore
+                            queryMerchant.formik.values.area_id === val.id,
+                        ) || null
+                    }
+                    onChange={(e, value) => {
+                      queryMerchant.formik.setFieldValue('area_id', value?.id);
+                    }}
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        name="Merchant"
-                        placeholder="Select Pasar"
+                        name="Area"
+                        placeholder="Select Area"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -207,6 +236,27 @@ export default function DisburseForm() {
                     )}
                   />
                 </FormLabel>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  justifyContent="end"
+                >
+                  <Button
+                    variant="text"
+                    onClick={() => {
+                      queryMerchant.formik.resetForm();
+                      queryMerchant.handleResetFilter({
+                        whiteList: ['search'],
+                      });
+                    }}
+                  >
+                    Reset
+                  </Button>
+                  <Button type="submit">Apply</Button>
+                </Stack>
               </Grid>
             </Grid>
           </Collapse>
