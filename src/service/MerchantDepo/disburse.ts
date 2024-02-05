@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import http from 'utils/request';
 import { ListResponse, Response } from 'models/fetch';
-import { DisburseParams, DisburseList } from 'models/merchantDepo/Disburse';
+import { DisburseParams, DisburseList } from 'models/merchantDepo/disburse';
 
 export const getAllDisburse = (params?: DisburseParams) =>
   new Promise<ListResponse<DisburseList>>(async (resolve, reject) => {

@@ -8,6 +8,7 @@ export interface MerchantParams extends ListParams {
 }
 
 export interface MerchantList {
+  rank: number;
   jelajah_id: number;
   join_date: number;
   merchant_name: string;
@@ -45,4 +46,9 @@ export interface MerchantDetails {
   total_disburse: number;
   rank: number;
   score: number;
+  area_name: string;
+  qris_merchant_id: number;
+  last_month_gmv: number;
+  last_month_trx: number;
+  is_active: boolean;
 }

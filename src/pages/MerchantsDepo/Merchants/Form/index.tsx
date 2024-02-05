@@ -18,11 +18,11 @@ import {
 } from '@mui/material';
 import Table from 'components/Table';
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useModal from 'hooks/useModal';
 import FormLabel from 'components/FormLabel';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
 import { useMutation } from '@tanstack/react-query';
 import { postMerchant } from 'service/MerchantDepo/Merchant';
@@ -37,6 +37,14 @@ import {
 export default function MerchantForm() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
+  const { id } = useParams();
+  const [selectedData, setSelectedData] = useState<{
+    id: number;
+    last_month_total_trx: number;
+    last_month_gmv: number;
+    merchant_name: string;
+    area_name: string;
+  }>();
 
   const merchantQuery = useMerchantList();
   const areaQuery = UseAreaListService();
@@ -46,6 +54,11 @@ export default function MerchantForm() {
   const modalForm = useModal();
 
   const { mutate } = useMutation(postMerchant);
+  useEffect(() => {
+    if (id) {
+      modalForm.openModal();
+    }
+  }, [id]);
 
   const headCells: HeadCells<any>[] = [
     // {
@@ -93,7 +106,7 @@ export default function MerchantForm() {
       },
     },
     {
-      id: 'last_month_total_tx',
+      id: 'last_month_total_trx',
       enableSort: true,
       label: 'Last Month Total Transaction',
       format: (value) => {
@@ -119,7 +132,7 @@ export default function MerchantForm() {
           >
             <Stack direction="row" alignItems="center" gap={2} flex={1}>
               <TextField
-                placeholder="Search for Invoice Number"
+                placeholder="Search Merchant"
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
@@ -195,7 +208,7 @@ export default function MerchantForm() {
                       <TextField
                         {...params}
                         name="Area"
-                        placeholder="Select Area"
+                        placeholder="Select Pasar"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -242,7 +255,7 @@ export default function MerchantForm() {
                       <TextField
                         {...params}
                         name="Merchant"
-                        placeholder="Select Merchant Name"
+                        placeholder="Name of Merchant"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -286,11 +299,28 @@ export default function MerchantForm() {
               setSelected(e);
             }}
             enableRadio
-            orderBy="total_gmv"
+            orderBy={merchantQuery.params.sort_by}
+            orderType={merchantQuery.params.sort_type}
             loading={merchantQuery.isLoading}
             page={merchantQuery.data?.page || 0}
             count={merchantQuery.data?.count || 0}
             totalData={merchantQuery.data?.total || 0}
+            onChangeSort={(value) => {
+              merchantQuery.handleChangeParams({
+                ...merchantQuery.params,
+                sort_by: value.orderBy,
+                sort_type: value.orderType,
+              });
+              merchantQuery.handleToSetSearchParams(
+                'sort_by',
+                // @ts-ignore
+                value.orderBy || '',
+              );
+              merchantQuery.handleToSetSearchParams(
+                'sort_type',
+                value.orderType,
+              );
+            }}
             onChangePage={(value) => {
               merchantQuery.handleChangeParams({
                 ...merchantQuery.params,
@@ -300,11 +330,7 @@ export default function MerchantForm() {
             }}
           />
           <Stack direction="row" gap={2}>
-            <Button
-              variant="text"
-              color="error"
-              onClick={() => navigate('/depo/merchants/')}
-            >
+            <Button variant="text" color="error" onClick={() => navigate(-1)}>
               Back
             </Button>
             <Button
@@ -313,15 +339,17 @@ export default function MerchantForm() {
               // onClick={showFilter.toggleModal}
               onClick={() => {
                 modalForm.openModal();
-                // mutate(
-                //   {},
-                //   {
-                //     onSuccess: () => {
-                //       navigate(-1);
-                //     },
-                //     onError: () => {},
-                //   },
-                // );
+                const curent = merchantQuery.listData.find(
+                  (item) => item.id === selected[0],
+                );
+                if (curent === undefined) return;
+                setSelectedData({
+                  id: curent.id,
+                  area_name: curent.area_name,
+                  last_month_total_trx: curent.last_month_total_trx,
+                  last_month_gmv: curent.last_month_gmv,
+                  merchant_name: curent.merchant_name,
+                });
               }}
             >
               Next
@@ -329,13 +357,17 @@ export default function MerchantForm() {
           </Stack>
         </Card>
       </Stack>
-      {/* <Modal
+      <Modal
         open={modalForm.open}
         title="Create Invoice"
-        onClose={modalForm.closeModal}
+        onClose={!id ? modalForm.closeModal : () => navigate(-1)}
       >
-        <ModalFormMerchantDepo />
-      </Modal> */}
+        <ModalFormMerchantDepo
+          id={id}
+          initCreateData={selectedData}
+          handleClose={!id ? modalForm.closeModal : () => navigate(-1)}
+        />
+      </Modal>
     </Box>
   );
 }

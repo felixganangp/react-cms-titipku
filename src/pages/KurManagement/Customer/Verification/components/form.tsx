@@ -659,7 +659,7 @@ function Form({ onClose, formData }: Props) {
                             {...params}
                             name="bankName"
                             onBlur={handleBlur}
-                            placeholder="Select your bank account"
+                            placeholder="Seleck bank account"
                           />
                         )}
                       />

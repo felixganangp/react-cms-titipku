@@ -20,7 +20,7 @@ import {
 } from '@mui/material';
 import Table from 'components/Table';
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useModal from 'hooks/useModal';
 import FormLabel from 'components/FormLabel';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
@@ -49,15 +49,16 @@ export default function MerchantsPages() {
   const deleteMerchant = useDeleteMerchantDepo();
 
   const openDateJoinFilter = useModal();
+  const openEndDateJoinFilter = useModal();
   const showFilter = useModal();
   const modalDelete = useModal();
 
   const headCells: HeadCells<MerchantList>[] = [
-    // {
-    //   id: 'rank',
-    //   label: 'Rank',
-    //   format: (value) => `#${value.rank}`,
-    // },
+    {
+      id: 'rank',
+      label: 'Rank',
+      format: (value) => (value?.rank ? `#${value?.rank || '-'}` : '-'),
+    },
     {
       id: 'Join Date',
       label: 'Join Date',
@@ -88,6 +89,7 @@ export default function MerchantsPages() {
     {
       id: 'type',
       label: 'Type',
+      format: (value) => value.type.replace('Andalan', 'Andalan Titipku'),
     },
     {
       id: 'limit',
@@ -151,6 +153,13 @@ export default function MerchantsPages() {
       ),
     },
   ];
+
+  useEffect(() => {
+    if (!modalDelete.open) {
+      setSelected([]);
+    }
+  }, [modalDelete.open]);
+
   return (
     <Box p="20px" bgcolor="#F5F7FA">
       <Stack spacing={2}>
@@ -169,7 +178,7 @@ export default function MerchantsPages() {
                 Add New
               </Button>
               <TextField
-                placeholder="Search for Invoice Number"
+                placeholder="Search Merchant"
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
@@ -276,10 +285,12 @@ export default function MerchantsPages() {
                 </FormLabel>
               </Grid>
               <Grid item xs={12} md={3}>
-                <FormLabel text="Merchant Type">
+                <FormLabel text="Type">
                   <Autocomplete
                     options={typeMerchantList.listData}
-                    getOptionLabel={(option) => option.description}
+                    getOptionLabel={(option) =>
+                      option.description.replace('Andalan', 'Andalan Titipku')
+                    }
                     value={
                       typeMerchantList.listData.find(
                         (val) =>
@@ -296,7 +307,7 @@ export default function MerchantsPages() {
                       <TextField
                         {...params}
                         name="Type"
-                        placeholder="Select Type"
+                        placeholder="Select Status"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -307,33 +318,88 @@ export default function MerchantsPages() {
               </Grid>
               <Grid item xs={12} md={4}>
                 <FormLabel text="Join Date">
-                  <DesktopDatePicker
-                    value={merchantQuery.formik.values.start_join_date || null}
-                    onChange={(value) => {
-                      merchantQuery.formik.setFieldValue(
-                        'start_join_date',
-                        value,
-                      );
-                      openDateJoinFilter.toggleModal();
-                    }}
-                    inputFormat="DD/MM/YYYY"
-                    maxDate={moment()}
-                    open={openDateJoinFilter.open}
-                    onOpen={openDateJoinFilter.toggleModal}
-                    onClose={openDateJoinFilter.toggleModal}
-                    renderInput={(params) => {
-                      return (
-                        <TextField
-                          {...params}
-                          name="grade"
-                          placeholder="Select Grade"
-                          variant="outlined"
-                          fullWidth
-                          onClick={openDateJoinFilter.toggleModal}
-                        />
-                      );
-                    }}
-                  />
+                  <Stack direction="row" spacing={1} alignItems="start">
+                    <Stack spacing={1} width="100%">
+                      <DesktopDatePicker
+                        value={
+                          merchantQuery.formik.values.start_join_date || null
+                        }
+                        onChange={(value) => {
+                          merchantQuery.formik.setFieldValue(
+                            'start_join_date',
+                            value,
+                          );
+                          openDateJoinFilter.toggleModal();
+                        }}
+                        inputFormat="DD/MM/YYYY"
+                        maxDate={merchantQuery.formik.values.end_join_date}
+                        open={openDateJoinFilter.open}
+                        onOpen={openDateJoinFilter.toggleModal}
+                        onClose={openDateJoinFilter.toggleModal}
+                        renderInput={(params) => {
+                          return (
+                            <TextField
+                              {...params}
+                              name="date"
+                              placeholder="Select date"
+                              variant="outlined"
+                              fullWidth
+                              onClick={openDateJoinFilter.toggleModal}
+                            />
+                          );
+                        }}
+                      />
+                      {merchantQuery.formik.errors.start_join_date && (
+                        <Typography color="error.main">
+                          {merchantQuery.formik.errors.start_join_date}
+                        </Typography>
+                      )}
+                    </Stack>
+                    <Box
+                      sx={{
+                        width: '20px',
+                        borderBottom: '1px solid #000',
+                        pt: 2,
+                      }}
+                    />
+                    <Stack spacing={1} width="100%">
+                      <DesktopDatePicker
+                        value={
+                          merchantQuery.formik.values.end_join_date || null
+                        }
+                        onChange={(value) => {
+                          merchantQuery.formik.setFieldValue(
+                            'end_join_date',
+                            value,
+                          );
+                          openEndDateJoinFilter.toggleModal();
+                        }}
+                        inputFormat="DD/MM/YYYY"
+                        maxDate={moment()}
+                        minDate={merchantQuery.formik.values.start_join_date}
+                        open={openEndDateJoinFilter.open}
+                        onOpen={openEndDateJoinFilter.toggleModal}
+                        onClose={openEndDateJoinFilter.toggleModal}
+                        renderInput={(params) => {
+                          return (
+                            <TextField
+                              {...params}
+                              name="date"
+                              placeholder="Select date"
+                              variant="outlined"
+                              fullWidth
+                              onClick={openEndDateJoinFilter.toggleModal}
+                            />
+                          );
+                        }}
+                      />
+                      {merchantQuery.formik.errors.end_join_date && (
+                        <Typography color="error.main">
+                          {merchantQuery.formik.errors.end_join_date}
+                        </Typography>
+                      )}
+                    </Stack>
+                  </Stack>
                 </FormLabel>
               </Grid>
               <Grid item xs={12} md={12}>
@@ -382,8 +448,8 @@ export default function MerchantsPages() {
               setSelected(e);
             }}
             enableCheckBox
-            orderBy={merchantQuery.params.order_by}
-            orderType={merchantQuery.params.order_type}
+            orderBy={merchantQuery.params.sort_by}
+            orderType={merchantQuery.params.sort_type}
             loading={merchantQuery.isLoading}
             page={merchantQuery.data?.page || 0}
             count={merchantQuery.data?.count || 0}
@@ -391,16 +457,16 @@ export default function MerchantsPages() {
             onChangeSort={(value) => {
               merchantQuery.handleChangeParams({
                 ...merchantQuery.params,
-                order_by: value.orderBy,
-                order_type: value.orderType,
+                sort_by: value.orderBy,
+                sort_type: value.orderType,
               });
               merchantQuery.handleToSetSearchParams(
-                'order_by',
+                'sort_by',
                 // @ts-ignore
                 value.orderBy || '',
               );
               merchantQuery.handleToSetSearchParams(
-                'order_type',
+                'sort_type',
                 value.orderType,
               );
             }}

@@ -752,6 +752,12 @@ export default function InventoryPage() {
     },
   ];
 
+  useEffect(() => {
+    if (!deleteModal.open) {
+      setSelected([]);
+    }
+  }, [deleteModal.open]);
+
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <Grid container spacing={2}>

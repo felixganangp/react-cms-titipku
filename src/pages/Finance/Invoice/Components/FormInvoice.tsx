@@ -408,7 +408,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
                     {...params}
                     name="bankName"
                     onBlur={formik.handleBlur}
-                    placeholder="Select your bank"
+                    placeholder="Seleck bank"
                   />
                 )}
               />

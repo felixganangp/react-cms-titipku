@@ -78,5 +78,6 @@ export default function UseParams<T>(props?: T & ListParams) {
     handleSearch,
     handleResetFilter,
     searchValue,
+    setSearchValue,
   };
 }

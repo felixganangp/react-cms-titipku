@@ -19,7 +19,7 @@ import {
 } from '@mui/material';
 import Table from 'components/Table';
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useModal from 'hooks/useModal';
 import FormLabel from 'components/FormLabel';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
@@ -35,6 +35,9 @@ import ModalFormQris from './Components/ModalFormQris';
 export default function MerchantsQrisPages() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
+  const [editSelected, setEditSelected] = useState<
+    (QrisList & { id: number; merchant_name: string }) | undefined
+  >(undefined);
 
   const qrisQuery = useQrisList();
   const filterMerchantDepoList = UseFilterMerchentDepoListService();
@@ -43,6 +46,8 @@ export default function MerchantsQrisPages() {
   const showFilter = useModal();
   const modalDelete = useModal();
   const modalForm = useModal();
+  const startDateOpen = useModal();
+  const endDateOpen = useModal();
 
   const headCells: HeadCells<QrisList>[] = [
     {
@@ -68,12 +73,16 @@ export default function MerchantsQrisPages() {
           menu={[
             {
               label: 'Edit',
-              onClick: () => {},
+              onClick: () => {
+                setEditSelected(value);
+                modalForm.toggleModal();
+              },
             },
             {
               label: 'Delete',
               onClick: () => {
                 setSelected([value.id]);
+                modalDelete.openModal();
               },
             },
           ]}
@@ -85,6 +94,13 @@ export default function MerchantsQrisPages() {
       ),
     },
   ];
+
+  useEffect(() => {
+    if (!modalDelete.open) {
+      setSelected([]);
+    }
+  }, [modalDelete.open]);
+
   return (
     <Box p="20px" bgcolor="#F5F7FA">
       <Stack spacing={2}>
@@ -210,7 +226,7 @@ export default function MerchantsQrisPages() {
                 </FormLabel>
               </Grid>
               <Grid item xs={12} md={4}>
-                <FormLabel text="Join Date">
+                <FormLabel text="Date">
                   <Stack direction="row" spacing={1} alignItems="start">
                     <Stack spacing={1} width="100%">
                       <DesktopDatePicker
@@ -218,9 +234,12 @@ export default function MerchantsQrisPages() {
                         inputFormat="DD/MM/YYYY"
                         onChange={(value) => {
                           qrisQuery.formik.setFieldValue('start_date', value);
+                          startDateOpen.toggleModal();
                         }}
+                        open={startDateOpen.open}
+                        onOpen={startDateOpen.toggleModal}
+                        onClose={startDateOpen.toggleModal}
                         maxDate={qrisQuery.formik.values.end_date}
-                        // maxDate={formik.values.max_date_created}
                         renderInput={(params) => {
                           return (
                             <TextField
@@ -229,6 +248,7 @@ export default function MerchantsQrisPages() {
                               placeholder="Select Grade"
                               variant="outlined"
                               fullWidth
+                              onClick={startDateOpen.toggleModal}
                             />
                           );
                         }}
@@ -252,9 +272,13 @@ export default function MerchantsQrisPages() {
                         inputFormat="DD/MM/YYYY"
                         onChange={(value) => {
                           qrisQuery.formik.setFieldValue('end_date', value);
+                          endDateOpen.toggleModal();
                         }}
                         minDate={qrisQuery.formik.values.start_date}
-                        // maxDate={formik.values.max_date_created}
+                        maxDate={moment()}
+                        open={endDateOpen.open}
+                        onOpen={endDateOpen.toggleModal}
+                        onClose={endDateOpen.toggleModal}
                         renderInput={(params) => {
                           return (
                             <TextField
@@ -263,6 +287,7 @@ export default function MerchantsQrisPages() {
                               placeholder="Select Grade"
                               variant="outlined"
                               fullWidth
+                              onClick={endDateOpen.toggleModal}
                             />
                           );
                         }}
@@ -286,10 +311,10 @@ export default function MerchantsQrisPages() {
                   <Button
                     variant="text"
                     onClick={() => {
-                      // qrisQuery.formik.resetForm();
-                      // qrisQuery.handleResetFilter({
-                      //   whiteList: ['search'],
-                      // });
+                      qrisQuery.formik.resetForm();
+                      qrisQuery.handleResetFilter({
+                        whiteList: ['search'],
+                      });
                     }}
                   >
                     Reset
@@ -350,7 +375,15 @@ export default function MerchantsQrisPages() {
         title="Create Qris"
         onClose={modalForm.closeModal}
       >
-        <ModalFormQris />
+        <ModalFormQris
+          data={editSelected}
+          handleClose={(isSubmited) => {
+            if (isSubmited) {
+              qrisQuery.refetch();
+            }
+            modalForm.closeModal();
+          }}
+        />
       </ModalComp>
     </Box>
   );

@@ -1,7 +1,7 @@
 /* eslint-disable radix */
 /* eslint-disable array-callback-return */
 /* eslint-disable no-nested-ternary */
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   Typography,
   Box,
@@ -246,6 +246,13 @@ export default function SupplierPage() {
     },
   ];
 
+  useEffect(() => {
+    if (!deleteModal.open) {
+      setSelected([]);
+      setSelectedSupplier([]);
+    }
+  }, [deleteModal.open]);
+
   return (
     <Box p="20px" bgcolor="#f8f8f8">
       <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -305,7 +312,8 @@ export default function SupplierPage() {
                     return addition.push(obj);
                 });
                 const existing = selectedSupplier.filter(
-                  (item) => array.indexOf(item.id) !== -1,
+                  // @ts-ignore
+                  (item) => array.indexOf(item?.id) !== -1,
                 );
                 return [...existing, ...addition];
               });

@@ -14,6 +14,7 @@ export const getAllQris = (params?: QrisParams) =>
       });
       delete paramsRest.jelajah_id;
     }
+    if (costumeParams.length <= 1) costumeParams = '';
     try {
       const respon = await http.get(`merchant-depo/qris${costumeParams}`, {
         params: paramsRest,
@@ -32,7 +33,7 @@ export const getAllQris = (params?: QrisParams) =>
 export const postQris = (data?: QrisForm) =>
   new Promise<ListResponse<any>>(async (resolve, reject) => {
     try {
-      const respon = await http.post(`merchant-depo/merchant-depo`, data);
+      const respon = await http.post(`merchant-depo/qris`, data);
       if (respon.data) {
         resolve(respon.data);
       }
