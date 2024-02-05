@@ -52,8 +52,6 @@ export default function HistoryLimit({
         disableNumber
         headCells={headCells}
         data={limitQuery.listData}
-        enableRadio
-        orderBy="total_gmv"
         loading={limitQuery.isLoading}
         page={limitQuery.data?.page || 0}
         count={limitQuery.data?.count || 0}
