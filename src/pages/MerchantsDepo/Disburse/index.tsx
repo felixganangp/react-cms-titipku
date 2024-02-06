@@ -1,7 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import MenuList from 'components/MenuList';
 import { HeadCells } from 'components/Table/types';
-import { Add, KeyboardArrowDown, MoreVert, Search } from '@mui/icons-material';
+import {
+  Add,
+  JoinLeft,
+  KeyboardArrowDown,
+  MoreVert,
+  Search,
+} from '@mui/icons-material';
 import {
   Box,
   Stack,
@@ -16,10 +22,11 @@ import {
   Grid,
   Autocomplete,
 } from '@mui/material';
+import CustomModal from 'components/Modal';
 import Table from 'components/Table';
 import DeleteModal from 'components/Delete/freetext';
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useModal from 'hooks/useModal';
 import FormLabel from 'components/FormLabel';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
@@ -27,34 +34,64 @@ import { useNavigate } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
 import Label from 'components/Label';
 import SearchIcon from '@mui/icons-material/Search';
-
+import { DisburseList } from 'models/merchantDepo/Disburse';
+import ModalFormDisburseDepo from './Form/components/ModalForm';
 import {
   UseDisburse,
   DisburseStatus,
   useDeleteDisburse,
+  useUpdateStatusDisburse,
+  UseListDisburseStatus,
 } from '../hooks/useDisburse';
-import { UseFilterMerchentListService } from '../hooks/useConfigMerchant';
+import { UseFilterMerchentDepoListService } from '../hooks/useConfigMerchant';
+
+type UpdateStatusPayload = {
+  id: number;
+  status: number;
+};
 
 export default function DisbursePages() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
+  const [selectedData, setSelectedData] = useState<DisburseList>();
   const showFilter = useModal();
   const modalDelete = useModal();
+  const modalUpdateStatus = useModal();
+  const modalUpdate = useModal();
+  const openStartDateFilter = useModal();
+  const openEndDateFilter = useModal();
 
   const queryDisburse = UseDisburse();
-  const queryMerchantFilter = UseFilterMerchentListService();
+  const queryMerchantFilter = UseFilterMerchentDepoListService();
   const deleteDisburse = useDeleteDisburse();
+  const updateStatusDisburse = useUpdateStatusDisburse();
+  const queryDisburseStatus = UseListDisburseStatus();
+
+  const handleUpdate = () => {
+    console.log('valx', selectedData);
+    if (selectedData?.id) {
+      modalUpdate.openModal();
+    }
+  };
+
+  useEffect(() => {
+    handleUpdate();
+  }, [selectedData]);
 
   const headCells: HeadCells<any>[] = [
     {
       id: 'date',
       label: 'Date',
-      format: (value) => moment().format('DD MMM YYYY'),
+      format: (value) => moment(value.date * 1000).format('DD MMM YYYY'),
     },
     {
       id: 'due_date',
       label: 'Due Date',
-      format: (value) => moment().format('DD MMM YYYY'),
+      format: (value) => {
+        return value.due_date
+          ? moment(value.due_date * 1000).format('DD MMM YYYY') || '-'
+          : '-';
+      },
     },
     {
       id: 'dpd',
@@ -67,7 +104,11 @@ export default function DisbursePages() {
     {
       id: 'paid_date',
       label: 'Paid Date',
-      format: (value) => moment().format('DD MMM YYYY'),
+      format: (value) => {
+        return value.paid_date
+          ? moment(value.paid_date * 1000).format('DD MMM YYYY') || '-'
+          : '-';
+      },
     },
     {
       id: 'account_number',
@@ -86,11 +127,11 @@ export default function DisbursePages() {
     },
     {
       id: 'transfer_amount',
-      label: 'Amount',
-      format: ({ amount_trf }) => {
+      label: 'Amount Transferred',
+      format: ({ transfer_amount }) => {
         return (
           <Typography variant="body1">
-            Rp. {numberSeperator(amount_trf || 0)}
+            Rp. {numberSeperator(transfer_amount || 0)}
           </Typography>
         );
       },
@@ -103,12 +144,12 @@ export default function DisbursePages() {
         const color =
           // eslint-disable-next-line no-nested-ternary
           status === 'On Process'
-            ? 'warning'
+            ? '#ff8f00'
             : status === 'Transferred'
-            ? 'success'
-            : 'info';
+            ? '#008e58'
+            : 'red';
         return (
-          <Label variant="filled" color={color}>
+          <Label variant="filled" sx={{ backgroundColor: color }}>
             {status}
           </Label>
         );
@@ -122,7 +163,11 @@ export default function DisbursePages() {
           menu={[
             {
               label: 'Edit',
-              onClick: () => {},
+              onClick: () => {
+                // handleUpdate(value);
+                setSelectedData(value);
+                // console.log('selected', selectedData, value.id);
+              },
             },
             {
               label: 'Delete',
@@ -136,7 +181,10 @@ export default function DisbursePages() {
               label: 'Update to Transferred',
               color: 'error',
               hide: value.status !== 'On Process',
-              onClick: () => {},
+              onClick: () => {
+                setSelected([value.id]);
+                modalUpdateStatus.openModal();
+              },
             },
           ]}
         >
@@ -201,6 +249,13 @@ export default function DisbursePages() {
                     color: 'error',
                     onClick: () => {
                       modalDelete.openModal();
+                    },
+                  },
+                  {
+                    label: `Update ${selected.length} Items to Transferred`,
+                    color: 'error',
+                    onClick: () => {
+                      modalUpdateStatus.openModal();
                     },
                   },
                 ]}
@@ -284,20 +339,13 @@ export default function DisbursePages() {
                   <Autocomplete
                     id="filterStatus"
                     value={
-                      queryDisburse.formikParams.values.status
-                        ? {
-                            id: queryDisburse.formikParams.values.status,
-                            name: DisburseStatus[
-                              queryDisburse.formikParams.values.status
-                            ],
-                          }
-                        : null
+                      queryDisburseStatus.listData.find(
+                        // @ts-ignore
+                        (val) =>
+                          val.id === queryDisburse.formikParams.values.status,
+                      ) || null
                     }
-                    options={Object.keys(DisburseStatus).map((val) => ({
-                      id: val,
-                      // @ts-ignore
-                      name: DisburseStatus[val],
-                    }))}
+                    options={queryDisburseStatus.listData}
                     onChange={(e, value) => {
                       // handleChangeGrade(value);
                       queryDisburse.formikParams.setFieldValue(
@@ -305,7 +353,7 @@ export default function DisbursePages() {
                         value?.id,
                       );
                     }}
-                    getOptionLabel={(option) => `${option.name}`}
+                    getOptionLabel={(option) => `${option.description}`}
                     renderInput={(params) => {
                       return (
                         <TextField
@@ -333,9 +381,12 @@ export default function DisbursePages() {
                             'start_date',
                             value,
                           );
+                          openStartDateFilter.toggleModal();
                         }}
                         maxDate={queryDisburse.formikParams.values.end_date}
-                        // maxDate={formik.values.max_date_created}
+                        open={openStartDateFilter.open}
+                        onOpen={openStartDateFilter.toggleModal}
+                        onClose={openStartDateFilter.toggleModal}
                         renderInput={(params) => {
                           return (
                             <TextField
@@ -344,6 +395,7 @@ export default function DisbursePages() {
                               placeholder="Select Grade"
                               variant="outlined"
                               fullWidth
+                              onClick={openStartDateFilter.toggleModal}
                             />
                           );
                         }}
@@ -372,9 +424,12 @@ export default function DisbursePages() {
                             'end_date',
                             value,
                           );
+                          openEndDateFilter.toggleModal();
                         }}
                         minDate={queryDisburse.formikParams.values.start_date}
-                        // maxDate={formik.values.max_date_created}
+                        open={openEndDateFilter.open}
+                        onOpen={openEndDateFilter.toggleModal}
+                        onClose={openEndDateFilter.toggleModal}
                         renderInput={(params) => {
                           return (
                             <TextField
@@ -383,6 +438,7 @@ export default function DisbursePages() {
                               placeholder="Select Date"
                               variant="outlined"
                               fullWidth
+                              onClick={openEndDateFilter.toggleModal}
                             />
                           );
                         }}
@@ -429,6 +485,7 @@ export default function DisbursePages() {
               setSelected(e);
             }}
             enableCheckBox
+            disableNumber
             loading={queryDisburse.isLoading}
             page={queryDisburse.data?.page || 0}
             count={queryDisburse.data?.count || 0}
@@ -454,6 +511,7 @@ export default function DisbursePages() {
               {
                 onSuccess: () => {
                   queryDisburse.refetch();
+                  setSelected([]);
                   modalDelete.closeModal();
                 },
               },
@@ -461,6 +519,49 @@ export default function DisbursePages() {
           }}
         />
       </Modal>
+      <Modal
+        open={modalUpdateStatus.open}
+        onClose={modalUpdateStatus.closeModal}
+      >
+        <DeleteModal
+          onClose={modalUpdateStatus.closeModal}
+          headerText="Update Status Disburse"
+          textButton="Update Status"
+          desc={
+            <>
+              Are you sure want to update status {selected.length} Disburse(s)
+              to transferred?
+            </>
+          }
+          onSubmit={() => {
+            const payload: UpdateStatusPayload[] = [];
+            selected.forEach((data) => {
+              payload.push({ id: +data, status: 2 });
+            });
+            updateStatusDisburse.mutate(payload, {
+              onSuccess: () => {
+                queryDisburse.refetch();
+                setSelected([]);
+                modalUpdateStatus.closeModal();
+              },
+            });
+          }}
+        />
+      </Modal>
+      <CustomModal
+        open={modalUpdate.open}
+        title="Update Disburse"
+        onClose={modalUpdate.closeModal}
+      >
+        <ModalFormDisburseDepo
+          id={selectedData?.id.toString()}
+          id_jelajah={selectedData?.jelajah_id}
+          handleClose={() => {
+            modalUpdate.closeModal();
+            queryDisburse.refetch();
+          }}
+        />
+      </CustomModal>
     </Box>
   );
 }
