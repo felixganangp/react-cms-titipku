@@ -78,6 +78,8 @@ export default function ModalFormQris({
         .min(1, 'Cant be less than 1')
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
+      transaction_date: Yup.mixed().required('This field is required'),
+      jelajah_id: Yup.mixed().required('This field is required'),
     }),
   });
 
