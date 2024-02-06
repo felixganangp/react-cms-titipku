@@ -36,12 +36,18 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
         ...values,
         page: 1,
         search: params.params.search,
+        start_join_date:
+          // @ts-ignore
+          values.start_join_date?.startOf('day').unix() || undefined,
+        end_join_date:
+          // @ts-ignore
+          values.end_join_date?.endOf('day').unix() || undefined,
         // @ts-ignore
-        start_join_date: values.start_join_date?.unix() || undefined,
-        // @ts-ignore
-        end_join_date: values.start_join_date?.unix() || undefined,
-        // @ts-ignore
-        jelajah_id: values.jelajah_id.map((val) => val.id),
+        jelajah_id:
+          values.jelajah_id.length > 0
+            ? // @ts-ignore
+              values.jelajah_id.map((val) => val.id)
+            : undefined,
       };
       params.handleChangeParams(newValue);
       const queryParams = new URLSearchParams(
@@ -49,7 +55,11 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
           Object.entries({
             ...newValue,
             // @ts-ignore
-            jelajah_name: values.jelajah_id.map((val) => val.name),
+            jelajah_name:
+              values.jelajah_id.length > 0
+                ? // @ts-ignore
+                  values.jelajah_id.map((val) => val.name)
+                : undefined,
           }).filter(([key, value]) => value !== undefined),
         ),
       );
@@ -133,6 +143,8 @@ export const useMerchantList = (setParams?: MerchantParams) => {
         ...values,
         page: 1,
         search: params.params.search,
+        // @ts-ignore
+        jelajah_id: values.jelajah_id.map((val) => val.id),
       };
       params.handleChangeParams(newValue);
       // const queryParams = new URLSearchParams(

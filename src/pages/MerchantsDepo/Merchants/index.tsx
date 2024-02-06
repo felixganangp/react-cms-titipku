@@ -62,6 +62,7 @@ export default function MerchantsPages() {
     {
       id: 'Join Date',
       label: 'Join Date',
+      width: 150,
       format: (value) =>
         value.join_date
           ? moment(value.join_date * 1000).format('DD MMM YYYY')
@@ -70,6 +71,7 @@ export default function MerchantsPages() {
     {
       id: 'merchant_name',
       label: 'Merchant Name',
+      width: 350,
       format: (value) => {
         const isNew = value.is_new && (
           <Typography
@@ -108,7 +110,8 @@ export default function MerchantsPages() {
       enableSort: true,
       label: 'Balance',
       format: (value) => {
-        if (!value.balance) return <Typography>-</Typography>;
+        if (!value.balance && value.total_gmv === 0)
+          return <Typography>-</Typography>;
         return <Typography>Rp {numberSeperator(value.balance)}</Typography>;
       },
     },
@@ -427,7 +430,8 @@ export default function MerchantsPages() {
               return {
                 ...item,
                 table_color:
-                  item.type === 'Andalan'
+                  item.type === 'Andalan' ||
+                  (item.total_gmv === 0 && item.balance === 0)
                     ? '#fff'
                     : tenPecent >= item.balance
                     ? '#F9EBE7'

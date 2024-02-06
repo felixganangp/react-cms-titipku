@@ -362,7 +362,7 @@ export default function MerchantsQrisPages() {
       </Modal>
       <ModalComp
         open={modalForm.open}
-        title="Create Qris"
+        title={!editSelected ? 'Add New QRIS' : 'Edit QRIS'}
         onClose={modalForm.closeModal}
       >
         <ModalFormQris
