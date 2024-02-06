@@ -1,15 +1,33 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import useToast from 'hooks/useToast';
-import { DisburseParams } from 'models/merchantDepo/disburse';
-import { getAllDisburse, deleteDisburse } from 'service/MerchantDepo/disburse';
+import { DisburseParams, MerchantParams } from 'models/merchantDepo/disburse';
+import {
+  getAllDisburse,
+  deleteDisburse,
+  getDisburseStatus,
+  postDisburse,
+  updateDisburse,
+  detailsDisburse,
+  updateStatusDisburse,
+  getMerchantDepoList,
+} from 'service/MerchantDepo/disburse';
+// import { getMerchantDepoList } from 'service/MerchantDepo/Merchant';
 import { useFormik } from 'formik';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
 import { useEffect, useMemo } from 'react';
+import moment from 'moment';
 
 export const DisburseStatus = {
   1: 'On Process',
   2: 'Transferred',
+};
+
+export const MerchantCondition = {
+  5: 'Below 5%',
+  10: 'Below 10%',
+  15: 'Below 15%',
+  20: 'Below 20%',
 };
 
 export function UseDisburse(setParams?: DisburseParams) {
@@ -37,7 +55,7 @@ export function UseDisburse(setParams?: DisburseParams) {
         // @ts-ignore
         end_date: values.end_date?.unix() || undefined,
         // @ts-ignore
-        status: (values.status || '').trim().toLowerCase() || undefined,
+        status: values.status || undefined,
         jelajah_id: values.jelajah_id || undefined,
       };
 
@@ -105,6 +123,120 @@ export function UseDisburse(setParams?: DisburseParams) {
   };
 }
 
+export const useMerchantDepoList = (setParams?: MerchantParams) => {
+  const params = UseParams<MerchantParams>(setParams);
+  const query = useQuery({
+    queryKey: [
+      'merchant-depo/disburse/merchant-depo-list',
+      { ...params.params, depo_type_id: [1, 3] },
+    ],
+    queryFn: () =>
+      getMerchantDepoList({
+        ...params.params,
+        depo_type_id: [1, 3],
+      }),
+  });
+  const formik = useFormik({
+    initialValues: {
+      start_join_date: undefined,
+      end_join_date: undefined,
+      depo_type_id: [1, 3],
+      jelajah_id: [],
+      area_id: undefined,
+      balance_condition: undefined,
+    },
+    onSubmit: (values) => {
+      const newValue = {
+        ...values,
+        page: 1,
+        search: params.params.search,
+        start_join_date:
+          // @ts-ignore
+          values.start_join_date?.startOf('day').unix() || undefined,
+        end_join_date:
+          // @ts-ignore
+          values.end_join_date?.endOf('day').unix() || undefined,
+        // @ts-ignore
+        jelajah_id:
+          values.jelajah_id.length > 0
+            ? // @ts-ignore
+              values.jelajah_id.map((val) => val.id)
+            : undefined,
+      };
+      params.handleChangeParams(newValue);
+      const queryParams = new URLSearchParams(
+        Object.fromEntries(
+          Object.entries({
+            ...newValue,
+            // @ts-ignore
+            jelajah_name:
+              values.jelajah_id.length > 0
+                ? // @ts-ignore
+                  values.jelajah_id.map((val) => val.name)
+                : undefined,
+          }).filter(([key, value]) => value !== undefined),
+        ),
+      );
+
+      // Set the search property of the current URL
+      window.history.pushState({}, '', `?${queryParams.toString()}`);
+    },
+  });
+
+  useEffect(() => {
+    // Parse the URL search parameters
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Get all values from the URL search parameters
+    const initialFilter = Array.from(urlParams).reduce(
+      (values, [key, value]) => {
+        // @ts-ignore
+        if (key === 'jelajah_id') {
+          // @ts-ignore
+          value = value.split(',').map((item) => parseInt(item, 10));
+        }
+        // @ts-ignore
+        values[key] = value;
+        return values;
+      },
+      {},
+    );
+    if (Object.keys(initialFilter).length > 0) {
+      const newValue = {
+        ...formik.values,
+        ...initialFilter,
+      };
+      formik.setValues({
+        ...newValue,
+        // @ts-ignore
+        start_join_date: newValue.start_join_date
+          ? moment(newValue.start_join_date * 1000)
+          : undefined,
+        // @ts-ignore
+        end_join_date: newValue.end_join_date
+          ? moment(newValue.end_join_date * 1000)
+          : undefined,
+      });
+      params.handleChangeParams(newValue);
+    }
+  }, []);
+
+  return {
+    formik,
+    ...params,
+    ...query,
+    listData: query.data?.data || [],
+  };
+};
+
+export const useDisburseDetails = (id?: number | string) => {
+  return useQuery({
+    queryKey: ['merchant-depo/disburse', id],
+    queryFn: () => detailsDisburse(id),
+    enabled: !!id,
+  });
+};
+
 export const useDeleteDisburse = () => {
   const { openToast } = useToast();
   return useMutation(deleteDisburse, {
@@ -118,6 +250,68 @@ export const useDeleteDisburse = () => {
       openToast({
         severity: 'error',
         headMsg: typeof e === 'string' ? e : 'Delete Disburse Success',
+      });
+    },
+  });
+};
+
+export function UseListDisburseStatus() {
+  const query = useQuery({
+    queryKey: ['disburse/status'],
+    queryFn: () => getDisburseStatus(),
+  });
+  return { ...query, listData: query?.data?.data || [] };
+}
+
+export const useCreateDisburse = () => {
+  const { openToast } = useToast();
+  return useMutation(postDisburse, {
+    onSuccess: () => {
+      openToast({
+        severity: 'success',
+        headMsg: 'Create Disburse Success',
+      });
+    },
+    onError: (e) => {
+      openToast({
+        severity: 'error',
+        headMsg: typeof e === 'string' ? e : 'Create Disburse Failed',
+      });
+    },
+  });
+};
+
+export const useUpdateDisburse = () => {
+  const { openToast } = useToast();
+  return useMutation(updateDisburse, {
+    onSuccess: () => {
+      openToast({
+        severity: 'success',
+        headMsg: 'Update Disburse Success',
+      });
+    },
+    onError: (e) => {
+      openToast({
+        severity: 'error',
+        headMsg: typeof e === 'string' ? e : 'Update Disburse Failed',
+      });
+    },
+  });
+};
+
+export const useUpdateStatusDisburse = () => {
+  const { openToast } = useToast();
+  return useMutation(updateStatusDisburse, {
+    onSuccess: () => {
+      openToast({
+        severity: 'success',
+        headMsg: 'Update Status Disburse Success',
+      });
+    },
+    onError: (e) => {
+      openToast({
+        severity: 'error',
+        headMsg: typeof e === 'string' ? e : 'Update Status Disburse Failed',
       });
     },
   });

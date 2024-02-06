@@ -17,4 +17,32 @@ export type DisburseList = {
   amount: number;
   transfer_amount: number;
   status: string;
+  jelajah_id: number;
 };
+
+export type DisburseDetails = {
+  id: number;
+  jelajah_id: number;
+  bank_name: string;
+  bank_account_name: string;
+  bank_account_number: number;
+  amount: number;
+  transfer_amount: number;
+  disburse_status_id: number;
+  paid_date: number;
+  created_at: number;
+  updated_at: number;
+  deleted_at: number;
+  status: {
+    id: number;
+    description: string;
+  };
+};
+
+export interface MerchantParams extends ListParams {
+  start_join_date?: string | number;
+  depo_type_id?: number[];
+  jelajah_id?: number[];
+  area_id?: number;
+  balance_condition?: number;
+}

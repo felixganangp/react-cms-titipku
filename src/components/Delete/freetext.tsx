@@ -4,6 +4,7 @@ import { Box, Typography, Button } from '@mui/material';
 interface ChangeStatusProps {
   headerText: JSX.Element | string;
   desc: JSX.Element | string;
+  textButton?: JSX.Element | string;
   onSubmit: () => void;
   onClose: () => void;
 }
@@ -11,6 +12,7 @@ interface ChangeStatusProps {
 export default function DeleteModal({
   headerText,
   desc,
+  textButton,
   onSubmit,
   onClose,
 }: ChangeStatusProps) {
@@ -42,7 +44,7 @@ export default function DeleteModal({
         boxShadow="3px 0 10px 0 rgba(0, 0, 0, 0.1)"
       >
         <Button variant="text" color="error" onClick={onSubmit}>
-          Delete Item
+          {textButton || 'Delete Item'}
         </Button>
         <Button onClick={onClose}>Back to List</Button>
       </Box>
