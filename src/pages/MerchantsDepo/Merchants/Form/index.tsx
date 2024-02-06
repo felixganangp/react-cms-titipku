@@ -239,21 +239,10 @@ export default function MerchantForm() {
                     }}
                     loading={filterMerchantQuery.isFetching}
                     getOptionLabel={(item) => item.name}
-                    value={filterMerchantQuery.listData
-                      .map((val) => ({
-                        id: val.id,
-                        name: val.merchant_name,
-                      }))
-                      .filter((val) =>
-                        // @ts-ignore
-                        merchantQuery.formik.values.jelajah_id.includes(val.id),
-                      )}
+                    value={merchantQuery.formik.values.jelajah_id}
                     multiple
                     onChange={(e, value) => {
-                      merchantQuery.formik.setFieldValue(
-                        'jelajah_id',
-                        value.map((val) => val.id),
-                      );
+                      merchantQuery.formik.setFieldValue('jelajah_id', value);
                     }}
                     renderInput={(params) => (
                       <TextField
@@ -370,7 +359,7 @@ export default function MerchantForm() {
       </Stack>
       <Modal
         open={modalForm.open}
-        title={`${id ? 'Update' : 'Create New'} Merchant`}
+        title={`${id ? 'Edit' : 'Add New'} Merchant`}
         onClose={!id ? modalForm.closeModal : () => navigate(-1)}
       >
         <ModalFormMerchantDepo

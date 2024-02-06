@@ -240,6 +240,7 @@ export default function ModalFormQris({
         <Button
           variant="text"
           color="error"
+          sx={{ borderRadius: '5px' }}
           onClick={() => {
             handleClose(false);
             formik.resetForm();
@@ -248,6 +249,7 @@ export default function ModalFormQris({
           Cancel
         </Button>
         <Button
+          sx={{ borderRadius: '5px' }}
           type="submit"
           color="primary"
           disabled={

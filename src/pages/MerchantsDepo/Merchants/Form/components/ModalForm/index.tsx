@@ -627,7 +627,7 @@ export default function ModalFormMerchantDepo({
         }}
       >
         <Button
-          sx={{ borderRadius: '5px' }}
+          sx={{ borderRadius: '2px' }}
           variant="text"
           color="error"
           onClick={() => {
@@ -641,7 +641,7 @@ export default function ModalFormMerchantDepo({
           type="submit"
           color="primary"
           disabled={!formik.isValid}
-          sx={{ borderRadius: '5px' }}
+          sx={{ borderRadius: '2px' }}
         >
           Submit
         </Button>
