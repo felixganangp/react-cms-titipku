@@ -69,12 +69,16 @@ export default function MerchantForm() {
     {
       id: 'Join Date',
       label: 'Join Date',
-      format: (value) => moment(value.join_date * 1000).format('DD MMM YYYY'),
+      width: 100,
+      format: (value) => moment(1707065961 * 1000).format('DD MMM YYYY'),
+    },
+    {
+      id: 'area_name',
+      label: 'Pasar',
     },
     {
       id: 'merchant_name',
       label: 'Merchant Name',
-      width: '200px',
       format: (value) => {
         const isNew = value.is_new && (
           <Typography
@@ -146,10 +150,10 @@ export default function MerchantForm() {
                 }}
                 onChange={(event) => {
                   merchantQuery.handleSearch(event.target.value);
-                  merchantQuery.handleToSetSearchParams(
-                    'search',
-                    event.target.value,
-                  );
+                  // merchantQuery.handleToSetSearchParams(
+                  //   'search',
+                  //   event.target.value,
+                  // );
                 }}
               />
             </Stack>
@@ -235,21 +239,10 @@ export default function MerchantForm() {
                     }}
                     loading={filterMerchantQuery.isFetching}
                     getOptionLabel={(item) => item.name}
-                    value={filterMerchantQuery.listData
-                      .map((val) => ({
-                        id: val.id,
-                        name: val.merchant_name,
-                      }))
-                      .filter((val) =>
-                        // @ts-ignore
-                        merchantQuery.formik.values.jelajah_id.includes(val.id),
-                      )}
+                    value={merchantQuery.formik.values.jelajah_id}
                     multiple
                     onChange={(e, value) => {
-                      merchantQuery.formik.setFieldValue(
-                        'jelajah_id',
-                        value.map((val) => val.id),
-                      );
+                      merchantQuery.formik.setFieldValue('jelajah_id', value);
                     }}
                     renderInput={(params) => (
                       <TextField
@@ -311,30 +304,37 @@ export default function MerchantForm() {
                 sort_by: value.orderBy,
                 sort_type: value.orderType,
               });
-              merchantQuery.handleToSetSearchParams(
-                'sort_by',
-                // @ts-ignore
-                value.orderBy || '',
-              );
-              merchantQuery.handleToSetSearchParams(
-                'sort_type',
-                value.orderType,
-              );
+              // merchantQuery.handleToSetSearchParams(
+              //   'sort_by',
+              //   // @ts-ignore
+              //   value.orderBy || '',
+              // );
+              // merchantQuery.handleToSetSearchParams(
+              //   'sort_type',
+              //   value.orderType,
+              // );
             }}
             onChangePage={(value) => {
               merchantQuery.handleChangeParams({
                 ...merchantQuery.params,
                 page: value,
               });
-              merchantQuery.handleToSetSearchParams('page', value.toString());
+              // merchantQuery.handleToSetSearchParams('page', value.toString());
             }}
           />
           <Stack direction="row" gap={2}>
-            <Button variant="text" color="error" onClick={() => navigate(-1)}>
+            <Button
+              size="small"
+              variant="text"
+              color="error"
+              sx={{ borderRadius: '4px', minWidth: '100px' }}
+              onClick={() => navigate(-1)}
+            >
               Back
             </Button>
             <Button
-              sx={{ borderRadius: '4px' }}
+              size="small"
+              sx={{ borderRadius: '4px', minWidth: '100px' }}
               disabled={selected.length === 0}
               // onClick={showFilter.toggleModal}
               onClick={() => {
@@ -359,7 +359,7 @@ export default function MerchantForm() {
       </Stack>
       <Modal
         open={modalForm.open}
-        title="Create Invoice"
+        title={`${id ? 'Edit' : 'Add New'} Merchant`}
         onClose={!id ? modalForm.closeModal : () => navigate(-1)}
       >
         <ModalFormMerchantDepo

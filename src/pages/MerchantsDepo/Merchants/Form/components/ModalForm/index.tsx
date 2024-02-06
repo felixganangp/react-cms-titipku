@@ -209,7 +209,12 @@ export default function ModalFormMerchantDepo({
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Box p="24px">
-        <FormControl text="Merchant Name" required>
+        <FormControl
+          text={
+            formik.values.merchant_depo_type_id === 2 ? 'Name' : 'Merchant Name'
+          }
+          required
+        >
           <TextField
             type="text"
             name="amount"
@@ -220,7 +225,14 @@ export default function ModalFormMerchantDepo({
             value={merchantName}
           />
         </FormControl>
-        <FormControl text="Last Month GMV" required>
+        <FormControl
+          text={
+            formik.values.merchant_depo_type_id === 2
+              ? 'Month GMV'
+              : 'Last Month GMV'
+          }
+          required
+        >
           <TextField
             type="text"
             name="amount"
@@ -240,7 +252,14 @@ export default function ModalFormMerchantDepo({
             )}
           />
         </FormControl>
-        <FormControl text="Last Month Transaction" required>
+        <FormControl
+          text={
+            formik.values.merchant_depo_type_id === 2
+              ? 'Month Transaction'
+              : 'Last Month Transaction'
+          }
+          required
+        >
           <TextField
             type="text"
             name="amount"
@@ -296,7 +315,7 @@ export default function ModalFormMerchantDepo({
             <TextField
               type="text"
               name="limit"
-              placeholder="Input Limt"
+              // placeholder="Input Limt"
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">Rp</InputAdornment>
@@ -341,7 +360,7 @@ export default function ModalFormMerchantDepo({
             <TextField
               type="text"
               name="depo_discount"
-              placeholder="Input discount"
+              placeholder="Input value discount"
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="start">%</InputAdornment>
@@ -486,7 +505,7 @@ export default function ModalFormMerchantDepo({
             >
               <TextField
                 fullWidth
-                placeholder="Input Branch Office bank"
+                placeholder="Input Account Name"
                 value={formik.values.bank_account_name}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -538,7 +557,7 @@ export default function ModalFormMerchantDepo({
             >
               <TextField
                 fullWidth
-                placeholder="Input Branch Office bank"
+                placeholder="Input NOBU Account Name"
                 value={formik.values.nobu_account_name}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
@@ -608,6 +627,7 @@ export default function ModalFormMerchantDepo({
         }}
       >
         <Button
+          sx={{ borderRadius: '2px' }}
           variant="text"
           color="error"
           onClick={() => {
@@ -617,7 +637,12 @@ export default function ModalFormMerchantDepo({
         >
           Cancel
         </Button>
-        <Button type="submit" color="primary" disabled={!formik.isValid}>
+        <Button
+          type="submit"
+          color="primary"
+          disabled={!formik.isValid}
+          sx={{ borderRadius: '2px' }}
+        >
           Submit
         </Button>
       </Box>

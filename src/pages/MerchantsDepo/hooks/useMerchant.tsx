@@ -36,17 +36,31 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
         ...values,
         page: 1,
         search: params.params.search,
+        start_join_date:
+          // @ts-ignore
+          values.start_join_date?.startOf('day').unix() || undefined,
+        end_join_date:
+          // @ts-ignore
+          values.end_join_date?.endOf('day').unix() || undefined,
         // @ts-ignore
-        start_join_date: values.start_join_date?.unix() || undefined,
-        // @ts-ignore
-        end_join_date: values.start_join_date?.unix() || undefined,
+        jelajah_id:
+          values.jelajah_id.length > 0
+            ? // @ts-ignore
+              values.jelajah_id.map((val) => val.id)
+            : undefined,
       };
       params.handleChangeParams(newValue);
       const queryParams = new URLSearchParams(
         Object.fromEntries(
-          Object.entries(newValue).filter(
-            ([key, value]) => value !== undefined,
-          ),
+          Object.entries({
+            ...newValue,
+            // @ts-ignore
+            jelajah_name:
+              values.jelajah_id.length > 0
+                ? // @ts-ignore
+                  values.jelajah_id.map((val) => val.name)
+                : undefined,
+          }).filter(([key, value]) => value !== undefined),
         ),
       );
 
@@ -66,6 +80,10 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
         if (key === 'jelajah_id') {
           // @ts-ignore
           value = value.split(',').map((item) => parseInt(item, 10));
+        }
+        if (key === 'jelajah_name') {
+          // @ts-ignore
+          value = value.split(',').map((item) => item);
         }
         // @ts-ignore
         values[key] = value;
@@ -88,7 +106,14 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
         end_join_date: newValue.end_join_date
           ? moment(newValue.end_join_date * 1000)
           : undefined,
+        // @ts-ignore
+        jelajah_id: newValue.jelajah_id.map((val, index) => {
+          // @ts-ignore
+          return { id: val, name: newValue.jelajah_name[index] };
+        }),
       });
+      // @ts-ignore
+      delete newValue.jelajah_name;
       params.handleChangeParams(newValue);
     }
   }, []);
@@ -118,19 +143,21 @@ export const useMerchantList = (setParams?: MerchantParams) => {
         ...values,
         page: 1,
         search: params.params.search,
+        // @ts-ignore
+        jelajah_id: values.jelajah_id.map((val) => val.id),
       };
       params.handleChangeParams(newValue);
-      const queryParams = new URLSearchParams(
-        // @ts-ignore
-        Object.fromEntries(
-          Object.entries(newValue).filter(
-            ([key, value]) => value !== undefined,
-          ),
-        ),
-      );
+      // const queryParams = new URLSearchParams(
+      //   // @ts-ignore
+      //   Object.fromEntries(
+      //     Object.entries(newValue).filter(
+      //       ([key, value]) => value !== undefined,
+      //     ),
+      //   ),
+      // );
 
       // Set the search property of the current URL
-      window.history.pushState({}, '', `?${queryParams.toString()}`);
+      // window.history.pushState({}, '', `?${queryParams.toString()}`);
     },
   });
 

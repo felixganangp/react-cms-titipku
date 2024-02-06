@@ -62,7 +62,7 @@ export default function MerchantsQrisPages() {
     },
     {
       id: 'Amount',
-      label: 'Limit',
+      label: 'Amount',
       format: (value) => `Rp ${numberSeperator(value.amount)}`,
     },
     {
@@ -119,7 +119,7 @@ export default function MerchantsQrisPages() {
                 Add New
               </Button>
               <TextField
-                placeholder="Search for Invoice Number"
+                placeholder="Search Item"
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
@@ -196,21 +196,10 @@ export default function MerchantsQrisPages() {
                     }}
                     loading={filterMerchantDepoList.isFetching}
                     getOptionLabel={(item) => item.name}
-                    value={filterMerchantDepoList.listData
-                      .map((val) => ({
-                        id: val.id,
-                        name: val.merchant_name,
-                      }))
-                      .filter((val) =>
-                        // @ts-ignore
-                        qrisQuery.formik.values.jelajah_id.includes(val.id),
-                      )}
+                    value={qrisQuery.formik.values.jelajah_id}
                     multiple
                     onChange={(e, value) => {
-                      qrisQuery.formik.setFieldValue(
-                        'jelajah_id',
-                        value.map((val) => val.id),
-                      );
+                      qrisQuery.formik.setFieldValue('jelajah_id', value);
                     }}
                     renderInput={(params) => (
                       <TextField
@@ -333,6 +322,7 @@ export default function MerchantsQrisPages() {
             setSelected={(e) => {
               setSelected(e);
             }}
+            disableNumber
             enableCheckBox
             orderBy={qrisQuery.params.order_by}
             orderType={qrisQuery.params.order_type}
@@ -372,7 +362,7 @@ export default function MerchantsQrisPages() {
       </Modal>
       <ModalComp
         open={modalForm.open}
-        title="Create Qris"
+        title={!editSelected ? 'Add New QRIS' : 'Edit QRIS'}
         onClose={modalForm.closeModal}
       >
         <ModalFormQris

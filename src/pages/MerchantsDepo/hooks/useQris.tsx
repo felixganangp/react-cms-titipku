@@ -34,16 +34,26 @@ export const useQrisList = (setParams?: QrisParams) => {
         page: 1,
         search: params.params.search,
         // @ts-ignore
-        start_date: values.start_date?.unix() || undefined,
+        start_date: values.start_date?.startOf('day').unix() || undefined,
         // @ts-ignore
-        end_date: values.end_date?.unix() || undefined,
+        end_date: values.end_date?.endOf('day').unix() || undefined,
+        jelajah_id:
+          values.jelajah_id.length > 0
+            ? // @ts-ignore
+              values.jelajah_id.map((val) => val.id)
+            : undefined,
       };
       params.handleChangeParams(newValue);
       const queryParams = new URLSearchParams(
         Object.fromEntries(
-          Object.entries(newValue).filter(
-            ([key, value]) => value !== undefined,
-          ),
+          Object.entries({
+            ...newValue,
+            jelajah_name:
+              values.jelajah_id.length > 0
+                ? // @ts-ignore
+                  values.jelajah_id.map((val) => val.name)
+                : undefined,
+          }).filter(([key, value]) => value !== undefined),
         ),
       );
 
@@ -91,12 +101,17 @@ export const useQrisList = (setParams?: QrisParams) => {
           // @ts-ignore
           value = value.split(',').map((item) => parseInt(item, 10));
         }
+        if (key === 'jelajah_name') {
+          // @ts-ignore
+          value = value.split(',').map((item) => item);
+        }
         // @ts-ignore
         values[key] = value;
         return values;
       },
       {},
     );
+
     if (Object.keys(initialFilter).length > 0) {
       const newValue = {
         ...formik.values,
@@ -112,7 +127,14 @@ export const useQrisList = (setParams?: QrisParams) => {
         end_date: newValue.end_date
           ? moment(newValue.end_date * 1000)
           : undefined,
+        // @ts-ignore
+        jelajah_id: newValue.jelajah_id.map((val, index) => {
+          // @ts-ignore
+          return { id: val, name: newValue.jelajah_name[index] };
+        }),
       });
+      // @ts-ignore
+      delete newValue.jelajah_name;
       params.handleChangeParams(newValue);
     }
   }, []);

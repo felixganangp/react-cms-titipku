@@ -232,21 +232,10 @@ export default function DisburseForm() {
                     }}
                     loading={filterMerchantDepoList.isFetching}
                     getOptionLabel={(item) => item.name}
-                    value={filterMerchantDepoList.listData
-                      .map((val) => ({
-                        id: val.id,
-                        name: val.merchant_name,
-                      }))
-                      .filter((val) =>
-                        // @ts-ignore
-                        queryMerchant.formik.values.jelajah_id.includes(val.id),
-                      )}
+                    value={queryMerchant.formik.values.jelajah_id}
                     multiple
                     onChange={(e, value) => {
-                      queryMerchant.formik.setFieldValue(
-                        'jelajah_id',
-                        value.map((val) => val.id),
-                      );
+                      queryMerchant.formik.setFieldValue('jelajah_id', value);
                     }}
                     renderInput={(params) => (
                       <TextField

@@ -150,18 +150,31 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
         ...values,
         page: 1,
         search: params.params.search,
+        start_join_date:
+          // @ts-ignore
+          values.start_join_date?.startOf('day').unix() || undefined,
+        end_join_date:
+          // @ts-ignore
+          values.end_join_date?.endOf('day').unix() || undefined,
         // @ts-ignore
-        start_join_date: values.start_join_date?.unix() || undefined,
-        // @ts-ignore
-        end_join_date: values.start_join_date?.unix() || undefined,
-        // depo_type_id: values.depo_type_id,
+        jelajah_id:
+          values.jelajah_id.length > 0
+            ? // @ts-ignore
+              values.jelajah_id.map((val) => val.id)
+            : undefined,
       };
       params.handleChangeParams(newValue);
       const queryParams = new URLSearchParams(
         Object.fromEntries(
-          Object.entries(newValue).filter(
-            ([key, value]) => value !== undefined,
-          ),
+          Object.entries({
+            ...newValue,
+            // @ts-ignore
+            jelajah_name:
+              values.jelajah_id.length > 0
+                ? // @ts-ignore
+                  values.jelajah_id.map((val) => val.name)
+                : undefined,
+          }).filter(([key, value]) => value !== undefined),
         ),
       );
 

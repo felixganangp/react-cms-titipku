@@ -78,6 +78,8 @@ export default function ModalFormQris({
         .min(1, 'Cant be less than 1')
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
+      transaction_date: Yup.mixed().required('This field is required'),
+      jelajah_id: Yup.mixed().required('This field is required'),
     }),
   });
 
@@ -238,6 +240,7 @@ export default function ModalFormQris({
         <Button
           variant="text"
           color="error"
+          sx={{ borderRadius: '5px' }}
           onClick={() => {
             handleClose(false);
             formik.resetForm();
@@ -246,6 +249,7 @@ export default function ModalFormQris({
           Cancel
         </Button>
         <Button
+          sx={{ borderRadius: '5px' }}
           type="submit"
           color="primary"
           disabled={
