@@ -62,7 +62,10 @@ export default function MerchantsPages() {
     {
       id: 'Join Date',
       label: 'Join Date',
-      format: (value) => moment(value.join_date * 100).format('DD MMM YYYY'),
+      format: (value) =>
+        value.join_date
+          ? moment(value.join_date * 1000).format('DD MMM YYYY')
+          : '-',
     },
     {
       id: 'merchant_name',
@@ -255,21 +258,10 @@ export default function MerchantsPages() {
                     }}
                     loading={filterMerchantDepoList.isFetching}
                     getOptionLabel={(item) => item.name}
-                    value={filterMerchantDepoList.listData
-                      .map((val) => ({
-                        id: val.id,
-                        name: val.merchant_name,
-                      }))
-                      .filter((val) =>
-                        // @ts-ignore
-                        merchantQuery.formik.values.jelajah_id.includes(val.id),
-                      )}
+                    value={merchantQuery.formik.values.jelajah_id}
                     multiple
                     onChange={(e, value) => {
-                      merchantQuery.formik.setFieldValue(
-                        'jelajah_id',
-                        value.map((val) => val.id),
-                      );
+                      merchantQuery.formik.setFieldValue('jelajah_id', value);
                     }}
                     renderInput={(params) => (
                       <TextField
@@ -435,7 +427,9 @@ export default function MerchantsPages() {
               return {
                 ...item,
                 table_color:
-                  tenPecent >= item.balance
+                  item.type === 'Andalan'
+                    ? '#fff'
+                    : tenPecent >= item.balance
                     ? '#F9EBE7'
                     : fivePecent >= item.balance
                     ? '#FFF3CD'
@@ -447,6 +441,7 @@ export default function MerchantsPages() {
             setSelected={(e) => {
               setSelected(e);
             }}
+            disableNumber
             enableCheckBox
             orderBy={merchantQuery.params.sort_by}
             orderType={merchantQuery.params.sort_type}
