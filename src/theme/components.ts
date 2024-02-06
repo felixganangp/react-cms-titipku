@@ -47,7 +47,7 @@ const components = (palette: Palette): ThemeOptions['components'] => ({
           },
         },
         '.Mui-disabled': {
-          backgroundColor: '#f8f8f8',
+          backgroundColor: '#d5d5d5',
         },
         '.MuiIconButton-root.Mui-disabled': {
           backgroundColor: '#f8f8f8',
