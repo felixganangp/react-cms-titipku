@@ -78,8 +78,14 @@ export default function ModalFormMerchantDepo({
                 values.depo_discount === '0' ? '5' : values.depo_discount,
                 10,
               )
-            : 0,
-        admin_fee: isUpdate || isDepo ? parseInt(values.admin_fee, 10) : 0,
+            : 5,
+        admin_fee:
+          isUpdate || isDepo
+            ? parseInt(
+                values.depo_discount === '0' ? '5' : values.depo_discount,
+                10,
+              )
+            : 5,
         bank_name: isUpdate || isDepo ? values.bank_name : '',
         bank_branch_office: isUpdate || isDepo ? values.bank_branch_office : '',
         bank_account_name: isUpdate || isDepo ? values.bank_account_name : '',
@@ -648,7 +654,7 @@ export default function ModalFormMerchantDepo({
           disabled={!formik.isValid}
           sx={{ borderRadius: '2px' }}
         >
-          Submit
+          {isUpdate ? 'Update' : 'Submit'}
         </Button>
       </Box>
       <Modal

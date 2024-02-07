@@ -256,7 +256,7 @@ export default function ModalFormQris({
             !formik.isValid || createQris.isLoading || updateQris.isLoading
           }
         >
-          Submit
+          {isUpdate ? 'Update' : 'Submit'}
         </Button>
       </Box>
     </Box>

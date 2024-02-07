@@ -291,6 +291,7 @@ export default function MerchantForm() {
             setSelected={(e) => {
               setSelected(e);
             }}
+            disableNumber
             enableRadio
             orderBy={merchantQuery.params.sort_by}
             orderType={merchantQuery.params.sort_type}
