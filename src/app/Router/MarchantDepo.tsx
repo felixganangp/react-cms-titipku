@@ -9,8 +9,16 @@ const MercheantsDetails = lazy(
 const QrisList = lazy(() => import('pages/MerchantsDepo/Qris'));
 const DisburseList = lazy(() => import('pages/MerchantsDepo/Disburse'));
 const DisburseForm = lazy(() => import('pages/MerchantsDepo/Disburse/Form'));
+const DashboardPages = lazy(() => import('pages/MerchantsDepo/Dashboard'));
 
 export const MerchantsRouters: RouteProps[] = [
+  {
+    name: 'Dashboard',
+    comp: DashboardPages,
+    path: '/depo/dashboard',
+    index: true,
+    auth: 'Private',
+  },
   {
     name: 'Merchants',
     comp: MerchantsList,

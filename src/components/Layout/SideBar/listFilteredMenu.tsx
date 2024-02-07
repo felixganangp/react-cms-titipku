@@ -4,6 +4,7 @@ import KurIcon from 'components/Icon/Kur';
 import AdminPanelIcon from 'components/Icon/AdminPanel';
 import { Child, FilteredMenu } from 'models/Menu';
 import B2B from 'components/Icon/B2B';
+import DepoAndalan from 'components/Icon/DepoAndalan';
 
 export const sidebarDataDev: FilteredMenu[] = [
   {
@@ -89,8 +90,14 @@ export const sidebarDataDev: FilteredMenu[] = [
     id: 70,
     title: 'Andalan & Depo',
     path: '',
-    icon: <KurIcon />,
+    icon: <DepoAndalan />,
     child: [
+      {
+        id: 71,
+        title: 'Dashboard',
+        path: '/depo/dashboard',
+        child: [],
+      },
       {
         id: 72,
         title: 'Merchants',
