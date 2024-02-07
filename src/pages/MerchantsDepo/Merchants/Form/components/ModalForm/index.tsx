@@ -73,8 +73,19 @@ export default function ModalFormMerchantDepo({
         jelajah_id: initCreateData?.id || id,
         limit: isUpdate || isDepo ? parseInt(values.limit, 10) : 0,
         depo_discount:
-          isUpdate || isAndalan ? parseInt(values.depo_discount, 10) : 0,
-        admin_fee: isUpdate || isDepo ? parseInt(values.admin_fee, 10) : 0,
+          isUpdate || isAndalan
+            ? parseInt(
+                values.depo_discount === '0' ? '5' : values.depo_discount,
+                10,
+              )
+            : 5,
+        admin_fee:
+          isUpdate || isDepo
+            ? parseInt(
+                values.depo_discount === '0' ? '5' : values.depo_discount,
+                10,
+              )
+            : 5,
         bank_name: isUpdate || isDepo ? values.bank_name : '',
         bank_branch_office: isUpdate || isDepo ? values.bank_branch_office : '',
         bank_account_name: isUpdate || isDepo ? values.bank_account_name : '',
@@ -643,7 +654,7 @@ export default function ModalFormMerchantDepo({
           disabled={!formik.isValid}
           sx={{ borderRadius: '2px' }}
         >
-          Submit
+          {isUpdate ? 'Update' : 'Submit'}
         </Button>
       </Box>
       <Modal

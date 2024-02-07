@@ -56,7 +56,13 @@ export default function UseParams<T>(props?: T & ListParams) {
       );
 
       // Set the search property of the current URL
-      window.history.pushState({}, '', `?${queryParams.toString()}`);
+      window.history.pushState(
+        {},
+        '',
+        queryParams.toString().length > 0
+          ? `?${queryParams.toString().length}`
+          : '',
+      );
     },
     [params],
   );
