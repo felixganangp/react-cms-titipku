@@ -45,4 +45,5 @@ export interface MerchantParams extends ListParams {
   jelajah_id?: number[];
   area_id?: number;
   balance_condition?: number;
+  is_new?: number;
 }

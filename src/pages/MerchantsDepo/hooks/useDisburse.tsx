@@ -24,10 +24,9 @@ export const DisburseStatus = {
 };
 
 export const MerchantCondition = {
-  5: 'Below 5%',
-  10: 'Below 10%',
-  15: 'Below 15%',
-  20: 'Below 20%',
+  1: 'New',
+  5: 'Less then 5%',
+  10: 'Less then 10%',
 };
 
 export function UseDisburse(setParams?: DisburseParams) {
@@ -144,6 +143,7 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
       jelajah_id: [],
       area_id: undefined,
       balance_condition: undefined,
+      is_new: undefined,
     },
     onSubmit: (values) => {
       const newValue = {

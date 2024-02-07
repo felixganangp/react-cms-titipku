@@ -194,21 +194,14 @@ export default function DisburseForm() {
                             val.id === queryMerchant.formik.values.area_id,
                         ) || null
                     }
-                    // value={queryInnvoice}
                     onChange={(e, value) =>
                       queryMerchant.formik.setFieldValue('area_id', value?.id)
                     }
-                    // onBlur={() => {
-                    //   formik.setFieldTouched('area');
-                    // }}
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         name="area_id"
-                        placeholder="Select Merchant Name"
-                        // error={
-                        //   formik.touched.area && Boolean(formik.errors.area)
-                        // }
+                        placeholder="Select Pasar"
                       />
                     )}
                   />
@@ -241,7 +234,7 @@ export default function DisburseForm() {
                       <TextField
                         {...params}
                         name="Merchant"
-                        placeholder="Select Merchant Name"
+                        placeholder="Name of Merchant"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -251,7 +244,7 @@ export default function DisburseForm() {
                 </FormLabel>
               </Grid>
               <Grid item xs={12} md={2}>
-                <FormLabel text="Status">
+                <FormLabel text="Condition">
                   <Autocomplete
                     id="filterStatus"
                     value={
@@ -271,6 +264,10 @@ export default function DisburseForm() {
                     }))}
                     onChange={(e, value) => {
                       // handleChangeGrade(value);
+                      console.log(typeof value?.id);
+                      if (value?.id === '1') {
+                        queryMerchant.formik.setFieldValue('is_new', value?.id);
+                      }
                       queryMerchant.formik.setFieldValue(
                         'balance_condition',
                         value?.id,
@@ -282,7 +279,7 @@ export default function DisburseForm() {
                         <TextField
                           {...params}
                           name="condition"
-                          placeholder="Select Balance Condition"
+                          placeholder="Select Condition"
                           variant="outlined"
                         />
                       );
@@ -336,8 +333,8 @@ export default function DisburseForm() {
               setSelected(e);
             }}
             enableRadio
-            orderBy={queryMerchant.params.order_by}
-            orderType={queryMerchant.params.order_type}
+            orderBy={queryMerchant.params.sort_by}
+            orderType={queryMerchant.params.sort_type}
             loading={queryMerchant.isLoading}
             page={queryMerchant.data?.page || 0}
             count={queryMerchant.data?.count || 0}
@@ -367,18 +364,18 @@ export default function DisburseForm() {
             }}
           />
           <Stack direction="row" gap={2}>
-            <Button variant="text" color="error" onClick={() => navigate(-1)}>
+            <Button
+              variant="text"
+              color="error"
+              onClick={() => navigate('/depo/disburse')}
+            >
               Back
             </Button>
             <Button
-              sx={{ borderRadius: '4px' }}
+              sx={{ borderRadius: '4px', width: '120px' }}
               disabled={selected.length === 0}
               onClick={() => {
                 formModal.openModal();
-                // const current = queryMerchant.listData.find(
-                //   (item) => item.id === selected[0],
-                // );
-                // if (current === undefined) return;
                 setSelectedData({
                   id_jelajah: +selected[0],
                 });
@@ -392,7 +389,7 @@ export default function DisburseForm() {
 
       <Modal
         open={formModal.open}
-        title="Create Disburse"
+        title="Add New Disburse"
         onClose={!id ? formModal.closeModal : () => navigate(-1)}
       >
         <ModalFormDisburseDepo
