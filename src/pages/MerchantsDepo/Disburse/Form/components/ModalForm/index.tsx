@@ -72,10 +72,11 @@ export default function ModalFormDisburseDepo({
   }
 
   if (
-    disburseDetails?.data?.data.bank_name !==
+    isUpdate &&
+    (disburseDetails?.data?.data.bank_name !==
       merchantDetails?.data?.data?.bank_name ||
-    disburseDetails?.data?.data.bank_account_number !==
-      merchantDetails?.data?.data?.bank_account_number
+      disburseDetails?.data?.data.bank_account_number !==
+        merchantDetails?.data?.data?.bank_account_number)
   ) {
     bankAccounts.push({
       id: disburseDetails?.data?.data?.bank_account_number,

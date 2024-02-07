@@ -547,7 +547,7 @@ export default function DisbursePages() {
       </Modal>
       <CustomModal
         open={modalUpdate.open}
-        title="Update Disburse"
+        title="Edit Disburse"
         onClose={modalUpdate.closeModal}
       >
         <ModalFormDisburseDepo
