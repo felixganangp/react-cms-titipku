@@ -68,7 +68,6 @@ export default function DisbursePages() {
   const queryDisburseStatus = UseListDisburseStatus();
 
   const handleUpdate = () => {
-    console.log('valx', selectedData);
     if (selectedData?.id) {
       modalUpdate.openModal();
     }
@@ -164,9 +163,7 @@ export default function DisbursePages() {
             {
               label: 'Edit',
               onClick: () => {
-                // handleUpdate(value);
                 setSelectedData(value);
-                // console.log('selected', selectedData, value.id);
               },
             },
             {

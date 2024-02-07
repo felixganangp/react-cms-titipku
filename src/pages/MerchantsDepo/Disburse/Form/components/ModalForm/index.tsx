@@ -77,16 +77,13 @@ export default function ModalFormDisburseDepo({
     disburseDetails?.data?.data.bank_account_number !==
       merchantDetails?.data?.data?.bank_account_number
   ) {
-    console.log('blah', disburseDetails?.data.data);
     bankAccounts.push({
-      id: disburseDetails?.data.data.bank_account_number,
-      string: `${disburseDetails?.data.data.bank_name} - ${disburseDetails?.data.data.bank_account_number}`,
-      bank: disburseDetails?.data.data.bank_name,
-      bank_account_name: disburseDetails?.data.data.bank_account_name,
+      id: disburseDetails?.data?.data?.bank_account_number,
+      string: `${disburseDetails?.data?.data?.bank_name} - ${disburseDetails?.data?.data?.bank_account_number}`,
+      bank: disburseDetails?.data?.data?.bank_name,
+      bank_account_name: disburseDetails?.data?.data?.bank_account_name,
     });
   }
-
-  console.log('merchdetail', merchantDetails, bankAccounts);
 
   const formik = useFormik({
     initialValues: {
