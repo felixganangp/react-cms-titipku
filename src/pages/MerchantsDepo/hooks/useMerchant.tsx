@@ -12,6 +12,7 @@ import {
   postMerchant,
   updateMerchant,
   getMerchantDepoLimitHistoryList,
+  getAllTransactionMerchantDepo,
 } from 'service/MerchantDepo/Merchant';
 import { useFormik } from 'formik';
 import { useEffect } from 'react';
@@ -262,8 +263,23 @@ export function useGetLimitHistory(id?: string, setParams?: ListParams) {
   const params = UseParams(setParams);
 
   const query = useQuery({
-    queryKey: ['merchant-depo/merchant-depo/filter', params.params],
+    queryKey: ['merchant-depo/merchant-depo/filter', id, params.params],
     queryFn: () => getMerchantDepoLimitHistoryList(id, params.params),
+    enabled: !!id,
+  });
+  return { ...query, ...params, listData: query?.data?.data || [] };
+}
+
+export function useGetTransactionMutation(id?: string, setParams?: ListParams) {
+  const params = UseParams(setParams);
+
+  const query = useQuery({
+    queryKey: [
+      'merchant-depo/merchant-depo/transaction-history',
+      id,
+      params.params,
+    ],
+    queryFn: () => getAllTransactionMerchantDepo(id, params.params),
     enabled: !!id,
   });
   return { ...query, ...params, listData: query?.data?.data || [] };
