@@ -4,6 +4,7 @@ import {
   getAllFilterMerchant,
   getAllFilterMerchantDepo,
   getAllTypeMerchantDepo,
+  getAllMutationTypeMerchantDepo,
 } from 'service/MerchantDepo/Config';
 import { useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
@@ -42,6 +43,16 @@ export function UseFilterMerchentListService(setParams?: ListParams) {
   const query = useQuery({
     queryKey: ['merchant-depo/merchant/filter', params.params],
     queryFn: () => getAllFilterMerchant(params.params),
+  });
+  return { ...query, ...params, listData: query?.data?.data || [] };
+}
+
+export function UseMutationTypeListService(setParams?: ListParams) {
+  const params = UseParams(setParams);
+
+  const query = useQuery({
+    queryKey: ['merchant-depo/merchant-depo/mutation-types', params.params],
+    queryFn: () => getAllMutationTypeMerchantDepo(params.params),
   });
   return { ...query, ...params, listData: query?.data?.data || [] };
 }

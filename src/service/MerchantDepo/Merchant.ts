@@ -4,6 +4,7 @@ import {
   MerchantDetails,
   MerchantList,
   MerchantParams,
+  TransactionMerchantDepoList,
 } from 'models/merchantDepo/Merchant';
 
 export const getMerchantDepoList = (params?: MerchantParams) =>
@@ -173,3 +174,28 @@ export const getMerchantDepoLimitHistoryList = (
       reject(message);
     }
   });
+
+export const getAllTransactionMerchantDepo = (
+  id?: string,
+  params?: ListParams,
+) =>
+  new Promise<ListResponse<TransactionMerchantDepoList>>(
+    async (resolve, reject) => {
+      try {
+        const respon = await http.get(
+          `merchant-depo/merchant-depo/${id}/transaction-history`,
+          {
+            params,
+          },
+        );
+        if (respon.data) {
+          resolve(respon.data);
+        }
+      } catch (err: any) {
+        const message: string = err.response
+          ? `${err.response.data.message}`
+          : 'Oops, something wrong with our server, please try again later.';
+        reject(message);
+      }
+    },
+  );

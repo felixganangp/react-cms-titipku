@@ -52,3 +52,14 @@ export interface MerchantDetails {
   last_month_trx: number;
   is_active: boolean;
 }
+
+export interface TransactionMerchantDepoList {
+  mutation_id: number;
+  qris_id: number;
+  jelajah_id: number;
+  description: string;
+  mutation_type_id: number;
+  debit: number;
+  credit: number;
+  created_at: number;
+}

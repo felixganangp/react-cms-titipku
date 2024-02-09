@@ -33,10 +33,17 @@ import Table from 'components/Table';
 import { HeadCells } from 'components/Table/types';
 import moment from 'moment';
 import numberSeperator from 'utils/numberSeperator';
-import { useMerchantDetails } from '../hooks/useMerchant';
+import { TransactionMerchantDepoList } from 'models/merchantDepo/Merchant';
+import {
+  useGetTransactionMutation,
+  useMerchantDetails,
+} from '../hooks/useMerchant';
+import { UseMutationTypeListService } from '../hooks/useConfigMerchant';
 
 export default function MercheantsDetails() {
   const { id } = useParams();
+  const mutationType = UseMutationTypeListService();
+  const mutationTransaction = useGetTransactionMutation(id);
   const merchantDetails = useMerchantDetails(id);
   const details = merchantDetails.data?.data;
   const navigate = useNavigate();
@@ -45,7 +52,7 @@ export default function MercheantsDetails() {
   const isDepo = details?.depo_type_id === 1 || details?.depo_type_id === 3;
   const isAndalan = details?.depo_type_id === 2 || details?.depo_type_id === 3;
 
-  const headCells: HeadCells<any>[] = [
+  const headCells: HeadCells<TransactionMerchantDepoList>[] = [
     {
       id: 'Date',
       label: 'Date',
@@ -54,16 +61,24 @@ export default function MercheantsDetails() {
     {
       id: 'Type',
       label: 'Type',
-      format: (value) => `#${value.rank}`,
+      format: (value) => {
+        const type = mutationType.listData.find(
+          (item) => item.id === value.mutation_type_id,
+        );
+        return type?.description || '-';
+      },
     },
     {
       id: 'Reference',
       label: 'Reference',
+      format: (value) => {
+        return value?.description || '-';
+      },
     },
     {
       id: 'Amount',
-      enableSort: true,
       label: 'Amount',
+      format: (value) => `Rp ${numberSeperator(value.credit)}`,
     },
     {
       id: 'Action',
@@ -474,20 +489,7 @@ export default function MercheantsDetails() {
             </Grid>
             <Table
               headCells={headCells}
-              data={[
-                { rank: 1, id: 'skdldslk', 'Join Date': '2021-10-10' },
-                {
-                  rank: 1,
-                  id: 'skdldslk',
-                  'Join Date': '2021-10-10',
-                },
-                {
-                  rank: 1,
-                  id: 'skdldslk',
-                  'Join Date': '2021-10-10',
-                },
-                { rank: 1, id: 'skdldslk', 'Join Date': '2021-10-10' },
-              ]}
+              data={mutationTransaction.listData}
               selected={selected}
               setSelected={(e) => {
                 setSelected(e);
