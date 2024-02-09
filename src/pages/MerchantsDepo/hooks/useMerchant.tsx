@@ -282,5 +282,34 @@ export function useGetTransactionMutation(id?: string, setParams?: ListParams) {
     queryFn: () => getAllTransactionMerchantDepo(id, params.params),
     enabled: !!id,
   });
-  return { ...query, ...params, listData: query?.data?.data || [] };
+
+  const formik = useFormik({
+    initialValues: {
+      type: undefined,
+      from: undefined,
+      to: undefined,
+    },
+    onSubmit: (values) => {
+      const newValue = {
+        ...values,
+        page: 1,
+        search: params.params.search,
+        // @ts-ignore
+        type: values.type?.id || undefined,
+        // @ts-ignore
+        from: values.from ? values.from?.startOf('day').unix() : undefined,
+        // @ts-ignore
+        to: values.to ? values.to.endOf('day').unix() : undefined,
+      };
+
+      params.handleChangeParams(newValue);
+    },
+  });
+
+  return {
+    formik,
+    ...query,
+    ...params,
+    listData: query?.data?.data || [],
+  };
 }

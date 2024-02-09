@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import AccordionOnDetails from 'components/Accordion/SubDetailsPagesWrapper';
 import DescriptionDetail from 'components/DescDetails';
 import {
@@ -18,6 +18,7 @@ import {
   Typography,
   Autocomplete,
   TextField,
+  Modal,
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import MerchantAndalan from 'assets/merchant-andalan.svg';
@@ -34,11 +35,18 @@ import { HeadCells } from 'components/Table/types';
 import moment from 'moment';
 import numberSeperator from 'utils/numberSeperator';
 import { TransactionMerchantDepoList } from 'models/merchantDepo/Merchant';
+import useModal from 'hooks/useModal';
+import ModalComp from 'components/Modal';
+import DeleteModal from 'components/Delete/freetext';
+import { QrisForm } from 'models/merchantDepo/Qris';
 import {
   useGetTransactionMutation,
   useMerchantDetails,
 } from '../hooks/useMerchant';
 import { UseMutationTypeListService } from '../hooks/useConfigMerchant';
+import ModalFormQris from '../Qris/Components/ModalFormQris';
+
+import { useDeleteQris } from '../hooks/useQris';
 
 export default function MercheantsDetails() {
   const { id } = useParams();
@@ -48,15 +56,27 @@ export default function MercheantsDetails() {
   const details = merchantDetails.data?.data;
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
+  const currentSelected = useMemo(() => {
+    return selected.filter((val) => val !== 0);
+  }, [selected]);
 
   const isDepo = details?.depo_type_id === 1 || details?.depo_type_id === 3;
   const isAndalan = details?.depo_type_id === 2 || details?.depo_type_id === 3;
+  const deleteQris = useDeleteQris();
+
+  const openDateFilter = useModal();
+  const openEndDateFilter = useModal();
+  const modalDelete = useModal();
+  const modalForm = useModal();
+  const [editSelected, setEditSelected] = useState<
+    (QrisForm & { id: number; merchant_name: string }) | undefined
+  >(undefined);
 
   const headCells: HeadCells<TransactionMerchantDepoList>[] = [
     {
       id: 'Date',
       label: 'Date',
-      format: (value) => moment().format('DD MMM YYYY'),
+      format: (value) => moment.unix(value.created_at).format('DD MMM YYYY'),
     },
     {
       id: 'Type',
@@ -84,8 +104,31 @@ export default function MercheantsDetails() {
       id: 'Action',
       label: 'Action',
       format: (value) => (
-        <MenuList menu={[]}>
-          <IconButton>
+        <MenuList
+          menu={[
+            {
+              label: 'Edit',
+              onClick: () => {
+                setEditSelected({
+                  id: value.qris_id,
+                  merchant_name: details?.merchant_name || '',
+                  amount: value.credit,
+                  transaction_date: value.created_at,
+                  jelajah_id: value.jelajah_id,
+                });
+                modalForm.toggleModal();
+              },
+            },
+            {
+              label: 'Delete',
+              onClick: () => {
+                setSelected([value.qris_id]);
+                modalDelete.openModal();
+              },
+            },
+          ]}
+        >
+          <IconButton disabled={value.qris_id === 0}>
             <MoreVert />
           </IconButton>
         </MenuList>
@@ -360,23 +403,24 @@ export default function MercheantsDetails() {
                   container
                   spacing={2}
                   component="form"
-                  // onSubmit={queryInnvoice.formikParams.handleSubmit}
+                  onSubmit={mutationTransaction.formik.handleSubmit}
                 >
                   <Grid item xs={12} md={5}>
                     <FormLabel text="Type">
                       <Autocomplete
-                        options={[]}
-                        // onBlur={() => {
-                        //   formik.setFieldTouched('area');
-                        // }}
+                        options={mutationType.listData}
+                        getOptionLabel={(option) => option.description || ''}
+                        onChange={(e, value) => {
+                          mutationTransaction.formik.setFieldValue(
+                            'type',
+                            value,
+                          );
+                        }}
                         renderInput={(params) => (
                           <TextField
                             {...params}
                             name="Type"
                             placeholder="Select Type"
-                            // error={
-                            //   formik.touched.area && Boolean(formik.errors.area)
-                            // }
                           />
                         )}
                       />
@@ -385,65 +429,82 @@ export default function MercheantsDetails() {
                   <Grid item xs={12} md={7}>
                     <FormLabel text="Range Date">
                       <Stack direction="row" gap={1} alignItems="start">
-                        <DesktopDatePicker
-                          // value={
-                          //   queryInnvoice.formikParams.values.max_invoice_date || null
-                          // }
-                          value={null}
-                          onChange={() => {}}
-                          inputFormat="DD/MM/YYYY"
-                          // onChange={(value) => {
-                          //   queryInnvoice.formikParams.setFieldValue(
-                          //     'max_invoice_date',
-                          //     value,
-                          //   );
-                          // }}
-                          // minDate={queryInnvoice.formikParams.values.min_invoice_date}
-                          // maxDate={formik.values.max_date_created}
-                          renderInput={(params) => {
-                            return (
-                              <TextField
-                                {...params}
-                                name="grade"
-                                placeholder="Select Grade"
-                                variant="outlined"
-                                fullWidth
-                              />
-                            );
-                          }}
-                        />
+                        <Stack spacing={1} width="100%">
+                          <DesktopDatePicker
+                            value={
+                              mutationTransaction.formik.values.from || null
+                            }
+                            onChange={(value) => {
+                              mutationTransaction.formik.setFieldValue(
+                                'from',
+                                value,
+                              );
+                              openDateFilter.toggleModal();
+                            }}
+                            inputFormat="DD/MM/YYYY"
+                            maxDate={mutationTransaction.formik.values.to}
+                            open={openDateFilter.open}
+                            onOpen={openDateFilter.toggleModal}
+                            onClose={openDateFilter.toggleModal}
+                            renderInput={(params) => {
+                              return (
+                                <TextField
+                                  {...params}
+                                  name="date"
+                                  placeholder="Select date"
+                                  variant="outlined"
+                                  fullWidth
+                                  onClick={openDateFilter.toggleModal}
+                                />
+                              );
+                            }}
+                          />
+                        </Stack>
+                        {mutationTransaction.formik.errors.from && (
+                          <Typography color="error.main">
+                            {mutationTransaction.formik.errors.from}
+                          </Typography>
+                        )}
                         <Box
                           minWidth="20px"
                           borderBottom="1px solid"
                           mt="20px"
                         />
-                        <DesktopDatePicker
-                          // value={
-                          //   queryInnvoice.formikParams.values.max_invoice_date || null
-                          // }
-                          value={null}
-                          onChange={() => {}}
-                          inputFormat="DD/MM/YYYY"
-                          // onChange={(value) => {
-                          //   queryInnvoice.formikParams.setFieldValue(
-                          //     'max_invoice_date',
-                          //     value,
-                          //   );
-                          // }}
-                          // minDate={queryInnvoice.formikParams.values.min_invoice_date}
-                          // maxDate={formik.values.max_date_created}
-                          renderInput={(params) => {
-                            return (
-                              <TextField
-                                {...params}
-                                name="grade"
-                                placeholder="Select Grade"
-                                variant="outlined"
-                                fullWidth
-                              />
-                            );
-                          }}
-                        />
+                        <Stack spacing={1} width="100%">
+                          <DesktopDatePicker
+                            value={mutationTransaction.formik.values.to || null}
+                            onChange={(value) => {
+                              mutationTransaction.formik.setFieldValue(
+                                'to',
+                                value,
+                              );
+                              openEndDateFilter.toggleModal();
+                            }}
+                            inputFormat="DD/MM/YYYY"
+                            maxDate={moment()}
+                            minDate={mutationTransaction.formik.values.from}
+                            open={openEndDateFilter.open}
+                            onOpen={openEndDateFilter.toggleModal}
+                            onClose={openEndDateFilter.toggleModal}
+                            renderInput={(params) => {
+                              return (
+                                <TextField
+                                  {...params}
+                                  name="date"
+                                  placeholder="Select date"
+                                  variant="outlined"
+                                  fullWidth
+                                  onClick={openEndDateFilter.toggleModal}
+                                />
+                              );
+                            }}
+                          />
+                          {mutationTransaction.formik.errors.to && (
+                            <Typography color="error.main">
+                              {mutationTransaction.formik.errors.to}
+                            </Typography>
+                          )}
+                        </Stack>
                       </Stack>
                     </FormLabel>
                   </Grid>
@@ -452,10 +513,10 @@ export default function MercheantsDetails() {
                       <Button
                         variant="text"
                         onClick={() => {
-                          // queryInnvoice.formikParams.resetForm();
-                          // queryInnvoice.handleResetFilter({
-                          //   whiteList: ['search'],
-                          // });
+                          mutationTransaction.formik.resetForm();
+                          mutationTransaction.handleResetFilter({
+                            whiteList: ['search'],
+                          });
                         }}
                       >
                         Reset
@@ -470,14 +531,17 @@ export default function MercheantsDetails() {
                   <MenuList
                     menu={[
                       {
-                        label: 'Delete 2 Items',
-                        color: 'error',
-                        onClick: () => {},
+                        label: `Delete ${currentSelected.length} Items`,
+                        onClick: () => {
+                          modalDelete.openModal();
+                        },
                       },
                     ]}
                   >
                     <Button
                       endIcon={<KeyboardArrowDown />}
+                      disabled={currentSelected.length === 0}
+
                       //   variant="outlined"
                       //   onClick={showFilter.toggleModal}
                     >
@@ -489,27 +553,70 @@ export default function MercheantsDetails() {
             </Grid>
             <Table
               headCells={headCells}
-              data={mutationTransaction.listData}
+              data={mutationTransaction.listData.map((val) => {
+                return {
+                  ...val,
+                  table_disabled: val.qris_id === 0,
+                  id: val.qris_id,
+                };
+              })}
               selected={selected}
               setSelected={(e) => {
                 setSelected(e);
               }}
               enableCheckBox
-              // loading={queryInnvoice.isLoading}
-              // page={queryInnvoice.data?.page || 0}
-              // count={queryInnvoice.data?.count || 0}
-              // totalData={queryInnvoice.data?.total || 0}
-              // onChangePage={(value) => {
-              //   queryInnvoice.handleChangeParams({
-              //     ...queryInnvoice.params,
-              //     page: value,
-              //   });
-              //   queryInnvoice.handleToSetSearchParams('page', value.toString());
-              // }}
+              loading={mutationTransaction.isLoading}
+              page={mutationTransaction.data?.page || 0}
+              count={mutationTransaction.data?.count || 0}
+              totalData={mutationTransaction.data?.total || 0}
+              onChangePage={(value) => {
+                mutationTransaction.handleChangeParams({
+                  ...mutationTransaction.params,
+                  page: value,
+                });
+              }}
             />
           </Box>
         </Card>
       </AccordionOnDetails>
+      <ModalComp
+        open={modalForm.open}
+        title={!editSelected ? 'Add New QRIS' : 'Edit QRIS'}
+        onClose={modalForm.closeModal}
+      >
+        <ModalFormQris
+          data={editSelected}
+          handleClose={(isSubmited) => {
+            if (isSubmited) {
+              mutationTransaction.refetch();
+            }
+            modalForm.closeModal();
+          }}
+        />
+      </ModalComp>
+      <Modal open={modalDelete.open} onClose={modalDelete.closeModal}>
+        <DeleteModal
+          onClose={modalDelete.closeModal}
+          headerText="Delete  Merchant"
+          desc={
+            <>
+              Are you sure want to delete {currentSelected.length} item
+              Merchant?
+            </>
+          }
+          onSubmit={() => {
+            deleteQris.mutate(
+              { ids: currentSelected },
+              {
+                onSuccess: () => {
+                  mutationTransaction.refetch();
+                  modalDelete.closeModal();
+                },
+              },
+            );
+          }}
+        />
+      </Modal>
     </Box>
   );
 }

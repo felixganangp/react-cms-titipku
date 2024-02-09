@@ -243,7 +243,11 @@ function EnhancedTable<T extends Data>({
                         ]}
                       >
                         <Checkbox
-                          sx={{ color: '#e5e5e5' }}
+                          disabled={row.table_disabled}
+                          sx={{
+                            color: '#e5e5e5',
+                            opacity: row?.table_disabled ? 0.2 : 1,
+                          }}
                           checked={isItemSelected}
                           inputProps={{
                             'aria-labelledby': labelId,
