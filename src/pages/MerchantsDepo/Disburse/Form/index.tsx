@@ -267,11 +267,13 @@ export default function DisburseForm() {
                       console.log(typeof value?.id);
                       if (value?.id === '1') {
                         queryMerchant.formik.setFieldValue('is_new', value?.id);
+                      } else {
+                        queryMerchant.formik.setFieldValue('is_new', undefined);
+                        queryMerchant.formik.setFieldValue(
+                          'balance_condition',
+                          value?.id,
+                        );
                       }
-                      queryMerchant.formik.setFieldValue(
-                        'balance_condition',
-                        value?.id,
-                      );
                     }}
                     getOptionLabel={(option) => `${option.name}`}
                     renderInput={(params) => {
