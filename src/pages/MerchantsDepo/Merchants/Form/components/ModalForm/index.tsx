@@ -81,10 +81,7 @@ export default function ModalFormMerchantDepo({
             : 5,
         admin_fee:
           isUpdate || isDepo
-            ? parseInt(
-                values.depo_discount === '0' ? '5' : values.depo_discount,
-                10,
-              )
+            ? parseInt(values.admin_fee === '0' ? '5' : values.admin_fee, 10)
             : 5,
         bank_name: isUpdate || isDepo ? values.bank_name : '',
         bank_branch_office: isUpdate || isDepo ? values.bank_branch_office : '',
