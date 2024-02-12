@@ -421,7 +421,7 @@ export default function MercheantsDetails() {
                           <TextField
                             {...params}
                             name="Type"
-                            placeholder="Select Type"
+                            placeholder="Type transaction"
                           />
                         )}
                       />
