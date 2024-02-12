@@ -65,6 +65,7 @@ export default function ModalFormMerchantDepo({
       bank_account_number: '',
       nobu_account_name: '',
       nobu_account_number: '',
+      merchant_qris_id: '',
       qris_ready: false,
     },
     onSubmit: (values) => {
@@ -181,6 +182,16 @@ export default function ModalFormMerchantDepo({
           .max(25, 'must be at most 25 characters'),
         // .required('This field is required'),
       }),
+      merchant_qris_id: Yup.string().when('merchant_depo_type_id', {
+        is: (val: number) => val === 1 || val === 3,
+        then: Yup.string().when('qris_ready', {
+          is: (val: boolean) => val,
+          then: Yup.string()
+            .min(10, 'must be at least 10 characters')
+            .max(50, 'must be at most 50 characters')
+            .required('This field is required'),
+        }),
+      }),
     }),
   });
 
@@ -200,7 +211,9 @@ export default function ModalFormMerchantDepo({
         bank_account_number: detailData?.bank_account_number || '',
         nobu_account_name: detailData?.nobu_account_name || '',
         nobu_account_number: detailData?.nobu_account_number || '',
-        qris_ready: detailData?.qris_ready || false,
+        qris_ready: detailData?.qris_ready,
+        // @ts-ignore
+        merchant_qris_id: detailData?.qris_merchant_id,
         merchant_depo_type_id: detailData?.depo_type_id || 2,
       });
     }
@@ -621,11 +634,35 @@ export default function ModalFormMerchantDepo({
               // }
             >
               <SwitchCostum
-                value={formik.values.qris_ready}
+                checked={formik.values.qris_ready}
                 name="qris_ready"
                 onChange={formik.handleChange}
               />
             </FormControl>
+            {formik.values.qris_ready && (
+              <FormControl
+                text=""
+                // required
+                error={
+                  formik.touched.merchant_qris_id &&
+                  Boolean(formik.errors.merchant_qris_id)
+                }
+                helperText={
+                  formik.touched.merchant_qris_id &&
+                  formik.errors.merchant_qris_id &&
+                  `${formik.errors.merchant_qris_id}`
+                }
+              >
+                <TextField
+                  fullWidth
+                  placeholder="Merchant ID NOBU"
+                  value={formik.values.merchant_qris_id}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  name="merchant_qris_id"
+                />
+              </FormControl>
+            )}
           </>
         )}
       </Box>
