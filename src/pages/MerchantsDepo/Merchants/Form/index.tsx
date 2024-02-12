@@ -114,11 +114,9 @@ export default function MerchantForm() {
       enableSort: true,
       label: 'Last Month Total Transaction',
       format: (value) => {
-        if (!value.last_month_total_tx) return <Typography>-</Typography>;
+        if (!value.last_month_total_trx) return <Typography>-</Typography>;
         return (
-          <Typography>
-            Rp {numberSeperator(value.last_month_total_tx)}
-          </Typography>
+          <Typography>{numberSeperator(value.last_month_total_trx)}</Typography>
         );
       },
     },
