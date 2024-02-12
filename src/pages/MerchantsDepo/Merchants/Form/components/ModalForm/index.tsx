@@ -146,7 +146,13 @@ export default function ModalFormMerchantDepo({
           is: (val: number) => val === 1 || val === 3,
           then: Yup.mixed().nullable().required('This field is required'),
         }),
-      bank_branch_office: Yup.string(),
+      bank_branch_office: Yup.string().when('bank_name', {
+        is: (val: string) => val !== 'BCA (Bank Central Asia)',
+        then: Yup.string()
+          .min(2, 'must be at least 3 characters')
+          .max(255, 'must be at most 255 characters')
+          .required('This field is required'),
+      }),
       bank_account_name: Yup.string().when('merchant_depo_type_id', {
         is: (val: number) => val === 1 || val === 3,
         then: Yup.string()
@@ -165,15 +171,15 @@ export default function ModalFormMerchantDepo({
         is: (val: number) => val === 1 || val === 3,
         then: Yup.string()
           .min(3, 'must be at least 3 characters')
-          .max(255, 'must be at most 255 characters')
-          .required('This field is required'),
+          .max(255, 'must be at most 255 characters'),
+        // .required('This field is required'),
       }),
       nobu_account_number: Yup.string().when('merchant_depo_type_id', {
         is: (val: number) => val === 1 || val === 3,
         then: Yup.string()
           .min(5, 'must be at least 5 characters')
-          .max(25, 'must be at most 25 characters')
-          .required('This field is required'),
+          .max(25, 'must be at most 25 characters'),
+        // .required('This field is required'),
       }),
     }),
   });
@@ -478,7 +484,7 @@ export default function ModalFormMerchantDepo({
             </FormControl>
             <FormControl
               text="Branch Office"
-              // required
+              required={formik.values.bank_name !== 'BCA (Bank Central Asia)'}
               error={
                 formik.touched.bank_branch_office &&
                 Boolean(formik.errors.bank_branch_office)
@@ -552,7 +558,7 @@ export default function ModalFormMerchantDepo({
             </FormControl>
             <FormControl
               text="NOBU Account Name"
-              required
+              // required
               error={
                 formik.touched.nobu_account_name &&
                 Boolean(formik.errors.nobu_account_name)
@@ -574,7 +580,7 @@ export default function ModalFormMerchantDepo({
             </FormControl>
             <FormControl
               text="NOBU Account Number"
-              required
+              // required
               error={
                 formik.touched.nobu_account_number &&
                 Boolean(formik.errors.nobu_account_number)
@@ -604,7 +610,6 @@ export default function ModalFormMerchantDepo({
             </FormControl>
             <FormControl
               text="Is QRIS Ready?"
-              required
               // error={
               //   formik.touched.bank_account_number &&
               //   Boolean(formik.errors.bank_account_number)
