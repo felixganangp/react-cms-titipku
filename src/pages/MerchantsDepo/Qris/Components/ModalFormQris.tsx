@@ -46,7 +46,8 @@ export default function ModalFormQris({
     },
     onSubmit: (values) => {
       const payload = {
-        ...values,
+        // @ts-ignore
+        jelajah_id: values.jelajah_id.id,
         // @ts-ignore
         amount: parseInt(values?.amount || 0, 10),
         // @ts-ignore
@@ -56,7 +57,10 @@ export default function ModalFormQris({
       if (isUpdate) {
         updateQris.mutate(
           // @ts-ignore
-          { data: payload, id: data?.id },
+          {
+            data: payload,
+            id: data?.id,
+          },
           {
             onSuccess: () => {
               handleClose(true);
@@ -93,8 +97,15 @@ export default function ModalFormQris({
         // @ts-ignore
         transaction_date: moment.unix(data.transaction_date),
       });
+    } else {
+      formik.setValues({
+        jelajah_id: null,
+        amount: null,
+        transaction_date: null,
+      });
     }
   }, [data]);
+
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Box p="24px">
@@ -131,7 +142,7 @@ export default function ModalFormQris({
             getOptionLabel={(item) => item.name}
             value={formik.values.jelajah_id}
             onChange={(e, value) => {
-              formik.setFieldValue('jelajah_id', value?.id);
+              formik.setFieldValue('jelajah_id', value);
             }}
             renderInput={(params) => (
               <TextField

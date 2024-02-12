@@ -363,7 +363,10 @@ export default function MerchantsQrisPages() {
       <ModalComp
         open={modalForm.open}
         title={!editSelected ? 'Add New QRIS' : 'Edit QRIS'}
-        onClose={modalForm.closeModal}
+        onClose={() => {
+          modalForm.closeModal();
+          setEditSelected(undefined);
+        }}
       >
         <ModalFormQris
           data={editSelected}
@@ -371,6 +374,7 @@ export default function MerchantsQrisPages() {
             if (isSubmited) {
               qrisQuery.refetch();
             }
+            setEditSelected(undefined);
             modalForm.closeModal();
           }}
         />
