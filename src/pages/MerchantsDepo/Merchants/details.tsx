@@ -301,7 +301,7 @@ export default function MercheantsDetails() {
                   title="Join Date"
                   icon={<CalendarToday sx={{ color: '#008e58' }} />}
                   content={
-                    details?.join_date !== 0
+                    details?.join_date !== 0 && details?.join_date !== null
                       ? moment((details?.join_date || 0) * 1000).format(
                           'DD MMM YYYY',
                         )
@@ -349,7 +349,7 @@ export default function MercheantsDetails() {
                   title="Join Date Andalan & Depo"
                   icon={<CalendarToday sx={{ color: '#008e58' }} />}
                   content={
-                    details?.active_date !== 0
+                    details?.active_date !== 0 && details?.active_date !== null
                       ? moment((details?.active_date || 0) * 1000).format(
                           'DD MMM YYYY',
                         )
