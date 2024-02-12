@@ -167,18 +167,18 @@ export default function MercheantsDetails() {
               </Typography>
               <Box
                 component="img"
-                src={MerchantDepo}
+                src={MerchantAndalan}
                 display={
-                  details?.depo_type_id === 1 || details?.depo_type_id === 3
+                  details?.depo_type_id === 2 || details?.depo_type_id === 3
                     ? 'block'
                     : 'none'
                 }
               />
               <Box
                 component="img"
-                src={MerchantAndalan}
+                src={MerchantDepo}
                 display={
-                  details?.depo_type_id === 2 || details?.depo_type_id === 3
+                  details?.depo_type_id === 1 || details?.depo_type_id === 3
                     ? 'block'
                     : 'none'
                 }
@@ -300,9 +300,13 @@ export default function MercheantsDetails() {
                 <DescriptionDetail
                   title="Join Date"
                   icon={<CalendarToday sx={{ color: '#008e58' }} />}
-                  content={moment((details?.created_at || 0) * 1000).format(
-                    'DD MMM YYYY',
-                  )}
+                  content={
+                    details?.join_date !== 0
+                      ? moment((details?.join_date || 0) * 1000).format(
+                          'DD MMM YYYY',
+                        )
+                      : ''
+                  }
                 />
               </Grid>
               <Grid item xs={6} md={2.4}>
@@ -340,20 +344,17 @@ export default function MercheantsDetails() {
                   content={details?.nobu_account_number}
                 />
               </Grid>
-              <Grid
-                item
-                xs={6}
-                md={2.4}
-                sx={{
-                  opacity: (details?.join_date || 0) !== 0 ? '100%' : '0%',
-                }}
-              >
+              <Grid item xs={6} md={2.4}>
                 <DescriptionDetail
                   title="Join Date Andalan & Depo"
                   icon={<CalendarToday sx={{ color: '#008e58' }} />}
-                  content={moment((details?.join_date || 0) * 100).format(
-                    'DD MMM YYYY',
-                  )}
+                  content={
+                    details?.active_date !== 0
+                      ? moment((details?.active_date || 0) * 1000).format(
+                          'DD MMM YYYY',
+                        )
+                      : ''
+                  }
                 />
               </Grid>
               <Grid item xs={6} md={2.4}>

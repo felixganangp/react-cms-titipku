@@ -87,7 +87,7 @@ export default function ModalFormQris({
     if (data) {
       formik.setValues({
         // @ts-ignore
-        jelajah_id: data.jelajah_id,
+        jelajah_id: { id: data.jelajah_id, name: data.merchant_name },
         // @ts-ignore
         amount: data.amount,
         // @ts-ignore
@@ -129,18 +129,7 @@ export default function ModalFormQris({
             }}
             loading={filterMerchantDepoList.isFetching}
             getOptionLabel={(item) => item.name}
-            value={
-              filterMerchantDepoList.listData
-                .map((val) => ({
-                  id: val.id,
-                  name: val.merchant_name,
-                }))
-                .find(
-                  (val) =>
-                    // @ts-ignore
-                    formik.values.jelajah_id === val.id,
-                ) || null
-            }
+            value={formik.values.jelajah_id}
             onChange={(e, value) => {
               formik.setFieldValue('jelajah_id', value?.id);
             }}
