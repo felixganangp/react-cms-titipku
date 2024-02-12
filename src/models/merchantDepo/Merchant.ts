@@ -31,6 +31,7 @@ export interface MerchantDetails {
   provision_fee: number;
   admin_fee: number;
   join_date: number;
+  active_date: number;
   depo_type_id: number;
   bank_name: string;
   bank_branch_office: string;
