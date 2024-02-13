@@ -147,13 +147,19 @@ export default function ModalFormMerchantDepo({
           is: (val: number) => val === 1 || val === 3,
           then: Yup.mixed().nullable().required('This field is required'),
         }),
-      bank_branch_office: Yup.string().when('bank_name', {
-        is: (val: string) => val !== 'BCA (Bank Central Asia)',
-        then: Yup.string()
-          .min(2, 'must be at least 3 characters')
-          .max(255, 'must be at most 255 characters')
-          .required('This field is required'),
-      }),
+      bank_branch_office: Yup.string()
+        .nullable()
+        .test((val) => {
+          if (
+            formik.values.merchant_depo_type_id === 1 ||
+            formik.values.merchant_depo_type_id === 3
+          ) {
+            if (val !== 'BCA (Bank Central Asia)') {
+              return val !== '';
+            }
+          }
+          return true;
+        }),
       bank_account_name: Yup.string().when('merchant_depo_type_id', {
         is: (val: number) => val === 1 || val === 3,
         then: Yup.string()
@@ -182,16 +188,19 @@ export default function ModalFormMerchantDepo({
           .max(25, 'must be at most 25 characters'),
         // .required('This field is required'),
       }),
-      merchant_qris_id: Yup.string().when('merchant_depo_type_id', {
-        is: (val: number) => val === 1 || val === 3,
-        then: Yup.string().when('qris_ready', {
-          is: (val: boolean) => val,
-          then: Yup.string()
-            .min(10, 'must be at least 10 characters')
-            .max(50, 'must be at most 50 characters')
-            .required('This field is required'),
+      merchant_qris_id: Yup.string()
+        .nullable()
+        .test((val) => {
+          if (
+            formik.values.merchant_depo_type_id === 1 ||
+            formik.values.merchant_depo_type_id === 3
+          ) {
+            if (formik.values.qris_ready) {
+              return val !== '';
+            }
+          }
+          return true;
         }),
-      }),
     }),
   });
 
@@ -232,6 +241,8 @@ export default function ModalFormMerchantDepo({
       ? `(${initCreateData?.area_name || merchantDetails.data?.data.area_name})`
       : ''
   }`;
+
+  console.log(formik.errors);
 
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
