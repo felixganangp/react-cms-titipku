@@ -25,6 +25,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import useModal from 'hooks/useModal';
 import Modal from 'components/Modal';
+import useToast from 'hooks/useToast';
 import HistoryLimit from '../HistoryLimit';
 
 type ModalFormMerchantDepoProps = {
@@ -43,6 +44,7 @@ export default function ModalFormMerchantDepo({
   handleClose,
   initCreateData,
 }: ModalFormMerchantDepoProps) {
+  const { openToast } = useToast();
   const navigate = useNavigate();
   const isUpdate = !initCreateData;
   const typeMerchantList = UseTypeListService();
@@ -69,44 +71,52 @@ export default function ModalFormMerchantDepo({
       qris_ready: false,
     },
     onSubmit: (values) => {
-      const payload = {
-        ...values,
-        jelajah_id: initCreateData?.id || id,
-        limit: isUpdate || isDepo ? parseInt(values.limit, 10) : 0,
-        depo_discount:
-          isUpdate || isAndalan
-            ? parseInt(
-                values.depo_discount === '0' ? '5' : values.depo_discount,
-                10,
-              )
-            : 0,
-        admin_fee:
-          isUpdate || isDepo
-            ? parseInt(values.admin_fee === '0' ? '5' : values.admin_fee, 10)
-            : 0,
-        bank_name: isUpdate || isDepo ? values.bank_name : '',
-        bank_branch_office: isUpdate || isDepo ? values.bank_branch_office : '',
-        bank_account_name: isUpdate || isDepo ? values.bank_account_name : '',
-        bank_account_number:
-          isUpdate || isDepo ? values.bank_account_number : '',
-        nobu_account_name: isUpdate || isDepo ? values.nobu_account_name : '',
-        nobu_account_number:
-          isUpdate || isDepo ? values.nobu_account_number : '',
-      };
-      if (isUpdate) {
-        updateMerchant.mutate(
-          { data: payload, id },
-          {
+      try {
+        const payload = {
+          ...values,
+          jelajah_id: initCreateData?.id || id,
+          limit: isUpdate || isDepo ? parseInt(values.limit, 10) : 0,
+          depo_discount:
+            isUpdate || isAndalan
+              ? parseInt(
+                  values.depo_discount === '0' ? '5' : values.depo_discount,
+                  10,
+                )
+              : 0,
+          admin_fee:
+            isUpdate || isDepo
+              ? parseInt(values.admin_fee === '0' ? '5' : values.admin_fee, 10)
+              : 0,
+          bank_name: isUpdate || isDepo ? values.bank_name : '',
+          bank_branch_office:
+            isUpdate || isDepo ? values.bank_branch_office : '',
+          bank_account_name: isUpdate || isDepo ? values.bank_account_name : '',
+          bank_account_number:
+            isUpdate || isDepo ? values.bank_account_number : '',
+          nobu_account_name: isUpdate || isDepo ? values.nobu_account_name : '',
+          nobu_account_number:
+            isUpdate || isDepo ? values.nobu_account_number : '',
+        };
+        if (isUpdate) {
+          updateMerchant.mutate(
+            { data: payload, id },
+            {
+              onSuccess: () => {
+                navigate(-1);
+              },
+            },
+          );
+        } else {
+          createMerchant.mutate(payload, {
             onSuccess: () => {
               navigate(-1);
             },
-          },
-        );
-      } else {
-        createMerchant.mutate(payload, {
-          onSuccess: () => {
-            navigate(-1);
-          },
+          });
+        }
+      } catch (e) {
+        openToast({
+          severity: 'error',
+          headMsg: typeof e === 'string' ? e : 'Create Merchant Failed',
         });
       }
     },
@@ -147,19 +157,21 @@ export default function ModalFormMerchantDepo({
           is: (val: number) => val === 1 || val === 3,
           then: Yup.mixed().nullable().required('This field is required'),
         }),
-      bank_branch_office: Yup.string()
-        .nullable()
-        .test((val) => {
+      bank_branch_office: Yup.string().test(
+        'branch',
+        'This field is required',
+        (val) => {
           if (
             formik.values.merchant_depo_type_id === 1 ||
             formik.values.merchant_depo_type_id === 3
           ) {
-            if (val !== 'BCA (Bank Central Asia)') {
-              return val !== '';
+            if (formik.values.bank_name !== 'BCA (Bank Central Asia)') {
+              return Boolean(formik.values.bank_branch_office);
             }
           }
           return true;
-        }),
+        },
+      ),
       bank_account_name: Yup.string().when('merchant_depo_type_id', {
         is: (val: number) => val === 1 || val === 3,
         then: Yup.string()
@@ -188,19 +200,21 @@ export default function ModalFormMerchantDepo({
           .max(25, 'must be at most 25 characters'),
         // .required('This field is required'),
       }),
-      merchant_qris_id: Yup.string()
-        .nullable()
-        .test((val) => {
+      merchant_qris_id: Yup.string().test(
+        'qris',
+        'This field is required',
+        (val) => {
           if (
             formik.values.merchant_depo_type_id === 1 ||
             formik.values.merchant_depo_type_id === 3
           ) {
             if (formik.values.qris_ready) {
-              return val !== '';
+              return Boolean(formik.values.merchant_qris_id);
             }
           }
           return true;
-        }),
+        },
+      ),
     }),
   });
 
@@ -222,7 +236,7 @@ export default function ModalFormMerchantDepo({
         nobu_account_number: detailData?.nobu_account_number || '',
         qris_ready: detailData?.qris_ready,
         // @ts-ignore
-        merchant_qris_id: detailData?.qris_merchant_id,
+        merchant_qris_id: detailData?.qris_merchant_id || '',
         merchant_depo_type_id: detailData?.depo_type_id || 2,
       });
     }
@@ -241,8 +255,6 @@ export default function ModalFormMerchantDepo({
       ? `(${initCreateData?.area_name || merchantDetails.data?.data.area_name})`
       : ''
   }`;
-
-  console.log(formik.errors);
 
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
@@ -647,7 +659,10 @@ export default function ModalFormMerchantDepo({
               <SwitchCostum
                 checked={formik.values.qris_ready}
                 name="qris_ready"
-                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                onChange={(e) => {
+                  formik.handleChange(e);
+                }}
               />
             </FormControl>
             {formik.values.qris_ready && (
