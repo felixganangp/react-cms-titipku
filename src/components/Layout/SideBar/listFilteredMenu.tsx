@@ -4,6 +4,7 @@ import KurIcon from 'components/Icon/Kur';
 import AdminPanelIcon from 'components/Icon/AdminPanel';
 import { Child, FilteredMenu } from 'models/Menu';
 import B2B from 'components/Icon/B2B';
+import DepoAndalan from 'components/Icon/DepoAndalan';
 
 export const sidebarDataDev: FilteredMenu[] = [
   {
@@ -89,8 +90,14 @@ export const sidebarDataDev: FilteredMenu[] = [
     id: 70,
     title: 'Andalan & Depo',
     path: '',
-    icon: <KurIcon />,
+    icon: <DepoAndalan />,
     child: [
+      {
+        id: 71,
+        title: 'Dashboard',
+        path: '/depo/dashboard',
+        child: [],
+      },
       {
         id: 72,
         title: 'Merchants',
@@ -176,52 +183,85 @@ export const sidebarDataProd: FilteredMenu[] = [
       },
     ],
   },
+  // {
+  //   id: 48,
+  //   title: 'KUR',
+  //   path: '',
+  //   icon: <KurIcon />,
+  //   child: [
+  //     {
+  //       id: 52,
+  //       title: 'Request',
+  //       path: '/kur/request',
+  //       child: [],
+  //     },
+  //     {
+  //       id: 53,
+  //       title: 'Payment',
+  //       path: '/kur/payment',
+  //       child: [],
+  //     },
+  //     {
+  //       id: 54,
+  //       title: 'Invoice Management',
+  //       path: '/kur/invoice',
+  //       child: [],
+  //     },
+  //     {
+  //       id: 51,
+  //       title: 'Customer',
+  //       path: '/kur/customer',
+  //       child: [],
+  //     },
+  //   ],
+  // },
+
   {
-    id: 48,
-    title: 'KUR',
+    id: 63,
+    title: 'Andalan & Depo',
     path: '',
-    icon: <KurIcon />,
+    icon: <DepoAndalan />,
     child: [
       {
-        id: 52,
-        title: 'Request',
-        path: '/kur/request',
+        id: 64,
+        title: 'Dashboard',
+        path: '/depo/dashboard',
         child: [],
       },
       {
-        id: 53,
-        title: 'Payment',
-        path: '/kur/payment',
+        id: 65,
+        title: 'Merchants',
+        path: '/depo/merchants',
         child: [],
       },
       {
-        id: 54,
-        title: 'Invoice Management',
-        path: '/kur/invoice',
+        id: 66,
+        title: 'Disburse',
+        path: '/depo/disburse',
         child: [],
       },
       {
-        id: 51,
-        title: 'Customer',
-        path: '/kur/customer',
+        id: 67,
+        title: 'QRIS',
+        path: '/depo/qris',
         child: [],
       },
     ],
   },
   {
-    id: 47,
+    id: 43,
     title: 'Admin Panel',
     path: '',
     icon: <AdminPanelIcon />,
     child: [
       {
-        id: 49,
+        id: 45,
         title: 'Role User',
         path: '/role-user',
         child: [],
       },
       {
-        id: 50,
+        id: 46,
         title: 'Role Access',
         path: '/role-access',
         child: [],

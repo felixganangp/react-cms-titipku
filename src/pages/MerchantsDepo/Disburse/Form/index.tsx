@@ -20,21 +20,36 @@ import {
 } from '@mui/material';
 import Table from 'components/Table';
 // import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useModal from 'hooks/useModal';
+import Modal from 'components/Modal';
 import FormLabel from 'components/FormLabel';
 // import { DesktopDatePicker } from '@mui/x-date-pickers';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
-
-import { useMerchantDepoList } from '../../hooks/useMerchant';
+import ModalFormDisburseDepo from './components/ModalForm';
+import {
+  UseAreaListService,
+  UseFilterMerchentDepoListService,
+} from '../../hooks/useConfigMerchant';
+import {
+  useMerchantDepoList,
+  MerchantCondition,
+} from '../../hooks/useDisburse';
 
 export default function DisburseForm() {
   const [selected, setSelected] = useState<(string | number)[]>([]);
+  const { id } = useParams();
+  const [selectedData, setSelectedData] = useState<{
+    id_jelajah: number;
+  }>();
   const navigate = useNavigate();
   const showFilter = useModal();
+  const formModal = useModal();
 
   const queryMerchant = useMerchantDepoList();
+  const queryArea = UseAreaListService();
+  const filterMerchantDepoList = UseFilterMerchentDepoListService();
 
   const headCells: HeadCells<any>[] = [
     {
@@ -46,7 +61,7 @@ export default function DisburseForm() {
       id: 'merchant_name',
       label: 'Merchant Name',
       format: (value) => {
-        const isNew = false && (
+        const isNew = value.is_new && (
           <Typography
             color="primary"
             component="span"
@@ -113,7 +128,7 @@ export default function DisburseForm() {
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
-                // value={queryInnvoice.searchValue}
+                value={queryMerchant.searchValue}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -121,13 +136,13 @@ export default function DisburseForm() {
                     </InputAdornment>
                   ),
                 }}
-                // onChange={(event) => {
-                //   queryInnvoice.handleSearch(event.target.value);
-                //   queryInnvoice.handleToSetSearchParams(
-                //     'search',
-                //     event.target.value,
-                //   );
-                // }}
+                onChange={(event) => {
+                  queryMerchant.handleSearch(event.target.value);
+                  queryMerchant.handleToSetSearchParams(
+                    'search',
+                    event.target.value,
+                  );
+                }}
               />
             </Stack>
             <Stack direction="row" alignItems="center" gap={2}>
@@ -146,40 +161,80 @@ export default function DisburseForm() {
               spacing={2}
               component="form"
               mt={2}
-              // onSubmit={queryInnvoice.formikParams.handleSubmit}
+              onSubmit={queryMerchant.formik.handleSubmit}
             >
               <Grid item xs={12} md={4}>
                 <FormLabel text="Pasar">
                   <Autocomplete
-                    options={[]}
-                    // onBlur={() => {
-                    //   formik.setFieldTouched('area');
-                    // }}
+                    options={
+                      queryArea.listData.map((val) => ({
+                        id: val.id,
+                        name: val.title,
+                      })) || []
+                    }
+                    noOptionsText={
+                      !queryArea.searchValue
+                        ? 'Type to search pasar'
+                        : 'No option'
+                    }
+                    inputValue={queryArea.searchValue}
+                    onInputChange={(_, newInputValue) => {
+                      queryArea.handleSearch(newInputValue);
+                    }}
+                    loading={queryArea.isFetching}
+                    getOptionLabel={(item) => item.name}
+                    value={
+                      queryArea.listData
+                        .map((val) => ({
+                          id: val.id,
+                          name: val.title,
+                        }))
+                        .find(
+                          (val) =>
+                            val.id === queryMerchant.formik.values.area_id,
+                        ) || null
+                    }
+                    onChange={(e, value) =>
+                      queryMerchant.formik.setFieldValue('area_id', value?.id)
+                    }
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        name="Merchant"
+                        name="area_id"
                         placeholder="Select Pasar"
-                        // error={
-                        //   formik.touched.area && Boolean(formik.errors.area)
-                        // }
                       />
                     )}
                   />
                 </FormLabel>
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={5}>
                 <FormLabel text="Merchant Name">
                   <Autocomplete
-                    options={[]}
-                    // onBlur={() => {
-                    //   formik.setFieldTouched('area');
-                    // }}
+                    options={filterMerchantDepoList.listData.map((val) => ({
+                      id: val.id,
+                      name: val.merchant_name,
+                    }))}
+                    noOptionsText={
+                      !filterMerchantDepoList.searchValue
+                        ? 'Type to search merchant name'
+                        : 'No option'
+                    }
+                    inputValue={filterMerchantDepoList.searchValue}
+                    onInputChange={(_, newInputValue) => {
+                      filterMerchantDepoList.handleSearch(newInputValue);
+                    }}
+                    loading={filterMerchantDepoList.isFetching}
+                    getOptionLabel={(item) => item.name}
+                    value={queryMerchant.formik.values.jelajah_id}
+                    multiple
+                    onChange={(e, value) => {
+                      queryMerchant.formik.setFieldValue('jelajah_id', value);
+                    }}
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         name="Merchant"
-                        placeholder="Select Merchant Name"
+                        placeholder="Name of Merchant"
                         // error={
                         //   formik.touched.area && Boolean(formik.errors.area)
                         // }
@@ -188,25 +243,70 @@ export default function DisburseForm() {
                   />
                 </FormLabel>
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={2}>
                 <FormLabel text="Condition">
                   <Autocomplete
-                    options={[]}
-                    // onBlur={() => {
-                    //   formik.setFieldTouched('area');
-                    // }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="Merchant"
-                        placeholder="Select Merchant Name"
-                        // error={
-                        //   formik.touched.area && Boolean(formik.errors.area)
-                        // }
-                      />
-                    )}
+                    id="filterStatus"
+                    value={
+                      queryMerchant.formik.values.balance_condition
+                        ? {
+                            id: queryMerchant.formik.values.balance_condition,
+                            name: MerchantCondition[
+                              queryMerchant.formik.values.balance_condition
+                            ],
+                          }
+                        : null
+                    }
+                    options={Object.keys(MerchantCondition).map((val) => ({
+                      id: val,
+                      // @ts-ignore
+                      name: MerchantCondition[val],
+                    }))}
+                    onChange={(e, value) => {
+                      if (value?.id === '1') {
+                        queryMerchant.formik.setFieldValue('is_new', value?.id);
+                      } else {
+                        queryMerchant.formik.setFieldValue('is_new', undefined);
+                        queryMerchant.formik.setFieldValue(
+                          'balance_condition',
+                          value?.id,
+                        );
+                      }
+                    }}
+                    getOptionLabel={(option) => `${option.name}`}
+                    renderInput={(params) => {
+                      return (
+                        <TextField
+                          {...params}
+                          name="condition"
+                          placeholder="Select Condition"
+                          variant="outlined"
+                        />
+                      );
+                    }}
                   />
                 </FormLabel>
+              </Grid>
+              <Grid item xs={12} md={12}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  justifyContent="end"
+                >
+                  <Button
+                    variant="text"
+                    onClick={() => {
+                      queryMerchant.formik.resetForm();
+                      queryMerchant.handleResetFilter({
+                        whiteList: ['search'],
+                      });
+                    }}
+                  >
+                    Reset
+                  </Button>
+                  <Button type="submit">Apply</Button>
+                </Stack>
               </Grid>
             </Grid>
           </Collapse>
@@ -220,9 +320,9 @@ export default function DisburseForm() {
               return {
                 ...item,
                 table_color:
-                  tenPecent >= item.balance
+                  tenPecent >= item.balance && !item.is_new
                     ? '#F9EBE7'
-                    : fivePecent >= item.balance
+                    : fivePecent >= item.balance && !item.is_new
                     ? '#FFF3CD'
                     : '#fff',
                 id: item.jelajah_id,
@@ -233,8 +333,8 @@ export default function DisburseForm() {
               setSelected(e);
             }}
             enableRadio
-            orderBy={queryMerchant.params.order_by}
-            orderType={queryMerchant.params.order_type}
+            orderBy={queryMerchant.params.sort_by || 'disburse'}
+            orderType={queryMerchant.params.sort_type}
             loading={queryMerchant.isLoading}
             page={queryMerchant.data?.page || 0}
             count={queryMerchant.data?.count || 0}
@@ -242,16 +342,16 @@ export default function DisburseForm() {
             onChangeSort={(value) => {
               queryMerchant.handleChangeParams({
                 ...queryMerchant.params,
-                order_by: value.orderBy,
-                order_type: value.orderType,
+                sort_by: value.orderBy || 'disburse',
+                sort_type: value.orderType,
               });
               queryMerchant.handleToSetSearchParams(
-                'order_by',
+                'sort_by',
                 // @ts-ignore
-                value.orderBy || '',
+                value.orderBy || 'disburse',
               );
               queryMerchant.handleToSetSearchParams(
-                'order_type',
+                'sort_type',
                 value.orderType,
               );
             }}
@@ -264,18 +364,40 @@ export default function DisburseForm() {
             }}
           />
           <Stack direction="row" gap={2}>
-            <Button variant="text" color="error" onClick={() => navigate(-1)}>
+            <Button
+              variant="text"
+              color="error"
+              onClick={() => navigate('/depo/disburse')}
+            >
               Back
             </Button>
             <Button
-              sx={{ borderRadius: '4px' }}
-              // onClick={showFilter.toggleModal}
+              sx={{ borderRadius: '4px', width: '120px' }}
+              disabled={selected.length === 0}
+              onClick={() => {
+                formModal.openModal();
+                setSelectedData({
+                  id_jelajah: +selected[0],
+                });
+              }}
             >
               Next
             </Button>
           </Stack>
         </Card>
       </Stack>
+
+      <Modal
+        open={formModal.open}
+        title="Add New Disburse"
+        onClose={!id ? formModal.closeModal : () => navigate(-1)}
+      >
+        <ModalFormDisburseDepo
+          id={id}
+          id_jelajah={selectedData?.id_jelajah}
+          handleClose={!id ? formModal.closeModal : () => navigate(-1)}
+        />
+      </Modal>
     </Box>
   );
 }
