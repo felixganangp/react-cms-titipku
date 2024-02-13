@@ -263,8 +263,6 @@ export default function DisburseForm() {
                       name: MerchantCondition[val],
                     }))}
                     onChange={(e, value) => {
-                      // handleChangeGrade(value);
-                      console.log(typeof value?.id);
                       if (value?.id === '1') {
                         queryMerchant.formik.setFieldValue('is_new', value?.id);
                       } else {
@@ -335,7 +333,7 @@ export default function DisburseForm() {
               setSelected(e);
             }}
             enableRadio
-            orderBy={queryMerchant.params.sort_by}
+            orderBy={queryMerchant.params.sort_by || 'disburse'}
             orderType={queryMerchant.params.sort_type}
             loading={queryMerchant.isLoading}
             page={queryMerchant.data?.page || 0}
@@ -344,13 +342,13 @@ export default function DisburseForm() {
             onChangeSort={(value) => {
               queryMerchant.handleChangeParams({
                 ...queryMerchant.params,
-                sort_by: value.orderBy,
+                sort_by: value.orderBy || 'disburse',
                 sort_type: value.orderType,
               });
               queryMerchant.handleToSetSearchParams(
                 'sort_by',
                 // @ts-ignore
-                value.orderBy || '',
+                value.orderBy || 'disburse',
               );
               queryMerchant.handleToSetSearchParams(
                 'sort_type',

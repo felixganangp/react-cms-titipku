@@ -147,13 +147,19 @@ export default function ModalFormMerchantDepo({
           is: (val: number) => val === 1 || val === 3,
           then: Yup.mixed().nullable().required('This field is required'),
         }),
-      bank_branch_office: Yup.string().when('bank_name', {
-        is: (val: string) => val !== 'BCA (Bank Central Asia)',
-        then: Yup.string()
-          .min(2, 'must be at least 3 characters')
-          .max(255, 'must be at most 255 characters')
-          .required('This field is required'),
-      }),
+      // bank_branch_office: Yup.string().when('bank_name', {
+      //   is: (val: string) => val !== 'BCA (Bank Central Asia)',
+      //   then: Yup.string()
+      //     .min(2, 'must be at least 3 characters')
+      //     .max(255, 'must be at most 255 characters')
+      //     .required('This field is required'),
+      // }),
+      bank_branch_office: Yup.string()
+        .nullable()
+        .when('merchant_depo_type_id', {
+          is: (val: number) => val === 1 || val === 3,
+          then: Yup.mixed().nullable().required('This field is required'),
+        }),
       bank_account_name: Yup.string().when('merchant_depo_type_id', {
         is: (val: number) => val === 1 || val === 3,
         then: Yup.string()
@@ -187,7 +193,6 @@ export default function ModalFormMerchantDepo({
         then: Yup.string().when('qris_ready', {
           is: (val: boolean) => val,
           then: Yup.string()
-            .min(10, 'must be at least 10 characters')
             .max(50, 'must be at most 50 characters')
             .required('This field is required'),
         }),
