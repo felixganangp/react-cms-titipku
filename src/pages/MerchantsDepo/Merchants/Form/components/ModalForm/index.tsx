@@ -157,19 +157,20 @@ export default function ModalFormMerchantDepo({
           is: (val: number) => val === 1 || val === 3,
           then: Yup.mixed().nullable().required('This field is required'),
         }),
-      bank_branch_office: Yup.string().test(
-        'branch',
-        'This field is required',
-        (val) => {
-          if (
-            formik.values.merchant_depo_type_id === 1 ||
-            formik.values.merchant_depo_type_id === 3
-          ) {
-            if (formik.values.bank_name !== 'BCA (Bank Central Asia)') {
-              return Boolean(formik.values.bank_branch_office);
-            }
-          }
-          return true;
+      bank_branch_office: Yup.string().when(
+        ['merchant_depo_type_id', 'bank_name'],
+        {
+          is: (merchant_depo_type_id: number, bank_name: string) => {
+            return (
+              (merchant_depo_type_id === 1 || merchant_depo_type_id === 3) &&
+              bank_name !== 'BCA (Bank Central Asia)'
+            );
+          },
+          then: Yup.string()
+            .min(3, 'must be at least 3 characters')
+            .max(50, 'must be at most 50 characters')
+            .required('This field is required'),
+          otherwise: Yup.string().nullable(),
         },
       ),
       bank_account_name: Yup.string().when('merchant_depo_type_id', {
@@ -200,19 +201,20 @@ export default function ModalFormMerchantDepo({
           .max(25, 'must be at most 25 characters'),
         // .required('This field is required'),
       }),
-      merchant_qris_id: Yup.string().test(
-        'qris',
-        'This field is required',
-        (val) => {
-          if (
-            formik.values.merchant_depo_type_id === 1 ||
-            formik.values.merchant_depo_type_id === 3
-          ) {
-            if (formik.values.qris_ready) {
-              return Boolean(formik.values.merchant_qris_id);
-            }
-          }
-          return true;
+      merchant_qris_id: Yup.string().when(
+        ['merchant_depo_type_id', 'qris_ready'],
+        {
+          is: (merchant_depo_type_id: number, qris_ready: boolean) => {
+            return (
+              (merchant_depo_type_id === 1 || merchant_depo_type_id === 3) &&
+              qris_ready
+            );
+          },
+          then: Yup.string()
+            .min(10, 'must be at least 10 characters')
+            .max(50, 'must be at most 50 characters')
+            .required('This field is required'),
+          otherwise: Yup.string().nullable(),
         },
       ),
     }),
