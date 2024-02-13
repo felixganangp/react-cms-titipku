@@ -133,6 +133,7 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
       getMerchantDepoList({
         ...params.params,
         depo_type_id: [1, 3],
+        sort_by: params.params.sort_by || 'disburse',
       }),
   });
   const formik = useFormik({
@@ -144,12 +145,14 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
       area_id: undefined,
       balance_condition: undefined,
       is_new: undefined,
+      sort_by: 'disburse',
     },
     onSubmit: (values) => {
       const newValue = {
         ...values,
         page: 1,
         search: params.params.search,
+        sort_by: values.sort_by || 'disburse',
         start_join_date:
           // @ts-ignore
           values.start_join_date?.startOf('day').unix() || undefined,
