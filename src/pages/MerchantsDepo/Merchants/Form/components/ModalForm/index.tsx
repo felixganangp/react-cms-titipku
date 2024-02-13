@@ -158,7 +158,7 @@ export default function ModalFormMerchantDepo({
         .nullable()
         .when('merchant_depo_type_id', {
           is: (val: number) => val === 1 || val === 3,
-          then: Yup.mixed().nullable().required('This field is required'),
+          then: Yup.string().nullable().required('This field is required'),
         }),
       bank_account_name: Yup.string().when('merchant_depo_type_id', {
         is: (val: number) => val === 1 || val === 3,
