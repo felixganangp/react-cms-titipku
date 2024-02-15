@@ -553,9 +553,12 @@ export default function DisbursePages() {
         <ModalFormDisburseDepo
           id={selectedData?.id.toString()}
           id_jelajah={selectedData?.jelajah_id}
-          handleClose={() => {
+          handleClose={(isSubmiting) => {
+            if (isSubmiting) {
+              queryDisburse.refetch();
+              setSelectedData(undefined);
+            }
             modalUpdate.closeModal();
-            queryDisburse.refetch();
           }}
         />
       </CustomModal>
