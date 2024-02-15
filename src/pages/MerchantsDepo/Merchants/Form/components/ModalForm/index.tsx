@@ -422,6 +422,7 @@ export default function ModalFormMerchantDepo({
               value={numberSeperator(formik.values.depo_discount || '')}
               onChange={(e) => {
                 const value = e.target.value
+                  .replace(',', '.')
                   .replace(/[^0-9.]/g, '')
                   .replace(/(\..*?)\..*/g, '$1');
 
@@ -460,6 +461,7 @@ export default function ModalFormMerchantDepo({
                 value={numberSeperator(formik.values.admin_fee || '')}
                 onChange={(e) => {
                   const value = e.target.value
+                    .replace(',', '.')
                     .replace(/[^0-9.]/g, '')
                     .replace(/(\..*?)\..*/g, '$1');
 
