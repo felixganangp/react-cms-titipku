@@ -6,6 +6,7 @@ import {
   Autocomplete,
   Box,
   Button,
+  CircularProgress,
   InputAdornment,
   Switch,
   SwitchProps,
@@ -719,8 +720,17 @@ export default function ModalFormMerchantDepo({
         <Button
           type="submit"
           color="primary"
-          disabled={!formik.isValid}
+          disabled={
+            !formik.isValid ||
+            updateMerchant.isLoading ||
+            createMerchant.isLoading
+          }
           sx={{ borderRadius: '2px' }}
+          startIcon={
+            (updateMerchant.isLoading || createMerchant.isLoading) && (
+              <CircularProgress size={20} />
+            )
+          }
         >
           {isUpdate ? 'Update' : 'Submit'}
         </Button>
