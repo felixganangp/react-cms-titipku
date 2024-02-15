@@ -4,6 +4,7 @@ import {
   Autocomplete,
   Box,
   Button,
+  CircularProgress,
   InputAdornment,
   TextField,
 } from '@mui/material';
@@ -254,6 +255,11 @@ export default function ModalFormQris({
           color="primary"
           disabled={
             !formik.isValid || createQris.isLoading || updateQris.isLoading
+          }
+          startIcon={
+            (createQris.isLoading || updateQris.isLoading) && (
+              <CircularProgress size={20} />
+            )
           }
         >
           {isUpdate ? 'Update' : 'Submit'}
