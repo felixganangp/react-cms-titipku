@@ -6,6 +6,7 @@ import {
   Autocomplete,
   Box,
   Button,
+  CircularProgress,
   InputAdornment,
   Switch,
   SwitchProps,
@@ -105,7 +106,7 @@ export default function ModalFormDisburseDepo({
           { data: payload, id },
           {
             onSuccess: () => {
-              handleClose();
+              handleClose(true);
             },
           },
         );
@@ -339,7 +340,20 @@ export default function ModalFormDisburseDepo({
         >
           Cancel
         </Button>
-        <Button type="submit" color="primary" disabled={!formik.isValid}>
+        <Button
+          type="submit"
+          color="primary"
+          disabled={
+            !formik.isValid ||
+            updateDisburse.isLoading ||
+            createDisburse.isLoading
+          }
+          startIcon={
+            (updateDisburse.isLoading || createDisburse.isLoading) && (
+              <CircularProgress size={20} />
+            )
+          }
+        >
           Submit
         </Button>
       </Box>
