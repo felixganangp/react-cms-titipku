@@ -31,6 +31,7 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
       end_join_date: undefined,
       depo_type_id: undefined,
       jelajah_id: [],
+      area_id: undefined,
     },
     onSubmit: (values) => {
       const newValue = {
@@ -49,6 +50,8 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
             ? // @ts-ignore
               values.jelajah_id.map((val) => val.id)
             : undefined,
+        // @ts-ignore
+        area_id: values.area_id?.id || undefined,
       };
       params.handleChangeParams(newValue);
       const queryParams = new URLSearchParams(
@@ -61,6 +64,8 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
                 ? // @ts-ignore
                   values.jelajah_id.map((val) => val.name)
                 : undefined,
+            // @ts-ignore
+            area_name: values.area_id?.name || undefined,
           }).filter(([key, value]) => value !== undefined),
         ),
       );
@@ -85,6 +90,14 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
         if (key === 'jelajah_name') {
           // @ts-ignore
           value = value.split(',').map((item) => item);
+        }
+        // @ts-ignore
+        if (key === 'area_id') {
+          // @ts-ignore
+          value = parseInt(value, 10);
+        }
+        if (key === 'area_name') {
+          // @ts-ignore
         }
         // @ts-ignore
         values[key] = value;
@@ -112,9 +125,13 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
           // @ts-ignore
           return { id: val, name: newValue.jelajah_name[index] };
         }),
+        // @ts-ignore
+        area_id: { id: newValue.area_id, name: newValue.area_name },
       });
       // @ts-ignore
       delete newValue.jelajah_name;
+      // @ts-ignore
+      delete newValue.area_name;
       params.handleChangeParams(newValue);
     }
   }, []);

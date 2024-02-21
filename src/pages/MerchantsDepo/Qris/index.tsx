@@ -51,8 +51,9 @@ export default function MerchantsQrisPages() {
 
   const headCells: HeadCells<QrisList>[] = [
     {
-      id: 'Date',
+      id: 'transaction_date',
       label: 'Date',
+      enableSort: true,
       format: (value) =>
         moment(value.transaction_date * 1000).format('DD MMM YYYY'),
     },
@@ -336,6 +337,13 @@ export default function MerchantsQrisPages() {
                 page: value,
               });
               qrisQuery.handleToSetSearchParams('page', value.toString());
+            }}
+            onChangeSort={(value) => {
+              qrisQuery.handleChangeParams({
+                ...qrisQuery.params,
+                sort_by: value.orderBy,
+                sort_type: value.orderType,
+              });
             }}
           />
         </Card>

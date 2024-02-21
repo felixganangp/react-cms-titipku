@@ -19,6 +19,14 @@ export const getMerchantDepoList = (params?: MerchantParams) =>
       });
       delete paramsRest.jelajah_id;
     }
+    // if (paramsRest.area_id) {
+    //   paramsRest.area_id.forEach((val, index) => {
+    //     costumeParams += `area_id=${val}${
+    //       index === (paramsRest?.area_id?.length || 0) - 1 ? '' : '&'
+    //     }`;
+    //   });
+    //   delete paramsRest.area_id;
+    // }
     if (costumeParams.length <= 1) costumeParams = '';
     try {
       const respon = await http.get(

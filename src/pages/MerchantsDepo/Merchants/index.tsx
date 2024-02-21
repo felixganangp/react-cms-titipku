@@ -47,6 +47,7 @@ export default function MerchantsPages() {
   const typeMerchantList = UseTypeListService();
   const filterMerchantDepoList = UseFilterMerchentDepoListService();
   const deleteMerchant = useDeleteMerchantDepo();
+  const queryArea = UseAreaListService();
 
   const openDateJoinFilter = useModal();
   const openEndDateJoinFilter = useModal();
@@ -395,6 +396,41 @@ export default function MerchantsPages() {
                       )}
                     </Stack>
                   </Stack>
+                </FormLabel>
+              </Grid>
+              <Grid item xs={12} md={5}>
+                <FormLabel text="Area Name">
+                  <Autocomplete
+                    options={queryArea.listData.map((val) => ({
+                      id: val.id,
+                      name: val.title,
+                    }))}
+                    noOptionsText={
+                      !queryArea.searchValue
+                        ? 'Type to search area name'
+                        : 'No option'
+                    }
+                    inputValue={queryArea.searchValue}
+                    onInputChange={(_, newInputValue) => {
+                      queryArea.handleSearch(newInputValue);
+                    }}
+                    loading={queryArea.isFetching}
+                    getOptionLabel={(item) => item.name}
+                    value={merchantQuery.formik.values.area_id}
+                    onChange={(e, value) => {
+                      merchantQuery.formik.setFieldValue('area_id', value);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="Merchant"
+                        placeholder="Select Merchant Name"
+                        // error={
+                        //   formik.touched.area && Boolean(formik.errors.area)
+                        // }
+                      />
+                    )}
+                  />
                 </FormLabel>
               </Grid>
               <Grid item xs={12} md={12}>
