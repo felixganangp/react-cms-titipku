@@ -101,11 +101,20 @@ export default function DisbursePages() {
       label: 'Merchant Name',
     },
     {
-      id: 'paid_date',
-      label: 'Paid Date',
+      id: 'transfer_date',
+      label: 'Transfer Date',
       format: (value) => {
         return value.paid_date
           ? moment(value.paid_date * 1000).format('DD MMM YYYY') || '-'
+          : '-';
+      },
+    },
+    {
+      id: 'paid_off_date',
+      label: 'Paid Date',
+      format: (value) => {
+        return value.paid_off_date
+          ? moment(value.paid_off_date * 1000).format('DD MMM YYYY') || '-'
           : '-';
       },
     },
