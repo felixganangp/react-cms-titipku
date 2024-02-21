@@ -12,12 +12,13 @@ export type DisburseList = {
   due_date: number;
   dpd: number;
   merchant_name: string;
-  padi_date: number;
   account_number: string;
   amount: number;
   transfer_amount: number;
   status: string;
   jelajah_id: number;
+  paid_off_date: number;
+  paid_date: number;
 };
 
 export type DisburseDetails = {
