@@ -2,7 +2,15 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import MenuList from 'components/MenuList';
 import { HeadCells } from 'components/Table/types';
-import { Add, KeyboardArrowDown, MoreVert, Search } from '@mui/icons-material';
+import {
+  Add,
+  CalendarMonth,
+  CalendarMonthSharp,
+  Event,
+  KeyboardArrowDown,
+  MoreVert,
+  Search,
+} from '@mui/icons-material';
 import {
   Box,
   Stack,
@@ -28,6 +36,7 @@ import { useNavigate } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
 import DeleteModal from 'components/Delete/freetext';
 import { MerchantList } from 'models/merchantDepo/Merchant';
+import DateRangePicker from 'components/DateRangePicker';
 import {
   useDeleteMerchantDepo,
   useMerchantDepoList,
@@ -236,6 +245,7 @@ export default function MerchantsPages() {
               </MenuList>
             </Stack>
           </Stack>
+
           <Collapse in={showFilter.open}>
             <Grid
               container
@@ -314,88 +324,24 @@ export default function MerchantsPages() {
               </Grid>
               <Grid item xs={12} md={4}>
                 <FormLabel text="Join Date">
-                  <Stack direction="row" spacing={1} alignItems="start">
-                    <Stack spacing={1} width="100%">
-                      <DesktopDatePicker
-                        value={
-                          merchantQuery.formik.values.start_join_date || null
-                        }
-                        onChange={(value) => {
-                          merchantQuery.formik.setFieldValue(
-                            'start_join_date',
-                            value,
-                          );
-                          openDateJoinFilter.toggleModal();
-                        }}
-                        inputFormat="DD/MM/YYYY"
-                        maxDate={merchantQuery.formik.values.end_join_date}
-                        open={openDateJoinFilter.open}
-                        onOpen={openDateJoinFilter.toggleModal}
-                        onClose={openDateJoinFilter.toggleModal}
-                        renderInput={(params) => {
-                          return (
-                            <TextField
-                              {...params}
-                              name="date"
-                              placeholder="Select date"
-                              variant="outlined"
-                              fullWidth
-                              onClick={openDateJoinFilter.toggleModal}
-                            />
-                          );
-                        }}
-                      />
-                      {merchantQuery.formik.errors.start_join_date && (
-                        <Typography color="error.main">
-                          {merchantQuery.formik.errors.start_join_date}
-                        </Typography>
-                      )}
-                    </Stack>
-                    <Box
-                      sx={{
-                        width: '20px',
-                        borderBottom: '1px solid #000',
-                        pt: 2,
-                      }}
-                    />
-                    <Stack spacing={1} width="100%">
-                      <DesktopDatePicker
-                        value={
-                          merchantQuery.formik.values.end_join_date || null
-                        }
-                        onChange={(value) => {
-                          merchantQuery.formik.setFieldValue(
-                            'end_join_date',
-                            value,
-                          );
-                          openEndDateJoinFilter.toggleModal();
-                        }}
-                        inputFormat="DD/MM/YYYY"
-                        maxDate={moment()}
-                        minDate={merchantQuery.formik.values.start_join_date}
-                        open={openEndDateJoinFilter.open}
-                        onOpen={openEndDateJoinFilter.toggleModal}
-                        onClose={openEndDateJoinFilter.toggleModal}
-                        renderInput={(params) => {
-                          return (
-                            <TextField
-                              {...params}
-                              name="date"
-                              placeholder="Select date"
-                              variant="outlined"
-                              fullWidth
-                              onClick={openEndDateJoinFilter.toggleModal}
-                            />
-                          );
-                        }}
-                      />
-                      {merchantQuery.formik.errors.end_join_date && (
-                        <Typography color="error.main">
-                          {merchantQuery.formik.errors.end_join_date}
-                        </Typography>
-                      )}
-                    </Stack>
-                  </Stack>
+                  <DateRangePicker
+                    date={[
+                      // @ts-check
+                      merchantQuery.formik.values.start_join_date,
+                      // @ts-check
+                      merchantQuery.formik.values.end_join_date,
+                    ]}
+                    onChange={(value) => {
+                      merchantQuery.formik.setFieldValue(
+                        'start_join_date',
+                        value[0],
+                      );
+                      merchantQuery.formik.setFieldValue(
+                        'end_join_date',
+                        value[1],
+                      );
+                    }}
+                  />
                 </FormLabel>
               </Grid>
               <Grid item xs={12} md={5}>
