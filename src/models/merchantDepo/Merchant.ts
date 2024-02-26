@@ -34,6 +34,7 @@ export interface MerchantDetails {
   active_date: number;
   depo_type_id: number;
   bank_name: string;
+  bank_code: string;
   bank_id: number | null;
   bank_branch_office: string;
   bank_account_name: string;

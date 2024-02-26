@@ -34,7 +34,8 @@ import { useNavigate } from 'react-router-dom';
 import numberSeperator from 'utils/numberSeperator';
 import Label from 'components/Label';
 import SearchIcon from '@mui/icons-material/Search';
-import { DisburseList } from 'models/merchantDepo/Disburse';
+import DateRangePicker from 'components/DateRangePicker';
+import { DisburseList } from 'models/merchantDepo/disburse';
 import ModalFormDisburseDepo from './Form/components/ModalForm';
 import {
   UseDisburse,
@@ -375,7 +376,23 @@ export default function DisbursePages() {
               </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel text="Date">
-                  <Stack direction="row" spacing={1} alignItems="start">
+                  <DateRangePicker
+                    date={[
+                      queryDisburse.formikParams.values.start_date,
+                      queryDisburse.formikParams.values.end_date,
+                    ]}
+                    onChange={(value) => {
+                      queryDisburse.formikParams.setFieldValue(
+                        'start_date',
+                        value[0],
+                      );
+                      queryDisburse.formikParams.setFieldValue(
+                        'end_date',
+                        value[1],
+                      );
+                    }}
+                  />
+                  {/* <Stack direction="row" spacing={1} alignItems="start">
                     <Stack spacing={1} width="100%">
                       <DesktopDatePicker
                         value={
@@ -455,7 +472,7 @@ export default function DisbursePages() {
                         </Typography>
                       )}
                     </Stack>
-                  </Stack>
+                  </Stack> */}
                 </FormLabel>
               </Grid>
               <Grid item xs={12} md={12}>

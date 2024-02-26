@@ -39,6 +39,7 @@ import useModal from 'hooks/useModal';
 import ModalComp from 'components/Modal';
 import DeleteModal from 'components/Delete/freetext';
 import { QrisForm } from 'models/merchantDepo/Qris';
+import DateRangePicker from 'components/DateRangePicker';
 import {
   useGetTransactionMutation,
   useMerchantDetails,
@@ -429,7 +430,23 @@ export default function MercheantsDetails() {
                   </Grid>
                   <Grid item xs={12} md={7}>
                     <FormLabel text="Range Date">
-                      <Stack direction="row" gap={1} alignItems="start">
+                      <DateRangePicker
+                        date={[
+                          mutationTransaction.formik.values.from,
+                          mutationTransaction.formik.values.to,
+                        ]}
+                        onChange={(value) => {
+                          mutationTransaction.formik.setFieldValue(
+                            'from',
+                            value[0],
+                          );
+                          mutationTransaction.formik.setFieldValue(
+                            'to',
+                            value[1],
+                          );
+                        }}
+                      />
+                      {/* <Stack direction="row" gap={1} alignItems="start">
                         <Stack spacing={1} width="100%">
                           <DesktopDatePicker
                             value={
@@ -506,7 +523,7 @@ export default function MercheantsDetails() {
                             </Typography>
                           )}
                         </Stack>
-                      </Stack>
+                      </Stack> */}
                     </FormLabel>
                   </Grid>
                   <Grid item xs={12} md={12}>
