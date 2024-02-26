@@ -1,5 +1,5 @@
 /* eslint-disable no-plusplus */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Event, KeyboardArrowLeft } from '@mui/icons-material';
 import {
   Box,
@@ -244,6 +244,18 @@ export default function DateRangePicker({
       </Grid>
     ));
   }, [currentDate, selectedDate, dateHover]);
+
+  useEffect(() => {
+    if (anchorEl) {
+      if (endDate) {
+        return setCurrentDate(endDate);
+      }
+      if (startDate) {
+        return setCurrentDate(startDate);
+      }
+      return setCurrentDate(moment());
+    }
+  }, [anchorEl]);
 
   return (
     <Box>
