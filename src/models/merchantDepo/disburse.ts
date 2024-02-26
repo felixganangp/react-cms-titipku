@@ -25,6 +25,7 @@ export type DisburseDetails = {
   id: number;
   jelajah_id: number;
   bank_name: string;
+  bank_code: string;
   bank_account_name: string;
   bank_account_number: number;
   amount: number;
