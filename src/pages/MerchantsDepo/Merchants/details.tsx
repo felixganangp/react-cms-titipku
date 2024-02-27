@@ -431,6 +431,7 @@ export default function MercheantsDetails() {
                   <Grid item xs={12} md={7}>
                     <FormLabel text="Range Date">
                       <DateRangePicker
+                        endSelectDate={moment()}
                         date={[
                           mutationTransaction.formik.values.from,
                           mutationTransaction.formik.values.to,
