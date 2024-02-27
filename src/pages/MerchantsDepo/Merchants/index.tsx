@@ -325,6 +325,7 @@ export default function MerchantsPages() {
               <Grid item xs={12} md={4}>
                 <FormLabel text="Join Date">
                   <DateRangePicker
+                    endSelectDate={moment()}
                     date={[
                       // @ts-check
                       merchantQuery.formik.values.start_join_date,

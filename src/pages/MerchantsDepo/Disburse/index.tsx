@@ -377,6 +377,7 @@ export default function DisbursePages() {
               <Grid item xs={12} md={6}>
                 <FormLabel text="Date">
                   <DateRangePicker
+                    endSelectDate={moment()}
                     date={[
                       queryDisburse.formikParams.values.start_date,
                       queryDisburse.formikParams.values.end_date,

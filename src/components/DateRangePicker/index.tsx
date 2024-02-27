@@ -23,10 +23,11 @@ const Day = ({
   date,
   startDate,
   endDate,
+  startSelectDate,
+  endSelectDate,
   onClick,
   dateHover,
   onHover,
-  onLeave,
 }: {
   currentDate: Moment;
   date: Moment;
@@ -35,7 +36,8 @@ const Day = ({
   dateHover?: Moment | null;
   onClick: (date: Moment) => void;
   onHover?: (date: Moment) => void;
-  onLeave?: (date: Moment) => void;
+  startSelectDate?: Moment | null;
+  endSelectDate?: Moment | null;
 }) => {
   const sx = useMemo(() => {
     let styleFont: SxProps<Theme> = {};
@@ -111,6 +113,23 @@ const Day = ({
       };
     }
 
+    if (
+      (endSelectDate && date.isAfter(endSelectDate, 'date')) ||
+      (startSelectDate && date.isBefore(startSelectDate, 'date'))
+    ) {
+      styleFont = {
+        ...styleFont,
+        cursor: 'not-allowed',
+        color: (theme) => alpha(theme.palette.text.primary, 0.3),
+      };
+
+      styleContainer = {
+        ':hover': {
+          backgroundColor: 'unset',
+        },
+        cursor: 'not-allowed',
+      };
+    }
     return {
       styleContainer,
       styleFont,
@@ -124,16 +143,27 @@ const Day = ({
         aspectRatio: '1',
         ...sx.styleContainer,
       }}
-      onClick={() => onClick(date)}
+      onClick={() => {
+        if (
+          (endSelectDate && date.isAfter(endSelectDate, 'date')) ||
+          (startSelectDate && date.isBefore(startSelectDate, 'date'))
+        )
+          return;
+        onClick(date);
+      }}
       justifyContent="center"
       alignItems="center"
-      onMouseEnter={() => onHover && onHover(date)}
+      onMouseEnter={() => {
+        if (onHover) {
+          onHover(date);
+        }
+      }}
     >
       <Stack
         sx={{
           ...sx.styleFont,
         }}
-        onClick={() => onClick(date)}
+        // onClick={() => onClick(date)}
         justifyContent="center"
         alignItems="center"
         borderRadius="50%"
@@ -154,12 +184,16 @@ export default function DateRangePicker({
   onChange,
   date,
   randerInput,
+  startSelectDate,
+  endSelectDate,
 }: {
   onChange?: (
     date: [Moment | null | undefined, Moment | null | undefined],
   ) => void;
   date?: [Moment | null | undefined, Moment | null | undefined];
   randerInput?: (params: any) => JSX.Element;
+  startSelectDate?: Moment | null;
+  endSelectDate?: Moment | null;
 }) {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [currentDate, setCurrentDate] = useState<Moment>(moment());
@@ -215,12 +249,13 @@ export default function DateRangePicker({
           endDate={endDate}
           date={day}
           dateHover={dateHover}
+          startSelectDate={startSelectDate}
+          endSelectDate={endSelectDate}
           onHover={(value) => {
             if (startDate && !endDate) {
               setDateHover(value);
             }
           }}
-          onLeave={() => setDateHover(null)}
           onClick={(value) => {
             if (!startDate) {
               setSelectedDate([value, null]);
@@ -281,7 +316,9 @@ export default function DateRangePicker({
             },
             endAdornment: (
               <InputAdornment position="start">
-                <Event />
+                <IconButton>
+                  <Event />
+                </IconButton>
               </InputAdornment>
             ),
           }}
