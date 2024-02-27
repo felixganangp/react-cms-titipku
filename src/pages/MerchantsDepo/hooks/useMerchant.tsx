@@ -29,7 +29,7 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
     initialValues: {
       start_join_date: undefined,
       end_join_date: undefined,
-      depo_type_id: undefined,
+      depo_type_id: [],
       jelajah_id: [],
       area_id: undefined,
     },
@@ -82,6 +82,11 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
     // Get all values from the URL search parameters
     const initialFilter = Array.from(urlParams).reduce(
       (values, [key, value]) => {
+        // @ts-ignore
+        if (key === 'depo_type_id') {
+          // @ts-ignore
+          value = value.split(',').map((item) => parseInt(item, 10));
+        }
         // @ts-ignore
         if (key === 'jelajah_id') {
           // @ts-ignore

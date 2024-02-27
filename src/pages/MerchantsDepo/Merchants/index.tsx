@@ -297,16 +297,19 @@ export default function MerchantsPages() {
                     getOptionLabel={(option) =>
                       option.description.replace('Andalan', 'Andalan Titipku')
                     }
+                    multiple
                     value={
-                      typeMerchantList.listData.find(
-                        (val) =>
-                          val.id === merchantQuery.formik.values.depo_type_id,
+                      typeMerchantList.listData.filter((val) =>
+                        merchantQuery.formik.values.depo_type_id?.includes(
+                          // @ts-ignore
+                          val.id,
+                        ),
                       ) || null
                     }
                     onChange={(e, value) =>
                       merchantQuery.formik.setFieldValue(
                         'depo_type_id',
-                        value?.id,
+                        value.map((val) => val.id),
                       )
                     }
                     renderInput={(params) => (
