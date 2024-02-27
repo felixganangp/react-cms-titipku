@@ -28,6 +28,7 @@ import numberSeperator from 'utils/numberSeperator';
 import { useNavigate } from 'react-router-dom';
 import DeleteModal from 'components/Delete/freetext';
 import { QrisList } from 'models/merchantDepo/Qris';
+import DateRangePicker from 'components/DateRangePicker';
 import { useDeleteQris, useQrisList } from '../hooks/useQris';
 import { UseFilterMerchentDepoListService } from '../hooks/useConfigMerchant';
 import ModalFormQris from './Components/ModalFormQris';
@@ -217,78 +218,17 @@ export default function MerchantsQrisPages() {
               </Grid>
               <Grid item xs={12} md={4}>
                 <FormLabel text="Date">
-                  <Stack direction="row" spacing={1} alignItems="start">
-                    <Stack spacing={1} width="100%">
-                      <DesktopDatePicker
-                        value={qrisQuery.formik.values.start_date || null}
-                        inputFormat="DD/MM/YYYY"
-                        onChange={(value) => {
-                          qrisQuery.formik.setFieldValue('start_date', value);
-                          startDateOpen.toggleModal();
-                        }}
-                        open={startDateOpen.open}
-                        onOpen={startDateOpen.toggleModal}
-                        onClose={startDateOpen.toggleModal}
-                        maxDate={qrisQuery.formik.values.end_date}
-                        renderInput={(params) => {
-                          return (
-                            <TextField
-                              {...params}
-                              name="grade"
-                              placeholder="Select Grade"
-                              variant="outlined"
-                              fullWidth
-                              onClick={startDateOpen.toggleModal}
-                            />
-                          );
-                        }}
-                      />
-                      {qrisQuery.formik.errors.start_date && (
-                        <Typography color="error.main">
-                          {qrisQuery.formik.errors.start_date}
-                        </Typography>
-                      )}
-                    </Stack>
-                    <Box
-                      sx={{
-                        width: '20px',
-                        borderBottom: '1px solid #000',
-                        pt: 2,
-                      }}
-                    />
-                    <Stack spacing={1} width="100%">
-                      <DesktopDatePicker
-                        value={qrisQuery.formik.values.end_date || null}
-                        inputFormat="DD/MM/YYYY"
-                        onChange={(value) => {
-                          qrisQuery.formik.setFieldValue('end_date', value);
-                          endDateOpen.toggleModal();
-                        }}
-                        minDate={qrisQuery.formik.values.start_date}
-                        maxDate={moment()}
-                        open={endDateOpen.open}
-                        onOpen={endDateOpen.toggleModal}
-                        onClose={endDateOpen.toggleModal}
-                        renderInput={(params) => {
-                          return (
-                            <TextField
-                              {...params}
-                              name="grade"
-                              placeholder="Select Grade"
-                              variant="outlined"
-                              fullWidth
-                              onClick={endDateOpen.toggleModal}
-                            />
-                          );
-                        }}
-                      />
-                      {qrisQuery.formik.errors.end_date && (
-                        <Typography color="error.main">
-                          {qrisQuery.formik.errors.end_date}
-                        </Typography>
-                      )}
-                    </Stack>
-                  </Stack>
+                  <DateRangePicker
+                    endSelectDate={moment()}
+                    date={[
+                      qrisQuery.formik.values.start_date,
+                      qrisQuery.formik.values.end_date,
+                    ]}
+                    onChange={(value) => {
+                      qrisQuery.formik.setFieldValue('start_date', value[0]);
+                      qrisQuery.formik.setFieldValue('end_date', value[1]);
+                    }}
+                  />
                 </FormLabel>
               </Grid>
               <Grid item xs={12} md={12}>
