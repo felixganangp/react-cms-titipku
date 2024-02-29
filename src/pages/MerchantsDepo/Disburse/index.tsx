@@ -74,6 +74,19 @@ export default function DisbursePages() {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'On Process':
+        return '#ff8f00';
+      case 'Transferred':
+        return '#008e58';
+      case 'Request':
+        return '#ff8f00';
+      default:
+        return 'red';
+    }
+  };
+
   useEffect(() => {
     handleUpdate();
   }, [selectedData]);
@@ -150,13 +163,7 @@ export default function DisbursePages() {
       label: 'Status',
       align: 'center',
       format: ({ status }) => {
-        const color =
-          // eslint-disable-next-line no-nested-ternary
-          status === 'On Process'
-            ? '#ff8f00'
-            : status === 'Transferred'
-            ? '#008e58'
-            : 'red';
+        const color = getStatusColor(status);
         return (
           <Label variant="filled" sx={{ backgroundColor: color }}>
             {status}
