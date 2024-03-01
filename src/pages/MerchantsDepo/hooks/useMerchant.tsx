@@ -25,6 +25,34 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
     queryKey: ['merchant-depo/merchant-depo', params.params],
     queryFn: () => getMerchantDepoList(params.params),
   });
+
+  const handleCondition = (value?: string) => {
+    switch (value) {
+      case 'New':
+        return {
+          is_new: 1,
+        };
+      case '100%':
+        return {
+          balance_condition: 100,
+          balance_condition_operator: 'EQ',
+        };
+
+      case 'Less than 10%':
+        return {
+          balance_condition: 10,
+          balance_condition_operator: 'LT',
+        };
+      case 'Less than 5%':
+        return {
+          balance_condition: 5,
+          balance_condition_operator: 'LT',
+        };
+      default:
+        return {};
+        break;
+    }
+  };
   const formik = useFormik({
     initialValues: {
       start_join_date: undefined,
@@ -32,6 +60,7 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
       depo_type_id: [],
       jelajah_id: [],
       area_id: undefined,
+      condition: undefined,
     },
     onSubmit: (values) => {
       const newValue = {
@@ -52,8 +81,13 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
             : undefined,
         // @ts-ignore
         area_id: values.area_id?.id || undefined,
+        depo_type_id:
+          values.depo_type_id.length > 0 ? values.depo_type_id : undefined,
       };
-      params.handleChangeParams(newValue);
+      params.handleChangeParams({
+        ...newValue,
+        ...handleCondition(values.condition),
+      });
       const queryParams = new URLSearchParams(
         Object.fromEntries(
           Object.entries({
@@ -137,7 +171,11 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
       delete newValue.jelajah_name;
       // @ts-ignore
       delete newValue.area_name;
-      params.handleChangeParams(newValue);
+      params.handleChangeParams({
+        ...newValue,
+        // @ts-ignore
+        ...handleCondition(initialFilter.condition),
+      });
     }
   }, []);
 

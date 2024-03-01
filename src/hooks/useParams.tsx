@@ -29,43 +29,49 @@ export default function UseParams<T>(props?: T & ListParams) {
     }
   }, []);
 
-  const handleResetFilter = useCallback(
-    (config?: { whiteList: string[] }) => {
-      const resetParams = { page: 1, count: 10, ...(props as T & ListParams) };
-      const whiteListParams = Object.keys(params)
-        .filter((key) => (config?.whiteList || [])?.includes(key))
-        .reduce((obj, key) => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          obj[key] = params[key];
-          return obj;
-        }, {} as T & ListParams);
+  const handleResetFilter = (config?: { whiteList: string[] }) => {
+    const resetParams = { page: 1, count: 10, ...(props as T & ListParams) };
+    const whiteListParams = Object.keys(params)
+      .filter((key) => (config?.whiteList || [])?.includes(key))
+      .reduce((obj, key) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        obj[key] = params[key];
+        return obj;
+      }, {} as T & ListParams);
 
-      if (!config?.whiteList?.includes('search')) {
-        setSearchValue('');
-      }
+    if (!config?.whiteList?.includes('search')) {
+      setSearchValue('');
+    }
 
-      setParams({ ...resetParams, ...whiteListParams });
-      // Update the URL search parameters
-      const queryParams = new URLSearchParams(
-        Object.fromEntries(
-          Object.entries(whiteListParams).filter(
-            ([key, value]) => value !== undefined,
-          ),
+    setParams(whiteListParams);
+    // Update the URL search parameters
+    const queryParams = new URLSearchParams(
+      Object.fromEntries(
+        Object.entries(whiteListParams).filter(
+          ([key, value]) => value !== undefined,
         ),
-      );
+      ),
+    );
 
-      // Set the search property of the current URL
-      window.history.pushState(
+    // Set the search property of the current URL
+    if (queryParams.toString().length > 0) {
+      window.history.replaceState(
         {},
         '',
-        queryParams.toString().length > 0
-          ? `?${queryParams.toString().length}`
-          : '',
+        queryParams.toString().length > 0 ? `?${queryParams.toString()}` : '',
       );
-    },
-    [params],
-  );
+    } else {
+      // Create a URL object from the current URL
+      const url = new URL(window.location.toString());
+
+      // Clear all search parameters
+      url.search = '';
+
+      // Replace the current URL without reloading the page
+      window.history.replaceState({}, '', url.toString());
+    }
+  };
 
   const handleToSetSearchParams = (name: string, value: string) => {
     // Create a new URLSearchParams instance

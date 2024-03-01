@@ -383,6 +383,28 @@ export default function MerchantsPages() {
                   />
                 </FormLabel>
               </Grid>
+              <Grid item xs={12} md={3}>
+                <FormLabel text="Condition">
+                  <Autocomplete
+                    options={['New', '100%', 'Less than 10%', 'Less than 5%']}
+                    value={merchantQuery.formik.values.condition}
+                    isOptionEqualToValue={(option, value) => option === value}
+                    onChange={(e, value) =>
+                      merchantQuery.formik.setFieldValue('condition', value)
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="Condition"
+                        placeholder="Select condition"
+                        // error={
+                        //   formik.touched.area && Boolean(formik.errors.area)
+                        // }
+                      />
+                    )}
+                  />
+                </FormLabel>
+              </Grid>
               <Grid item xs={12} md={12}>
                 <Stack
                   direction="row"
