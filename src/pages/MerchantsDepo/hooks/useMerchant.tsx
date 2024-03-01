@@ -59,8 +59,8 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
       end_join_date: undefined,
       depo_type_id: [],
       jelajah_id: [],
-      area_id: undefined,
-      condition: undefined,
+      area_id: null,
+      condition: null,
     },
     onSubmit: (values) => {
       const newValue = {
@@ -86,6 +86,7 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
       };
       params.handleChangeParams({
         ...newValue,
+        // @ts-ignore
         ...handleCondition(values.condition),
       });
       const queryParams = new URLSearchParams(
@@ -171,6 +172,7 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
       delete newValue.jelajah_name;
       // @ts-ignore
       delete newValue.area_name;
+      // @ts-ignore
       params.handleChangeParams({
         ...newValue,
         // @ts-ignore

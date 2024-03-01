@@ -441,9 +441,9 @@ export default function MerchantsPages() {
                   item.type === 'Andalan' ||
                   (item.total_gmv === 0 && item.balance === 0)
                     ? '#fff'
-                    : tenPecent >= item.balance
+                    : item.balance <= fivePecent
                     ? '#F9EBE7'
-                    : fivePecent >= item.balance
+                    : item.balance <= tenPecent
                     ? '#FFF3CD'
                     : '#fff',
                 id: item.jelajah_id,

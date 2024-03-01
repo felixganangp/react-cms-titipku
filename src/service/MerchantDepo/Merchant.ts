@@ -20,6 +20,8 @@ export const getMerchantDepoList = (params?: MerchantParams) =>
       delete paramsRest.jelajah_id;
     }
     if (paramsRest.depo_type_id) {
+      if (costumeParams.length >= 1) costumeParams += '&';
+
       paramsRest.depo_type_id.forEach((val, index) => {
         costumeParams += `depo_type_id=${val}${
           index === (paramsRest?.depo_type_id?.length || 0) - 1 ? '' : '&'
