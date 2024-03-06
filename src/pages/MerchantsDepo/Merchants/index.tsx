@@ -257,10 +257,18 @@ export default function MerchantsPages() {
               <Grid item xs={12} md={5}>
                 <FormLabel text="Merchant Name">
                   <Autocomplete
-                    options={filterMerchantDepoList.listData.map((val) => ({
-                      id: val.id,
-                      name: val.merchant_name,
-                    }))}
+                    options={filterMerchantDepoList.listData
+                      .map((val) => ({
+                        id: val.id,
+                        name: val.merchant_name,
+                      }))
+                      .filter(
+                        (val) =>
+                          !merchantQuery.formik.values.jelajah_id
+                            // @ts-ignore
+                            ?.map((i) => i.id)
+                            ?.includes(val.id),
+                      )}
                     noOptionsText={
                       !filterMerchantDepoList.searchValue
                         ? 'Type to search merchant name'

@@ -412,6 +412,7 @@ export default function MercheantsDetails() {
                       <Autocomplete
                         options={mutationType.listData}
                         getOptionLabel={(option) => option.description || ''}
+                        value={mutationTransaction.formik.values.type}
                         onChange={(e, value) => {
                           mutationTransaction.formik.setFieldValue(
                             'type',

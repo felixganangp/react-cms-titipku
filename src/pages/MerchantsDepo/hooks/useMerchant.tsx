@@ -347,7 +347,7 @@ export function useGetTransactionMutation(id?: string, setParams?: ListParams) {
 
   const formik = useFormik({
     initialValues: {
-      type: undefined,
+      type: null,
       from: undefined,
       to: undefined,
     },
