@@ -21,8 +21,8 @@ import {
   Collapse,
   Grid,
   Autocomplete,
+  CircularProgress,
 } from '@mui/material';
-import CustomModal from 'components/Modal';
 import Table from 'components/Table';
 import DeleteModal from 'components/Delete/freetext';
 import moment from 'moment';
@@ -36,14 +36,17 @@ import Label from 'components/Label';
 import SearchIcon from '@mui/icons-material/Search';
 import DateRangePicker from 'components/DateRangePicker';
 import { DisburseList } from 'models/merchantDepo/disburse';
+import ModalComp from 'components/Modal';
 import {
   UseDisburse,
   DisburseStatus,
   useDeleteDisburse,
   useUpdateStatusDisburse,
   UseListDisburseStatus,
+  useUpdateDisburse,
 } from '../hooks/useDisburse';
 import { UseFilterMerchentDepoListService } from '../hooks/useConfigMerchant';
+import ModalConfirmTransfer from './Components/ModalConfirmTransfer';
 
 type UpdateStatusPayload = {
   id: number;
@@ -60,18 +63,15 @@ export default function DisbursePages() {
   const modalUpdate = useModal();
   const openStartDateFilter = useModal();
   const openEndDateFilter = useModal();
+  const openConfirmTransfer = useModal();
+  const [type, setType] = useState<string>('');
 
   const queryDisburse = UseDisburse({ status: ['8', '4'] });
   const queryMerchantFilter = UseFilterMerchentDepoListService();
   const deleteDisburse = useDeleteDisburse();
   const updateStatusDisburse = useUpdateStatusDisburse();
+  const updateDisburse = useUpdateDisburse();
   const queryDisburseStatus = UseListDisburseStatus();
-
-  const handleUpdate = () => {
-    if (selectedData?.id) {
-      modalUpdate.openModal();
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -86,11 +86,7 @@ export default function DisbursePages() {
     }
   };
 
-  useEffect(() => {
-    handleUpdate();
-  }, [selectedData]);
-
-  const headCells: HeadCells<any>[] = [
+  const headCells: HeadCells<DisburseList>[] = [
     {
       id: 'date',
       label: 'Request Date',
@@ -127,10 +123,35 @@ export default function DisbursePages() {
       label: 'Action',
       format: (value) => (
         <Stack direction="row" gap="10px">
-          <Button color="error" variant="outlined" sx={{ borderRadius: '5px' }}>
+          <Button
+            color="error"
+            variant="outlined"
+            sx={{ borderRadius: '5px' }}
+            disabled={
+              selectedData?.id === value?.id && updateDisburse.isLoading
+            }
+            startIcon={
+              selectedData?.id === value?.id &&
+              updateDisburse.isLoading && <CircularProgress size={20} />
+            }
+            onClick={() => {
+              setSelectedData(value);
+              openConfirmTransfer.openModal();
+              setType('Decline');
+            }}
+          >
             Decline
           </Button>
-          <Button sx={{ borderRadius: '5px' }}>Approve</Button>
+          <Button
+            sx={{ borderRadius: '5px' }}
+            onClick={() => {
+              setSelectedData(value);
+              openConfirmTransfer.openModal();
+              setType('Approve');
+            }}
+          >
+            Approve
+          </Button>
         </Stack>
       ),
     },
@@ -185,16 +206,18 @@ export default function DisbursePages() {
               <MenuList
                 menu={[
                   {
-                    label: `Delete ${selected.length} Items`,
-                    color: 'error',
+                    label: `Decline ${selected.length} Items`,
+                    color: 'error.main',
                     onClick: () => {
-                      modalDelete.openModal();
+                      setType('Decline');
+                      modalUpdateStatus.openModal();
                     },
                   },
                   {
-                    label: `Update ${selected.length} Items to Transferred`,
-                    color: 'error',
+                    label: `Approve ${selected.length} Items`,
+                    color: 'primary.main',
                     onClick: () => {
+                      setType('Approve');
                       modalUpdateStatus.openModal();
                     },
                   },
@@ -410,7 +433,7 @@ export default function DisbursePages() {
             }}
             enableCheckBox
             disableNumber
-            loading={queryDisburse.isLoading}
+            loading={queryDisburse.isFetching}
             page={queryDisburse.data?.page || 0}
             count={queryDisburse.data?.count || 0}
             totalData={queryDisburse.data?.total || 0}
@@ -449,22 +472,22 @@ export default function DisbursePages() {
       >
         <DeleteModal
           onClose={modalUpdateStatus.closeModal}
-          headerText="Update Status Disburse"
-          textButton="Update Status"
+          headerText={`${type} transfer`}
+          textButton={type}
           desc={
             <>
-              Are you sure want to update status {selected.length} Disburse(s)
-              to transferred?
+              Are you sure want to {type} {selected.length} items?
             </>
           }
           onSubmit={() => {
             const payload: UpdateStatusPayload[] = [];
             selected.forEach((data) => {
-              payload.push({ id: +data, status: 2 });
+              payload.push({ id: +data, status: type === 'Approve' ? 6 : 3 });
             });
             updateStatusDisburse.mutate(payload, {
               onSuccess: () => {
                 queryDisburse.refetch();
+                setType('');
                 setSelected([]);
                 modalUpdateStatus.closeModal();
               },
@@ -472,6 +495,22 @@ export default function DisbursePages() {
           }}
         />
       </Modal>
+      <ModalComp
+        open={openConfirmTransfer.open}
+        title="Confirm Transfer"
+        onClose={openConfirmTransfer.closeModal}
+      >
+        <ModalConfirmTransfer
+          type={type}
+          data={selectedData}
+          onCLose={() => {
+            queryDisburse.refetch();
+            openConfirmTransfer.closeModal();
+            setSelectedData(undefined);
+            setType('');
+          }}
+        />
+      </ModalComp>
     </Box>
   );
 }

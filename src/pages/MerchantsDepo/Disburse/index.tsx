@@ -84,7 +84,8 @@ export default function DisbursePages() {
         return '#ff8f00';
       case 'Transferred By System':
         return '#ff8f00';
-
+      case 'On Process By System':
+        return '#0774d1';
       default:
         return 'red';
     }

@@ -19,6 +19,8 @@ export type DisburseList = {
   jelajah_id: number;
   paid_off_date: number;
   paid_date: number;
+  balance: number;
+  limit: number;
 };
 
 export type DisburseDetails = {
