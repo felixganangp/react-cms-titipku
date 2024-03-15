@@ -54,6 +54,8 @@ export interface MerchantDetails {
   last_month_gmv: number;
   last_month_trx: number;
   is_active: boolean;
+  auto_disburse_disable_reason?: string;
+  is_auto_disburse?: boolean;
 }
 
 export interface TransactionMerchantDepoList {

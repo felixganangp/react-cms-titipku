@@ -70,6 +70,8 @@ export default function ModalFormMerchantDepo({
       nobu_account_number: '',
       merchant_qris_id: '',
       qris_ready: false,
+      is_auto_disburse: true,
+      auto_disburse_disable_reason: '',
     },
     onSubmit: (values) => {
       try {
@@ -217,6 +219,19 @@ export default function ModalFormMerchantDepo({
           otherwise: Yup.string().nullable(),
         },
       ),
+      auto_disburse_disable_reason: Yup.string().when(
+        ['merchant_depo_type_id', 'is_auto_disburse'],
+        {
+          is: (merchant_depo_type_id: number, is_auto_disburse: boolean) => {
+            return (
+              (merchant_depo_type_id === 1 || merchant_depo_type_id === 3) &&
+              !is_auto_disburse
+            );
+          },
+          then: Yup.string().required('This field is required'),
+          otherwise: Yup.string().nullable(),
+        },
+      ),
     }),
   });
 
@@ -240,6 +255,9 @@ export default function ModalFormMerchantDepo({
         // @ts-ignore
         merchant_qris_id: detailData?.qris_merchant_id || '',
         merchant_depo_type_id: detailData?.depo_type_id || 2,
+        is_auto_disburse: detailData?.is_auto_disburse || true,
+        auto_disburse_disable_reason:
+          detailData?.auto_disburse_disable_reason || '',
       });
     }
   }, [merchantDetails.data]);
@@ -690,6 +708,40 @@ export default function ModalFormMerchantDepo({
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   name="merchant_qris_id"
+                />
+              </FormControl>
+            )}
+            <FormControl text="Auto Disburse">
+              <SwitchCostum
+                checked={formik.values.is_auto_disburse}
+                name="is_auto_disburse"
+                onBlur={formik.handleBlur}
+                onChange={(e) => {
+                  formik.handleChange(e);
+                }}
+              />
+            </FormControl>
+            {!formik.values.is_auto_disburse && (
+              <FormControl
+                text="Reason"
+                // required
+                error={
+                  formik.touched.auto_disburse_disable_reason &&
+                  Boolean(formik.errors.auto_disburse_disable_reason)
+                }
+                helperText={
+                  formik.touched.auto_disburse_disable_reason &&
+                  formik.errors.auto_disburse_disable_reason &&
+                  `${formik.errors.auto_disburse_disable_reason}`
+                }
+              >
+                <TextField
+                  fullWidth
+                  placeholder="Reason"
+                  value={formik.values.auto_disburse_disable_reason}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  name="auto_disburse_disable_reason"
                 />
               </FormControl>
             )}

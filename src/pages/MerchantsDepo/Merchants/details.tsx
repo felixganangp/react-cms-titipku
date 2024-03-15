@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define */
 import { useMemo, useState } from 'react';
 import AccordionOnDetails from 'components/Accordion/SubDetailsPagesWrapper';
 import DescriptionDetail from 'components/DescDetails';
@@ -18,7 +19,9 @@ import {
   Typography,
   Autocomplete,
   TextField,
+  styled,
   Modal,
+  Switch,
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import MerchantAndalan from 'assets/merchant-andalan.svg';
@@ -39,6 +42,7 @@ import useModal from 'hooks/useModal';
 import ModalComp from 'components/Modal';
 import DeleteModal from 'components/Delete/freetext';
 import { QrisForm } from 'models/merchantDepo/Qris';
+// import FormControl from 'components/FormLabel';
 import DateRangePicker from 'components/DateRangePicker';
 import {
   useGetTransactionMutation,
@@ -185,13 +189,8 @@ export default function MercheantsDetails() {
                 }
               />
             </Stack>
-            <Stack
-              borderBottom="1px solid #E0E0E0"
-              borderTop="1px solid #E0E0E0"
-              p={2}
-              my={2}
-              width={['100%', '100%', '60%']}
-            >
+            <Box width="full" borderBottom="1px solid #E0E0E0" my={1} />
+            <Stack px={2} py={1} width={['100%', '100%', '60%']}>
               <Grid container spacing={2}>
                 <Grid item xs={6} md={2.4}>
                   <Box bgcolor="#F9EBE7" p={1}>
@@ -245,6 +244,8 @@ export default function MercheantsDetails() {
                 </Grid>
               </Grid>
             </Stack>
+            <Box width="full" borderBottom="1px solid #E0E0E0" my={1} />
+
             <Grid container spacing={2} mt={2}>
               <Grid item xs={6} md={2.4}>
                 <DescriptionDetail
@@ -393,6 +394,26 @@ export default function MercheantsDetails() {
                 />
               </Grid>
             </Grid>
+            <Box width="full" borderBottom="1px solid #E0E0E0" my={1} />
+            <Stack px={2} py={1} width={['100%', '100%', '60%']}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={6} md={4}>
+                  <FormLabel text="Auto Disburse">
+                    <SwitchCostum checked={details?.is_auto_disburse} />
+                  </FormLabel>
+                </Grid>
+                <Grid item xs={6} md={8}>
+                  {!details?.is_auto_disburse && (
+                    <TextField
+                      fullWidth
+                      placeholder="Reason"
+                      value={details?.auto_disburse_disable_reason || ''}
+                      name="auto_disburse_disable_reason"
+                    />
+                  )}
+                </Grid>
+              </Grid>
+            </Stack>
           </Box>
         </Card>
       </AccordionOnDetails>
@@ -640,3 +661,47 @@ export default function MercheantsDetails() {
     </Box>
   );
 }
+
+const SwitchCostum = styled(Switch)(({ theme }) => ({
+  width: 28,
+  height: 16,
+  padding: 0,
+  display: 'flex',
+  '&:active': {
+    '& .MuiSwitch-thumb': {
+      width: 15,
+    },
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      transform: 'translateX(9px)',
+    },
+  },
+  '& .MuiSwitch-switchBase': {
+    padding: 2,
+    '&.Mui-checked': {
+      transform: 'translateX(12px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        opacity: 1,
+        backgroundColor: theme.palette.primary.main,
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    transition: theme.transitions.create(['width'], {
+      duration: 200,
+    }),
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 16 / 2,
+    opacity: 1,
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255,255,255,.35)'
+        : 'rgba(0,0,0,.25)',
+    boxSizing: 'border-box',
+  },
+}));
