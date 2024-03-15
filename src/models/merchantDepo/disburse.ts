@@ -3,7 +3,7 @@ import { ListParams } from '../fetch';
 export interface DisburseParams extends ListParams {
   start_date?: string;
   end_date?: string;
-  status?: string;
+  status?: string | string[];
 }
 
 export type DisburseList = {
@@ -19,6 +19,8 @@ export type DisburseList = {
   jelajah_id: number;
   paid_off_date: number;
   paid_date: number;
+  balance: number;
+  limit: number;
 };
 
 export type DisburseDetails = {

@@ -21,8 +21,8 @@ import {
   Collapse,
   Grid,
   Autocomplete,
+  CircularProgress,
 } from '@mui/material';
-import CustomModal from 'components/Modal';
 import Table from 'components/Table';
 import DeleteModal from 'components/Delete/freetext';
 import moment from 'moment';
@@ -36,15 +36,17 @@ import Label from 'components/Label';
 import SearchIcon from '@mui/icons-material/Search';
 import DateRangePicker from 'components/DateRangePicker';
 import { DisburseList } from 'models/merchantDepo/disburse';
-import ModalFormDisburseDepo from './Form/components/ModalForm';
+import ModalComp from 'components/Modal';
 import {
   UseDisburse,
   DisburseStatus,
   useDeleteDisburse,
   useUpdateStatusDisburse,
   UseListDisburseStatus,
+  useUpdateDisburse,
 } from '../hooks/useDisburse';
 import { UseFilterMerchentDepoListService } from '../hooks/useConfigMerchant';
+import ModalConfirmTransfer from './Components/ModalConfirmTransfer';
 
 type UpdateStatusPayload = {
   id: number;
@@ -61,18 +63,15 @@ export default function DisbursePages() {
   const modalUpdate = useModal();
   const openStartDateFilter = useModal();
   const openEndDateFilter = useModal();
+  const openConfirmTransfer = useModal();
+  const [type, setType] = useState<string>('');
 
-  const queryDisburse = UseDisburse();
+  const queryDisburse = UseDisburse({ status: ['8', '4'] });
   const queryMerchantFilter = UseFilterMerchentDepoListService();
   const deleteDisburse = useDeleteDisburse();
   const updateStatusDisburse = useUpdateStatusDisburse();
+  const updateDisburse = useUpdateDisburse();
   const queryDisburseStatus = UseListDisburseStatus();
-
-  const handleUpdate = () => {
-    if (selectedData?.id) {
-      modalUpdate.openModal();
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -82,63 +81,20 @@ export default function DisbursePages() {
         return '#008e58';
       case 'Request':
         return '#ff8f00';
-      case 'Transferred By System':
-        return '#ff8f00';
-      case 'On Process By System':
-        return '#0774d1';
       default:
         return 'red';
     }
   };
 
-  useEffect(() => {
-    handleUpdate();
-  }, [selectedData]);
-
-  const headCells: HeadCells<any>[] = [
+  const headCells: HeadCells<DisburseList>[] = [
     {
       id: 'date',
-      label: 'Date',
+      label: 'Request Date',
       format: (value) => moment(value.date * 1000).format('DD MMM YYYY'),
-    },
-    {
-      id: 'due_date',
-      label: 'Due Date',
-      format: (value) => {
-        return value.due_date
-          ? moment(value.due_date * 1000).format('DD MMM YYYY') || '-'
-          : '-';
-      },
-    },
-    {
-      id: 'dpd',
-      label: 'DPD',
     },
     {
       id: 'merchant_name',
       label: 'Merchant Name',
-    },
-    {
-      id: 'transfer_date',
-      label: 'Transfer Date',
-      format: (value) => {
-        return value.paid_date
-          ? moment(value.paid_date * 1000).format('DD MMM YYYY') || '-'
-          : '-';
-      },
-    },
-    {
-      id: 'paid_off_date',
-      label: 'Paid Date',
-      format: (value) => {
-        return value.paid_off_date
-          ? moment(value.paid_off_date * 1000).format('DD MMM YYYY') || '-'
-          : '-';
-      },
-    },
-    {
-      id: 'account_number',
-      label: 'Account Number',
     },
     {
       id: 'amount',
@@ -163,53 +119,40 @@ export default function DisbursePages() {
       },
     },
     {
-      id: 'status',
-      label: 'Status',
-      align: 'center',
-      format: ({ status }) => {
-        const color = getStatusColor(status);
-        return (
-          <Label variant="filled" sx={{ backgroundColor: color }}>
-            {status}
-          </Label>
-        );
-      },
-    },
-    {
       id: 'Action',
       label: 'Action',
       format: (value) => (
-        <MenuList
-          menu={[
-            {
-              label: 'Edit',
-              onClick: () => {
-                setSelectedData(value);
-              },
-            },
-            {
-              label: 'Delete',
-              color: 'error',
-              onClick: () => {
-                setSelected([value.id]);
-                modalDelete.openModal();
-              },
-            },
-            {
-              label: 'Update to Transferred',
-              color: 'error',
-              hide: value.status !== 'On Process',
-              onClick: () => {
-                setSelected([value.id]);
-                modalUpdateStatus.openModal();
-              },
-            },
-          ]}
-        >
-          <IconButton>
-            <MoreVert />
-          </IconButton>
-        </MenuList>
+        <Stack direction="row" gap="10px">
+          <Button
+            color="error"
+            variant="outlined"
+            sx={{ borderRadius: '5px' }}
+            disabled={
+              selectedData?.id === value?.id && updateDisburse.isLoading
+            }
+            startIcon={
+              selectedData?.id === value?.id &&
+              updateDisburse.isLoading && <CircularProgress size={20} />
+            }
+            onClick={() => {
+              setSelectedData(value);
+              openConfirmTransfer.openModal();
+              setType('Decline');
+            }}
+          >
+            Decline
+          </Button>
+          <Button
+            sx={{ borderRadius: '5px' }}
+            onClick={() => {
+              setSelectedData(value);
+              openConfirmTransfer.openModal();
+              setType('Approve');
+            }}
+          >
+            Approve
+          </Button>
+        </Stack>
       ),
     },
   ];
@@ -263,16 +206,18 @@ export default function DisbursePages() {
               <MenuList
                 menu={[
                   {
-                    label: `Delete ${selected.length} Items`,
-                    color: 'error',
+                    label: `Decline ${selected.length} Items`,
+                    color: 'error.main',
                     onClick: () => {
-                      modalDelete.openModal();
+                      setType('Decline');
+                      modalUpdateStatus.openModal();
                     },
                   },
                   {
-                    label: `Update ${selected.length} Items to Transferred`,
-                    color: 'error',
+                    label: `Approve ${selected.length} Items`,
+                    color: 'primary.main',
                     onClick: () => {
+                      setType('Approve');
                       modalUpdateStatus.openModal();
                     },
                   },
@@ -349,39 +294,6 @@ export default function DisbursePages() {
                         // }
                       />
                     )}
-                  />
-                </FormLabel>
-              </Grid>
-              <Grid item xs={12} md={2}>
-                <FormLabel text="Status">
-                  <Autocomplete
-                    id="filterStatus"
-                    value={
-                      queryDisburseStatus.listData.find(
-                        // @ts-ignore
-                        (val) =>
-                          val.id === queryDisburse.formikParams.values.status,
-                      ) || null
-                    }
-                    options={queryDisburseStatus.listData}
-                    onChange={(e, value) => {
-                      // handleChangeGrade(value);
-                      queryDisburse.formikParams.setFieldValue(
-                        'status',
-                        value?.id,
-                      );
-                    }}
-                    getOptionLabel={(option) => `${option.description}`}
-                    renderInput={(params) => {
-                      return (
-                        <TextField
-                          {...params}
-                          name="status"
-                          placeholder="Select Status"
-                          variant="outlined"
-                        />
-                      );
-                    }}
                   />
                 </FormLabel>
               </Grid>
@@ -521,7 +433,7 @@ export default function DisbursePages() {
             }}
             enableCheckBox
             disableNumber
-            loading={queryDisburse.isLoading}
+            loading={queryDisburse.isFetching}
             page={queryDisburse.data?.page || 0}
             count={queryDisburse.data?.count || 0}
             totalData={queryDisburse.data?.total || 0}
@@ -560,22 +472,22 @@ export default function DisbursePages() {
       >
         <DeleteModal
           onClose={modalUpdateStatus.closeModal}
-          headerText="Update Status Disburse"
-          textButton="Update Status"
+          headerText={`${type} transfer`}
+          textButton={type}
           desc={
             <>
-              Are you sure want to update status {selected.length} Disburse(s)
-              to transferred?
+              Are you sure want to {type} {selected.length} items?
             </>
           }
           onSubmit={() => {
             const payload: UpdateStatusPayload[] = [];
             selected.forEach((data) => {
-              payload.push({ id: +data, status: 2 });
+              payload.push({ id: +data, status: type === 'Approve' ? 6 : 3 });
             });
             updateStatusDisburse.mutate(payload, {
               onSuccess: () => {
                 queryDisburse.refetch();
+                setType('');
                 setSelected([]);
                 modalUpdateStatus.closeModal();
               },
@@ -583,23 +495,22 @@ export default function DisbursePages() {
           }}
         />
       </Modal>
-      <CustomModal
-        open={modalUpdate.open}
-        title="Edit Disburse"
-        onClose={modalUpdate.closeModal}
+      <ModalComp
+        open={openConfirmTransfer.open}
+        title="Confirm Transfer"
+        onClose={openConfirmTransfer.closeModal}
       >
-        <ModalFormDisburseDepo
-          id={selectedData?.id.toString()}
-          id_jelajah={selectedData?.jelajah_id}
-          handleClose={(isSubmiting) => {
-            if (isSubmiting) {
-              queryDisburse.refetch();
-              setSelectedData(undefined);
-            }
-            modalUpdate.closeModal();
+        <ModalConfirmTransfer
+          type={type}
+          data={selectedData}
+          onCLose={() => {
+            queryDisburse.refetch();
+            openConfirmTransfer.closeModal();
+            setSelectedData(undefined);
+            setType('');
           }}
         />
-      </CustomModal>
+      </ModalComp>
     </Box>
   );
 }
