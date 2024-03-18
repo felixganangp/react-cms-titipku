@@ -15,7 +15,10 @@ import {
   styled,
 } from '@mui/material';
 import FormControl from 'components/FormLabel';
-import { UseTypeListService } from 'pages/MerchantsDepo/hooks/useConfigMerchant';
+import {
+  UseBankListService,
+  UseTypeListService,
+} from 'pages/MerchantsDepo/hooks/useConfigMerchant';
 import numberSeperator from 'utils/numberSeperator';
 import bankData from 'data/list-bank.json';
 import {
@@ -52,7 +55,7 @@ export default function ModalFormMerchantDepo({
   const createMerchant = useCreateMerchantDepo();
   const updateMerchant = useUpdateMerchantDepo();
   const merchantDetails = useMerchantDetails(id);
-
+  const bankList = UseBankListService({ count: 100 });
   const showHistory = useModal();
 
   const formik = useFormik({
@@ -63,6 +66,7 @@ export default function ModalFormMerchantDepo({
       depo_discount: '',
       admin_fee: '',
       bank_name: '',
+      bank_id: null,
       bank_branch_office: '',
       bank_account_name: '',
       bank_account_number: '',
@@ -165,7 +169,7 @@ export default function ModalFormMerchantDepo({
           is: (merchant_depo_type_id: number, bank_name: string) => {
             return (
               (merchant_depo_type_id === 1 || merchant_depo_type_id === 3) &&
-              bank_name !== 'BCA (Bank Central Asia)'
+              bank_name !== 'BCA'
             );
           },
           then: Yup.string()
@@ -252,6 +256,8 @@ export default function ModalFormMerchantDepo({
         nobu_account_name: detailData?.nobu_account_name || '',
         nobu_account_number: detailData?.nobu_account_number || '',
         qris_ready: detailData?.qris_ready,
+        // @ts-ignore
+        bank_id: detailData?.bank_id || 0,
         // @ts-ignore
         merchant_qris_id: detailData?.qris_merchant_id || '',
         merchant_depo_type_id: detailData?.depo_type_id || 2,
@@ -512,9 +518,11 @@ export default function ModalFormMerchantDepo({
               <Autocomplete
                 data-testid="form-customer-list-bank"
                 id="list-bank"
-                options={bankData.data}
+                options={bankList.data?.data || []}
                 onChange={(e, value) => {
                   formik.setFieldValue('bank_name', value?.name);
+                  // @ts-ignore
+                  formik.setFieldValue('bank_id', value?.id);
                 }}
                 // isOptionEqualToValue={(option: {
                 //   name: string;
@@ -526,7 +534,7 @@ export default function ModalFormMerchantDepo({
                 getOptionLabel={(option) => `${option.name}`}
                 value={
                   // @ts-ignore
-                  bankData.data.find(
+                  bankList.data?.data.find(
                     (val) => val.name === formik.values.bank_name,
                   ) || null
                 }
@@ -542,7 +550,7 @@ export default function ModalFormMerchantDepo({
             </FormControl>
             <FormControl
               text="Branch Office"
-              required={formik.values.bank_name !== 'BCA (Bank Central Asia)'}
+              required={formik.values.bank_name !== 'BCA'}
               error={
                 formik.touched.bank_branch_office &&
                 Boolean(formik.errors.bank_branch_office)

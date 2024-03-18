@@ -38,6 +38,7 @@ type BankAccounts = {
   bank: string;
   string: string;
   bank_account_name: string;
+  bank_code?: string;
 };
 export default function ModalFormDisburseDepo({
   id,
@@ -113,6 +114,7 @@ export default function ModalFormDisburseDepo({
       jelajah_id: id_jelajah,
       bank_name: '',
       bank_account_name: '',
+      bank_code: '',
       bank_account_number: '',
       amount: 0,
       transfer_amount: 0,
@@ -151,21 +153,45 @@ export default function ModalFormDisburseDepo({
   });
 
   useEffect(() => {
-    const detailData = disburseDetails.data?.data;
-    if (detailData) {
-      formik.setValues({
+    const accountBank: BankAccounts[] = [];
+    accountBank.push({
+      // @ts-ignore
+      id: merchantDetails.data?.data.bank_account_number || '',
+      string: `${merchantDetails.data?.data.bank_name} - ${merchantDetails.data?.data.bank_account_number}`,
+      bank: merchantDetails.data?.data.bank_name || '',
+      bank_account_name: merchantDetails.data?.data.bank_account_name || '',
+      bank_code: merchantDetails.data?.data.bank_code || '',
+    });
+    if (merchantDetails.data?.data.nobu_account_number) {
+      accountBank.push({
         // @ts-ignore
-        jelajah_id: id_jelajah,
-        bank_name: detailData?.bank_name,
-        bank_account_name: detailData?.bank_account_name,
-        bank_account_number: detailData?.bank_account_number.toString(),
-        amount: detailData?.amount,
-        transfer_amount: detailData?.transfer_amount,
-        status: detailData?.status?.id,
+        id: merchantDetails.data?.data.nobu_account_number || '',
+        string: `Nobu - ${merchantDetails.data?.data.nobu_account_number}`,
+        bank: 'Nobu',
+        bank_account_name: merchantDetails.data?.data.nobu_account_name,
+        bank_code: merchantDetails.data?.data.bank_code || '',
       });
     }
-  }, [disburseDetails.data]);
 
+    if (
+      isUpdate &&
+      (disburseDetails?.data?.data.bank_name !==
+        merchantDetails?.data?.data?.bank_name ||
+        disburseDetails?.data?.data.bank_account_number !==
+          merchantDetails?.data?.data?.bank_account_number)
+    ) {
+      accountBank.push({
+        id: disburseDetails?.data?.data?.bank_account_number || 0,
+        string: `${disburseDetails?.data?.data?.bank_name} - ${disburseDetails?.data?.data?.bank_account_number}`,
+        bank: disburseDetails?.data?.data?.bank_name || '',
+        bank_account_name: disburseDetails?.data?.data
+          ?.bank_account_name as string,
+        bank_code: disburseDetails?.data?.data?.bank_code as string,
+      });
+    }
+
+    setBankAccounts(accountBank);
+  }, [merchantDetails.data, disburseDetails.data]);
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Box p="24px">
@@ -247,6 +273,7 @@ export default function ModalFormDisburseDepo({
                 value?.bank_account_name,
               );
               formik.setFieldValue('bank_name', value?.bank);
+              formik.setFieldValue('bank_code', value?.bank_code);
             }}
             renderInput={(params) => (
               <TextField
