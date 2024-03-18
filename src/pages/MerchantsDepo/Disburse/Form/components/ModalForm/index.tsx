@@ -418,7 +418,9 @@ export default function ModalFormDisburseDepo({
             }
           >
             <Autocomplete
-              options={disburseStatus.listData}
+              options={disburseStatus.listData.filter(
+                (val) => !val.description.includes('By System'),
+              )}
               getOptionLabel={(option) => option.description}
               value={
                 disburseStatus.listData.find(
