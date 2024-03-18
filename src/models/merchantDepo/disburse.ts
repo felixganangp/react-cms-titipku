@@ -24,6 +24,7 @@ export type DisburseList = {
 };
 
 export type DisburseDetails = {
+  bank_branch: unknown;
   id: number;
   jelajah_id: number;
   bank_name: string;

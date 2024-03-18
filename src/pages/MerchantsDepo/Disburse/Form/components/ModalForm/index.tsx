@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { useEffect, useMemo, useState } from 'react';
 import { useFormik } from 'formik';
@@ -192,6 +193,17 @@ export default function ModalFormDisburseDepo({
 
     setBankAccounts(accountBank);
   }, [merchantDetails.data, disburseDetails.data]);
+
+  const Branch =
+    formik.values?.bank_account_number ===
+    merchantDetails.data?.data?.bank_account_number
+      ? merchantDetails.data?.data?.bank_branch_office
+      : // @ts-ignore
+      disburseDetails.data?.data?.bank_account_number ===
+        formik.values?.bank_account_number
+      ? // @ts-ignore
+        disburseDetails.data?.data?.bank_branch_office
+      : '';
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Box p="24px">
@@ -285,6 +297,19 @@ export default function ModalFormDisburseDepo({
             )}
           />
         </FormControl>
+        {Branch && (
+          <>
+            <FormControl text="Branch" required>
+              <TextField
+                fullWidth
+                placeholder="Branch bank"
+                disabled
+                value={Branch}
+              />
+            </FormControl>
+          </>
+        )}
+
         <FormControl
           text="Top Up Value"
           required
