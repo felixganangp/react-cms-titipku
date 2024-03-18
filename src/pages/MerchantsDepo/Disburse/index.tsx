@@ -99,15 +99,23 @@ export default function DisbursePages() {
     {
       id: 'date',
       label: 'Date',
-      format: (value) => moment(value.date * 1000).format('DD MMM YYYY'),
+      format: (value) => (
+        <Typography sx={{ whiteSpace: 'nowrap' }}>
+          {moment(value.date * 1000).format('DD MMM YYYY')}
+        </Typography>
+      ),
     },
     {
       id: 'due_date',
       label: 'Due Date',
       format: (value) => {
-        return value.due_date
-          ? moment(value.due_date * 1000).format('DD MMM YYYY') || '-'
-          : '-';
+        return (
+          <Typography sx={{ whiteSpace: 'nowrap' }}>
+            {value.due_date
+              ? moment(value.due_date * 1000).format('DD MMM YYYY') || '-'
+              : '-'}
+          </Typography>
+        );
       },
     },
     {
@@ -122,30 +130,43 @@ export default function DisbursePages() {
       id: 'transfer_date',
       label: 'Transfer Date',
       format: (value) => {
-        return value.paid_date
-          ? moment(value.paid_date * 1000).format('DD MMM YYYY') || '-'
-          : '-';
+        return (
+          <Typography sx={{ whiteSpace: 'nowrap' }}>
+            {value.paid_date
+              ? moment(value.paid_date * 1000).format('DD MMM YYYY') || '-'
+              : '-'}
+          </Typography>
+        );
       },
     },
     {
       id: 'paid_off_date',
       label: 'Paid Date',
       format: (value) => {
-        return value.paid_off_date
-          ? moment(value.paid_off_date * 1000).format('DD MMM YYYY') || '-'
-          : '-';
+        return (
+          <Typography sx={{ whiteSpace: 'nowrap' }}>
+            {value.paid_off_date
+              ? moment(value.paid_off_date * 1000).format('DD MMM YYYY') || '-'
+              : '-'}
+          </Typography>
+        );
       },
     },
     {
       id: 'account_number',
       label: 'Account Number',
+      width: 200,
+    },
+    {
+      id: 'bank_branch_office',
+      label: 'Branch',
     },
     {
       id: 'amount',
       label: 'Amount',
       format: ({ amount }) => {
         return (
-          <Typography variant="body1">
+          <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
             Rp. {numberSeperator(amount || 0)}
           </Typography>
         );
@@ -156,7 +177,7 @@ export default function DisbursePages() {
       label: 'Amount Transferred',
       format: ({ transfer_amount }) => {
         return (
-          <Typography variant="body1">
+          <Typography variant="body1" sx={{ whiteSpace: 'nowrap' }}>
             Rp. {numberSeperator(transfer_amount || 0)}
           </Typography>
         );
