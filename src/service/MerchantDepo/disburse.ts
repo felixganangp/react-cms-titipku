@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 /* eslint-disable @typescript-eslint/naming-convention */
 import http from 'utils/request';
 import { ListResponse, Response } from 'models/fetch';
@@ -18,10 +19,15 @@ export const getAllDisburse = (params?: DisburseParams) =>
     if (typeof paramsRest.status === 'object') {
       paramsRest.status.forEach((val, index) => {
         costumeParams += `status=${val}${
-          index === (paramsRest?.status?.length || 0) - 1 ? '&' : '&'
+          index === (paramsRest?.status?.length || 0) - 1 ? '' : '&'
         }`;
       });
       delete paramsRest.status;
+    } else {
+      // @ts-ignore
+      if (paramsRest.status === 4 || paramsRest.status === '4') {
+        costumeParams += `tabs=request`;
+      }
     }
     if (costumeParams.length <= 1) costumeParams = '';
 

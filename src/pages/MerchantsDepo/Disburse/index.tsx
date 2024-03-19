@@ -43,6 +43,7 @@ import {
   useDeleteDisburse,
   useUpdateStatusDisburse,
   UseListDisburseStatus,
+  useUpdateDisburse,
 } from '../hooks/useDisburse';
 import { UseFilterMerchentDepoListService } from '../hooks/useConfigMerchant';
 
@@ -58,15 +59,26 @@ export default function DisbursePages() {
   const showFilter = useModal();
   const modalDelete = useModal();
   const modalUpdateStatus = useModal();
+  const modalUpdateStatusOneItem = useModal();
   const modalUpdate = useModal();
   const openStartDateFilter = useModal();
   const openEndDateFilter = useModal();
+  const [updateStatus, setUpdateStatus] = useState<{
+    title: string;
+    desc: string;
+    onSubmit: () => void;
+  }>({
+    title: '',
+    desc: '',
+    onSubmit: () => {},
+  });
 
   const queryDisburse = UseDisburse();
   const queryMerchantFilter = UseFilterMerchentDepoListService();
   const deleteDisburse = useDeleteDisburse();
   const updateStatusDisburse = useUpdateStatusDisburse();
   const queryDisburseStatus = UseListDisburseStatus();
+  const updateDisburse = useUpdateDisburse();
 
   const handleUpdate = () => {
     if (selectedData?.id) {
@@ -206,6 +218,9 @@ export default function DisbursePages() {
           menu={[
             {
               label: 'Edit',
+              hide:
+                value.status === 'On Process By System' ||
+                value.status === 'Transferred By System',
               onClick: () => {
                 setSelectedData(value);
               },
@@ -213,6 +228,9 @@ export default function DisbursePages() {
             {
               label: 'Delete',
               color: 'error',
+              hide:
+                value.status === 'On Process By System' ||
+                value.status === 'Transferred By System',
               onClick: () => {
                 setSelected([value.id]);
                 modalDelete.openModal();
@@ -225,6 +243,33 @@ export default function DisbursePages() {
               onClick: () => {
                 setSelected([value.id]);
                 modalUpdateStatus.openModal();
+              },
+            },
+            {
+              label: 'Re-Transferred',
+              color: 'error',
+              hide: value.status !== 'Failed',
+              onClick: () => {
+                setUpdateStatus({
+                  title: 'Re-Transferred Disburse',
+                  desc: `Are you sure want to re-transferred disburse ${value.merchant_name}?`,
+                  onSubmit: () => {
+                    updateDisburse.mutate(
+                      {
+                        data: { status: 6 },
+                        id: value.id,
+                      },
+                      {
+                        onSuccess: () => {
+                          queryDisburse.refetch();
+                          setSelected([]);
+                          modalUpdateStatusOneItem.closeModal();
+                        },
+                      },
+                    );
+                  },
+                });
+                modalUpdateStatusOneItem.openModal();
               },
             },
           ]}
@@ -575,6 +620,18 @@ export default function DisbursePages() {
               },
             );
           }}
+        />
+      </Modal>
+      <Modal
+        open={modalUpdateStatusOneItem.open}
+        onClose={modalUpdateStatusOneItem.closeModal}
+      >
+        <DeleteModal
+          onClose={modalUpdateStatusOneItem.closeModal}
+          headerText={updateStatus.title}
+          textButton="Update Status"
+          desc={<>{updateStatus.desc}</>}
+          onSubmit={updateStatus.onSubmit}
         />
       </Modal>
       <Modal
