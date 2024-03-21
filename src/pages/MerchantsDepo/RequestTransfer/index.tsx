@@ -97,6 +97,28 @@ export default function DisbursePages() {
       label: 'Merchant Name',
     },
     {
+      id: 'limit',
+      label: 'Limit',
+      format: ({ limit }) => {
+        return (
+          <Typography variant="body1">
+            Rp. {numberSeperator(limit || 0)}
+          </Typography>
+        );
+      },
+    },
+    {
+      id: 'balance',
+      label: 'Balance',
+      format: ({ balance }) => {
+        return (
+          <Typography variant="body1">
+            Rp. {numberSeperator(balance || 0)}
+          </Typography>
+        );
+      },
+    },
+    {
       id: 'amount',
       label: 'Amount',
       format: ({ amount }) => {

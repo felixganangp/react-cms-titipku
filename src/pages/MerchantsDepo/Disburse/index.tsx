@@ -37,9 +37,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import DateRangePicker from 'components/DateRangePicker';
 import { DisburseList } from 'models/merchantDepo/disburse';
 import ModalFormDisburseDepo from './Form/components/ModalForm';
+// eslint-disable-next-line import/no-cycle
 import {
   UseDisburse,
-  DisburseStatus,
   useDeleteDisburse,
   useUpdateStatusDisburse,
   UseListDisburseStatus,
@@ -50,6 +50,47 @@ import { UseFilterMerchentDepoListService } from '../hooks/useConfigMerchant';
 type UpdateStatusPayload = {
   id: number;
   status: number;
+};
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'On Process':
+      return '#83b9e8';
+    case 'Transferred':
+      return '#008e58';
+    case 'Request':
+      return '#ffc902';
+    case 'Transferred By System':
+      return '#008e58';
+    case 'Request By System':
+      return '#ff8f00';
+    case 'On Process By System':
+      return '#0774d1';
+    case 'Cancelled':
+      return '#757575';
+    default:
+      return '#c10000';
+  }
+};
+export const getRenameStatus = (status: string) => {
+  switch (status) {
+    case 'On Process':
+      return 'In Process';
+    // case 'Transferred':
+    //   return '#008e58';
+    case 'Request':
+      return 'Requested';
+    // case 'Transferred By System':
+    //   return '#ff8f00';
+    case 'Request By System':
+      return 'Requested By System';
+    case 'On Process By System':
+      return 'In Process By System';
+    case 'Cancelled':
+      return 'Declined';
+    default:
+      return status;
+  }
 };
 
 export default function DisbursePages() {
@@ -83,25 +124,6 @@ export default function DisbursePages() {
   const handleUpdate = () => {
     if (selectedData?.id) {
       modalUpdate.openModal();
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'On Process':
-        return '#ff8f00';
-      case 'Transferred':
-        return '#008e58';
-      case 'Request':
-        return '#ff8f00';
-      case 'Transferred By System':
-        return '#ff8f00';
-      case 'Request By System':
-        return '#ff8f00';
-      case 'On Process By System':
-        return '#0774d1';
-      default:
-        return 'red';
     }
   };
 
@@ -205,7 +227,7 @@ export default function DisbursePages() {
         const color = getStatusColor(status);
         return (
           <Label variant="filled" sx={{ backgroundColor: color }}>
-            {status}
+            {getRenameStatus(status)}
           </Label>
         );
       },

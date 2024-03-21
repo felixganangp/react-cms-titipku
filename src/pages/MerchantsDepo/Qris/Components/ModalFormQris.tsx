@@ -15,6 +15,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers';
 import useModal from 'hooks/useModal';
 import moment from 'moment';
 import { QrisForm } from 'models/merchantDepo/Qris';
+import DateTimePicker from 'components/DateTimePicker';
 
 import { UseFilterMerchentDepoListService } from '../../hooks/useConfigMerchant';
 import { usePostQrisService, useUpdateQrisService } from '../../hooks/useQris';
@@ -202,7 +203,7 @@ export default function ModalFormQris({
             `${formik.errors.transaction_date}`
           }
         >
-          <DesktopDatePicker
+          {/* <DesktopDatePicker
             value={formik.values.transaction_date || null}
             onChange={(value) => {
               formik.setFieldValue('transaction_date', value);
@@ -225,6 +226,12 @@ export default function ModalFormQris({
                 />
               );
             }}
+          /> */}
+          <DateTimePicker
+            onChange={(value) => {
+              formik.setFieldValue('transaction_date', value);
+            }}
+            value={formik.values.transaction_date || null}
           />
         </FormControl>
       </Box>
