@@ -261,7 +261,10 @@ export default function ModalFormMerchantDepo({
         // @ts-ignore
         merchant_qris_id: detailData?.qris_merchant_id || '',
         merchant_depo_type_id: detailData?.depo_type_id || 2,
-        is_auto_disburse: detailData?.is_auto_disburse || true,
+        is_auto_disburse:
+          detailData?.is_auto_disburse === undefined
+            ? false
+            : detailData?.is_auto_disburse,
         auto_disburse_disable_reason:
           detailData?.auto_disburse_disable_reason || '',
       });
@@ -732,7 +735,7 @@ export default function ModalFormMerchantDepo({
             {!formik.values.is_auto_disburse && (
               <FormControl
                 text="Reason"
-                // required
+                required
                 error={
                   formik.touched.auto_disburse_disable_reason &&
                   Boolean(formik.errors.auto_disburse_disable_reason)

@@ -396,7 +396,7 @@ export default function MercheantsDetails() {
             </Grid>
             <Box width="full" borderBottom="1px solid #E0E0E0" my={1} />
             <Stack px={2} py={1} width={['100%', '100%', '60%']}>
-              <Grid container spacing={2} alignItems="center">
+              <Grid container spacing={2} alignItems="start">
                 <Grid item xs={6} md={4}>
                   <FormLabel text="Auto Disburse">
                     <SwitchCostum checked={details?.is_auto_disburse} />
@@ -404,12 +404,14 @@ export default function MercheantsDetails() {
                 </Grid>
                 <Grid item xs={6} md={8}>
                   {!details?.is_auto_disburse && (
-                    <TextField
-                      fullWidth
-                      placeholder="Reason"
-                      value={details?.auto_disburse_disable_reason || ''}
-                      name="auto_disburse_disable_reason"
-                    />
+                    <FormLabel text="Reason">
+                      <TextField
+                        fullWidth
+                        placeholder="Reason"
+                        value={details?.auto_disburse_disable_reason || ''}
+                        name="auto_disburse_disable_reason"
+                      />
+                    </FormLabel>
                   )}
                 </Grid>
               </Grid>
