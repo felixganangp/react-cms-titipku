@@ -61,9 +61,9 @@ const getStatusColor = (status: string) => {
     case 'Transferred':
       return '#008e58';
     case 'Request':
-      return '#ffc902';
+      return '#ffc805';
     case 'Transferred By System':
-      return '#008e58';
+      return '#3ebb62';
     case 'Request By System':
       return '#ff8f00';
     case 'On Process By System':
@@ -77,7 +77,7 @@ const getStatusColor = (status: string) => {
 export const getRenameStatus = (status: string) => {
   switch (status) {
     case 'On Process':
-      return 'In Process';
+      return 'In Progress';
     // case 'Transferred':
     //   return '#008e58';
     case 'Request':
@@ -87,7 +87,7 @@ export const getRenameStatus = (status: string) => {
     case 'Request By System':
       return 'Requested By System';
     case 'On Process By System':
-      return 'In Process By System';
+      return 'In Progress By System';
     case 'Cancelled':
       return 'Declined';
     default:

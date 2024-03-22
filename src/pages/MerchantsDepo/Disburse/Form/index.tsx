@@ -395,7 +395,11 @@ export default function DisburseForm() {
         <ModalFormDisburseDepo
           id={id}
           id_jelajah={selectedData?.id_jelajah}
-          handleClose={!id ? formModal.closeModal : () => navigate(-1)}
+          handleClose={(isSubmit) => {
+            if (isSubmit) {
+              navigate(-1);
+            }
+          }}
         />
       </Modal>
     </Box>

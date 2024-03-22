@@ -144,7 +144,7 @@ export default function ModalFormDisburseDepo({
       } else {
         createDisburse.mutate(payload, {
           onSuccess: () => {
-            navigate(-1);
+            handleClose(true);
           },
         });
       }
@@ -424,8 +424,8 @@ export default function ModalFormDisburseDepo({
             }
           >
             <Autocomplete
-              options={disburseStatus.listData.filter(
-                (val) => !val.description.includes('By System'),
+              options={disburseStatus.listData.filter((val) =>
+                [1, 2, 3].includes(val.id),
               )}
               getOptionLabel={(option) => option.description}
               value={
