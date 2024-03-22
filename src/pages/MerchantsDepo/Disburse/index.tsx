@@ -45,6 +45,8 @@ import {
   UseListDisburseStatus,
   useUpdateDisburse,
 } from '../hooks/useDisburse';
+// eslint-disable-next-line import/no-cycle
+import ModalRetransfer from './Components/ModalRetransfer';
 import { UseFilterMerchentDepoListService } from '../hooks/useConfigMerchant';
 
 type UpdateStatusPayload = {
@@ -104,15 +106,6 @@ export default function DisbursePages() {
   const modalUpdate = useModal();
   const openStartDateFilter = useModal();
   const openEndDateFilter = useModal();
-  const [updateStatus, setUpdateStatus] = useState<{
-    title: string;
-    desc: string;
-    onSubmit: () => void;
-  }>({
-    title: '',
-    desc: '',
-    onSubmit: () => {},
-  });
 
   const queryDisburse = UseDisburse();
   const queryMerchantFilter = UseFilterMerchentDepoListService();
@@ -121,15 +114,15 @@ export default function DisbursePages() {
   const queryDisburseStatus = UseListDisburseStatus();
   const updateDisburse = useUpdateDisburse();
 
-  const handleUpdate = () => {
-    if (selectedData?.id) {
-      modalUpdate.openModal();
-    }
-  };
+  // const handleUpdate = () => {
+  //   if (selectedData?.id) {
+  //     modalUpdate.openModal();
+  //   }
+  // };
 
-  useEffect(() => {
-    handleUpdate();
-  }, [selectedData]);
+  // useEffect(() => {
+  //   handleUpdate();
+  // }, [selectedData]);
 
   const headCells: HeadCells<any>[] = [
     {
@@ -244,6 +237,7 @@ export default function DisbursePages() {
                 value.status === 'On Process By System' ||
                 value.status === 'Transferred By System',
               onClick: () => {
+                modalUpdate.openModal();
                 setSelectedData(value);
               },
             },
@@ -272,25 +266,8 @@ export default function DisbursePages() {
               color: 'error',
               hide: value.status !== 'Failed',
               onClick: () => {
-                setUpdateStatus({
-                  title: 'Re-Transferred Disburse',
-                  desc: `Are you sure want to re-transferred disburse ${value.merchant_name}?`,
-                  onSubmit: () => {
-                    updateDisburse.mutate(
-                      {
-                        data: { status: 6 },
-                        id: value.id,
-                      },
-                      {
-                        onSuccess: () => {
-                          queryDisburse.refetch();
-                          setSelected([]);
-                          modalUpdateStatusOneItem.closeModal();
-                        },
-                      },
-                    );
-                  },
-                });
+                setSelectedData(value);
+                setSelected([value.id]);
                 modalUpdateStatusOneItem.openModal();
               },
             },
@@ -644,18 +621,22 @@ export default function DisbursePages() {
           }}
         />
       </Modal>
-      <Modal
+      <CustomModal
         open={modalUpdateStatusOneItem.open}
         onClose={modalUpdateStatusOneItem.closeModal}
+        title="Re-Transfer"
       >
-        <DeleteModal
-          onClose={modalUpdateStatusOneItem.closeModal}
-          headerText={updateStatus.title}
-          textButton="Update Status"
-          desc={<>{updateStatus.desc}</>}
-          onSubmit={updateStatus.onSubmit}
+        <ModalRetransfer
+          selectedData={selectedData}
+          id={selected[0] || null}
+          onCLose={() => {
+            queryDisburse.refetch();
+            setSelected([]);
+            modalUpdateStatusOneItem.closeModal();
+            setSelectedData(undefined);
+          }}
         />
-      </Modal>
+      </CustomModal>
       <Modal
         open={modalUpdateStatus.open}
         onClose={modalUpdateStatus.closeModal}
