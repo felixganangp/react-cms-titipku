@@ -66,7 +66,7 @@ export default function DisbursePages() {
   const openConfirmTransfer = useModal();
   const [type, setType] = useState<string>('');
 
-  const queryDisburse = UseDisburse({ status: ['8', '4'] });
+  const queryDisburse = UseDisburse({ status: ['8', '4'], tab: 'request' });
   const queryMerchantFilter = UseFilterMerchentDepoListService();
   const deleteDisburse = useDeleteDisburse();
   const updateStatusDisburse = useUpdateStatusDisburse();
