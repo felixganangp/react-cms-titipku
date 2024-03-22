@@ -23,11 +23,6 @@ export const getAllDisburse = (params?: DisburseParams) =>
         }`;
       });
       delete paramsRest.status;
-    } else {
-      // @ts-ignore
-      if (paramsRest.status === 4 || paramsRest.status === '4') {
-        costumeParams += `tabs=request`;
-      }
     }
     if (costumeParams.length <= 1) costumeParams = '';
 

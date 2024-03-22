@@ -4,6 +4,7 @@ export interface DisburseParams extends ListParams {
   start_date?: string;
   end_date?: string;
   status?: string | string[];
+  tab?: string;
 }
 
 export type DisburseList = {
