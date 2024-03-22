@@ -235,11 +235,15 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
 };
 
 export const useDisburseDetails = (id?: number | string) => {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['merchant-depo/disburse', id],
     queryFn: () => detailsDisburse(id),
     enabled: !!id,
   });
+  return {
+    ...query,
+    details: query.data?.data,
+  };
 };
 
 export const useDeleteDisburse = () => {

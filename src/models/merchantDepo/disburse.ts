@@ -38,6 +38,8 @@ export type DisburseDetails = {
   created_at: number;
   updated_at: number;
   deleted_at: number;
+  failure_message: string;
+  failure_code: string;
   status: {
     id: number;
     description: string;

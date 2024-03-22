@@ -126,6 +126,12 @@ export default function ModalFormDisburseDepo({
       const payload = {
         ...values,
       };
+      if (
+        disburseDetails?.details &&
+        disburseDetails?.details?.status.id === 5
+      ) {
+        payload.status = 4;
+      }
       if (isUpdate) {
         updateDisburse.mutate(
           { data: payload, id },
@@ -441,6 +447,24 @@ export default function ModalFormDisburseDepo({
             />
           </FormControl>
         )}
+        {formik.values.is_auto_disburse &&
+          disburseDetails.details?.status.id === 5 && (
+            <Stack
+              border="solid 1px #e4e4e4"
+              p="10px 20px"
+              borderRadius="5px"
+              bgcolor="#f9ebe7"
+              spacing={0.1}
+              mt={1.5}
+            >
+              <Typography fontSize="14" fontWeight="500" color="error.main">
+                Error Info
+              </Typography>
+              <Typography fontSize="14">
+                <b>Reason :</b> {disburseDetails.details?.failure_message}
+              </Typography>
+            </Stack>
+          )}
       </Box>
       <Box
         display="flex"
