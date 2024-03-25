@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import AccordionOnDetails from 'components/Accordion/SubDetailsPagesWrapper';
 import DescriptionDetail from 'components/DescDetails';
 import {
@@ -22,6 +22,7 @@ import {
   styled,
   Modal,
   Switch,
+  InputAdornment,
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import MerchantAndalan from 'assets/merchant-andalan.svg';
@@ -44,9 +45,11 @@ import DeleteModal from 'components/Delete/freetext';
 import { QrisForm } from 'models/merchantDepo/Qris';
 // import FormControl from 'components/FormLabel';
 import DateRangePicker from 'components/DateRangePicker';
+import useToast from 'hooks/useToast';
 import {
   useGetTransactionMutation,
   useMerchantDetails,
+  useUpdateMerchantDepo,
 } from '../hooks/useMerchant';
 import { UseMutationTypeListService } from '../hooks/useConfigMerchant';
 import ModalFormQris from '../Qris/Components/ModalFormQris';
@@ -54,11 +57,14 @@ import ModalFormQris from '../Qris/Components/ModalFormQris';
 import { useDeleteQris } from '../hooks/useQris';
 
 export default function MercheantsDetails() {
+  const { openToast } = useToast();
   const { id } = useParams();
   const mutationType = UseMutationTypeListService();
   const mutationTransaction = useGetTransactionMutation(id);
   const merchantDetails = useMerchantDetails(id);
   const details = merchantDetails.data?.data;
+  const [updateData, setUpdateData] = useState<any>();
+
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const currentSelected = useMemo(() => {
@@ -69,14 +75,44 @@ export default function MercheantsDetails() {
   const isAndalan = details?.depo_type_id === 2 || details?.depo_type_id === 3;
   const deleteQris = useDeleteQris();
 
-  const openDateFilter = useModal();
-  const openEndDateFilter = useModal();
+  const updateMerchant = useUpdateMerchantDepo();
   const modalDelete = useModal();
   const modalForm = useModal();
+  const isEditReason = useModal();
   const [editSelected, setEditSelected] = useState<
     (QrisForm & { id: number; merchant_name: string }) | undefined
   >(undefined);
 
+  useEffect(() => {
+    if (details) {
+      setUpdateData({
+        // @ts-ignore
+        limit: details?.limit,
+        // @ts-ignore
+        depo_discount: details?.depo_discount,
+        // @ts-ignore
+        admin_fee: details?.admin_fee,
+        bank_name: details?.bank_name,
+        bank_branch_office: details?.bank_branch_office || '',
+        bank_account_name: details?.bank_account_name || '',
+        bank_account_number: details?.bank_account_number || '',
+        nobu_account_name: details?.nobu_account_name || '',
+        nobu_account_number: details?.nobu_account_number || '',
+        qris_ready: details?.qris_ready,
+        // @ts-ignore
+        bank_id: details?.bank_id || 0,
+        // @ts-ignore
+        merchant_qris_id: details?.qris_merchant_id || '',
+        merchant_depo_type_id: details?.depo_type_id || 2,
+        is_auto_disburse:
+          details?.is_auto_disburse === undefined
+            ? false
+            : details?.is_auto_disburse,
+        auto_disburse_disable_reason:
+          details?.auto_disburse_disable_reason || '',
+      });
+    }
+  }, [details]);
   const headCells: HeadCells<TransactionMerchantDepoList>[] = [
     {
       id: 'Date',
@@ -399,19 +435,139 @@ export default function MercheantsDetails() {
               <Grid container spacing={2} alignItems="start">
                 <Grid item xs={6} md={4}>
                   <FormLabel text="Auto Disburse">
-                    <SwitchCostum checked={details?.is_auto_disburse} />
+                    <SwitchCostum
+                      checked={details?.is_auto_disburse}
+                      onChange={(e) => {
+                        updateMerchant.mutate(
+                          {
+                            id: id || '',
+                            data: {
+                              ...updateData,
+                              is_auto_disburse: e.target.checked,
+                            },
+                          },
+                          {
+                            onSuccess: () => {
+                              merchantDetails.refetch();
+                              openToast({
+                                severity: 'success',
+                                headMsg: e.target.checked
+                                  ? 'Auto Disburse Enabled'
+                                  : 'Auto Disburse Disabled',
+                              });
+                              isEditReason.closeModal();
+                            },
+                            onError: (v) => {
+                              openToast({
+                                severity: 'error',
+                                headMsg:
+                                  typeof v === 'string'
+                                    ? v
+                                    : 'Create Merchant Failed',
+                              });
+                            },
+                          },
+                        );
+                      }}
+                    />
                   </FormLabel>
                 </Grid>
                 <Grid item xs={6} md={8}>
+                  <div />
+                </Grid>
+                <Grid item xs={6} md={8}>
                   {!details?.is_auto_disburse && (
-                    <FormLabel text="Reason">
-                      <TextField
-                        fullWidth
-                        placeholder="Reason"
-                        value={details?.auto_disburse_disable_reason || ''}
-                        name="auto_disburse_disable_reason"
-                      />
-                    </FormLabel>
+                    <>
+                      {isEditReason.open ? (
+                        <FormLabel text="Reason" required>
+                          <TextField
+                            fullWidth
+                            placeholder="Reason"
+                            size="medium"
+                            value={
+                              updateData?.auto_disburse_disable_reason || ''
+                            }
+                            onChange={(e) => {
+                              setUpdateData({
+                                ...updateData,
+                                auto_disburse_disable_reason: e.target.value,
+                              });
+                            }}
+                            name="auto_disburse_disable_reason"
+                            InputProps={{
+                              // style: {
+                              //   color: !startDate && !endDate ? 'rgba(0, 0, 0, 0.3)' : 'unset',
+                              // },
+                              endAdornment: (
+                                <InputAdornment position="start">
+                                  <Button
+                                    size="small"
+                                    disabled={
+                                      updateData?.auto_disburse_disable_reason ===
+                                        '' ||
+                                      updateData?.auto_disburse_disable_reason ===
+                                        details?.auto_disburse_disable_reason
+                                    }
+                                    onClick={() => {
+                                      updateMerchant.mutate(
+                                        {
+                                          id: id || '',
+                                          data: updateData,
+                                        },
+                                        {
+                                          onSuccess: () => {
+                                            merchantDetails.refetch();
+                                            openToast({
+                                              severity: 'success',
+                                              headMsg: 'Reason Cleared',
+                                            });
+                                            isEditReason.toggleModal();
+                                          },
+                                          onError: (e) => {
+                                            openToast({
+                                              severity: 'error',
+                                              headMsg:
+                                                typeof e === 'string'
+                                                  ? e
+                                                  : 'Create Merchant Failed',
+                                            });
+                                          },
+                                        },
+                                      );
+                                    }}
+                                  >
+                                    Submit
+                                  </Button>
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </FormLabel>
+                      ) : (
+                        <Stack
+                          border="solid 1px #e4e4e4"
+                          p="15px 20px"
+                          borderRadius="5px"
+                          bgcolor="#fdf1da"
+                          spacing={0.1}
+                          mt={1.5}
+                          direction="row"
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
+                          <Typography fontSize="14">
+                            <b>Reason :</b>{' '}
+                            {details?.auto_disburse_disable_reason || ''}
+                          </Typography>
+                          <Button
+                            variant="text"
+                            onClick={isEditReason.toggleModal}
+                          >
+                            Edit
+                          </Button>
+                        </Stack>
+                      )}
+                    </>
                   )}
                 </Grid>
               </Grid>
