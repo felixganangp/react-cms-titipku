@@ -463,7 +463,7 @@ export default function MercheantsDetails() {
                                 headMsg:
                                   typeof v === 'string'
                                     ? v
-                                    : 'Create Merchant Failed',
+                                    : 'Update Auto Disburse Failed',
                               });
                             },
                           },
@@ -519,7 +519,7 @@ export default function MercheantsDetails() {
                                             merchantDetails.refetch();
                                             openToast({
                                               severity: 'success',
-                                              headMsg: 'Reason Cleared',
+                                              headMsg: 'Reason Updated',
                                             });
                                             isEditReason.toggleModal();
                                           },
@@ -529,7 +529,7 @@ export default function MercheantsDetails() {
                                               headMsg:
                                                 typeof e === 'string'
                                                   ? e
-                                                  : 'Create Merchant Failed',
+                                                  : 'Update Reason Failed',
                                             });
                                           },
                                         },
