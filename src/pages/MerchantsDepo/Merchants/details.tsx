@@ -79,6 +79,7 @@ export default function MercheantsDetails() {
   const modalDelete = useModal();
   const modalForm = useModal();
   const isEditReason = useModal();
+  const modalReason = useModal();
   const [editSelected, setEditSelected] = useState<
     (QrisForm & { id: number; merchant_name: string }) | undefined
   >(undefined);
@@ -438,6 +439,13 @@ export default function MercheantsDetails() {
                     <SwitchCostum
                       checked={details?.is_auto_disburse}
                       onChange={(e) => {
+                        if (
+                          !e.target.checked &&
+                          !details?.auto_disburse_disable_reason
+                        ) {
+                          modalReason.toggleModal();
+                          return;
+                        }
                         updateMerchant.mutate(
                           {
                             id: id || '',
@@ -572,6 +580,81 @@ export default function MercheantsDetails() {
                 </Grid>
               </Grid>
             </Stack>
+            <ModalComp
+              title="Add Reason"
+              open={modalReason.open}
+              onClose={modalReason.closeModal}
+            >
+              <>
+                <Box py={2} px={3} pb={0}>
+                  <FormLabel text="Reason" required>
+                    <TextField
+                      fullWidth
+                      placeholder="Input Reason"
+                      size="medium"
+                      multiline
+                      minRows={3}
+                      value={updateData?.auto_disburse_disable_reason || ''}
+                      onChange={(e) => {
+                        setUpdateData({
+                          ...updateData,
+                          auto_disburse_disable_reason: e.target.value,
+                        });
+                      }}
+                      name="auto_disburse_disable_reason"
+                    />
+                  </FormLabel>
+                </Box>
+                <Stack
+                  direction="row"
+                  justifyContent="end"
+                  spacing={1}
+                  mt={2}
+                  p={2}
+                >
+                  <Button
+                    disabled={
+                      updateData?.auto_disburse_disable_reason === '' ||
+                      updateData?.auto_disburse_disable_reason ===
+                        details?.auto_disburse_disable_reason
+                    }
+                    onClick={() => {
+                      updateMerchant.mutate(
+                        {
+                          id: id || '',
+                          data: {
+                            ...updateData,
+                            is_auto_disburse: false,
+                          },
+                        },
+                        {
+                          onSuccess: () => {
+                            merchantDetails.refetch();
+                            openToast({
+                              severity: 'success',
+                              headMsg: 'Reason Updated',
+                            });
+                            isEditReason.closeModal();
+                            modalReason.closeModal();
+                          },
+                          onError: (e) => {
+                            openToast({
+                              severity: 'error',
+                              headMsg:
+                                typeof e === 'string'
+                                  ? e
+                                  : 'Update Reason Failed',
+                            });
+                          },
+                        },
+                      );
+                    }}
+                  >
+                    Submit
+                  </Button>
+                </Stack>
+              </>
+            </ModalComp>
           </Box>
         </Card>
       </AccordionOnDetails>
