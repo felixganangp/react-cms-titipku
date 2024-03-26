@@ -460,8 +460,8 @@ export default function MercheantsDetails() {
                               openToast({
                                 severity: 'success',
                                 headMsg: e.target.checked
-                                  ? 'Auto Disburse Enabled'
-                                  : 'Auto Disburse Disabled',
+                                  ? 'Auto Disburse Disabled'
+                                  : 'Auto Disburse Enabled',
                               });
                               isEditReason.closeModal();
                             },
