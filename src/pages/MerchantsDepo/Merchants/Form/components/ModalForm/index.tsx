@@ -15,7 +15,10 @@ import {
   styled,
 } from '@mui/material';
 import FormControl from 'components/FormLabel';
-import { UseTypeListService } from 'pages/MerchantsDepo/hooks/useConfigMerchant';
+import {
+  UseBankListService,
+  UseTypeListService,
+} from 'pages/MerchantsDepo/hooks/useConfigMerchant';
 import numberSeperator from 'utils/numberSeperator';
 import bankData from 'data/list-bank.json';
 import {
@@ -52,7 +55,7 @@ export default function ModalFormMerchantDepo({
   const createMerchant = useCreateMerchantDepo();
   const updateMerchant = useUpdateMerchantDepo();
   const merchantDetails = useMerchantDetails(id);
-
+  const bankList = UseBankListService({ count: 100 });
   const showHistory = useModal();
 
   const formik = useFormik({
@@ -63,6 +66,7 @@ export default function ModalFormMerchantDepo({
       depo_discount: '',
       admin_fee: '',
       bank_name: '',
+      bank_id: null,
       bank_branch_office: '',
       bank_account_name: '',
       bank_account_number: '',
@@ -70,6 +74,8 @@ export default function ModalFormMerchantDepo({
       nobu_account_number: '',
       merchant_qris_id: '',
       qris_ready: false,
+      is_auto_disburse: true,
+      auto_disburse_disable_reason: '',
     },
     onSubmit: (values) => {
       try {
@@ -163,7 +169,7 @@ export default function ModalFormMerchantDepo({
           is: (merchant_depo_type_id: number, bank_name: string) => {
             return (
               (merchant_depo_type_id === 1 || merchant_depo_type_id === 3) &&
-              bank_name !== 'BCA (Bank Central Asia)'
+              bank_name !== 'BCA'
             );
           },
           then: Yup.string()
@@ -217,6 +223,19 @@ export default function ModalFormMerchantDepo({
           otherwise: Yup.string().nullable(),
         },
       ),
+      auto_disburse_disable_reason: Yup.string().when(
+        ['merchant_depo_type_id', 'is_auto_disburse'],
+        {
+          is: (merchant_depo_type_id: number, is_auto_disburse: boolean) => {
+            return (
+              (merchant_depo_type_id === 1 || merchant_depo_type_id === 3) &&
+              !is_auto_disburse
+            );
+          },
+          then: Yup.string().required('This field is required'),
+          otherwise: Yup.string().nullable(),
+        },
+      ),
     }),
   });
 
@@ -238,8 +257,16 @@ export default function ModalFormMerchantDepo({
         nobu_account_number: detailData?.nobu_account_number || '',
         qris_ready: detailData?.qris_ready,
         // @ts-ignore
+        bank_id: detailData?.bank_id || 0,
+        // @ts-ignore
         merchant_qris_id: detailData?.qris_merchant_id || '',
         merchant_depo_type_id: detailData?.depo_type_id || 2,
+        is_auto_disburse:
+          detailData?.is_auto_disburse === undefined
+            ? false
+            : detailData?.is_auto_disburse,
+        auto_disburse_disable_reason:
+          detailData?.auto_disburse_disable_reason || '',
       });
     }
   }, [merchantDetails.data]);
@@ -494,9 +521,11 @@ export default function ModalFormMerchantDepo({
               <Autocomplete
                 data-testid="form-customer-list-bank"
                 id="list-bank"
-                options={bankData.data}
+                options={bankList.data?.data || []}
                 onChange={(e, value) => {
                   formik.setFieldValue('bank_name', value?.name);
+                  // @ts-ignore
+                  formik.setFieldValue('bank_id', value?.id);
                 }}
                 // isOptionEqualToValue={(option: {
                 //   name: string;
@@ -508,7 +537,7 @@ export default function ModalFormMerchantDepo({
                 getOptionLabel={(option) => `${option.name}`}
                 value={
                   // @ts-ignore
-                  bankData.data.find(
+                  bankList.data?.data.find(
                     (val) => val.name === formik.values.bank_name,
                   ) || null
                 }
@@ -524,7 +553,7 @@ export default function ModalFormMerchantDepo({
             </FormControl>
             <FormControl
               text="Branch Office"
-              required={formik.values.bank_name !== 'BCA (Bank Central Asia)'}
+              required={formik.values.bank_name !== 'BCA'}
               error={
                 formik.touched.bank_branch_office &&
                 Boolean(formik.errors.bank_branch_office)
@@ -690,6 +719,40 @@ export default function ModalFormMerchantDepo({
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   name="merchant_qris_id"
+                />
+              </FormControl>
+            )}
+            <FormControl text="Auto Disburse">
+              <SwitchCostum
+                checked={formik.values.is_auto_disburse}
+                name="is_auto_disburse"
+                onBlur={formik.handleBlur}
+                onChange={(e) => {
+                  formik.handleChange(e);
+                }}
+              />
+            </FormControl>
+            {!formik.values.is_auto_disburse && (
+              <FormControl
+                text="Reason"
+                required
+                error={
+                  formik.touched.auto_disburse_disable_reason &&
+                  Boolean(formik.errors.auto_disburse_disable_reason)
+                }
+                helperText={
+                  formik.touched.auto_disburse_disable_reason &&
+                  formik.errors.auto_disburse_disable_reason &&
+                  `${formik.errors.auto_disburse_disable_reason}`
+                }
+              >
+                <TextField
+                  fullWidth
+                  placeholder="Reason"
+                  value={formik.values.auto_disburse_disable_reason}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  name="auto_disburse_disable_reason"
                 />
               </FormControl>
             )}

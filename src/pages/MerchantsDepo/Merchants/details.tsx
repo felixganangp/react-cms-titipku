@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-use-before-define */
+import { useEffect, useMemo, useState } from 'react';
 import AccordionOnDetails from 'components/Accordion/SubDetailsPagesWrapper';
 import DescriptionDetail from 'components/DescDetails';
 import {
@@ -18,7 +19,10 @@ import {
   Typography,
   Autocomplete,
   TextField,
+  styled,
   Modal,
+  Switch,
+  InputAdornment,
 } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import MerchantAndalan from 'assets/merchant-andalan.svg';
@@ -39,10 +43,13 @@ import useModal from 'hooks/useModal';
 import ModalComp from 'components/Modal';
 import DeleteModal from 'components/Delete/freetext';
 import { QrisForm } from 'models/merchantDepo/Qris';
+// import FormControl from 'components/FormLabel';
 import DateRangePicker from 'components/DateRangePicker';
+import useToast from 'hooks/useToast';
 import {
   useGetTransactionMutation,
   useMerchantDetails,
+  useUpdateMerchantDepo,
 } from '../hooks/useMerchant';
 import { UseMutationTypeListService } from '../hooks/useConfigMerchant';
 import ModalFormQris from '../Qris/Components/ModalFormQris';
@@ -50,11 +57,14 @@ import ModalFormQris from '../Qris/Components/ModalFormQris';
 import { useDeleteQris } from '../hooks/useQris';
 
 export default function MercheantsDetails() {
+  const { openToast } = useToast();
   const { id } = useParams();
   const mutationType = UseMutationTypeListService();
   const mutationTransaction = useGetTransactionMutation(id);
   const merchantDetails = useMerchantDetails(id);
   const details = merchantDetails.data?.data;
+  const [updateData, setUpdateData] = useState<any>();
+
   const navigate = useNavigate();
   const [selected, setSelected] = useState<(string | number)[]>([]);
   const currentSelected = useMemo(() => {
@@ -65,14 +75,45 @@ export default function MercheantsDetails() {
   const isAndalan = details?.depo_type_id === 2 || details?.depo_type_id === 3;
   const deleteQris = useDeleteQris();
 
-  const openDateFilter = useModal();
-  const openEndDateFilter = useModal();
+  const updateMerchant = useUpdateMerchantDepo();
   const modalDelete = useModal();
   const modalForm = useModal();
+  const isEditReason = useModal();
+  const modalReason = useModal();
   const [editSelected, setEditSelected] = useState<
     (QrisForm & { id: number; merchant_name: string }) | undefined
   >(undefined);
 
+  useEffect(() => {
+    if (details) {
+      setUpdateData({
+        // @ts-ignore
+        limit: details?.limit,
+        // @ts-ignore
+        depo_discount: details?.depo_discount,
+        // @ts-ignore
+        admin_fee: details?.admin_fee,
+        bank_name: details?.bank_name,
+        bank_branch_office: details?.bank_branch_office || '',
+        bank_account_name: details?.bank_account_name || '',
+        bank_account_number: details?.bank_account_number || '',
+        nobu_account_name: details?.nobu_account_name || '',
+        nobu_account_number: details?.nobu_account_number || '',
+        qris_ready: details?.qris_ready,
+        // @ts-ignore
+        bank_id: details?.bank_id || 0,
+        // @ts-ignore
+        merchant_qris_id: details?.qris_merchant_id || '',
+        merchant_depo_type_id: details?.depo_type_id || 2,
+        is_auto_disburse:
+          details?.is_auto_disburse === undefined
+            ? false
+            : details?.is_auto_disburse,
+        auto_disburse_disable_reason:
+          details?.auto_disburse_disable_reason || '',
+      });
+    }
+  }, [details]);
   const headCells: HeadCells<TransactionMerchantDepoList>[] = [
     {
       id: 'Date',
@@ -185,13 +226,8 @@ export default function MercheantsDetails() {
                 }
               />
             </Stack>
-            <Stack
-              borderBottom="1px solid #E0E0E0"
-              borderTop="1px solid #E0E0E0"
-              p={2}
-              my={2}
-              width={['100%', '100%', '60%']}
-            >
+            <Box width="full" borderBottom="1px solid #E0E0E0" my={1} />
+            <Stack px={2} py={1} width={['100%', '100%', '60%']}>
               <Grid container spacing={2}>
                 <Grid item xs={6} md={2.4}>
                   <Box bgcolor="#F9EBE7" p={1}>
@@ -245,6 +281,8 @@ export default function MercheantsDetails() {
                 </Grid>
               </Grid>
             </Stack>
+            <Box width="full" borderBottom="1px solid #E0E0E0" my={1} />
+
             <Grid container spacing={2} mt={2}>
               <Grid item xs={6} md={2.4}>
                 <DescriptionDetail
@@ -393,6 +431,230 @@ export default function MercheantsDetails() {
                 />
               </Grid>
             </Grid>
+            <Box width="full" borderBottom="1px solid #E0E0E0" my={1} />
+            <Stack px={2} py={1} width={['100%', '100%', '60%']}>
+              <Grid container spacing={2} alignItems="start">
+                <Grid item xs={6} md={4}>
+                  <FormLabel text="Auto Disburse">
+                    <SwitchCostum
+                      checked={details?.is_auto_disburse}
+                      onChange={(e) => {
+                        if (
+                          !e.target.checked &&
+                          !details?.auto_disburse_disable_reason
+                        ) {
+                          modalReason.toggleModal();
+                          return;
+                        }
+                        updateMerchant.mutate(
+                          {
+                            id: id || '',
+                            data: {
+                              ...updateData,
+                              is_auto_disburse: e.target.checked,
+                            },
+                          },
+                          {
+                            onSuccess: () => {
+                              merchantDetails.refetch();
+                              openToast({
+                                severity: 'success',
+                                headMsg: e.target.checked
+                                  ? 'Auto Disburse Disabled'
+                                  : 'Auto Disburse Enabled',
+                              });
+                              isEditReason.closeModal();
+                            },
+                            onError: (v) => {
+                              openToast({
+                                severity: 'error',
+                                headMsg:
+                                  typeof v === 'string'
+                                    ? v
+                                    : 'Update Auto Disburse Failed',
+                              });
+                            },
+                          },
+                        );
+                      }}
+                    />
+                  </FormLabel>
+                </Grid>
+                <Grid item xs={6} md={8}>
+                  <div />
+                </Grid>
+                <Grid item xs={6} md={8}>
+                  {!details?.is_auto_disburse && (
+                    <>
+                      {isEditReason.open ? (
+                        <FormLabel text="Reason" required>
+                          <TextField
+                            fullWidth
+                            placeholder="Reason"
+                            size="medium"
+                            value={
+                              updateData?.auto_disburse_disable_reason || ''
+                            }
+                            onChange={(e) => {
+                              setUpdateData({
+                                ...updateData,
+                                auto_disburse_disable_reason: e.target.value,
+                              });
+                            }}
+                            name="auto_disburse_disable_reason"
+                            InputProps={{
+                              // style: {
+                              //   color: !startDate && !endDate ? 'rgba(0, 0, 0, 0.3)' : 'unset',
+                              // },
+                              endAdornment: (
+                                <InputAdornment position="start">
+                                  <Button
+                                    size="small"
+                                    disabled={
+                                      updateData?.auto_disburse_disable_reason ===
+                                        '' ||
+                                      updateData?.auto_disburse_disable_reason ===
+                                        details?.auto_disburse_disable_reason
+                                    }
+                                    onClick={() => {
+                                      updateMerchant.mutate(
+                                        {
+                                          id: id || '',
+                                          data: updateData,
+                                        },
+                                        {
+                                          onSuccess: () => {
+                                            merchantDetails.refetch();
+                                            openToast({
+                                              severity: 'success',
+                                              headMsg: 'Reason Updated',
+                                            });
+                                            isEditReason.toggleModal();
+                                          },
+                                          onError: (e) => {
+                                            openToast({
+                                              severity: 'error',
+                                              headMsg:
+                                                typeof e === 'string'
+                                                  ? e
+                                                  : 'Update Reason Failed',
+                                            });
+                                          },
+                                        },
+                                      );
+                                    }}
+                                  >
+                                    Submit
+                                  </Button>
+                                </InputAdornment>
+                              ),
+                            }}
+                          />
+                        </FormLabel>
+                      ) : (
+                        <Stack
+                          border="solid 1px #e4e4e4"
+                          p="15px 20px"
+                          borderRadius="5px"
+                          bgcolor="#fdf1da"
+                          spacing={0.1}
+                          mt={1.5}
+                          direction="row"
+                          justifyContent="space-between"
+                          alignItems="center"
+                        >
+                          <Typography fontSize="14">
+                            <b>Reason :</b>{' '}
+                            {details?.auto_disburse_disable_reason || ''}
+                          </Typography>
+                          <Button
+                            variant="text"
+                            onClick={isEditReason.toggleModal}
+                          >
+                            Edit
+                          </Button>
+                        </Stack>
+                      )}
+                    </>
+                  )}
+                </Grid>
+              </Grid>
+            </Stack>
+            <ModalComp
+              title="Add Reason"
+              open={modalReason.open}
+              onClose={modalReason.closeModal}
+            >
+              <>
+                <Box py={2} px={3} pb={0}>
+                  <FormLabel text="Reason" required>
+                    <TextField
+                      fullWidth
+                      placeholder="Input Reason"
+                      size="medium"
+                      multiline
+                      minRows={3}
+                      value={updateData?.auto_disburse_disable_reason || ''}
+                      onChange={(e) => {
+                        setUpdateData({
+                          ...updateData,
+                          auto_disburse_disable_reason: e.target.value,
+                        });
+                      }}
+                      name="auto_disburse_disable_reason"
+                    />
+                  </FormLabel>
+                </Box>
+                <Stack
+                  direction="row"
+                  justifyContent="end"
+                  spacing={1}
+                  mt={2}
+                  p={2}
+                >
+                  <Button
+                    disabled={
+                      updateData?.auto_disburse_disable_reason === '' ||
+                      updateData?.auto_disburse_disable_reason ===
+                        details?.auto_disburse_disable_reason
+                    }
+                    onClick={() => {
+                      updateMerchant.mutate(
+                        {
+                          id: id || '',
+                          data: {
+                            ...updateData,
+                            is_auto_disburse: false,
+                          },
+                        },
+                        {
+                          onSuccess: () => {
+                            merchantDetails.refetch();
+                            openToast({
+                              severity: 'success',
+                              headMsg: 'Reason Updated',
+                            });
+                            isEditReason.closeModal();
+                            modalReason.closeModal();
+                          },
+                          onError: (e) => {
+                            openToast({
+                              severity: 'error',
+                              headMsg:
+                                typeof e === 'string'
+                                  ? e
+                                  : 'Update Reason Failed',
+                            });
+                          },
+                        },
+                      );
+                    }}
+                  >
+                    Submit
+                  </Button>
+                </Stack>
+              </>
+            </ModalComp>
           </Box>
         </Card>
       </AccordionOnDetails>
@@ -640,3 +902,47 @@ export default function MercheantsDetails() {
     </Box>
   );
 }
+
+const SwitchCostum = styled(Switch)(({ theme }) => ({
+  width: 28,
+  height: 16,
+  padding: 0,
+  display: 'flex',
+  '&:active': {
+    '& .MuiSwitch-thumb': {
+      width: 15,
+    },
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      transform: 'translateX(9px)',
+    },
+  },
+  '& .MuiSwitch-switchBase': {
+    padding: 2,
+    '&.Mui-checked': {
+      transform: 'translateX(12px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        opacity: 1,
+        backgroundColor: theme.palette.primary.main,
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    transition: theme.transitions.create(['width'], {
+      duration: 200,
+    }),
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 16 / 2,
+    opacity: 1,
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255,255,255,.35)'
+        : 'rgba(0,0,0,.25)',
+    boxSizing: 'border-box',
+  },
+}));

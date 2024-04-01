@@ -1,3 +1,4 @@
+/* eslint-disable no-lonely-if */
 /* eslint-disable @typescript-eslint/naming-convention */
 import http from 'utils/request';
 import { ListResponse, Response } from 'models/fetch';
@@ -14,8 +15,19 @@ export const getAllDisburse = (params?: DisburseParams) =>
     // eslint-disable-next-line @typescript-eslint/naming-convention
     // @ts-ingnore
     const paramsRest = { ...params };
+    let costumeParams = '?';
+    if (typeof paramsRest.status === 'object') {
+      paramsRest.status.forEach((val, index) => {
+        costumeParams += `status=${val}${
+          index === (paramsRest?.status?.length || 0) - 1 ? '' : '&'
+        }`;
+      });
+      delete paramsRest.status;
+    }
+    if (costumeParams.length <= 1) costumeParams = '';
+
     try {
-      const respon = await http.get(`merchant-depo/disburse?`, {
+      const respon = await http.get(`merchant-depo/disburse${costumeParams}`, {
         params: paramsRest,
       });
       if (respon.data) {
@@ -123,7 +135,6 @@ export const updateDisburse = ({ data, id }: any) =>
 
 export const getMerchantDepoList = (params?: MerchantParams) =>
   new Promise<ListResponse<MerchantList>>(async (resolve, reject) => {
-    console.log('params', params);
     const paramsRest = { ...params };
     let costumeParams = '?';
     if (paramsRest.jelajah_id) {

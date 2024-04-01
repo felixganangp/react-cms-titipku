@@ -17,6 +17,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
 import { useEffect, useMemo } from 'react';
 import moment from 'moment';
+// eslint-disable-next-line import/no-cycle
+import { getRenameStatus } from '../Disburse';
 
 export const DisburseStatus = {
   1: 'On Process',
@@ -233,11 +235,15 @@ export const useMerchantDepoList = (setParams?: MerchantParams) => {
 };
 
 export const useDisburseDetails = (id?: number | string) => {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['merchant-depo/disburse', id],
     queryFn: () => detailsDisburse(id),
     enabled: !!id,
   });
+  return {
+    ...query,
+    details: query.data?.data,
+  };
 };
 
 export const useDeleteDisburse = () => {
@@ -263,7 +269,14 @@ export function UseListDisburseStatus() {
     queryKey: ['disburse/status'],
     queryFn: () => getDisburseStatus(),
   });
-  return { ...query, listData: query?.data?.data || [] };
+  return {
+    ...query,
+    listData:
+      query?.data?.data.map((val) => ({
+        ...val,
+        description: getRenameStatus(val.description),
+      })) || [],
+  };
 }
 
 export const useCreateDisburse = () => {

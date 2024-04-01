@@ -32,6 +32,7 @@ export default function MenuList(props: MenuListProps) {
     <>
       {cloneElement(children, {
         onClick: (e: React.MouseEvent<HTMLElement>) => handleClick('open', e),
+        disabled: children.props?.disabled || menu.every((val) => val.hide),
       })}
       <Menu
         data-testid="basic-menu"
