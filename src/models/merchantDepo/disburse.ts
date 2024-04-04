@@ -22,6 +22,7 @@ export type DisburseList = {
   paid_date: number;
   balance: number;
   limit: number;
+  bank_account_name: string;
 };
 
 export type DisburseDetails = {

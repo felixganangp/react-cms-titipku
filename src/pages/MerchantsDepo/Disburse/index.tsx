@@ -182,6 +182,10 @@ export default function DisbursePages() {
       },
     },
     {
+      id: 'bank_account_name',
+      label: 'Bank Account Name',
+    },
+    {
       id: 'account_number',
       label: 'Account Number',
       width: 200,
