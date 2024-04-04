@@ -97,6 +97,10 @@ export default function DisbursePages() {
       label: 'Merchant Name',
     },
     {
+      id: 'bank_account_name',
+      label: 'Bank Account Name',
+    },
+    {
       id: 'limit',
       label: 'Limit',
       format: ({ limit }) => {

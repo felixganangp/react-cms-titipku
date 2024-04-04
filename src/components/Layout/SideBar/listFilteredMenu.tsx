@@ -252,6 +252,12 @@ export const sidebarDataProd: FilteredMenu[] = [
         path: '/depo/qris',
         child: [],
       },
+      {
+        id: 69,
+        title: 'Request Transfer',
+        path: '/depo/req-transfer',
+        child: [],
+      },
     ],
   },
   {
