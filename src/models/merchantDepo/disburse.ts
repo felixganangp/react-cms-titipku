@@ -23,6 +23,7 @@ export type DisburseList = {
   balance: number;
   limit: number;
   bank_account_name: string;
+  user_name: string;
 };
 
 export type DisburseDetails = {
