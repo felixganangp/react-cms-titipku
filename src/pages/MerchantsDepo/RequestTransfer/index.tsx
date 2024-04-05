@@ -97,6 +97,10 @@ export default function DisbursePages() {
       label: 'Merchant Name',
     },
     {
+      id: 'user_name',
+      label: 'Merchant User Name',
+    },
+    {
       id: 'bank_account_name',
       label: 'Bank Account Name',
     },
