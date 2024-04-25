@@ -20,7 +20,7 @@ interface ModalProps {
   noTitle?: boolean;
   disableOutsideClose?: boolean;
 }
-function Modal({
+function ModalComp({
   onClose,
   open,
   title,
@@ -67,7 +67,7 @@ function Modal({
   );
 }
 
-Modal.defaultProps = {
+ModalComp.defaultProps = {
   width: '600px',
   maxWidth: 'sm',
   padding: '0px',
@@ -75,4 +75,4 @@ Modal.defaultProps = {
   title: '',
 };
 
-export default Modal;
+export default ModalComp;
