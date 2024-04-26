@@ -23,12 +23,14 @@ import DeleteModal from 'components/Delete/freetext';
 import ModalComp from 'components/Modal';
 import useModal from 'hooks/useModal';
 import useToast from 'hooks/useToast';
-import useGetDriver, { useDeleteDriver } from './hooks/useDriver';
-import FormDriver from './components/Form';
+import useCustomer, { useDeleteCustomer } from './hooks/useCustomer';
+import FormCustomer from './components/Form';
+// import useGetDriver, { useDeleteDriver } from './hooks/useDriver';
+// import FormDriver from './components/Form';
 
-export default function DriverManagement() {
-  const driver = useGetDriver();
-  const deleteDriver = useDeleteDriver();
+export default function CustomerManagement() {
+  const customer = useCustomer();
+  const deleteCustomer = useDeleteCustomer();
   const [selected, setSelected] = useState<any>(null);
   const deleteModal = useModal();
   const formModal = useModal();
@@ -36,22 +38,19 @@ export default function DriverManagement() {
 
   const headCell = [
     {
-      id: 'name',
-      label: 'Name',
+      id: 'customer_number',
+      label: 'Customer Number',
       align: 'left',
-      width: '27%',
     },
     {
-      id: 'gender',
-      label: 'Gander',
+      id: 'merchant_name',
+      label: 'Name',
       align: 'left',
-      width: '27%',
     },
     {
       id: 'phone_number',
       label: 'Phone Number',
       align: 'left',
-      width: '27%',
     },
     {
       id: 'menu',
@@ -90,7 +89,7 @@ export default function DriverManagement() {
     <Box p="20px" bgcolor="#f8f8f8">
       <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Typography fontSize="26px" fontWeight="600" fontFamily="Montserrat">
-          Driver Management
+          Customer Management
         </Typography>
       </Stack>
       <Box mt={2} bgcolor="#fff" border="1px solid #EBEFF3">
@@ -100,16 +99,16 @@ export default function DriverManagement() {
             onClick={formModal.openModal}
             size="large"
           >
-            Add Driver
+            Add Customer
           </Button>
           <TextField
             placeholder="Search Item"
             size="small"
             sx={{ flex: 1, bgcolor: '#f8f8f8', maxWidth: '560px' }}
             fullWidth
-            value={driver.searchValue}
-            // value={product.displayFilter.search}
-            onChange={(e) => driver.handleSearch(e.target.value)}
+            value={customer.searchValue}
+            onChange={(e) => customer.setSearchValue(e.target.value)}
+            // onChange={(e) => handleSeachDebounce(e.target.value)}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -122,19 +121,19 @@ export default function DriverManagement() {
         <YellowToast />
         <Box p={2}>
           <Table
-            data={driver.listData}
+            data={customer.listData}
             headCells={headCell}
-            loading={driver.isLoading}
-            totalData={driver.data?.count}
-            count={driver.params.count}
-            page={driver.params.page}
+            loading={customer.isLoading}
+            totalData={customer.data?.count}
+            count={customer.params.count}
+            page={customer.params.page}
             onChangePage={(page) =>
-              driver.handleChangeParams({
+              customer.handleChangeParams({
                 page,
               })
             }
             onChangeRowPerpage={(page) =>
-              driver.handleChangeParams({
+              customer.handleChangeParams({
                 count: page,
                 page: 1,
               })
@@ -145,16 +144,16 @@ export default function DriverManagement() {
       <Modal open={deleteModal.open} onClose={deleteModal.closeModal}>
         <DeleteModal
           onClose={deleteModal.closeModal}
-          headerText={`Delete Driver ${selected?.name}?`}
-          desc={<>Are you sure want to delete this Driver?</>}
+          headerText={`Delete Category ${selected?.merchant_name}?`}
+          desc={<>Are you sure want to delete this Customer?</>}
           onSubmit={() => {
-            deleteDriver.mutate(selected.id, {
+            deleteCustomer.mutate(selected.id, {
               onSuccess: () => {
                 openToast({
                   severity: 'success',
                   headMsg: 'Success delete drive',
                 });
-                driver.refetch();
+                customer.refetch();
                 deleteModal.closeModal();
               },
               onError: (err) => {
@@ -169,17 +168,17 @@ export default function DriverManagement() {
       </Modal>
       <ModalComp
         open={formModal.open}
-        title={selected?.id ? 'Edit Driver' : 'Add Driver'}
+        title={selected?.id ? 'Edit Customer' : 'Add Customer'}
         onClose={() => {
           formModal.closeModal();
           setSelected(null);
         }}
       >
-        <FormDriver
+        <FormCustomer
           selected={selected}
           onClose={(isSubmitted) => {
             if (isSubmitted) {
-              driver.refetch();
+              customer.refetch();
             }
             formModal.closeModal();
             setSelected(null);

@@ -50,6 +50,11 @@ export const sidebarDataDev: FilteredMenu[] = [
             title: 'Driver Management',
             path: '/b2b/driver',
           },
+          {
+            id: 78,
+            title: 'Customer Management',
+            path: '/b2b/customer',
+          },
         ],
       },
     ],
