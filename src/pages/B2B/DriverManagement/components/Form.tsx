@@ -111,7 +111,7 @@ export default function FormDriver({ selected, onClose }: FormTypes) {
       <Box p="24px">
         <FormLabel
           required
-          text="Category Name"
+          text="Name"
           error={
             (formik.touched.name && Boolean(formik.errors.name)) ||
             formik.touched.name
@@ -138,6 +138,9 @@ export default function FormDriver({ selected, onClose }: FormTypes) {
               aria-labelledby="demo-radio-buttons-group-label"
               name="radio-buttons-group"
               value={formik.values.gender}
+              onChange={(e) => {
+                formik.setFieldValue('gender', e.target.value);
+              }}
             >
               <FormControlLabel
                 value="perempuan"

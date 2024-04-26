@@ -1,10 +1,10 @@
 import http from 'utils/request';
 import { ListParams, ListResponse } from 'models/fetch';
 
-export const fetchDriver = (params: ListParams) =>
+export const fetchCustomer = (params?: ListParams) =>
   new Promise<ListResponse<any>>(async (resolve, reject) => {
     try {
-      const response = await http.get('/serpong-fresh/driver', {
+      const response = await http.get('/serpong-fresh/customer', {
         params,
       });
       if (response.data) resolve(response.data);
@@ -16,10 +16,26 @@ export const fetchDriver = (params: ListParams) =>
     }
   });
 
-export const deleteDriver = (id: number) =>
-  new Promise(async (resolve, reject) => {
+export const fetchArea = (params?: ListParams) =>
+  new Promise<ListResponse<any>>(async (resolve, reject) => {
     try {
-      const response = await http.delete(`/serpong-fresh/driver/${id}`);
+      const response = await http.get('/serpong-fresh/area', {
+        params,
+      });
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+export const fetchCustomerType = (params?: ListParams) =>
+  new Promise<ListResponse<any>>(async (resolve, reject) => {
+    try {
+      const response = await http.get('/serpong-fresh/customer-type', {
+        params,
+      });
       if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response
@@ -29,10 +45,10 @@ export const deleteDriver = (id: number) =>
     }
   });
 
-export const createDriver = (data: any) =>
+export const deleteCustomer = (id: number) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await http.post(`/serpong-fresh/driver`, data);
+      const response = await http.delete(`/serpong-fresh/customer/${id}`);
       if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response
@@ -42,7 +58,20 @@ export const createDriver = (data: any) =>
     }
   });
 
-export const updateDriver = ({
+export const createCustomer = (data: any) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await http.post(`/serpong-fresh/customer`, data);
+      if (response.data) resolve(response.data);
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const updateCustomer = ({
   id,
   data,
 }: {
@@ -51,7 +80,7 @@ export const updateDriver = ({
 }) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await http.put(`/serpong-fresh/driver/${id}`, data);
+      const response = await http.put(`/serpong-fresh/customer/${id}`, data);
       if (response.data) resolve(response.data);
     } catch (err: any) {
       const message: string = err.response
