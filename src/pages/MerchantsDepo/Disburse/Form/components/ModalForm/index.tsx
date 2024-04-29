@@ -343,7 +343,7 @@ export default function ModalFormDisburseDepo({
               formik.setFieldValue('amount', +value);
               // @ts-ignore
               const precentage = +value - +value * (adminFee / 100);
-              formik.setFieldValue('transfer_amount', +precentage);
+              formik.setFieldValue('transfer_amount', Math.round(+precentage));
             }}
             fullWidth
             autoComplete="off"
