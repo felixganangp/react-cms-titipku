@@ -162,7 +162,6 @@ export default function DriverManagement() {
                 });
                 driver.refetch();
                 deleteModal.closeModal();
-                setSelected(null);
               },
               onError: (err) => {
                 openToast({
