@@ -161,6 +161,7 @@ export default function CustomerManagement() {
                 });
                 customer.refetch();
                 deleteModal.closeModal();
+                setSelected(null);
               },
               onError: (err) => {
                 openToast({
