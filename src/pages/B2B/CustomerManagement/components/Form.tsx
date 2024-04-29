@@ -120,6 +120,7 @@ export default function FormCustomer({ selected, onClose }: FormTypes) {
     }),
     enableReinitialize: true,
   });
+  console.log(formik.errors);
 
   useEffect(() => {
     if (selected) {
