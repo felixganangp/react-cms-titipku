@@ -64,14 +64,14 @@ export default function FormCustomer({ selected, onClose }: FormTypes) {
             onSuccess: () => {
               openToast({
                 severity: 'success',
-                headMsg: 'Driver Updated',
+                headMsg: 'Customer Updated',
               });
               onClose(true);
             },
             onError: () => {
               openToast({
                 severity: 'error',
-                headMsg: 'Failed to update driver',
+                headMsg: 'Failed to update customer',
               });
             },
           },
@@ -81,14 +81,15 @@ export default function FormCustomer({ selected, onClose }: FormTypes) {
           onSuccess: () => {
             openToast({
               severity: 'success',
-              headMsg: 'Driver Created',
+              headMsg: 'Customer Created',
             });
             onClose(true);
           },
-          onError: () => {
+          onError: (e) => {
             openToast({
               severity: 'error',
-              headMsg: 'Failed to create driver',
+              // @ts-ignore
+              headMsg: e || 'Failed to create customer',
             });
           },
         });
@@ -98,7 +99,7 @@ export default function FormCustomer({ selected, onClose }: FormTypes) {
       name: yup.string().required('Name is required'),
       email: yup.string().email('Invalid email format'),
       // .required('Email is required'),
-      area_id: yup.number().required('Area is required'),
+      area_id: yup.mixed().required('Area is required'),
       merchant_name: yup.string().required('Merchant Name is required'),
       merchant_address: yup.string().required('Merchant Address is required'),
       customer_type_id: yup.number().required('Customer Type is required'),
@@ -177,7 +178,7 @@ export default function FormCustomer({ selected, onClose }: FormTypes) {
           <TextField
             type="text"
             name="name"
-            placeholder="Insert Category Nameme"
+            placeholder="Insert Customer Name"
             value={formik.values.name}
             onChange={(e) => {
               formik.handleChange(e);
@@ -203,14 +204,20 @@ export default function FormCustomer({ selected, onClose }: FormTypes) {
             name="phone_number"
             placeholder="Insert active phone number"
             value={formik.values.phone_number}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            fullWidth
-            sx={{
-              '& .MuiInputBase-input': {
-                backgroundColor: (isEdit && '#f5f7fa') || '',
-              },
+            onChange={(e) => {
+              let number = e.target.value;
+              if (number.startsWith('0')) {
+                number = number.slice(1);
+              }
+              formik.handleChange({
+                target: {
+                  name: 'phone_number',
+                  value: number,
+                },
+              });
             }}
+            fullWidth
+            onBlur={formik.handleBlur}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">+62</InputAdornment>
@@ -239,6 +246,7 @@ export default function FormCustomer({ selected, onClose }: FormTypes) {
         </FormLabel>
         <FormLabel
           text="Area"
+          required
           error={formik.touched.area_id && Boolean(formik.errors.area_id)}
           helperText={formik.touched.area_id ? formik.errors.area_id : ''}
         >
@@ -274,7 +282,19 @@ export default function FormCustomer({ selected, onClose }: FormTypes) {
             )}
           />
         </FormLabel>
-        <FormLabel text="Customer Type">
+        <FormLabel
+          required
+          text="Customer Type"
+          error={
+            formik.touched.customer_type_id &&
+            Boolean(formik.errors.customer_type_id)
+          }
+          helperText={
+            formik.touched.customer_type_id &&
+            formik.errors.customer_type_id &&
+            `${formik.errors.customer_type_id}`
+          }
+        >
           <Autocomplete
             options={customerType.listData}
             getOptionLabel={(item) => item.name}
@@ -330,6 +350,10 @@ export default function FormCustomer({ selected, onClose }: FormTypes) {
             formik.touched.merchant_address &&
             formik.errors.merchant_address &&
             `${formik.errors.merchant_address}`
+          }
+          error={
+            formik.touched.merchant_address &&
+            Boolean(formik.errors.merchant_address)
           }
         >
           <TextField
