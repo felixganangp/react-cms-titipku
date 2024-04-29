@@ -51,6 +51,12 @@ export default function CustomerManagement() {
       id: 'phone_number',
       label: 'Phone Number',
       align: 'left',
+      format: (val: any) => {
+        if (val.phone_number && val.phone_number.startsWith('0')) {
+          return <p>+62{val.phone_number.slice(1)}</p>;
+        }
+        return <p>+62{val.phone_number}</p>;
+      },
     },
     {
       id: 'menu',
@@ -107,7 +113,7 @@ export default function CustomerManagement() {
             sx={{ flex: 1, bgcolor: '#f8f8f8', maxWidth: '560px' }}
             fullWidth
             value={customer.searchValue}
-            onChange={(e) => customer.setSearchValue(e.target.value)}
+            onChange={(e) => customer.handleSearch(e.target.value)}
             // onChange={(e) => handleSeachDebounce(e.target.value)}
             InputProps={{
               startAdornment: (
@@ -124,7 +130,7 @@ export default function CustomerManagement() {
             data={customer.listData}
             headCells={headCell}
             loading={customer.isLoading}
-            totalData={customer.data?.count}
+            totalData={customer.data?.total}
             count={customer.params.count}
             page={customer.params.page}
             onChangePage={(page) =>
@@ -144,22 +150,24 @@ export default function CustomerManagement() {
       <Modal open={deleteModal.open} onClose={deleteModal.closeModal}>
         <DeleteModal
           onClose={deleteModal.closeModal}
-          headerText={`Delete Category ${selected?.merchant_name}?`}
+          headerText={`Delete Customer ${selected?.merchant_name}?`}
           desc={<>Are you sure want to delete this Customer?</>}
           onSubmit={() => {
             deleteCustomer.mutate(selected.id, {
               onSuccess: () => {
                 openToast({
                   severity: 'success',
-                  headMsg: 'Success delete drive',
+                  headMsg: 'Success delete customer',
                 });
                 customer.refetch();
                 deleteModal.closeModal();
+                setSelected(null);
               },
               onError: (err) => {
                 openToast({
                   severity: 'error',
-                  headMsg: 'Failed delete drive',
+                  // @ts-ignore
+                  headMsg: err || 'Failed delete drive',
                 });
               },
             });

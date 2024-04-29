@@ -52,6 +52,12 @@ export default function DriverManagement() {
       label: 'Phone Number',
       align: 'left',
       width: '27%',
+      format: (val: any) => {
+        if (val.phone_number && val.phone_number.startsWith('0')) {
+          return <p>+62{val.phone_number.slice(1)}</p>;
+        }
+        return <p>+62{val.phone_number}</p>;
+      },
     },
     {
       id: 'menu',
@@ -125,7 +131,7 @@ export default function DriverManagement() {
             data={driver.listData}
             headCells={headCell}
             loading={driver.isLoading}
-            totalData={driver.data?.count}
+            totalData={driver.data?.total}
             count={driver.params.count}
             page={driver.params.page}
             onChangePage={(page) =>
@@ -156,6 +162,7 @@ export default function DriverManagement() {
                 });
                 driver.refetch();
                 deleteModal.closeModal();
+                setSelected(null);
               },
               onError: (err) => {
                 openToast({

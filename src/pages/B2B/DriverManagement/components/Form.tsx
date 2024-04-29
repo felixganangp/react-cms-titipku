@@ -67,10 +67,11 @@ export default function FormDriver({ selected, onClose }: FormTypes) {
             });
             onClose(true);
           },
-          onError: () => {
+          onError: (e) => {
             openToast({
               severity: 'error',
-              headMsg: 'Failed to create driver',
+              // @ts-ignore
+              headMsg: e || 'Failed to create driver',
             });
           },
         });
@@ -123,7 +124,7 @@ export default function FormDriver({ selected, onClose }: FormTypes) {
           <TextField
             type="text"
             name="name"
-            placeholder="Insert Category Nameme"
+            placeholder="Insert driver name"
             value={formik.values.name}
             onChange={(e) => {
               formik.handleChange(e);
@@ -172,14 +173,20 @@ export default function FormDriver({ selected, onClose }: FormTypes) {
             name="phone_number"
             placeholder="Insert active phone number"
             value={formik.values.phone_number}
-            onChange={formik.handleChange}
+            onChange={(e) => {
+              let number = e.target.value;
+              if (number.startsWith('0')) {
+                number = number.slice(1);
+              }
+              formik.handleChange({
+                target: {
+                  name: 'phone_number',
+                  value: number,
+                },
+              });
+            }}
             onBlur={formik.handleBlur}
             fullWidth
-            sx={{
-              '& .MuiInputBase-input': {
-                backgroundColor: (isEdit && '#f5f7fa') || '',
-              },
-            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">+62</InputAdornment>
