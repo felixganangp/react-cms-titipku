@@ -50,10 +50,11 @@ export default function FormDriver({ selected, onClose }: FormTypes) {
               });
               onClose(true);
             },
-            onError: () => {
+            onError: (e) => {
               openToast({
                 severity: 'error',
-                headMsg: 'Failed to update driver',
+                // @ts-ignore
+                headMsg: e || 'Failed to update driver',
               });
             },
           },
@@ -78,7 +79,10 @@ export default function FormDriver({ selected, onClose }: FormTypes) {
       }
     },
     validationSchema: yup.object({
-      name: yup.string().required('Name is required'),
+      name: yup
+        .string()
+        .required('Name is required')
+        .max(255, 'must be at most 255 characters'),
       phone_number: yup
         .number()
         .required('Phone Number is required')
