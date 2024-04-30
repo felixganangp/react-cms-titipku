@@ -821,7 +821,7 @@ export default function CustomerDetails() {
           </Stack>
         </SubDetailsPagesWrapper>
 
-        <SubDetailsPagesWrapper title="KUR History" defaultOpen>
+        {/* <SubDetailsPagesWrapper title="KUR History" defaultOpen>
           <Box p="20px">
             <Tabs.Container
               value={kurHistoryTab}
@@ -865,7 +865,7 @@ export default function CustomerDetails() {
               />
             )}
           </Box>
-        </SubDetailsPagesWrapper>
+        </SubDetailsPagesWrapper> */}
         {/* <Modal
           open={modalImage.open}
           onClose={() => setModalImage({ open: false, filePath: null })}
