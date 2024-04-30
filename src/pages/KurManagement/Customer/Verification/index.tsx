@@ -53,6 +53,7 @@ import FormCustomer from 'pages/Finance/Customer/Components/Form';
 import FormBiChecking from './components/form-bi-checking';
 import FormCustomerReview from './components/form-customer-review';
 import Verify from './components/verify';
+import VerifyUpdateData from './components/verify-update-data';
 
 interface FormDataType {
   isEdit: boolean;
@@ -92,6 +93,7 @@ export default function KurCustomerVerification() {
   const formBiChecking = useModal();
   const formCustomerReview = useModal();
   const verifyModal = useModal();
+  const verifyModalUpdateData = useModal();
 
   const createUserModal = useModal();
   const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
@@ -295,6 +297,15 @@ export default function KurCustomerVerification() {
                 },
                 dataId: 'button-review-customer',
                 hide: val.user_status_id !== 4,
+              },
+              {
+                label: `Verify`,
+                onClick: () => {
+                  setSelectedSingle(val.id);
+                  verifyModalUpdateData.openModal();
+                },
+                dataId: 'button-review-customer',
+                hide: val.user_status_id === 4,
               },
               {
                 label: `Reject`,
@@ -787,6 +798,23 @@ export default function KurCustomerVerification() {
         <Verify
           onSubmit={handleSubmitVerify}
           onClose={verifyModal.closeModal}
+        />
+      </Modal>
+      <Modal
+        open={verifyModalUpdateData.open}
+        onClose={verifyModalUpdateData.closeModal}
+        title="Verify Customer"
+      >
+        <VerifyUpdateData
+          id={selectedSingle}
+          onSubmit={(isSubmited) => {
+            if (isSubmited) {
+              dispatch(customerAction.fetchData(customerKur.params));
+            }
+            verifyModalUpdateData.closeModal();
+            setSelectedSingle(undefined);
+          }}
+          onClose={verifyModalUpdateData.closeModal}
         />
       </Modal>
     </Box>
