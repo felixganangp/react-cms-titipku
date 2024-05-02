@@ -43,7 +43,7 @@ export default function DriverManagement() {
     },
     {
       id: 'gender',
-      label: 'Gander',
+      label: 'Gender',
       align: 'left',
       width: '27%',
     },

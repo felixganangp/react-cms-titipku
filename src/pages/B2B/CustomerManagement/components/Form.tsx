@@ -96,12 +96,24 @@ export default function FormCustomer({ selected, onClose }: FormTypes) {
       }
     },
     validationSchema: yup.object({
-      name: yup.string().required('Name is required'),
-      email: yup.string().email('Invalid email format'),
+      name: yup
+        .string()
+        .required('Name is required')
+        .max(255, 'must be at most 255 characters'),
+      email: yup
+        .string()
+        .email('Invalid email format')
+        .max(255, 'must be at most 255 characters'),
       // .required('Email is required'),
       area_id: yup.mixed().required('Area is required'),
-      merchant_name: yup.string().required('Merchant Name is required'),
-      merchant_address: yup.string().required('Merchant Address is required'),
+      merchant_name: yup
+        .string()
+        .required('Merchant Name is required')
+        .max(255, 'must be at most 255 characters'),
+      merchant_address: yup
+        .string()
+        .required('Merchant Address is required')
+        .max(2147483647, 'Must be less than or equal to 2147483647'),
       customer_type_id: yup.number().required('Customer Type is required'),
       phone_number: yup
         .number()
