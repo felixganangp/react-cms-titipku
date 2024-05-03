@@ -83,12 +83,12 @@ export const sidebarDataDev: FilteredMenu[] = [
         path: '',
         child: [
           {
-            id: 54,
+            id: 79,
             title: 'Customer',
             path: '/finance/customer',
           },
           {
-            id: 54,
+            id: 80,
             title: 'Verification',
             path: '/finance/verification',
           },
@@ -199,38 +199,43 @@ export const sidebarDataProd: FilteredMenu[] = [
       },
     ],
   },
-  // {
-  //   id: 48,
-  //   title: 'KUR',
-  //   path: '',
-  //   icon: <KurIcon />,
-  //   child: [
-  //     {
-  //       id: 52,
-  //       title: 'Request',
-  //       path: '/kur/request',
-  //       child: [],
-  //     },
-  //     {
-  //       id: 53,
-  //       title: 'Payment',
-  //       path: '/kur/payment',
-  //       child: [],
-  //     },
-  //     {
-  //       id: 54,
-  //       title: 'Invoice Management',
-  //       path: '/kur/invoice',
-  //       child: [],
-  //     },
-  //     {
-  //       id: 51,
-  //       title: 'Customer',
-  //       path: '/kur/customer',
-  //       child: [],
-  //     },
-  //   ],
-  // },
+  {
+    id: 59,
+    title: 'Finance',
+    path: '',
+    icon: <KurIcon />,
+    child: [
+      {
+        id: 62,
+        title: 'Payment',
+        path: '/finance/payment',
+        child: [],
+      },
+      {
+        id: 61,
+        title: 'Invoice Management',
+        path: '/finance/invoice',
+        child: [],
+      },
+      {
+        id: 60,
+        title: 'Customer Management',
+        path: '',
+        child: [
+          {
+            id: 72,
+            title: 'Customer',
+            path: '/finance/customer',
+          },
+          {
+            id: 73,
+            title: 'Verification',
+            path: '/finance/verification',
+          },
+        ],
+      },
+    ],
+  },
 
   {
     id: 63,
