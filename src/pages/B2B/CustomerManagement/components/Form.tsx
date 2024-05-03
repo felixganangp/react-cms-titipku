@@ -8,17 +8,11 @@ import {
   Box,
   TextField,
   Button,
-  FormControl,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   InputAdornment,
   Autocomplete,
   Switch,
   styled,
 } from '@mui/material';
-import { useAppDispatch, useAppSelector } from 'store/hooks';
-import { productAction } from 'store/slice/b2b/Product';
 import useToast from 'hooks/useToast';
 import useCustomer, {
   useArea,
@@ -132,7 +126,6 @@ export default function FormCustomer({ selected, onClose }: FormTypes) {
     }),
     enableReinitialize: true,
   });
-  console.log(formik.errors);
 
   useEffect(() => {
     if (selected) {
@@ -334,18 +327,7 @@ export default function FormCustomer({ selected, onClose }: FormTypes) {
             )}
           />
         </FormLabel>
-        <FormLabel
-          text="Is QRIS Ready?"
-          // error={
-          //   formik.touched.bank_account_number &&
-          //   Boolean(formik.errors.bank_account_number)
-          // }
-          // helperText={
-          //   formik.touched.bank_account_number &&
-          //   formik.errors.bank_account_number &&
-          //   `${formik.errors.bank_account_number}`
-          // }
-        >
+        <FormLabel text="Is QRIS Ready?">
           <SwitchCostum
             checked={formik.values.is_kur}
             name="is_kur"

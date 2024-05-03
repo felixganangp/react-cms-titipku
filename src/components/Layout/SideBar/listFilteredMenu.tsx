@@ -195,42 +195,21 @@ export const sidebarDataProd: FilteredMenu[] = [
             title: 'Supplier Management',
             path: '/b2b/supplier',
           },
+
+          {
+            id: 70,
+            title: 'Driver Management',
+            path: '/b2b/driver',
+          },
+          {
+            id: 71,
+            title: 'Customer Management',
+            path: '/b2b/customer',
+          },
         ],
       },
     ],
   },
-  // {
-  //   id: 48,
-  //   title: 'KUR',
-  //   path: '',
-  //   icon: <KurIcon />,
-  //   child: [
-  //     {
-  //       id: 52,
-  //       title: 'Request',
-  //       path: '/kur/request',
-  //       child: [],
-  //     },
-  //     {
-  //       id: 53,
-  //       title: 'Payment',
-  //       path: '/kur/payment',
-  //       child: [],
-  //     },
-  //     {
-  //       id: 54,
-  //       title: 'Invoice Management',
-  //       path: '/kur/invoice',
-  //       child: [],
-  //     },
-  //     {
-  //       id: 51,
-  //       title: 'Customer',
-  //       path: '/kur/customer',
-  //       child: [],
-  //     },
-  //   ],
-  // },
 
   {
     id: 63,
