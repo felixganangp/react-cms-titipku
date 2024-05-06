@@ -80,7 +80,7 @@ export default function Searchbar({ openSidebar }: SearchProps) {
         if (menuData.find((item) => item.id === menu.id) === undefined) {
           filtered.splice(i, 1);
         } else {
-          const filteredChild: Child[] = sidebarData[i].child.filter(
+          const filteredChild: Child[] = sidebarData[i]?.child?.filter(
             (a) =>
               menuData.find((subitem) => subitem.id === a.id) !== undefined,
           );
