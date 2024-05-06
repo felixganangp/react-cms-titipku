@@ -8,40 +8,40 @@ import DepoAndalan from 'components/Icon/DepoAndalan';
 
 export const sidebarDataDev: FilteredMenu[] = [
   {
-    id: 51,
+    id: 56,
     title: 'Serpong Fresh',
     path: '',
     icon: <B2B />,
     child: [
       {
-        id: 52,
+        id: 57,
         title: 'Inventory',
         path: '/b2b/inventory',
         child: [],
       },
       {
-        id: 57,
+        id: 63,
         title: 'Inbound',
         path: '/b2b/inbound',
         child: [],
       },
       {
-        id: 58,
+        id: 64,
         title: 'Setting',
         path: '',
         child: [
           {
-            id: 54,
+            id: 60,
             title: 'Category Management',
             path: '/b2b/category',
           },
           {
-            id: 55,
+            id: 61,
             title: 'Unit of Measurement',
             path: '/b2b/uom',
           },
           {
-            id: 56,
+            id: 62,
             title: 'Supplier Management',
             path: '/b2b/supplier',
           },
@@ -60,25 +60,58 @@ export const sidebarDataDev: FilteredMenu[] = [
     ],
   },
   {
-    id: 48,
+    id: 70,
+    title: 'Andalan & Depo',
+    path: '',
+    icon: <DepoAndalan />,
+    child: [
+      {
+        id: 71,
+        title: 'Dashboard',
+        path: '/depo/dashboard',
+      },
+      {
+        id: 72,
+        title: 'Merchants',
+        path: '/depo/merchants',
+      },
+      {
+        id: 73,
+        title: 'Disburse',
+        path: '/depo/disburse',
+      },
+      {
+        id: 74,
+        title: 'QRIS',
+        path: '/depo/qris',
+      },
+      {
+        id: 75,
+        title: 'Request Transfer',
+        path: '/depo/req-transfer',
+      },
+    ],
+  },
+  {
+    id: 66,
     title: 'Finance',
     path: '',
     icon: <KurIcon />,
     child: [
       {
-        id: 53,
+        id: 69,
         title: 'Payment',
         path: '/finance/payment',
         child: [],
       },
       {
-        id: 54,
+        id: 68,
         title: 'Invoice Management',
         path: '/finance/invoice',
         child: [],
       },
       {
-        id: 51,
+        id: 67,
         title: 'Customer Management',
         path: '',
         child: [
@@ -93,44 +126,6 @@ export const sidebarDataDev: FilteredMenu[] = [
             path: '/finance/verification',
           },
         ],
-      },
-    ],
-  },
-  {
-    id: 70,
-    title: 'Andalan & Depo',
-    path: '',
-    icon: <DepoAndalan />,
-    child: [
-      {
-        id: 71,
-        title: 'Dashboard',
-        path: '/depo/dashboard',
-        child: [],
-      },
-      {
-        id: 72,
-        title: 'Merchants',
-        path: '/depo/merchants',
-        child: [],
-      },
-      {
-        id: 73,
-        title: 'Disburse',
-        path: '/depo/disburse',
-        child: [],
-      },
-      {
-        id: 74,
-        title: 'QRIS',
-        path: '/depo/qris',
-        child: [],
-      },
-      {
-        id: 75,
-        title: 'Request Transfer',
-        path: '/depo/req-transfer',
-        child: [],
       },
     ],
   },
@@ -200,44 +195,6 @@ export const sidebarDataProd: FilteredMenu[] = [
     ],
   },
   {
-    id: 59,
-    title: 'Finance',
-    path: '',
-    icon: <KurIcon />,
-    child: [
-      {
-        id: 62,
-        title: 'Payment',
-        path: '/finance/payment',
-        child: [],
-      },
-      {
-        id: 61,
-        title: 'Invoice Management',
-        path: '/finance/invoice',
-        child: [],
-      },
-      {
-        id: 60,
-        title: 'Customer Management',
-        path: '',
-        child: [
-          {
-            id: 72,
-            title: 'Customer',
-            path: '/finance/customer',
-          },
-          {
-            id: 73,
-            title: 'Verification',
-            path: '/finance/verification',
-          },
-        ],
-      },
-    ],
-  },
-
-  {
     id: 63,
     title: 'Andalan & Depo',
     path: '',
@@ -272,6 +229,43 @@ export const sidebarDataProd: FilteredMenu[] = [
         title: 'Request Transfer',
         path: '/depo/req-transfer',
         child: [],
+      },
+    ],
+  },
+  {
+    id: 59,
+    title: 'Finance',
+    path: '',
+    icon: <KurIcon />,
+    child: [
+      {
+        id: 62,
+        title: 'Payment',
+        path: '/finance/payment',
+        child: [],
+      },
+      {
+        id: 61,
+        title: 'Invoice Management',
+        path: '/finance/invoice',
+        child: [],
+      },
+      {
+        id: 60,
+        title: 'Customer Management',
+        path: '',
+        child: [
+          {
+            id: 72,
+            title: 'Customer',
+            path: '/finance/customer',
+          },
+          {
+            id: 73,
+            title: 'Verification',
+            path: '/finance/verification',
+          },
+        ],
       },
     ],
   },
