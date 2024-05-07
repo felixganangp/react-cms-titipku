@@ -42,6 +42,7 @@ import { MerchantResp } from 'models/Merchant';
 import debounce from 'utils/debounce';
 import { getColorCreditScore } from 'utils/creditScoreColor';
 import bankData from 'data/list-bank.json';
+import FormCustomer from 'pages/Finance/Customer/Components/Form';
 
 // import FormCustomer from '../Verification/components/form';
 
@@ -57,6 +58,8 @@ export default function KurCustomer() {
   const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
   const creditScore = useAppSelector((state) => state.creditScore);
+  const createUserModal = useModal();
+  const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
 
   // useEffect(() => {
   //   dispatch(customerAction.fetchData(customerKur.params));
@@ -83,6 +86,8 @@ export default function KurCustomer() {
     dispatch(
       customerAction.fetchData({
         status: 6,
+        page: customerKur.params.page,
+        search: customerKur.params.search,
       }),
     );
   }, [
@@ -257,7 +262,8 @@ export default function KurCustomer() {
               {
                 label: `Edit`,
                 onClick: () => {
-                  console.log('edit');
+                  createUserModal.openModal();
+                  setSelectedIdUser(val.id);
                 },
                 dataId: 'button-edit-customer',
               },
@@ -310,6 +316,7 @@ export default function KurCustomer() {
         },
       ),
     );
+    console.log('value', value);
     // }
     dispatch(
       customerAction.setParams({
@@ -610,6 +617,7 @@ export default function KurCustomer() {
                     onInputChange={(_, newInputValue) => {
                       setInputValueArea(newInputValue);
                     }}
+                    // @ts-ignore
                     value={customerKur?.stateFilter?.areaKur}
                     limitTags={3}
                     renderInput={(params) => {
@@ -732,6 +740,21 @@ export default function KurCustomer() {
       {/* <Modal open={formModal.open} title={formHead} onClose={formHandleClose}>
         <FormCustomer onClose={formHandleClose} formData={formData} />
       </Modal> */}
+      <Modal
+        open={createUserModal.open}
+        onClose={createUserModal.closeModal}
+        title={selectedIdUser ? 'Update Customer' : 'Create Customer'}
+      >
+        <FormCustomer
+          id={selectedIdUser}
+          handleClose={(isSubmite) => {
+            if (isSubmite) {
+              dispatch(customerAction.fetchData(customerKur.params));
+            }
+            createUserModal.closeModal();
+          }}
+        />
+      </Modal>
     </Box>
   );
 }
