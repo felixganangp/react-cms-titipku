@@ -47,6 +47,8 @@ export default function VerifyUpdateData({
     initialValues: {
       limit_request_plafon: 0,
       limit_request_cash: 0,
+      limit_plafon: 0,
+      limit_cash: 0,
       new_status: 6,
     },
     onSubmit: async (value) => {
@@ -80,10 +82,10 @@ export default function VerifyUpdateData({
             // @ts-ignore
             user_data.user_type_id = parseInt(value.user_type_id);
             break;
-          case 'geotag_image':
-            // @ts-ignore
-            user_data.new_status = 4;
-            break;
+          // case 'geotag_image':
+          //   // @ts-ignore
+          //   user_data.new_status = 4;
+          //   break;
           default:
             // @ts-ignore
             user_data[val] = value[val];
@@ -123,7 +125,6 @@ export default function VerifyUpdateData({
           }
         }),
       );
-
       updateUser.mutate(
         {
           id,
@@ -158,6 +159,16 @@ export default function VerifyUpdateData({
         .min(1, 'Cant be less than 1')
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
+      limit_plafon: yup
+        .number()
+        .min(1, 'Cant be less than 1')
+        .max(2147483647, 'Must be less than or equal to 2147483647')
+        .required('This field is required'),
+      limit_cash: yup
+        .number()
+        .min(1, 'Cant be less than 1')
+        .max(2147483647, 'Must be less than or equal to 2147483647')
+        .required('This field is required'),
     }),
   });
 
@@ -185,6 +196,8 @@ export default function VerifyUpdateData({
         marriage_partner_name: detail.marriage_partner_name,
         limit_request_plafon: detail.limit_request_plafon,
         limit_request_cash: detail.limit_request_cash,
+        limit_plafon: detail.limit_plafon || 0,
+        limit_cash: detail.limit_cash || 0,
         business_lifetime: detail.business_lifetime,
         user_type_id: detail.user_type.id,
         is_merchant_titipku: detail.is_merchant_titipku,
@@ -277,7 +290,7 @@ export default function VerifyUpdateData({
         >
           <TextField
             fullWidth
-            placeholder="Input request plafo"
+            placeholder="Input request plafon"
             name="limit_request_plafon"
             onBlur={formik.handleBlur}
             onKeyDown={(evt) =>
@@ -337,6 +350,75 @@ export default function VerifyUpdateData({
                 'limit_request_cash',
                 parseInt(value || '0'),
               );
+            }}
+            onKeyDown={(evt) =>
+              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+            }
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">Rp</InputAdornment>
+              ),
+            }}
+          />
+        </FormControl>
+        <FormControl
+          text="Limit plafon"
+          required
+          error={
+            formik.touched.limit_plafon && Boolean(formik.errors.limit_plafon)
+          }
+          helperText={
+            formik.touched.limit_plafon ? formik.errors.limit_plafon : ''
+          }
+        >
+          <TextField
+            fullWidth
+            placeholder="Input limit plafon"
+            name="limit_plafon"
+            onBlur={formik.handleBlur}
+            onKeyDown={(evt) =>
+              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+            }
+            error={
+              formik.touched.limit_plafon && Boolean(formik.errors.limit_plafon)
+            }
+            value={numberSeperator(formik.values.limit_plafon)}
+            onChange={(e) => {
+              const value = e.target.value
+                // @ts-ignore
+                .replaceAll('.', '')
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
+
+              formik.setFieldValue('limit_plafon', parseInt(value || '0'));
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">Rp</InputAdornment>
+              ),
+            }}
+          />
+        </FormControl>
+        <FormControl
+          text="Limit cash"
+          required
+          error={formik.touched.limit_cash && Boolean(formik.errors.limit_cash)}
+          helperText={formik.touched.limit_cash ? formik.errors.limit_cash : ''}
+        >
+          <TextField
+            fullWidth
+            placeholder="Input cash"
+            name="limit_cash"
+            onBlur={formik.handleBlur}
+            value={numberSeperator(formik.values.limit_cash)}
+            onChange={(e) => {
+              const value = e.target.value
+                // @ts-ignore
+                .replaceAll('.', '')
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
+
+              formik.setFieldValue('limit_cash', parseInt(value || '0'));
             }}
             onKeyDown={(evt) =>
               ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()

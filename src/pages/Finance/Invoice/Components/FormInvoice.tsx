@@ -514,13 +514,13 @@ export default function FormInvoice(props: FormInvoiceProps) {
                       bgcolor="#dedede"
                     >
                       <Stack>
-                        <Typography>Due Data</Typography>
+                        <Typography>Due Date</Typography>
                         <Typography>
                           {moment(item.due_date * 1000).format('DD-MM-YYYY')}
                         </Typography>
                       </Stack>
                       <Stack>
-                        <Typography>Installment per Amount</Typography>
+                        <Typography>Installment per Month</Typography>
                         <Typography>
                           Rp. {numberSeperator(item?.amount || 0)}
                         </Typography>

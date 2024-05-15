@@ -93,6 +93,8 @@ export const userDataKey = [
   'category_jelajah_name',
   'limit_request_plafon',
   'limit_request_cash',
+  'limit_plafon',
+  'limit_cash',
   'business_lifetime',
   'user_type_id',
   'is_merchant_titipku',
