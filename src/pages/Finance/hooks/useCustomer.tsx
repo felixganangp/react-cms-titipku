@@ -281,7 +281,7 @@ export function useCreateCustomer({
         .required('This field is required'),
       another_loan: yup
         .number()
-        .min(1, 'Cant be less than 1')
+        .min(0, 'Cant be less than 0')
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
       cash_out_purpose: yup
