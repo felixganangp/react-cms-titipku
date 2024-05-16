@@ -55,9 +55,9 @@ export default function KurCustomer() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const customerKur = useAppSelector((state) => state.customerKur);
-  const typeKur = useAppSelector((state) => state.typeKur);
+  // const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
-  const creditScore = useAppSelector((state) => state.creditScore);
+  // const creditScore = useAppSelector((state) => state.creditScore);
   const createUserModal = useModal();
   const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
 
@@ -137,17 +137,17 @@ export default function KurCustomer() {
     isEdit: false,
     initialData,
   });
-  useEffect(() => {
-    if (
-      customerKur.stateFilter?.areaKur &&
-      customerKur.stateFilter?.areaKur.length > 0
-    ) {
-      setOpenFilter(true);
-    }
-    dispatch(typeAction.fetchData());
-    dispatch(areaAction.fetchData());
-    dispatch(creditScoreAction.fetchData());
-  }, []);
+  // useEffect(() => {
+  //   if (
+  //     customerKur.stateFilter?.areaKur &&
+  //     customerKur.stateFilter?.areaKur.length > 0
+  //   ) {
+  //     setOpenFilter(true);
+  //   }
+  //   dispatch(typeAction.fetchData());
+  //   dispatch(areaAction.fetchData());
+  //   dispatch(creditScoreAction.fetchData());
+  // }, []);
 
   const [inputValueArea, setInputValueArea] = useState('');
 

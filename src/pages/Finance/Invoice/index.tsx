@@ -94,21 +94,82 @@ export default function InvoicePage() {
       },
     },
     {
-      id: 'status',
-      label: 'Status',
-      align: 'center',
-      format: ({ status }) => {
-        const color =
-          // eslint-disable-next-line no-nested-ternary
-          status === 'Late'
-            ? 'error'
-            : status === 'On Schedule'
-            ? 'success'
-            : 'info';
+      id: 'Name',
+      label: 'Name',
+      format: ({ user }) => {
+        return <Typography variant="body1">{user?.debtor_name}</Typography>;
+      },
+    },
+    {
+      id: 'Merchant Name',
+      label: 'Merchant Name',
+      format: ({ user }) => {
+        return <Typography variant="body1">{user?.merchant_name}</Typography>;
+      },
+    },
+    {
+      id: 'kur_Type',
+      label: 'Kur Type',
+      format: ({ user }) => {
+        // @ts-ignore
+        return KurType?.[user.user_type_id] || '-';
+      },
+    },
+    {
+      id: 'invoice_date',
+      label: 'Transfer Date',
+      format: ({ transfer_date }) => {
         return (
-          <Label variant="filled" color={color}>
-            {status}
-          </Label>
+          <Typography variant="body1">
+            {moment(transfer_date * 1000).format('DD/MM/YYYY')}
+          </Typography>
+        );
+      },
+    },
+    {
+      id: 'due_date',
+      label: 'Due Date',
+      format: ({ due_date }) => {
+        return (
+          <Typography variant="body1">
+            {moment(due_date * 1000).format('DD/MM/YYYY')}
+          </Typography>
+        );
+      },
+    },
+    {
+      id: 'amount',
+      label: 'Invoice Amount',
+      minWidth: '150px',
+      format: ({ amount }) => {
+        return (
+          <Typography variant="body1">
+            Rp. {numberSeperator(amount || 0)}
+          </Typography>
+        );
+      },
+    },
+    {
+      id: 'paid_amount',
+      label: 'Paid Off Amount',
+      format: ({ paid_amount }) => {
+        return (
+          <Typography variant="body1">
+            Rp. {numberSeperator(paid_amount || 0)}
+          </Typography>
+        );
+      },
+    },
+    {
+      id: 'last_paid',
+      label: 'Last Paid',
+      format: ({ last_paid }) => {
+        return (
+          <Typography variant="body1">
+            {last_paid !== 0
+              ? moment(last_paid * 1000).format('DD/MM/YYYY')
+              : '-'}
+          </Typography>
         );
       },
     },
@@ -131,74 +192,21 @@ export default function InvoicePage() {
       },
     },
     {
-      id: 'Name',
-      label: 'Name',
-      format: ({ user }) => {
-        return <Typography variant="body1">{user?.merchant_name}</Typography>;
-      },
-    },
-    {
-      id: 'kur_Type',
-      label: 'Kur Type',
-      format: ({ user }) => {
-        // @ts-ignore
-        return KurType?.[user.user_type_id] || '-';
-      },
-    },
-    {
-      id: 'invoice_date',
-      label: 'Invoice Date',
-      format: ({ transfer_date }) => {
+      id: 'status',
+      label: 'Status',
+      align: 'center',
+      format: ({ status }) => {
+        const color =
+          // eslint-disable-next-line no-nested-ternary
+          status === 'Late'
+            ? 'error'
+            : status === 'On Schedule'
+            ? 'success'
+            : 'info';
         return (
-          <Typography variant="body1">
-            {moment(transfer_date * 1000).format('DD/MM/YYYY')}
-          </Typography>
-        );
-      },
-    },
-    {
-      id: 'amount',
-      label: 'Invoice Amount',
-      format: ({ amount }) => {
-        return (
-          <Typography variant="body1">
-            Rp. {numberSeperator(amount || 0)}
-          </Typography>
-        );
-      },
-    },
-    {
-      id: 'paid_amount',
-      label: 'Paid Off Amount',
-      format: ({ paid_amount }) => {
-        return (
-          <Typography variant="body1">
-            Rp. {numberSeperator(paid_amount || 0)}
-          </Typography>
-        );
-      },
-    },
-    {
-      id: 'due_date',
-      label: 'Due Date',
-      format: ({ due_date }) => {
-        return (
-          <Typography variant="body1">
-            {moment(due_date * 1000).format('DD/MM/YYYY')}
-          </Typography>
-        );
-      },
-    },
-    {
-      id: 'last_paid',
-      label: 'Last Paid',
-      format: ({ last_paid }) => {
-        return (
-          <Typography variant="body1">
-            {last_paid !== 0
-              ? moment(last_paid * 1000).format('DD/MM/YYYY')
-              : '-'}
-          </Typography>
+          <Label variant="filled" color={color}>
+            {status}
+          </Label>
         );
       },
     },
