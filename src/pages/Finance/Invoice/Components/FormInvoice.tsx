@@ -187,7 +187,6 @@ export default function FormInvoice(props: FormInvoiceProps) {
     formik.values.installment_period,
   ]);
 
-  console.log('formik', formik.values);
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Box p="24px">
@@ -619,6 +618,11 @@ export default function FormInvoice(props: FormInvoiceProps) {
         onClose={customerModal.closeModal}
         setSelected={(e) => {
           formik.setFieldValue('user', e);
+          formik.setFieldValue('destination_bank_account', e.bank_account);
+          formik.setFieldValue(
+            'destination_bank',
+            bankData.data.find((item) => item.code === e.bank_name),
+          );
         }}
       />
     </Box>

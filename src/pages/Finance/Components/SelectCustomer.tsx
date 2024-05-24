@@ -25,7 +25,7 @@ type Props = {
   open: boolean;
   onClose: () => void;
   setSelected: (value: any) => void;
-  status: number | null;
+  status?: number | null;
 };
 export default function SelectCustomer({
   open,

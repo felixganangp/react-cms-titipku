@@ -23,6 +23,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers';
 import moment from 'moment';
 import useModal from 'hooks/useModal';
 import InputImage from 'components/InputImage';
+import bankData from 'data/list-bank.json';
 import { useCreateCustomer, useCustomerDetails } from '../../hooks/useCustomer';
 import { step1Key, step2Key, Type } from '../../hooks/constumer.config';
 import { SteperHeader } from './SteperHeader';
@@ -448,6 +449,62 @@ export default function FormCustomer({
                 }
               />
             )}
+          />
+        </FormControl>
+        <FormControl
+          text="Destination Bank"
+          error={formik.touched.bank_name && Boolean(formik.errors.bank_name)}
+          helperText={
+            formik.touched.bank_name &&
+            formik.errors.bank_name &&
+            `${formik.errors.bank_name}`
+          }
+        >
+          <Autocomplete
+            data-testid="form-customer-list-bank"
+            id="list-bank"
+            options={bankData.data}
+            onChange={(e, value) => {
+              formik.setFieldValue('bank_name', value?.code);
+            }}
+            isOptionEqualToValue={(option: { name: string; code: string }) => {
+              // @ts-ignore
+              return option.name === formik.values.bank_name?.name;
+            }}
+            getOptionLabel={(option) => `${option.name}`}
+            value={
+              bankData.data.find(
+                (val) => val.code === formik.values.bank_name,
+              ) || null
+            }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                name="bank_name"
+                onBlur={formik.handleBlur}
+                placeholder="Seleck bank"
+              />
+            )}
+          />
+        </FormControl>
+        <FormControl
+          text="Destination Bank Account"
+          error={
+            formik.touched.bank_account && Boolean(formik.errors.bank_account)
+          }
+          helperText={
+            formik.touched.bank_account &&
+            formik.errors.bank_account &&
+            `${formik.errors.bank_account}`
+          }
+        >
+          <TextField
+            fullWidth
+            placeholder="Insert destination bank"
+            value={formik.values.bank_account}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            name="bank_account"
           />
         </FormControl>
         <FormControl

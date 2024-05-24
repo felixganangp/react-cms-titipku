@@ -34,6 +34,9 @@ export const initialValues = {
   nik_partner_image: '',
   divorce_papers_image: '',
   geotag_image: [],
+  // BANK
+  bank_name: '',
+  bank_account: '',
 };
 
 export const step1Key = [
@@ -101,7 +104,10 @@ export const userDataKey = [
   'marriage_status',
   'marriage_partner_name',
   'nik_partner',
+  'bank_name',
+  'bank_account',
 ];
+
 export const idirDataKey = [
   ...step2Key,
   'marriage_status',

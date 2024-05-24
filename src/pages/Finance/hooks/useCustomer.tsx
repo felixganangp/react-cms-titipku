@@ -362,6 +362,8 @@ export function useCreateCustomer({
         // geotag_image: detail.user_geotag_images.map(
         //   (val) => val.image_filepath,
         // ),
+        bank_account: detail.bank_account,
+        bank_name: detail.bank_name,
       };
       Object.keys(Document).map((val) => {
         const doc = detail.user_documents.find(

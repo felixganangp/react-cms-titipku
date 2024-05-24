@@ -38,6 +38,8 @@ export type CustomerDetailType = {
   user_documents: UserDocument[];
   user_status_history: UserStatusHistory[];
   user_geotag_images: GeoLocation[];
+  bank_account: string;
+  bank_name: string;
 };
 
 export type User = {
