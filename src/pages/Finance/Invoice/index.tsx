@@ -150,6 +150,18 @@ export default function InvoicePage() {
       },
     },
     {
+      id: 'interes_rate',
+      label: 'Interest Rate',
+      minWidth: '150px',
+      format: ({ amount, admin_fee }) => {
+        return (
+          <Typography variant="body1">
+            {Math.round(((admin_fee/amount)*100))}%
+          </Typography>
+        );
+      },
+    },
+    {
       id: 'paid_amount',
       label: 'Paid Off Amount',
       format: ({ paid_amount }) => {
