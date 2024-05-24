@@ -50,6 +50,7 @@ import {
 } from '../hooks/useInvoiceService';
 import FormSetManualSettled from './Components/FormSetManualSettled';
 import FormCustomer from '../Customer/Components/Form';
+import { Type } from '../hooks/constumer.config';
 
 export default function InvoicePage() {
   const navigate = useNavigate();
@@ -517,6 +518,47 @@ export default function InvoicePage() {
                         ),
                     )}
                     options={queryInnvoice.restructureList}
+                    getOptionLabel={(option) => `${option.name}`}
+                    renderInput={(params) => {
+                      return (
+                        <TextField
+                          {...params}
+                          name="grade"
+                          placeholder="Select Restructure type"
+                          variant="outlined"
+                        />
+                      );
+                    }}
+                  />
+                </FormLabel>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <FormLabel text="User Type">
+                  <Autocomplete
+                    id="filterGrade"
+                    onChange={(e, value) => {
+                      queryInnvoice.formikParams.setFieldValue(
+                        'user_type_id',
+                        value?.id,
+                      );
+                    }}
+                    value={Object.keys(Type)
+                      .map((val) => ({
+                        id: val,
+                        // @ts-ignore
+                        name: Type[val],
+                      }))
+                      .find(
+                        (val) =>
+                          val.id ===
+                          (queryInnvoice.formikParams.values.user_type_id ||
+                            null),
+                      )}
+                    options={Object.keys(Type).map((val) => ({
+                      id: val,
+                      // @ts-ignore
+                      name: Type[val],
+                    }))}
                     getOptionLabel={(option) => `${option.name}`}
                     renderInput={(params) => {
                       return (
