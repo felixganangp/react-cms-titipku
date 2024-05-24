@@ -86,11 +86,14 @@ export default function FormInvoice(props: FormInvoiceProps) {
         is: (val: any) => val === '2',
         then: yup.string().required('Required'),
       }),
-      provision_installment_period: yup
-        .number()
-        .min(0, 'Min 0 period')
-        .max(36, 'Max 36 period')
-        .required('Required'),
+      provision_installment_period: yup.number().when('user', {
+        is: (val: any) => val?.need_provision,
+        then: yup
+          .number()
+          .min(0, 'Min 0 period')
+          .max(36, 'Max 36 period')
+          .required('Required'),
+      }),
       nota_image: yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
@@ -184,6 +187,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
     formik.values.installment_period,
   ]);
 
+  console.log('formik', formik.values);
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Box p="24px">
@@ -532,32 +536,35 @@ export default function FormInvoice(props: FormInvoiceProps) {
             </FormControl>
           </>
         )}
+        {/* @ts-ignore */}
+        {formik.values.user?.need_provision && (
+          <FormControl
+            text="Provision Installment Period"
+            required
+            error={
+              formik.touched.provision_installment_period &&
+              Boolean(formik.errors.provision_installment_period)
+            }
+            helperText={
+              formik.touched.provision_installment_period &&
+              formik.errors.provision_installment_period &&
+              `${formik.errors.provision_installment_period}`
+            }
+          >
+            <TextField
+              fullWidth
+              placeholder="Insert Provision Installment Period"
+              value={formik.values.provision_installment_period}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              name="provision_installment_period"
+              type="number"
+              // @ts-ignore
+              onWheel={(e) => e.target?.blur()}
+            />
+          </FormControl>
+        )}
 
-        <FormControl
-          text="Provision Installment Period"
-          required
-          error={
-            formik.touched.provision_installment_period &&
-            Boolean(formik.errors.provision_installment_period)
-          }
-          helperText={
-            formik.touched.provision_installment_period &&
-            formik.errors.provision_installment_period &&
-            `${formik.errors.provision_installment_period}`
-          }
-        >
-          <TextField
-            fullWidth
-            placeholder="Insert Provision Installment Period"
-            value={formik.values.provision_installment_period}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            name="provision_installment_period"
-            type="number"
-            // @ts-ignore
-            onWheel={(e) => e.target?.blur()}
-          />
-        </FormControl>
         <FormControl
           text="Note Image"
           required

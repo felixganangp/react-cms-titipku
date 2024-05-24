@@ -1,6 +1,6 @@
 /* eslint-disable radix */
 import React, { useEffect, useState } from 'react';
-import { Box, Grid, Card, Stack, Typography } from '@mui/material';
+import { Box, Grid, Card, Stack, Typography, Button } from '@mui/material';
 import moment from 'moment';
 
 import DescDetails from 'components/DescDetails';
@@ -35,8 +35,13 @@ import { RequestKUR } from 'models/kur/Request';
 import { PaymentKUR } from 'models/kur/Payment';
 import { InvoiceKur, InvoiceKurDetail } from 'models/kur/Invoice';
 
-import { CalendarMonth } from '@mui/icons-material';
-import { Button } from 'react-day-picker';
+import { CalendarMonth, KeyboardArrowDown } from '@mui/icons-material';
+import MenuList from 'components/MenuList';
+import { useMutation } from '@tanstack/react-query';
+import { getDownloadPdfUser } from 'service/Kur/Customer';
+import useLoadingSpinner from 'hooks/useLoadingSpinner';
+import useToast from 'hooks/useToast';
+import { base64toOpen } from 'utils/base64toDownload';
 import { TitlePage, BackButton, Menu } from './details.styled';
 
 function StatusColor(string: string | undefined) {
@@ -66,6 +71,9 @@ export default function CustomerDetails() {
     open: false,
     filePath: null,
   });
+  const generatePDF = useMutation(getDownloadPdfUser);
+  const { setLoading } = useLoadingSpinner();
+  const { openToast } = useToast();
 
   useEffect(() => {
     if (id) {
@@ -535,18 +543,61 @@ export default function CustomerDetails() {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Card>
-              <Menu>Kredit Usaha Rakyat</Menu>
-              <Box
-                style={{ textDecoration: 'none' }}
-                onClick={() => navigate(-1)}
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
               >
-                <BackButton
-                  sx={{ '&:hover': { backgroundColor: '#ffff' } }}
-                  startIcon={<ArrowBackIosIcon />}
+                <Box>
+                  <Menu>Kredit Usaha Rakyat</Menu>
+                  <Box
+                    style={{ textDecoration: 'none' }}
+                    onClick={() => navigate(-1)}
+                  >
+                    <BackButton
+                      sx={{ '&:hover': { backgroundColor: '#ffff' } }}
+                      startIcon={<ArrowBackIosIcon />}
+                    >
+                      <TitlePage>Customer Detail</TitlePage>
+                    </BackButton>
+                  </Box>
+                </Box>
+                <MenuList
+                  menu={[
+                    {
+                      label: `Genenerate Invoice`,
+                      onClick: () => {
+                        setLoading(true);
+                        // @ts-ignore
+                        generatePDF.mutate(id.toString(), {
+                          onSuccess: (data) => {
+                            setLoading(false);
+                            openToast({
+                              headMsg: 'Success to generate PDF',
+                              severity: 'success',
+                            });
+                            base64toOpen(
+                              // @ts-ignore
+                              data.data,
+                              `${customerKur.details?.user_number} - ${customerKur.details?.debtor_name}(${customerKur.details?.merchant_name}).pdf`,
+                            );
+                          },
+                          onError: (error) => {
+                            openToast({
+                              headMsg: 'Failed to generate PDF',
+                              severity: 'error',
+                            });
+                            setLoading(false);
+                          },
+                        });
+                      },
+                      dataId: 'button-edit-customer',
+                    },
+                  ]}
                 >
-                  <TitlePage>Customer Detail</TitlePage>
-                </BackButton>
-              </Box>
+                  <Button endIcon={<KeyboardArrowDown />}>Action</Button>
+                </MenuList>
+              </Stack>
             </Card>
           </Grid>
         </Grid>

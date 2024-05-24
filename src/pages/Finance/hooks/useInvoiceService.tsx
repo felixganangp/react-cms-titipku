@@ -31,6 +31,7 @@ export function UseInvoiceService(setParams?: InvoiceParams) {
       min_due_date: undefined,
       max_due_date: undefined,
       restructure_type_id: [],
+      user_type_id: undefined,
     },
     onSubmit: (values) => {
       const newValue = {

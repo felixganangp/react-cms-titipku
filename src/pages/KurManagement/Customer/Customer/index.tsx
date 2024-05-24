@@ -43,6 +43,11 @@ import debounce from 'utils/debounce';
 import { getColorCreditScore } from 'utils/creditScoreColor';
 import bankData from 'data/list-bank.json';
 import FormCustomer from 'pages/Finance/Customer/Components/Form';
+import { useMutation } from '@tanstack/react-query';
+import { getDownloadPdfUser } from 'service/Kur/Customer';
+import useLoadingSpinner from 'hooks/useLoadingSpinner';
+import { base64toOpen } from 'utils/base64toDownload';
+import useToast from 'hooks/useToast';
 
 // import FormCustomer from '../Verification/components/form';
 
@@ -52,6 +57,7 @@ interface FormDataType {
 }
 
 export default function KurCustomer() {
+  const { openToast } = useToast();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const customerKur = useAppSelector((state) => state.customerKur);
@@ -60,6 +66,8 @@ export default function KurCustomer() {
   // const creditScore = useAppSelector((state) => state.creditScore);
   const createUserModal = useModal();
   const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
+  const generatePDF = useMutation(getDownloadPdfUser);
+  const { setLoading } = useLoadingSpinner();
 
   // useEffect(() => {
   //   dispatch(customerAction.fetchData(customerKur.params));
@@ -264,6 +272,34 @@ export default function KurCustomer() {
                 onClick: () => {
                   createUserModal.openModal();
                   setSelectedIdUser(val.id);
+                },
+                dataId: 'button-edit-customer',
+              },
+              {
+                label: `Genenerate Invoice`,
+                onClick: () => {
+                  setLoading(true);
+                  generatePDF.mutate(val.id.toString(), {
+                    onSuccess: (data) => {
+                      setLoading(false);
+                      openToast({
+                        headMsg: 'Success to generate PDF',
+                        severity: 'success',
+                      });
+                      base64toOpen(
+                        // @ts-ignore
+                        data.data,
+                        `${val.user_number} - ${val.debtor_name}(${val.merchant_name}).pdf`,
+                      );
+                    },
+                    onError: (error) => {
+                      openToast({
+                        headMsg: 'Failed to generate PDF',
+                        severity: 'error',
+                      });
+                      setLoading(false);
+                    },
+                  });
                 },
                 dataId: 'button-edit-customer',
               },
