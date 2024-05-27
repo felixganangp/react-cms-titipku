@@ -150,18 +150,18 @@ export default function InvoicePage() {
         );
       },
     },
-    {
-      id: 'interes_rate',
-      label: 'Interest Rate',
-      minWidth: '150px',
-      format: ({ amount, admin_fee }) => {
-        return (
-          <Typography variant="body1">
-            {Math.round(((admin_fee/amount)*100))}%
-          </Typography>
-        );
-      },
-    },
+    // {
+    //   id: 'interes_rate',
+    //   label: 'Interest Rate',
+    //   minWidth: '150px',
+    //   format: ({ amount, admin_fee }) => {
+    //     return (
+    //       <Typography variant="body1">
+    //         {Math.round(((admin_fee/amount)*100))}%
+    //       </Typography>
+    //     );
+    //   },
+    // },
     {
       id: 'paid_amount',
       label: 'Paid Off Amount',
@@ -191,8 +191,11 @@ export default function InvoicePage() {
       label: 'Restructure Type',
       align: 'center',
       format: ({ invoice_restructure_type }) => {
-        return invoice_restructure_type.name;
-        // </Label>
+        return (
+          <Typography variant="body1">
+            {invoice_restructure_type.name || '-'}
+          </Typography>
+        );
       },
     },
     {
@@ -314,7 +317,7 @@ export default function InvoicePage() {
                 Create Invoice
               </Button>
               <TextField
-                placeholder="Search for Invoice Number"
+                placeholder="Search"
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
