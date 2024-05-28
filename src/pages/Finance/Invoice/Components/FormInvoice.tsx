@@ -162,6 +162,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
           amount: formik.values.loan_amount,
           period: value,
           start_date: moment(formik.values.transfer_date).unix(),
+          interest_rate: formik.values.interest_rate,
         },
         {
           onSuccess: (data) => {
@@ -187,6 +188,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
     formik.values.loan_amount,
     formik.values.transfer_date,
     formik.values.installment_period,
+    formik.values.interest_rate,
   ]);
 
   return (
