@@ -150,18 +150,18 @@ export default function InvoicePage() {
         );
       },
     },
-    // {
-    //   id: 'interes_rate',
-    //   label: 'Interest Rate',
-    //   minWidth: '150px',
-    //   format: ({ amount, admin_fee }) => {
-    //     return (
-    //       <Typography variant="body1">
-    //         {Math.round(((admin_fee/amount)*100))}%
-    //       </Typography>
-    //     );
-    //   },
-    // },
+    {
+      id: 'interes_rate',
+      label: 'Interest Rate',
+      minWidth: '150px',
+      format: ({ amount, admin_fee, interest_rate }) => {
+        return (
+          <Typography variant="body1">
+            {interest_rate === 0 ? 3 : interest_rate}%
+          </Typography>
+        );
+      },
+    },
     {
       id: 'paid_amount',
       label: 'Paid Off Amount',

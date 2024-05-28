@@ -41,6 +41,7 @@ export type InvoiceListType = {
   due_date: number;
   last_paid: number;
   status: string;
+  interest_rate: number;
 };
 
 export type InvoiceDetailsType = {

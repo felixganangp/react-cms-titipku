@@ -62,6 +62,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
       installment_period: '',
       provision_installment_period: '',
       nota_image: '',
+      interest_rate: 0,
     },
     validationSchema: yup.object({
       user: yup.object().nullable().required('Required'),
@@ -70,6 +71,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
         .min(2, 'Please enter a minimum required amount.')
         .required('Required'),
       transfer_date: yup.mixed().nullable().required('Required'),
+      interest_rate: yup.number().nullable().required('Required').min(0),
       destination_bank: yup.mixed().when('invoice_type_id', {
         is: (val: any) => val === '1',
         then: yup.object().nullable().required('Required'),
@@ -468,6 +470,40 @@ export default function FormInvoice(props: FormInvoiceProps) {
                     .replace(/(\..*?)\..*/g, '$1');
 
                   formik.setFieldValue('bank_transfer_fee', value);
+                }}
+              />
+            </FormControl>
+            <FormControl
+              text="Interest Rate"
+              required
+              error={
+                formik.touched.interest_rate &&
+                Boolean(formik.errors.interest_rate)
+              }
+              helperText={
+                formik.touched.interest_rate &&
+                formik.errors.interest_rate &&
+                `${formik.errors.interest_rate}`
+              }
+            >
+              <TextField
+                type="text"
+                name="interest_rate"
+                placeholder="Insert Price"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="start">%</InputAdornment>
+                  ),
+                }}
+                fullWidth
+                autoComplete="off"
+                value={numberSeperator(formik.values.interest_rate || '')}
+                onChange={(e) => {
+                  const value = e.target.value
+                    .replace(/[^0-9.]/g, '')
+                    .replace(/(\..*?)\..*/g, '$1');
+
+                  formik.setFieldValue('interest_rate', value);
                 }}
               />
             </FormControl>
