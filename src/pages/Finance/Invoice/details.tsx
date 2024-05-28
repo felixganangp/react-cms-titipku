@@ -307,6 +307,52 @@ export default function InvoiceDetails() {
             </Grid>
           </Card>
         </AccordionOnDetails>
+        <AccordionOnDetails defaultOpen title="Installment">
+          <Card>
+            <Table
+              headCells={[
+                {
+                  id: 'date',
+                  label: 'Due Date',
+                  format: (val: any) => {
+                    return (
+                      <Box>
+                        <Typography>
+                          {moment((val.due_date || 0) * 1000).format(
+                            'MMMM DD, YYYY',
+                          )}
+                        </Typography>
+                        <Typography variant="caption">
+                          {moment((val.due_date || 0) * 1000).format('HH:mm')}
+                        </Typography>
+                      </Box>
+                    );
+                  },
+                },
+                {
+                  id: 'amount',
+                  label: 'Amount',
+                  format: (val: any) => {
+                    return (
+                      <Typography>
+                        Rp {numberSeperator(val?.amount || 0)}
+                      </Typography>
+                    );
+                  },
+                },
+                {
+                  id: 'object',
+                  label: 'Object',
+                  format: (val: any) => {
+                    return <Typography>{val.status}</Typography>;
+                  },
+                },
+              ]}
+              data={invoiceDetails.details?.invoice_details || []}
+              loading={settlementQuery.isLoading}
+            />
+          </Card>
+        </AccordionOnDetails>
         <AccordionOnDetails defaultOpen title="Settlement">
           <Card>
             <Table
