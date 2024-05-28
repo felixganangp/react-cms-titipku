@@ -473,42 +473,39 @@ export default function FormInvoice(props: FormInvoiceProps) {
                 }}
               />
             </FormControl>
-            <FormControl
-              text="Interest Rate"
-              required
-              error={
-                formik.touched.interest_rate &&
-                Boolean(formik.errors.interest_rate)
-              }
-              helperText={
-                formik.touched.interest_rate &&
-                formik.errors.interest_rate &&
-                `${formik.errors.interest_rate}`
-              }
-            >
-              <TextField
-                type="text"
-                name="interest_rate"
-                placeholder="Insert Price"
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="start">%</InputAdornment>
-                  ),
-                }}
-                fullWidth
-                autoComplete="off"
-                value={numberSeperator(formik.values.interest_rate || '')}
-                onChange={(e) => {
-                  const value = e.target.value
-                    .replace(/[^0-9.]/g, '')
-                    .replace(/(\..*?)\..*/g, '$1');
-
-                  formik.setFieldValue('interest_rate', value);
-                }}
-              />
-            </FormControl>
           </>
         )}
+        <FormControl
+          text="Interest Rate"
+          required
+          error={
+            formik.touched.interest_rate && Boolean(formik.errors.interest_rate)
+          }
+          helperText={
+            formik.touched.interest_rate &&
+            formik.errors.interest_rate &&
+            `${formik.errors.interest_rate}`
+          }
+        >
+          <TextField
+            type="text"
+            name="interest_rate"
+            placeholder="Insert Price"
+            InputProps={{
+              endAdornment: <InputAdornment position="start">%</InputAdornment>,
+            }}
+            fullWidth
+            autoComplete="off"
+            value={numberSeperator(formik.values.interest_rate || '')}
+            onChange={(e) => {
+              const value = e.target.value
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
+
+              formik.setFieldValue('interest_rate', value);
+            }}
+          />
+        </FormControl>
         {formik.values.invoice_type_id === '2' && (
           <>
             <FormControl
