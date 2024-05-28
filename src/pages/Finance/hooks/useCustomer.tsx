@@ -177,7 +177,7 @@ export function useCreateCustomer({
           },
           onError: (value) => {
             openToast({
-              headMsg: 'Failed update user',
+              headMsg: 'Failed create user',
               message: '',
               severity: 'error',
             });
@@ -243,6 +243,16 @@ export function useCreateCustomer({
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
       limit_request_cash: yup
+        .number()
+        .min(1, 'Cant be less than 1')
+        .max(2147483647, 'Must be less than or equal to 2147483647')
+        .required('This field is required'),
+      limit_plafon: yup
+        .number()
+        .min(1, 'Cant be less than 1')
+        .max(2147483647, 'Must be less than or equal to 2147483647')
+        .required('This field is required'),
+      limit_cash: yup
         .number()
         .min(1, 'Cant be less than 1')
         .max(2147483647, 'Must be less than or equal to 2147483647')
@@ -348,6 +358,8 @@ export function useCreateCustomer({
         marriage_partner_name: detail.marriage_partner_name,
         limit_request_plafon: detail.limit_request_plafon,
         limit_request_cash: detail.limit_request_cash,
+        limit_plafon: detail.limit_plafon,
+        limit_cash: detail.limit_cash,
         business_lifetime: detail.business_lifetime,
         user_type_id: detail.user_type.id,
         is_merchant_titipku: detail.is_merchant_titipku,

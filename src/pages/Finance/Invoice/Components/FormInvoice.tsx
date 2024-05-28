@@ -233,9 +233,9 @@ export default function FormInvoice(props: FormInvoiceProps) {
                   {numberSeperator(
                     (formik.values.invoice_type_id === '1'
                       ? // @ts-ignore
-                        formik.values.user?.limit_plafon
+                        formik.values.user?.available_limit_plafon
                       : // @ts-ignore
-                        formik.values.user?.limit_cash) || 0,
+                        formik.values.user?.available_limit_cash) || 0,
                   )}
                 </Typography>
               </Stack>

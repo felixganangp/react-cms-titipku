@@ -133,9 +133,9 @@ export default function KurCustomerVerification() {
   const [inputValueArea, setInputValueArea] = useState('');
   const [openFilter, setOpenFilter] = useState(false);
   useEffect(() => {
-    dispatch(typeAction.fetchData());
-    dispatch(areaAction.fetchData());
-    dispatch(creditScoreAction.fetchData());
+    // dispatch(typeAction.fetchData());
+    // dispatch(creditScoreAction.fetchData());
+    // dispatch(areaAction.fetchData());
   }, []);
 
   const convertDate = (date: number) => {

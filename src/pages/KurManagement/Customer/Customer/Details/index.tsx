@@ -80,27 +80,6 @@ export default function CustomerDetails() {
       const idCust = parseInt(id);
       // Fetch
       dispatch(customerAction.fetchDataDetail({ id }));
-      dispatch(
-        requestKURAction.fetchData({
-          ...request.params,
-          kur_user_id: idCust,
-          count: 5,
-        }),
-      );
-      dispatch(
-        paymentKURAction.fetchData({
-          ...payment.params,
-          kur_user_id: idCust,
-          count: 5,
-        }),
-      );
-      dispatch(
-        invoiceKurAction.fetchData({
-          ...invoice.params,
-          kur_user_id: idCust,
-          count: 5,
-        }),
-      );
       // Set Params
       dispatch(
         requestKURAction.setParams({

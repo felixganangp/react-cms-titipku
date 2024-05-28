@@ -593,6 +593,78 @@ export default function FormCustomer({
             }}
           />
         </FormControl>
+        <FormControl
+          text="Limit plafon"
+          required
+          error={
+            formik.touched.limit_plafon && Boolean(formik.errors.limit_plafon)
+          }
+          helperText={
+            formik.touched.limit_plafon ? formik.errors.limit_plafon : ''
+          }
+        >
+          <TextField
+            fullWidth
+            placeholder="Input plafon"
+            name="limit_plafon"
+            onBlur={formik.handleBlur}
+            onKeyDown={(evt) =>
+              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+            }
+            error={
+              formik.touched.limit_plafon && Boolean(formik.errors.limit_plafon)
+            }
+            value={numberSeperator(formik.values.limit_plafon)}
+            onChange={(e) => {
+              const value = e.target.value
+                // @ts-ignore
+                .replaceAll('.', '')
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
+
+              formik.setFieldValue('limit_plafon', parseInt(value || '0'));
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">Rp</InputAdornment>
+              ),
+            }}
+          />
+        </FormControl>
+        <FormControl
+          text="Limit cash"
+          required
+          error={formik.touched.limit_cash && Boolean(formik.errors.limit_cash)}
+          helperText={formik.touched.limit_cash ? formik.errors.limit_cash : ''}
+        >
+          <TextField
+            fullWidth
+            placeholder="Input limit cash"
+            name="limit_cash"
+            onBlur={formik.handleBlur}
+            onKeyDown={(evt) =>
+              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+            }
+            error={
+              formik.touched.limit_cash && Boolean(formik.errors.limit_cash)
+            }
+            value={numberSeperator(formik.values.limit_cash)}
+            onChange={(e) => {
+              const value = e.target.value
+                // @ts-ignore
+                .replaceAll('.', '')
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
+
+              formik.setFieldValue('limit_cash', parseInt(value || '0'));
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">Rp</InputAdornment>
+              ),
+            }}
+          />
+        </FormControl>
       </Box>
       <Box display={step === 2 ? 'block' : 'none'}>
         <FormControl

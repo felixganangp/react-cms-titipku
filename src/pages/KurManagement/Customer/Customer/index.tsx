@@ -785,7 +785,13 @@ export default function KurCustomer() {
           id={selectedIdUser}
           handleClose={(isSubmite) => {
             if (isSubmite) {
-              dispatch(customerAction.fetchData(customerKur.params));
+              dispatch(
+                customerAction.fetchData({
+                  status: 6,
+                  page: customerKur.params.page,
+                  search: customerKur.params.search,
+                }),
+              );
             }
             createUserModal.closeModal();
           }}
