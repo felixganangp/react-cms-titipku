@@ -189,6 +189,18 @@ export default function CustomerDetails() {
     };
   };
 
+  const getBiCheckingNotes = (biId: number | undefined) => {
+    let stat = '';
+    if (biId === 1) {
+      stat = 'Conforming';
+    } else if (biId === 2) {
+      stat = 'Conforming with notes';
+    } else if (biId === 3) {
+      stat = 'Not Conforming';
+    }
+    return stat;
+  };
+
   const headCellRequest: HeadCells<RequestKUR>[] = [
     {
       id: 'id',
@@ -717,6 +729,16 @@ export default function CustomerDetails() {
                   icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
                   content={`RP ${digitFormatter.format(getLimit().cash || 0)}`}
                 />
+                <DescDetails
+                  title="Bank"
+                  icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={customerKur.details?.bank_name}
+                />
+                <DescDetails
+                  title="Bank"
+                  icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={customerKur.details?.bank_account}
+                />
               </Grid>
             </Grid>
           </Box>
@@ -849,6 +871,45 @@ export default function CustomerDetails() {
               </Stack>
             ))}
           </Stack>
+        </SubDetailsPagesWrapper>
+
+        <SubDetailsPagesWrapper title="Verification Data" defaultOpen>
+          <Box p="20px">
+            <Grid container spacing={2}>
+              <Grid
+                item
+                xs={6}
+                md={3}
+                gap="20px"
+                display="flex"
+                flexDirection="column"
+                alignItems="start"
+              >
+                <DescDetails
+                  title="BI Checking Status"
+                  icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={getBiCheckingNotes(
+                    customerKur.details?.bi_checking_status_id,
+                  )}
+                />
+                <DescDetails
+                  title="BI Checking Notes"
+                  icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={customerKur.details?.bi_checking_notes}
+                />
+                <DescDetails
+                  title="Komite Notes"
+                  icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={customerKur.details?.komite_notes}
+                />
+                <DescDetails
+                  title="Reject Notes"
+                  icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={customerKur.details?.reject_notes}
+                />
+              </Grid>
+            </Grid>
+          </Box>
         </SubDetailsPagesWrapper>
 
         {/* <SubDetailsPagesWrapper title="KUR History" defaultOpen>

@@ -34,7 +34,8 @@ import SelectCustomer from '../../Components/SelectCustomer';
 import { KurType } from '../../hooks/useConfigFinance';
 
 const paymentMethod = [
-  { name: 'Transfer', value: 'transfer' },
+  { name: 'Bank Transfer', value: 'transfer' },
+  { name: 'Qris', value: 'qris' },
   { name: 'Cash', value: 'cash' },
 ];
 type Props = {

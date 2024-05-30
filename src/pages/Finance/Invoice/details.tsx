@@ -168,7 +168,7 @@ export default function InvoiceDetails() {
                     </Typography>
                   </Grid>
                   <Grid item sm={4}>
-                    <Typography color="primary">Invoice Amount</Typography>
+                    <Typography color="primary">Transfer Amount</Typography>
                     <Typography>
                       Rp {numberSeperator(invoiceDetails.details?.amount || 0)}
                     </Typography>
@@ -206,12 +206,13 @@ export default function InvoiceDetails() {
                       {numberSeperator(invoiceDetails.details?.dpd_amount || 0)}
                     </Typography>
                   </Grid>
+
                   <Grid item sm={4}>
-                    <Typography color="primary">Outstanding Amount</Typography>
+                    <Typography color="primary">Bank Transfer Fee</Typography>
                     <Typography>
                       Rp{' '}
                       {numberSeperator(
-                        invoiceDetails.details?.outstanding_amount || 0,
+                        invoiceDetails.details?.bank_transfer_fee || 0,
                       )}
                     </Typography>
                   </Grid>
@@ -239,12 +240,12 @@ export default function InvoiceDetails() {
                       </Grid>
                       <Grid item sm={4}>
                         <Typography color="primary">
-                          Bank Transfer Fee
+                          Outstanding Amount
                         </Typography>
                         <Typography>
                           Rp{' '}
                           {numberSeperator(
-                            invoiceDetails.details?.bank_transfer_fee || 0,
+                            invoiceDetails.details?.outstanding_amount || 0,
                           )}
                         </Typography>
                       </Grid>

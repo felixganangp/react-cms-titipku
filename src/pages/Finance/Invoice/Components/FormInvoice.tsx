@@ -478,7 +478,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
           </>
         )}
         <FormControl
-          text="Interest Rate"
+          text="Admin Fee"
           required
           error={
             formik.touched.interest_rate && Boolean(formik.errors.interest_rate)
@@ -492,7 +492,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
           <TextField
             type="text"
             name="interest_rate"
-            placeholder="Insert Price"
+            placeholder="Insert Admin Fee"
             InputProps={{
               endAdornment: <InputAdornment position="start">%</InputAdornment>,
             }}
