@@ -571,7 +571,11 @@ export default function FormInvoice(props: FormInvoiceProps) {
           </>
         )}
         {/* @ts-ignore */}
-        {formik.values.user?.need_provision && (
+        {((formik.values.user?.need_provision_cash &&
+          formik.values.invoice_type_id === '2') ||
+          // @ts-ignore
+          (formik.values.user?.need_provision_normal &&
+            formik.values.invoice_type_id === '1')) && (
           <FormControl
             text="Provision Installment Period"
             required

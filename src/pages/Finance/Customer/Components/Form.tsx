@@ -36,6 +36,7 @@ export default function FormCustomer({
   handleClose: (isSubmited: boolean) => void;
 }) {
   const openCalender = useModal();
+  const openCalenderDisburse = useModal();
   const [step, setStep] = useState<number>(1);
   const areaParams = UseParams({ count: 25 });
   const areaQuery = useQuery({
@@ -662,6 +663,55 @@ export default function FormCustomer({
               startAdornment: (
                 <InputAdornment position="start">Rp</InputAdornment>
               ),
+            }}
+          />
+        </FormControl>
+        <FormControl
+          text="Disburse Date"
+          required
+          error={
+            formik.touched.disburse_date && Boolean(formik.errors.disburse_date)
+          }
+          helperText={
+            formik.touched.disburse_date ? formik.errors.disburse_date : ''
+          }
+        >
+          <DesktopDatePicker
+            maxDate={moment()}
+            open={openCalenderDisburse.open}
+            onOpen={() => {
+              formik.setFieldTouched('disburse_date');
+            }}
+            onClose={openCalenderDisburse.closeModal}
+            onChange={(value) => {
+              formik.setFieldValue('disburse_date', value?.unix());
+            }}
+            value={moment.unix(
+              // @ts-ignore
+              formik.values.disburse_date || moment.unix(),
+            )}
+            // slotProps={{
+            //   textField: {
+            //     fullWidth: true,
+            //     onBlur: () => {
+            //       formik.setFieldTouched('disburse_date');
+            //     },
+            //   },
+            // }}
+            // onClose={openDateSelect.toggleModal}
+            renderInput={(params) => {
+              return (
+                <TextField
+                  {...params}
+                  onClick={openCalenderDisburse.toggleModal}
+                  name="disburse_date"
+                  onBlur={formik.handleBlur}
+                  placeholder="Select Grade"
+                  variant="outlined"
+                  fullWidth
+                  // onClick={openDateSelect.toggleModal}
+                />
+              );
             }}
           />
         </FormControl>

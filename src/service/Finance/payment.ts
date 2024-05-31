@@ -55,6 +55,7 @@ export const getPaymentSimulation = (params: {
   amount: number;
   user_id: number | string;
   payment_date: number;
+  invoice_type_id: number;
 }) =>
   new Promise<any>(async (resolve, reject) => {
     try {
