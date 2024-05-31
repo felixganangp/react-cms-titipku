@@ -19,8 +19,8 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-    - run: yarn install
-    - run: yarn build 
+    - run: /home/ubuntu/.yarn/bin/yarn install 
+    - run: /home/ubuntu/.yarn/bin/yarn build 
 
     # - name: Slack Notification
     #   uses: rtCamp/action-slack-notify@v2
