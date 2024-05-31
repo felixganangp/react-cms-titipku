@@ -7,6 +7,7 @@ export type CustomerDetailType = {
   phone_number: string;
   family_phone_number: string;
   business_lifetime: number;
+  disburse_date: number;
   marriage_status: string;
   marriage_partner_name: string;
   limit_request_plafon: number;

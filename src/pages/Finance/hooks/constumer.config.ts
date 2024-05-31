@@ -39,6 +39,7 @@ export const initialValues = {
   // BANK
   bank_name: '',
   bank_account: '',
+  disburse_date: '',
 };
 
 export const step1Key = [
@@ -110,6 +111,7 @@ export const userDataKey = [
   'nik_partner',
   'bank_name',
   'bank_account',
+  'disburse_date',
 ];
 
 export const idirDataKey = [
