@@ -162,7 +162,7 @@ export default function FormPayment({ onClose }: Props) {
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Box p="24px">
         <FormControl
-          text="Name"
+          text="Invoice Type"
           required
           // error={touched.name && Boolean(errors.name)}
           // helperText={touched.name && errors.name && `${errors.name}`}
@@ -425,7 +425,7 @@ export default function FormPayment({ onClose }: Props) {
           />
         </FormControl>
         <FormControl
-          text="Proof Payment"
+          text="Proof of Payment"
           required
           error={
             formik.touched.proof_of_payment &&

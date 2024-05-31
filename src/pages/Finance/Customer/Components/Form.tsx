@@ -718,7 +718,7 @@ export default function FormCustomer({
       </Box>
       <Box display={step === 2 ? 'block' : 'none'}>
         <FormControl
-          text="GVM"
+          text="GMV"
           required
           error={formik.touched.gmv && Boolean(formik.errors.gmv)}
           helperText={formik.touched.gmv ? formik.errors.gmv : ''}

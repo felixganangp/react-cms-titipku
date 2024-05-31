@@ -112,12 +112,12 @@ export const sidebarDataDev: FilteredMenu[] = [
       },
       {
         id: 67,
-        title: 'Customer Management',
+        title: 'Merchant Management',
         path: '',
         child: [
           {
             id: 79,
-            title: 'Customer',
+            title: 'Merchant',
             path: '/finance/customer',
           },
           {
@@ -252,12 +252,12 @@ export const sidebarDataProd: FilteredMenu[] = [
       },
       {
         id: 60,
-        title: 'Customer Management',
+        title: 'Merchant Management',
         path: '',
         child: [
           {
             id: 72,
-            title: 'Customer',
+            title: 'Merchant',
             path: '/finance/customer',
           },
           {

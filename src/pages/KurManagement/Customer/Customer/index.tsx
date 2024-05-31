@@ -276,7 +276,7 @@ export default function KurCustomer() {
                 dataId: 'button-edit-customer',
               },
               {
-                label: `Genenerate Invoice`,
+                label: `Generate Invoice`,
                 onClick: () => {
                   setLoading(true);
                   generatePDF.mutate(val.id.toString(), {
@@ -526,7 +526,7 @@ export default function KurCustomer() {
         <Grid item xs={12}>
           <Card>
             <Typography data-testid="header-page" variant="titlePage">
-              KUR Customer
+              Merchant List
             </Typography>
           </Card>
         </Grid>
@@ -555,7 +555,7 @@ export default function KurCustomer() {
                 >
                   <TextField
                     data-testid="search-customer"
-                    placeholder="Search Customer"
+                    placeholder="Search Merchant"
                     size="small"
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px', flex: 1 }}
                     fullWidth
@@ -779,7 +779,7 @@ export default function KurCustomer() {
       <Modal
         open={createUserModal.open}
         onClose={createUserModal.closeModal}
-        title={selectedIdUser ? 'Update Customer' : 'Create Customer'}
+        title={selectedIdUser ? 'Update Merchant' : 'Create Merchant'}
       >
         <FormCustomer
           id={selectedIdUser}

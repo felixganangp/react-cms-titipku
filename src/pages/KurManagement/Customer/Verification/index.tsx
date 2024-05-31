@@ -460,7 +460,7 @@ export default function KurCustomerVerification() {
         <Grid item xs={12}>
           <Card>
             <Typography data-testid="header-page" variant="titlePage">
-              KUR Customer
+              Merchant Verification
             </Typography>
           </Card>
         </Grid>
@@ -479,7 +479,7 @@ export default function KurCustomerVerification() {
                     createUserModal.openModal();
                   }}
                 >
-                  Add Customer
+                  Add Merchant
                 </Button>
                 <Box
                   width="100%"
@@ -489,7 +489,7 @@ export default function KurCustomerVerification() {
                 >
                   <TextField
                     data-testid="search-customer"
-                    placeholder="Search customer"
+                    placeholder="Search merchant"
                     size="small"
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px', flex: 1 }}
                     fullWidth
@@ -778,7 +778,7 @@ export default function KurCustomerVerification() {
       <Modal
         open={createUserModal.open}
         onClose={createUserModal.closeModal}
-        title={selectedIdUser ? 'Update Customer' : 'Create Customer'}
+        title={selectedIdUser ? 'Update Merchant' : 'Create Merchant'}
       >
         <FormCustomer
           id={selectedIdUser}

@@ -343,7 +343,7 @@ export default function InvoiceDetails() {
                 },
                 {
                   id: 'object',
-                  label: 'Object',
+                  label: 'Status',
                   format: (val: any) => {
                     return <Typography>{val.status}</Typography>;
                   },
