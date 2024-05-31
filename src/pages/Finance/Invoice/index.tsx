@@ -50,6 +50,7 @@ import {
 } from '../hooks/useInvoiceService';
 import FormSetManualSettled from './Components/FormSetManualSettled';
 import FormCustomer from '../Customer/Components/Form';
+import { Type } from '../hooks/constumer.config';
 
 export default function InvoicePage() {
   const navigate = useNavigate();
@@ -94,45 +95,15 @@ export default function InvoicePage() {
       },
     },
     {
-      id: 'status',
-      label: 'Status',
-      align: 'center',
-      format: ({ status }) => {
-        const color =
-          // eslint-disable-next-line no-nested-ternary
-          status === 'Late'
-            ? 'error'
-            : status === 'On Schedule'
-            ? 'success'
-            : 'info';
-        return (
-          <Label variant="filled" color={color}>
-            {status}
-          </Label>
-        );
-      },
-    },
-    {
-      id: 'invoice_restructure_type',
-      label: 'Restructure Type',
-      align: 'center',
-      format: ({ invoice_restructure_type }) => {
-        return invoice_restructure_type.name;
-        // </Label>
-      },
-    },
-    {
-      id: 'invoice_type',
-      label: 'Invoice Type',
-      format: ({ invoice_type }) => {
-        return (
-          <Typography variant="body1">{invoice_type?.name || '-'}</Typography>
-        );
-      },
-    },
-    {
       id: 'Name',
       label: 'Name',
+      format: ({ user }) => {
+        return <Typography variant="body1">{user?.debtor_name}</Typography>;
+      },
+    },
+    {
+      id: 'Merchant Name',
+      label: 'Merchant Name',
       format: ({ user }) => {
         return <Typography variant="body1">{user?.merchant_name}</Typography>;
       },
@@ -147,33 +118,11 @@ export default function InvoicePage() {
     },
     {
       id: 'invoice_date',
-      label: 'Invoice Date',
+      label: 'Transfer Date',
       format: ({ transfer_date }) => {
         return (
           <Typography variant="body1">
             {moment(transfer_date * 1000).format('DD/MM/YYYY')}
-          </Typography>
-        );
-      },
-    },
-    {
-      id: 'amount',
-      label: 'Invoice Amount',
-      format: ({ amount }) => {
-        return (
-          <Typography variant="body1">
-            Rp. {numberSeperator(amount || 0)}
-          </Typography>
-        );
-      },
-    },
-    {
-      id: 'paid_amount',
-      label: 'Paid Off Amount',
-      format: ({ paid_amount }) => {
-        return (
-          <Typography variant="body1">
-            Rp. {numberSeperator(paid_amount || 0)}
           </Typography>
         );
       },
@@ -190,6 +139,41 @@ export default function InvoicePage() {
       },
     },
     {
+      id: 'amount',
+      label: 'Invoice Amount',
+      minWidth: '150px',
+      format: ({ amount }) => {
+        return (
+          <Typography variant="body1">
+            Rp. {numberSeperator(amount || 0)}
+          </Typography>
+        );
+      },
+    },
+    {
+      id: 'interes_rate',
+      label: 'Interest Rate',
+      minWidth: '150px',
+      format: ({ amount, admin_fee, interest_rate }) => {
+        return (
+          <Typography variant="body1">
+            {interest_rate === 0 ? 3 : interest_rate}%
+          </Typography>
+        );
+      },
+    },
+    {
+      id: 'paid_amount',
+      label: 'Paid Off Amount',
+      format: ({ paid_amount }) => {
+        return (
+          <Typography variant="body1">
+            Rp. {numberSeperator(paid_amount || 0)}
+          </Typography>
+        );
+      },
+    },
+    {
       id: 'last_paid',
       label: 'Last Paid',
       format: ({ last_paid }) => {
@@ -199,6 +183,46 @@ export default function InvoicePage() {
               ? moment(last_paid * 1000).format('DD/MM/YYYY')
               : '-'}
           </Typography>
+        );
+      },
+    },
+    {
+      id: 'invoice_restructure_type',
+      label: 'Restructure Type',
+      align: 'center',
+      format: ({ invoice_restructure_type }) => {
+        return (
+          <Typography variant="body1">
+            {invoice_restructure_type.name || '-'}
+          </Typography>
+        );
+      },
+    },
+    {
+      id: 'invoice_type',
+      label: 'Invoice Type',
+      format: ({ invoice_type }) => {
+        return (
+          <Typography variant="body1">{invoice_type?.name || '-'}</Typography>
+        );
+      },
+    },
+    {
+      id: 'status',
+      label: 'Status',
+      align: 'center',
+      format: ({ status }) => {
+        const color =
+          // eslint-disable-next-line no-nested-ternary
+          status === 'Late'
+            ? 'error'
+            : status === 'On Schedule'
+            ? 'success'
+            : 'info';
+        return (
+          <Label variant="filled" color={color}>
+            {status}
+          </Label>
         );
       },
     },
@@ -293,7 +317,7 @@ export default function InvoicePage() {
                 Create Invoice
               </Button>
               <TextField
-                placeholder="Search for Invoice Number"
+                placeholder="Search"
                 size="small"
                 sx={{ bgcolor: '#ebeff3', maxWidth: '560px', flex: 1 }}
                 fullWidth
@@ -509,6 +533,47 @@ export default function InvoicePage() {
                         ),
                     )}
                     options={queryInnvoice.restructureList}
+                    getOptionLabel={(option) => `${option.name}`}
+                    renderInput={(params) => {
+                      return (
+                        <TextField
+                          {...params}
+                          name="grade"
+                          placeholder="Select Restructure type"
+                          variant="outlined"
+                        />
+                      );
+                    }}
+                  />
+                </FormLabel>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <FormLabel text="User Type">
+                  <Autocomplete
+                    id="filterGrade"
+                    onChange={(e, value) => {
+                      queryInnvoice.formikParams.setFieldValue(
+                        'user_type_id',
+                        value?.id,
+                      );
+                    }}
+                    value={Object.keys(Type)
+                      .map((val) => ({
+                        id: val,
+                        // @ts-ignore
+                        name: Type[val],
+                      }))
+                      .find(
+                        (val) =>
+                          val.id ===
+                          (queryInnvoice.formikParams.values.user_type_id ||
+                            null),
+                      )}
+                    options={Object.keys(Type).map((val) => ({
+                      id: val,
+                      // @ts-ignore
+                      name: Type[val],
+                    }))}
                     getOptionLabel={(option) => `${option.name}`}
                     renderInput={(params) => {
                       return (

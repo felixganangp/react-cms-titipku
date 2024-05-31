@@ -23,6 +23,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers';
 import moment from 'moment';
 import useModal from 'hooks/useModal';
 import InputImage from 'components/InputImage';
+import bankData from 'data/list-bank.json';
 import { useCreateCustomer, useCustomerDetails } from '../../hooks/useCustomer';
 import { step1Key, step2Key, Type } from '../../hooks/constumer.config';
 import { SteperHeader } from './SteperHeader';
@@ -35,6 +36,7 @@ export default function FormCustomer({
   handleClose: (isSubmited: boolean) => void;
 }) {
   const openCalender = useModal();
+  const openCalenderDisburse = useModal();
   const [step, setStep] = useState<number>(1);
   const areaParams = UseParams({ count: 25 });
   const areaQuery = useQuery({
@@ -451,6 +453,62 @@ export default function FormCustomer({
           />
         </FormControl>
         <FormControl
+          text="Destination Bank"
+          error={formik.touched.bank_name && Boolean(formik.errors.bank_name)}
+          helperText={
+            formik.touched.bank_name &&
+            formik.errors.bank_name &&
+            `${formik.errors.bank_name}`
+          }
+        >
+          <Autocomplete
+            data-testid="form-customer-list-bank"
+            id="list-bank"
+            options={bankData.data}
+            onChange={(e, value) => {
+              formik.setFieldValue('bank_name', value?.code);
+            }}
+            isOptionEqualToValue={(option: { name: string; code: string }) => {
+              // @ts-ignore
+              return option.name === formik.values.bank_name?.name;
+            }}
+            getOptionLabel={(option) => `${option.name}`}
+            value={
+              bankData.data.find(
+                (val) => val.code === formik.values.bank_name,
+              ) || null
+            }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                name="bank_name"
+                onBlur={formik.handleBlur}
+                placeholder="Seleck bank"
+              />
+            )}
+          />
+        </FormControl>
+        <FormControl
+          text="Destination Bank Account"
+          error={
+            formik.touched.bank_account && Boolean(formik.errors.bank_account)
+          }
+          helperText={
+            formik.touched.bank_account &&
+            formik.errors.bank_account &&
+            `${formik.errors.bank_account}`
+          }
+        >
+          <TextField
+            fullWidth
+            placeholder="Insert destination bank"
+            value={formik.values.bank_account}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            name="bank_account"
+          />
+        </FormControl>
+        <FormControl
           text="Limit request plafon"
           required
           error={
@@ -536,10 +594,131 @@ export default function FormCustomer({
             }}
           />
         </FormControl>
+        <FormControl
+          text="Limit plafon"
+          required
+          error={
+            formik.touched.limit_plafon && Boolean(formik.errors.limit_plafon)
+          }
+          helperText={
+            formik.touched.limit_plafon ? formik.errors.limit_plafon : ''
+          }
+        >
+          <TextField
+            fullWidth
+            placeholder="Input plafon"
+            name="limit_plafon"
+            onBlur={formik.handleBlur}
+            onKeyDown={(evt) =>
+              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+            }
+            error={
+              formik.touched.limit_plafon && Boolean(formik.errors.limit_plafon)
+            }
+            value={numberSeperator(formik.values.limit_plafon)}
+            onChange={(e) => {
+              const value = e.target.value
+                // @ts-ignore
+                .replaceAll('.', '')
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
+
+              formik.setFieldValue('limit_plafon', parseInt(value || '0'));
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">Rp</InputAdornment>
+              ),
+            }}
+          />
+        </FormControl>
+        <FormControl
+          text="Limit cash"
+          required
+          error={formik.touched.limit_cash && Boolean(formik.errors.limit_cash)}
+          helperText={formik.touched.limit_cash ? formik.errors.limit_cash : ''}
+        >
+          <TextField
+            fullWidth
+            placeholder="Input limit cash"
+            name="limit_cash"
+            onBlur={formik.handleBlur}
+            onKeyDown={(evt) =>
+              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+            }
+            error={
+              formik.touched.limit_cash && Boolean(formik.errors.limit_cash)
+            }
+            value={numberSeperator(formik.values.limit_cash)}
+            onChange={(e) => {
+              const value = e.target.value
+                // @ts-ignore
+                .replaceAll('.', '')
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
+
+              formik.setFieldValue('limit_cash', parseInt(value || '0'));
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">Rp</InputAdornment>
+              ),
+            }}
+          />
+        </FormControl>
+        <FormControl
+          text="Disburse Date"
+          required
+          error={
+            formik.touched.disburse_date && Boolean(formik.errors.disburse_date)
+          }
+          helperText={
+            formik.touched.disburse_date ? formik.errors.disburse_date : ''
+          }
+        >
+          <DesktopDatePicker
+            maxDate={moment()}
+            open={openCalenderDisburse.open}
+            onOpen={() => {
+              formik.setFieldTouched('disburse_date');
+            }}
+            onClose={openCalenderDisburse.closeModal}
+            onChange={(value) => {
+              formik.setFieldValue('disburse_date', value?.unix());
+            }}
+            value={moment.unix(
+              // @ts-ignore
+              formik.values.disburse_date || moment.unix(),
+            )}
+            // slotProps={{
+            //   textField: {
+            //     fullWidth: true,
+            //     onBlur: () => {
+            //       formik.setFieldTouched('disburse_date');
+            //     },
+            //   },
+            // }}
+            // onClose={openDateSelect.toggleModal}
+            renderInput={(params) => {
+              return (
+                <TextField
+                  {...params}
+                  onClick={openCalenderDisburse.toggleModal}
+                  name="disburse_date"
+                  onBlur={formik.handleBlur}
+                  placeholder="Select Grade"
+                  variant="outlined"
+                  fullWidth
+                  // onClick={openDateSelect.toggleModal}
+                />
+              );
+            }}
+          />
+        </FormControl>
       </Box>
       <Box display={step === 2 ? 'block' : 'none'}>
         <FormControl
-          text="GVM"
+          text="GMV"
           required
           error={formik.touched.gmv && Boolean(formik.errors.gmv)}
           helperText={formik.touched.gmv ? formik.errors.gmv : ''}

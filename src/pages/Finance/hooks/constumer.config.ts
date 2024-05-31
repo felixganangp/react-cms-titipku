@@ -14,6 +14,8 @@ export const initialValues = {
   marriage_partner_name: '',
   limit_request_plafon: '',
   limit_request_cash: '',
+  limit_plafon: '',
+  limit_cash: '',
   business_lifetime: '',
   user_type_id: null,
   is_merchant_titipku: true,
@@ -34,6 +36,10 @@ export const initialValues = {
   nik_partner_image: '',
   divorce_papers_image: '',
   geotag_image: [],
+  // BANK
+  bank_name: '',
+  bank_account: '',
+  disburse_date: '',
 };
 
 export const step1Key = [
@@ -45,6 +51,8 @@ export const step1Key = [
   'category_jelajah',
   'limit_request_plafon',
   'limit_request_cash',
+  'limit_plafon',
+  'limit_cash',
   'business_lifetime',
   'user_type_id',
   'is_merchant_titipku',
@@ -93,13 +101,19 @@ export const userDataKey = [
   'category_jelajah_name',
   'limit_request_plafon',
   'limit_request_cash',
+  'limit_plafon',
+  'limit_cash',
   'business_lifetime',
   'user_type_id',
   'is_merchant_titipku',
   'marriage_status',
   'marriage_partner_name',
   'nik_partner',
+  'bank_name',
+  'bank_account',
+  'disburse_date',
 ];
+
 export const idirDataKey = [
   ...step2Key,
   'marriage_status',

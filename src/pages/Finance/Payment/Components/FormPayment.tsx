@@ -14,8 +14,11 @@ import {
   Box,
   Button,
   ButtonBase,
+  FormControlLabel,
   IconButton,
   InputAdornment,
+  Radio,
+  RadioGroup,
   Stack,
   TextField,
   Typography,
@@ -34,7 +37,8 @@ import SelectCustomer from '../../Components/SelectCustomer';
 import { KurType } from '../../hooks/useConfigFinance';
 
 const paymentMethod = [
-  { name: 'Transfer', value: 'transfer' },
+  { name: 'Bank Transfer', value: 'transfer' },
+  { name: 'Qris', value: 'qris' },
   { name: 'Cash', value: 'cash' },
 ];
 type Props = {
@@ -50,6 +54,7 @@ export default function FormPayment({ onClose }: Props) {
 
   const formik = useFormik({
     initialValues: {
+      invoice_type_id: '1',
       user: null,
       amount: '',
       payment_date: null,
@@ -118,6 +123,7 @@ export default function FormPayment({ onClose }: Props) {
           // @ts-ignore
           user_id: values?.user?.id || 0,
           payment_date: moment(values.payment_date).unix(),
+          invoice_type_id: values.invoice_type_id,
         },
         {
           onSuccess: (data) => {
@@ -145,11 +151,33 @@ export default function FormPayment({ onClose }: Props) {
         setSimulationPayment(formik.values);
       }
     }
-  }, [formik.values.amount, formik.values.user, formik.values.payment_date]);
+  }, [
+    formik.values.amount,
+    formik.values.user,
+    formik.values.payment_date,
+    formik.values.invoice_type_id,
+  ]);
 
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
       <Box p="24px">
+        <FormControl
+          text="Invoice Type"
+          required
+          // error={touched.name && Boolean(errors.name)}
+          // helperText={touched.name && errors.name && `${errors.name}`}
+        >
+          <RadioGroup
+            row
+            aria-labelledby="demo-row-radio-buttons-group-label"
+            name="invoice_type_id"
+            value={formik.values.invoice_type_id}
+            onChange={formik.handleChange}
+          >
+            <FormControlLabel value="1" control={<Radio />} label="Normal" />
+            <FormControlLabel value="2" control={<Radio />} label="Cash" />
+          </RadioGroup>
+        </FormControl>
         <FormControl
           text="Merchant"
           required
@@ -397,7 +425,7 @@ export default function FormPayment({ onClose }: Props) {
           />
         </FormControl>
         <FormControl
-          text="Proof Payment"
+          text="Proof of Payment"
           required
           error={
             formik.touched.proof_of_payment &&

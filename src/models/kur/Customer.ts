@@ -58,6 +58,7 @@ export type CustomerDetail = {
   bi_checking_status: string;
   bi_checking_notes: string;
   komite_notes: string;
+  reject_notes: string;
   is_merchant_titipku: boolean;
   area_id: number;
   area_name: string;
@@ -78,6 +79,9 @@ export type CustomerDetail = {
   user_documents: CustomerDocument[];
   user_status_history: CustomerStatusHistory[];
   user_geotag_images: GeoLocation[];
+  bi_checking_status_id: number;
+  bank_name: string;
+  bank_account: string;
 };
 
 export type CustomerDocument = {

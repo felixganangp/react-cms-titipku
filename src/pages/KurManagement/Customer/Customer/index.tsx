@@ -42,6 +42,12 @@ import { MerchantResp } from 'models/Merchant';
 import debounce from 'utils/debounce';
 import { getColorCreditScore } from 'utils/creditScoreColor';
 import bankData from 'data/list-bank.json';
+import FormCustomer from 'pages/Finance/Customer/Components/Form';
+import { useMutation } from '@tanstack/react-query';
+import { getDownloadPdfUser } from 'service/Kur/Customer';
+import useLoadingSpinner from 'hooks/useLoadingSpinner';
+import { base64toOpen } from 'utils/base64toDownload';
+import useToast from 'hooks/useToast';
 
 // import FormCustomer from '../Verification/components/form';
 
@@ -51,12 +57,17 @@ interface FormDataType {
 }
 
 export default function KurCustomer() {
+  const { openToast } = useToast();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const customerKur = useAppSelector((state) => state.customerKur);
-  const typeKur = useAppSelector((state) => state.typeKur);
+  // const typeKur = useAppSelector((state) => state.typeKur);
   const areaKur = useAppSelector((state) => state.area);
-  const creditScore = useAppSelector((state) => state.creditScore);
+  // const creditScore = useAppSelector((state) => state.creditScore);
+  const createUserModal = useModal();
+  const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
+  const generatePDF = useMutation(getDownloadPdfUser);
+  const { setLoading } = useLoadingSpinner();
 
   // useEffect(() => {
   //   dispatch(customerAction.fetchData(customerKur.params));
@@ -83,6 +94,8 @@ export default function KurCustomer() {
     dispatch(
       customerAction.fetchData({
         status: 6,
+        page: customerKur.params.page,
+        search: customerKur.params.search,
       }),
     );
   }, [
@@ -132,17 +145,17 @@ export default function KurCustomer() {
     isEdit: false,
     initialData,
   });
-  useEffect(() => {
-    if (
-      customerKur.stateFilter?.areaKur &&
-      customerKur.stateFilter?.areaKur.length > 0
-    ) {
-      setOpenFilter(true);
-    }
-    dispatch(typeAction.fetchData());
-    dispatch(areaAction.fetchData());
-    dispatch(creditScoreAction.fetchData());
-  }, []);
+  // useEffect(() => {
+  //   if (
+  //     customerKur.stateFilter?.areaKur &&
+  //     customerKur.stateFilter?.areaKur.length > 0
+  //   ) {
+  //     setOpenFilter(true);
+  //   }
+  //   dispatch(typeAction.fetchData());
+  //   dispatch(areaAction.fetchData());
+  //   dispatch(creditScoreAction.fetchData());
+  // }, []);
 
   const [inputValueArea, setInputValueArea] = useState('');
 
@@ -257,7 +270,36 @@ export default function KurCustomer() {
               {
                 label: `Edit`,
                 onClick: () => {
-                  console.log('edit');
+                  createUserModal.openModal();
+                  setSelectedIdUser(val.id);
+                },
+                dataId: 'button-edit-customer',
+              },
+              {
+                label: `Generate Invoice`,
+                onClick: () => {
+                  setLoading(true);
+                  generatePDF.mutate(val.id.toString(), {
+                    onSuccess: (data) => {
+                      setLoading(false);
+                      openToast({
+                        headMsg: 'Success to generate PDF',
+                        severity: 'success',
+                      });
+                      base64toOpen(
+                        // @ts-ignore
+                        data.data,
+                        `${val.user_number} - ${val.debtor_name}(${val.merchant_name}).pdf`,
+                      );
+                    },
+                    onError: (error) => {
+                      openToast({
+                        headMsg: 'Failed to generate PDF',
+                        severity: 'error',
+                      });
+                      setLoading(false);
+                    },
+                  });
                 },
                 dataId: 'button-edit-customer',
               },
@@ -310,6 +352,7 @@ export default function KurCustomer() {
         },
       ),
     );
+    console.log('value', value);
     // }
     dispatch(
       customerAction.setParams({
@@ -483,7 +526,7 @@ export default function KurCustomer() {
         <Grid item xs={12}>
           <Card>
             <Typography data-testid="header-page" variant="titlePage">
-              KUR Customer
+              Merchant List
             </Typography>
           </Card>
         </Grid>
@@ -512,7 +555,7 @@ export default function KurCustomer() {
                 >
                   <TextField
                     data-testid="search-customer"
-                    placeholder="Search Customer"
+                    placeholder="Search Merchant"
                     size="small"
                     sx={{ bgcolor: '#fafafa', maxWidth: '560px', flex: 1 }}
                     fullWidth
@@ -610,6 +653,7 @@ export default function KurCustomer() {
                     onInputChange={(_, newInputValue) => {
                       setInputValueArea(newInputValue);
                     }}
+                    // @ts-ignore
                     value={customerKur?.stateFilter?.areaKur}
                     limitTags={3}
                     renderInput={(params) => {
@@ -732,6 +776,27 @@ export default function KurCustomer() {
       {/* <Modal open={formModal.open} title={formHead} onClose={formHandleClose}>
         <FormCustomer onClose={formHandleClose} formData={formData} />
       </Modal> */}
+      <Modal
+        open={createUserModal.open}
+        onClose={createUserModal.closeModal}
+        title={selectedIdUser ? 'Update Merchant' : 'Create Merchant'}
+      >
+        <FormCustomer
+          id={selectedIdUser}
+          handleClose={(isSubmite) => {
+            if (isSubmite) {
+              dispatch(
+                customerAction.fetchData({
+                  status: 6,
+                  page: customerKur.params.page,
+                  search: customerKur.params.search,
+                }),
+              );
+            }
+            createUserModal.closeModal();
+          }}
+        />
+      </Modal>
     </Box>
   );
 }

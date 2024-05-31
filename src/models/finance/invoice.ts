@@ -41,6 +41,7 @@ export type InvoiceListType = {
   due_date: number;
   last_paid: number;
   status: string;
+  interest_rate: number;
 };
 
 export type InvoiceDetailsType = {
@@ -74,6 +75,7 @@ export type InvoiceDetailsType = {
   outstanding_amount: number;
   status: string;
   dpd_amount: number;
+  invoice_details: InvoiceDetails[];
 };
 
 export type User = {
@@ -110,4 +112,19 @@ export type User = {
   created_at: number;
   updated_at: number;
   deleted_at: null;
+};
+
+export type InvoiceDetails = {
+  id: number;
+  amount: number;
+  created_at: number;
+  created_by: number;
+  deleted_at: number;
+  deleted_by: number;
+  dpd_amount: number;
+  due_date: number;
+  invoice_id: number;
+  status: string;
+  updated_at: number;
+  updated_by: number;
 };

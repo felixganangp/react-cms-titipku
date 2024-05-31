@@ -1,6 +1,6 @@
 /* eslint-disable radix */
 import React, { useEffect, useState } from 'react';
-import { Box, Grid, Card, Stack, Typography } from '@mui/material';
+import { Box, Grid, Card, Stack, Typography, Button } from '@mui/material';
 import moment from 'moment';
 
 import DescDetails from 'components/DescDetails';
@@ -35,8 +35,13 @@ import { RequestKUR } from 'models/kur/Request';
 import { PaymentKUR } from 'models/kur/Payment';
 import { InvoiceKur, InvoiceKurDetail } from 'models/kur/Invoice';
 
-import { CalendarMonth } from '@mui/icons-material';
-import { Button } from 'react-day-picker';
+import { CalendarMonth, KeyboardArrowDown } from '@mui/icons-material';
+import MenuList from 'components/MenuList';
+import { useMutation } from '@tanstack/react-query';
+import { getDownloadPdfUser } from 'service/Kur/Customer';
+import useLoadingSpinner from 'hooks/useLoadingSpinner';
+import useToast from 'hooks/useToast';
+import { base64toOpen } from 'utils/base64toDownload';
 import { TitlePage, BackButton, Menu } from './details.styled';
 
 function StatusColor(string: string | undefined) {
@@ -66,33 +71,15 @@ export default function CustomerDetails() {
     open: false,
     filePath: null,
   });
+  const generatePDF = useMutation(getDownloadPdfUser);
+  const { setLoading } = useLoadingSpinner();
+  const { openToast } = useToast();
 
   useEffect(() => {
     if (id) {
       const idCust = parseInt(id);
       // Fetch
       dispatch(customerAction.fetchDataDetail({ id }));
-      dispatch(
-        requestKURAction.fetchData({
-          ...request.params,
-          kur_user_id: idCust,
-          count: 5,
-        }),
-      );
-      dispatch(
-        paymentKURAction.fetchData({
-          ...payment.params,
-          kur_user_id: idCust,
-          count: 5,
-        }),
-      );
-      dispatch(
-        invoiceKurAction.fetchData({
-          ...invoice.params,
-          kur_user_id: idCust,
-          count: 5,
-        }),
-      );
       // Set Params
       dispatch(
         requestKURAction.setParams({
@@ -200,6 +187,18 @@ export default function CustomerDetails() {
       invoice: customerKur.details?.limit_plafon,
       cash: customerKur.details?.limit_cash,
     };
+  };
+
+  const getBiCheckingNotes = (biId: number | undefined) => {
+    let stat = '';
+    if (biId === 1) {
+      stat = 'Conforming';
+    } else if (biId === 2) {
+      stat = 'Conforming with notes';
+    } else if (biId === 3) {
+      stat = 'Not Conforming';
+    }
+    return stat;
   };
 
   const headCellRequest: HeadCells<RequestKUR>[] = [
@@ -535,18 +534,61 @@ export default function CustomerDetails() {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Card>
-              <Menu>Kredit Usaha Rakyat</Menu>
-              <Box
-                style={{ textDecoration: 'none' }}
-                onClick={() => navigate(-1)}
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
               >
-                <BackButton
-                  sx={{ '&:hover': { backgroundColor: '#ffff' } }}
-                  startIcon={<ArrowBackIosIcon />}
+                <Box>
+                  <Menu>Kredit Usaha Rakyat</Menu>
+                  <Box
+                    style={{ textDecoration: 'none' }}
+                    onClick={() => navigate(-1)}
+                  >
+                    <BackButton
+                      sx={{ '&:hover': { backgroundColor: '#ffff' } }}
+                      startIcon={<ArrowBackIosIcon />}
+                    >
+                      <TitlePage>Customer Detail</TitlePage>
+                    </BackButton>
+                  </Box>
+                </Box>
+                <MenuList
+                  menu={[
+                    {
+                      label: `Genenerate Invoice`,
+                      onClick: () => {
+                        setLoading(true);
+                        // @ts-ignore
+                        generatePDF.mutate(id.toString(), {
+                          onSuccess: (data) => {
+                            setLoading(false);
+                            openToast({
+                              headMsg: 'Success to generate PDF',
+                              severity: 'success',
+                            });
+                            base64toOpen(
+                              // @ts-ignore
+                              data.data,
+                              `${customerKur.details?.user_number} - ${customerKur.details?.debtor_name}(${customerKur.details?.merchant_name}).pdf`,
+                            );
+                          },
+                          onError: (error) => {
+                            openToast({
+                              headMsg: 'Failed to generate PDF',
+                              severity: 'error',
+                            });
+                            setLoading(false);
+                          },
+                        });
+                      },
+                      dataId: 'button-edit-customer',
+                    },
+                  ]}
                 >
-                  <TitlePage>Customer Detail</TitlePage>
-                </BackButton>
-              </Box>
+                  <Button endIcon={<KeyboardArrowDown />}>Action</Button>
+                </MenuList>
+              </Stack>
             </Card>
           </Grid>
         </Grid>
@@ -687,6 +729,16 @@ export default function CustomerDetails() {
                   icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
                   content={`RP ${digitFormatter.format(getLimit().cash || 0)}`}
                 />
+                <DescDetails
+                  title="Bank"
+                  icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={customerKur.details?.bank_name}
+                />
+                <DescDetails
+                  title="Bank"
+                  icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={customerKur.details?.bank_account}
+                />
               </Grid>
             </Grid>
           </Box>
@@ -819,6 +871,45 @@ export default function CustomerDetails() {
               </Stack>
             ))}
           </Stack>
+        </SubDetailsPagesWrapper>
+
+        <SubDetailsPagesWrapper title="Verification Data" defaultOpen>
+          <Box p="20px">
+            <Grid container spacing={2}>
+              <Grid
+                item
+                xs={6}
+                md={3}
+                gap="20px"
+                display="flex"
+                flexDirection="column"
+                alignItems="start"
+              >
+                <DescDetails
+                  title="BI Checking Status"
+                  icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={getBiCheckingNotes(
+                    customerKur.details?.bi_checking_status_id,
+                  )}
+                />
+                <DescDetails
+                  title="BI Checking Notes"
+                  icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={customerKur.details?.bi_checking_notes}
+                />
+                <DescDetails
+                  title="Komite Notes"
+                  icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={customerKur.details?.komite_notes}
+                />
+                <DescDetails
+                  title="Reject Notes"
+                  icon={<InfoOutlinedIcon sx={{ color: '#008e58' }} />}
+                  content={customerKur.details?.reject_notes}
+                />
+              </Grid>
+            </Grid>
+          </Box>
         </SubDetailsPagesWrapper>
 
         {/* <SubDetailsPagesWrapper title="KUR History" defaultOpen>

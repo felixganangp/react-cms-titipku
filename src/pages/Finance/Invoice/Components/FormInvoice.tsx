@@ -62,6 +62,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
       installment_period: '',
       provision_installment_period: '',
       nota_image: '',
+      interest_rate: 0,
     },
     validationSchema: yup.object({
       user: yup.object().nullable().required('Required'),
@@ -70,6 +71,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
         .min(2, 'Please enter a minimum required amount.')
         .required('Required'),
       transfer_date: yup.mixed().nullable().required('Required'),
+      interest_rate: yup.number().nullable().required('Required').min(0),
       destination_bank: yup.mixed().when('invoice_type_id', {
         is: (val: any) => val === '1',
         then: yup.object().nullable().required('Required'),
@@ -86,11 +88,14 @@ export default function FormInvoice(props: FormInvoiceProps) {
         is: (val: any) => val === '2',
         then: yup.string().required('Required'),
       }),
-      provision_installment_period: yup
-        .number()
-        .min(0, 'Min 0 period')
-        .max(36, 'Max 36 period')
-        .required('Required'),
+      provision_installment_period: yup.number().when('user', {
+        is: (val: any) => val?.need_provision,
+        then: yup
+          .number()
+          .min(0, 'Min 0 period')
+          .max(36, 'Max 36 period')
+          .required('Required'),
+      }),
       nota_image: yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
@@ -157,6 +162,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
           amount: formik.values.loan_amount,
           period: value,
           start_date: moment(formik.values.transfer_date).unix(),
+          interest_rate: formik.values.interest_rate,
         },
         {
           onSuccess: (data) => {
@@ -182,6 +188,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
     formik.values.loan_amount,
     formik.values.transfer_date,
     formik.values.installment_period,
+    formik.values.interest_rate,
   ]);
 
   return (
@@ -230,9 +237,9 @@ export default function FormInvoice(props: FormInvoiceProps) {
                   {numberSeperator(
                     (formik.values.invoice_type_id === '1'
                       ? // @ts-ignore
-                        formik.values.user?.limit_plafon
+                        formik.values.user?.available_limit_plafon
                       : // @ts-ignore
-                        formik.values.user?.limit_cash) || 0,
+                        formik.values.user?.available_limit_cash) || 0,
                   )}
                 </Typography>
               </Stack>
@@ -470,6 +477,37 @@ export default function FormInvoice(props: FormInvoiceProps) {
             </FormControl>
           </>
         )}
+        <FormControl
+          text="Admin Fee"
+          required
+          error={
+            formik.touched.interest_rate && Boolean(formik.errors.interest_rate)
+          }
+          helperText={
+            formik.touched.interest_rate &&
+            formik.errors.interest_rate &&
+            `${formik.errors.interest_rate}`
+          }
+        >
+          <TextField
+            type="text"
+            name="interest_rate"
+            placeholder="Insert Admin Fee"
+            InputProps={{
+              endAdornment: <InputAdornment position="start">%</InputAdornment>,
+            }}
+            fullWidth
+            autoComplete="off"
+            value={numberSeperator(formik.values.interest_rate || '')}
+            onChange={(e) => {
+              const value = e.target.value
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
+
+              formik.setFieldValue('interest_rate', value);
+            }}
+          />
+        </FormControl>
         {formik.values.invoice_type_id === '2' && (
           <>
             <FormControl
@@ -514,13 +552,13 @@ export default function FormInvoice(props: FormInvoiceProps) {
                       bgcolor="#dedede"
                     >
                       <Stack>
-                        <Typography>Due Data</Typography>
+                        <Typography>Due Date</Typography>
                         <Typography>
                           {moment(item.due_date * 1000).format('DD-MM-YYYY')}
                         </Typography>
                       </Stack>
                       <Stack>
-                        <Typography>Installment per Amount</Typography>
+                        <Typography>Installment per Month</Typography>
                         <Typography>
                           Rp. {numberSeperator(item?.amount || 0)}
                         </Typography>
@@ -532,32 +570,39 @@ export default function FormInvoice(props: FormInvoiceProps) {
             </FormControl>
           </>
         )}
+        {/* @ts-ignore */}
+        {((formik.values.user?.need_provision_cash &&
+          formik.values.invoice_type_id === '2') ||
+          // @ts-ignore
+          (formik.values.user?.need_provision_normal &&
+            formik.values.invoice_type_id === '1')) && (
+          <FormControl
+            text="Provision Installment Period"
+            required
+            error={
+              formik.touched.provision_installment_period &&
+              Boolean(formik.errors.provision_installment_period)
+            }
+            helperText={
+              formik.touched.provision_installment_period &&
+              formik.errors.provision_installment_period &&
+              `${formik.errors.provision_installment_period}`
+            }
+          >
+            <TextField
+              fullWidth
+              placeholder="Insert Provision Installment Period"
+              value={formik.values.provision_installment_period}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              name="provision_installment_period"
+              type="number"
+              // @ts-ignore
+              onWheel={(e) => e.target?.blur()}
+            />
+          </FormControl>
+        )}
 
-        <FormControl
-          text="Provision Installment Period"
-          required
-          error={
-            formik.touched.provision_installment_period &&
-            Boolean(formik.errors.provision_installment_period)
-          }
-          helperText={
-            formik.touched.provision_installment_period &&
-            formik.errors.provision_installment_period &&
-            `${formik.errors.provision_installment_period}`
-          }
-        >
-          <TextField
-            fullWidth
-            placeholder="Insert Provision Installment Period"
-            value={formik.values.provision_installment_period}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            name="provision_installment_period"
-            type="number"
-            // @ts-ignore
-            onWheel={(e) => e.target?.blur()}
-          />
-        </FormControl>
         <FormControl
           text="Note Image"
           required
@@ -612,6 +657,11 @@ export default function FormInvoice(props: FormInvoiceProps) {
         onClose={customerModal.closeModal}
         setSelected={(e) => {
           formik.setFieldValue('user', e);
+          formik.setFieldValue('destination_bank_account', e.bank_account);
+          formik.setFieldValue(
+            'destination_bank',
+            bankData.data.find((item) => item.code === e.bank_name),
+          );
         }}
       />
     </Box>

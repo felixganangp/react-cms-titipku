@@ -177,7 +177,7 @@ export function useCreateCustomer({
           },
           onError: (value) => {
             openToast({
-              headMsg: 'Failed update user',
+              headMsg: 'Failed create user',
               message: '',
               severity: 'error',
             });
@@ -247,6 +247,16 @@ export function useCreateCustomer({
         .min(1, 'Cant be less than 1')
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
+      limit_plafon: yup
+        .number()
+        .min(1, 'Cant be less than 1')
+        .max(2147483647, 'Must be less than or equal to 2147483647')
+        .required('This field is required'),
+      limit_cash: yup
+        .number()
+        .min(1, 'Cant be less than 1')
+        .max(2147483647, 'Must be less than or equal to 2147483647')
+        .required('This field is required'),
       business_lifetime: yup.string().required('This field is required'),
       user_type_id: yup.string().nullable().required('This field is required'),
       gmv: yup
@@ -281,7 +291,7 @@ export function useCreateCustomer({
         .required('This field is required'),
       another_loan: yup
         .number()
-        .min(1, 'Cant be less than 1')
+        .min(0, 'Cant be less than 0')
         .max(2147483647, 'Must be less than or equal to 2147483647')
         .required('This field is required'),
       cash_out_purpose: yup
@@ -348,6 +358,9 @@ export function useCreateCustomer({
         marriage_partner_name: detail.marriage_partner_name,
         limit_request_plafon: detail.limit_request_plafon,
         limit_request_cash: detail.limit_request_cash,
+        limit_plafon: detail.limit_plafon || 0,
+        limit_cash: detail.limit_cash || 0,
+        disburse_date: detail.disburse_date,
         business_lifetime: detail.business_lifetime,
         user_type_id: detail.user_type.id,
         is_merchant_titipku: detail.is_merchant_titipku,
@@ -362,6 +375,8 @@ export function useCreateCustomer({
         // geotag_image: detail.user_geotag_images.map(
         //   (val) => val.image_filepath,
         // ),
+        bank_account: detail.bank_account,
+        bank_name: detail.bank_name,
       };
       Object.keys(Document).map((val) => {
         const doc = detail.user_documents.find(

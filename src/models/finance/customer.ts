@@ -7,6 +7,7 @@ export type CustomerDetailType = {
   phone_number: string;
   family_phone_number: string;
   business_lifetime: number;
+  disburse_date: number;
   marriage_status: string;
   marriage_partner_name: string;
   limit_request_plafon: number;
@@ -38,6 +39,8 @@ export type CustomerDetailType = {
   user_documents: UserDocument[];
   user_status_history: UserStatusHistory[];
   user_geotag_images: GeoLocation[];
+  bank_account: string;
+  bank_name: string;
 };
 
 export type User = {
