@@ -323,6 +323,7 @@ export function useCreateCustomer({
         is: 'cerai',
         then: () => yup.mixed().required('This field is required'),
       }),
+      bank_account: yup.number().typeError('Must be a number'),
       marriage_partner_name: yup.string().when('marriage_status', {
         is: 'kawin',
         then: () =>
