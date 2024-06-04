@@ -161,6 +161,7 @@ export interface Customer {
   batch_id: number | null;
   balance: number;
   created_at: number;
+  disburse_date: number;
   updated_at: number | null;
   deleted_at: number | null;
   user_status: CustomerStatus;

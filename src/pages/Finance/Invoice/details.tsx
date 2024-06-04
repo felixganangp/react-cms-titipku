@@ -138,7 +138,8 @@ export default function InvoiceDetails() {
         <AccordionOnDetails defaultOpen title="Invoice">
           <Card>
             <Typography variant="h2" fontWeight="bold">
-              {invoiceDetails.details?.user.merchant_name}
+              {invoiceDetails.details?.user.debtor_name} (
+              {invoiceDetails.details?.user.user_number})
             </Typography>
             <Grid container spacing={2} mt={2}>
               <Grid item xs={6} sm={9}>
@@ -153,7 +154,7 @@ export default function InvoiceDetails() {
                   </Grid>
 
                   <Grid item sm={4}>
-                    <Typography color="primary">Debtor Name</Typography>
+                    <Typography color="primary">Merchant Name</Typography>
                     <Typography>
                       {invoiceDetails.details?.user.merchant_name}
                     </Typography>
@@ -216,12 +217,20 @@ export default function InvoiceDetails() {
                       )}
                     </Typography>
                   </Grid>
+                  <Grid item sm={4}>
+                    <Typography color="primary">Outstanding Amount</Typography>
+                    <Typography>
+                      Rp{' '}
+                      {numberSeperator(
+                        invoiceDetails.details?.outstanding_amount || 0,
+                      )}
+                    </Typography>
+                  </Grid>
+
                   {invoiceDetails.details?.invoice_type_id === 1 && (
                     <>
                       <Grid item sm={4}>
-                        <Typography color="primary">
-                          Bank Destination
-                        </Typography>
+                        <Typography color="primary">Bank Name</Typography>
                         <Typography>
                           {bankData.data.find(
                             (val) =>
@@ -231,51 +240,23 @@ export default function InvoiceDetails() {
                         </Typography>
                       </Grid>
                       <Grid item sm={4}>
-                        <Typography color="primary">
-                          Bank Destination Account{' '}
-                        </Typography>
+                        <Typography color="primary">Bank Account</Typography>
                         <Typography>
                           {invoiceDetails.details?.destination_bank_account}
                         </Typography>
                       </Grid>
-                      <Grid item sm={4}>
-                        <Typography color="primary">
-                          Outstanding Amount
-                        </Typography>
-                        <Typography>
-                          Rp{' '}
-                          {numberSeperator(
-                            invoiceDetails.details?.outstanding_amount || 0,
-                          )}
-                        </Typography>
-                      </Grid>
                     </>
                   )}
-                  <Grid item sm={4}>
-                    <Typography color="primary">Note Image</Typography>
-                    <Box
-                      component="img"
-                      width="100%"
-                      height="242px"
-                      bgcolor="#cecece"
-                      borderRadius="3px"
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="center"
-                      sx={{
-                        objectFit: 'contain',
-                        cursor: 'pointer',
-                      }}
-                      onClick={() => {
-                        // handleViewDetailImage(true, val.document_filepath);
-                      }}
-                      src={invoiceDetails.details?.nota_image}
-                    />
-                  </Grid>
                 </Grid>
               </Grid>
               <Grid item xs={6} sm={3}>
                 <Stack spacing={2} alignItems="start">
+                  <Stack>
+                    <Typography color="primary">Interest Rate</Typography>
+                    <Typography>
+                      {invoiceDetails.details?.interest_rate} %
+                    </Typography>
+                  </Stack>
                   <Stack>
                     <Typography color="primary">Invoice Type</Typography>
                     <Typography>
@@ -304,6 +285,28 @@ export default function InvoiceDetails() {
                     </Label>
                   </Stack>
                 </Stack>
+              </Grid>
+
+              <Grid item sm={4}>
+                <Typography color="primary">Nota Image</Typography>
+                <Box
+                  component="img"
+                  width="100%"
+                  height="242px"
+                  bgcolor="#cecece"
+                  borderRadius="3px"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  sx={{
+                    objectFit: 'contain',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() => {
+                    // handleViewDetailImage(true, val.document_filepath);
+                  }}
+                  src={invoiceDetails.details?.nota_image}
+                />
               </Grid>
             </Grid>
           </Card>
