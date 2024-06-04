@@ -95,6 +95,13 @@ export default function InvoicePage() {
       },
     },
     {
+      id: 'user-number',
+      label: 'User Number',
+      format: ({ user }) => {
+        return <Typography variant="body1">{user?.user_number}</Typography>;
+      },
+    },
+    {
       id: 'Name',
       label: 'Name',
       format: ({ user }) => {
@@ -104,6 +111,7 @@ export default function InvoicePage() {
     {
       id: 'Merchant Name',
       label: 'Merchant Name',
+      minWidth: '200px',
       format: ({ user }) => {
         return <Typography variant="body1">{user?.merchant_name}</Typography>;
       },
@@ -140,12 +148,12 @@ export default function InvoicePage() {
     },
     {
       id: 'amount',
-      label: 'Invoice Amount',
+      label: 'Transfer Amount',
       minWidth: '150px',
-      format: ({ amount }) => {
+      format: ({ transfer_amount }) => {
         return (
           <Typography variant="body1">
-            Rp. {numberSeperator(amount || 0)}
+            Rp. {numberSeperator(transfer_amount || 0)}
           </Typography>
         );
       },
@@ -157,7 +165,7 @@ export default function InvoicePage() {
       format: ({ amount, admin_fee, interest_rate }) => {
         return (
           <Typography variant="body1">
-            {interest_rate === 0 ? 3 : interest_rate}%
+            {interest_rate}%
           </Typography>
         );
       },
@@ -165,6 +173,7 @@ export default function InvoicePage() {
     {
       id: 'paid_amount',
       label: 'Paid Off Amount',
+      minWidth: '150px',
       format: ({ paid_amount }) => {
         return (
           <Typography variant="body1">
