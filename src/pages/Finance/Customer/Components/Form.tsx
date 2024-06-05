@@ -31,9 +31,11 @@ import { SteperHeader } from './SteperHeader';
 export default function FormCustomer({
   id,
   handleClose,
+  openModal,
 }: {
   id?: string | number;
   handleClose: (isSubmited: boolean) => void;
+  openModal?: boolean;
 }) {
   const openCalender = useModal();
   const openCalenderDisburse = useModal();
@@ -118,6 +120,12 @@ export default function FormCustomer({
       element.scrollIntoView({ behavior: 'smooth' });
     }
   }, [step]);
+
+  useEffect(() => {
+    if (!openModal) {
+      formik.resetForm();
+    }
+  }, [openModal]);
 
   return (
     <Box p="24px">
