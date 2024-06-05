@@ -43,6 +43,8 @@ export type InvoiceListType = {
   last_paid: number;
   status: string;
   interest_rate: number;
+  interest_per_today: number;
+  expected_interest: number;
 };
 
 export type InvoiceDetailsType = {

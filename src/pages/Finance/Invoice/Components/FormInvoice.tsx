@@ -383,7 +383,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
         {formik.values.invoice_type_id === '1' && (
           <>
             <FormControl
-              text="Destination Bank"
+              text="Bank Name"
               error={
                 formik.touched.destination_bank &&
                 Boolean(formik.errors.destination_bank)
@@ -421,7 +421,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
               />
             </FormControl>
             <FormControl
-              text="Destination Bank Account"
+              text="Bank Account"
               error={
                 formik.touched.destination_bank_account &&
                 Boolean(formik.errors.destination_bank_account)

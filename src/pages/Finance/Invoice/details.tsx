@@ -160,7 +160,7 @@ export default function InvoiceDetails() {
                     </Typography>
                   </Grid>
                   <Grid item sm={4}>
-                    <Typography color="primary">Interest per Today</Typography>
+                    <Typography color="primary">Interest Daily</Typography>
                     <Typography>
                       Rp{' '}
                       {numberSeperator(
