@@ -238,6 +238,15 @@ export default function PaymentPage() {
                   </Typography>
                 ),
               },
+              {
+                id: 'payment_method',
+                label: 'Payment Method',
+                format: (value: any) => (
+                  <Typography variant="body1">
+                    {value.payment_method.name}
+                  </Typography>
+                ),
+              },
             ]}
             data={paymentQuery.listData || []}
             loading={paymentQuery.isLoading}

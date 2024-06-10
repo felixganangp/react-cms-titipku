@@ -274,7 +274,7 @@ export default function InvoicePage() {
               },
               {
                 label: 'Restructure',
-                disabled: true,
+                disabled: false,
                 hide:
                   value.status === 'Paid Off' &&
                   value.invoice_type?.name !== 'Cash',
