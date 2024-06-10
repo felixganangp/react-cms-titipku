@@ -43,7 +43,7 @@ export default function ChildrenMenu({
   return (
     <List dense>
       {child.map((item) =>
-        item.child?.length === 0 ? (
+        (item.child?.length || 0) === 0 ? (
           <Link
             style={{
               textDecoration: 'none',
@@ -69,7 +69,7 @@ export default function ChildrenMenu({
           <div key={item.path + item.id}>
             <ItemButtonChildAsParent
               onClick={() =>
-                item.child?.length === 0 ? (
+                (item.child?.length || 0) === 0 ? (
                   <Link to={item.path} />
                 ) : (
                   toggleOpenList(item)
