@@ -32,9 +32,11 @@ import {
   UseGetPeyement,
   UseGetSimulationPayment,
 } from '../../hooks/usePaymentService';
-
 import SelectCustomer from '../../Components/SelectCustomer';
-import { KurType } from '../../hooks/useConfigFinance';
+import {
+  KurType,
+  UsePaymentMethodListService,
+} from '../../hooks/useConfigFinance';
 
 const paymentMethod = [
   { name: 'Bank Transfer', value: 'transfer' },
@@ -51,6 +53,7 @@ export default function FormPayment({ onClose }: Props) {
   const useGetPaymentSimulation = UseGetSimulationPayment();
   const customerModal = useModal();
   const openDateSelect = useModal();
+  const queryPaymentMethod = UsePaymentMethodListService();
 
   const formik = useFormik({
     initialValues: {
@@ -86,7 +89,7 @@ export default function FormPayment({ onClose }: Props) {
             break;
           case 'payment_method':
             // @ts-ignore
-            await fd.append('payment_method', values.payment_method.value);
+            await fd.append('payment_method_id', values.payment_method.id);
             break;
           default:
             // @ts-ignore
@@ -317,7 +320,8 @@ export default function FormPayment({ onClose }: Props) {
           <Autocomplete
             data-testid="form-customer-list-bank"
             id="list-bank"
-            options={paymentMethod}
+            // options={paymentMethod}
+            options={queryPaymentMethod.listData}
             onChange={(e, value) => {
               formik.setFieldValue('payment_method', value);
             }}

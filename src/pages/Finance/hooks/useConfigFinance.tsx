@@ -2,6 +2,7 @@ import { ListParams } from 'models/fetch';
 import {
   getAllAreaFinancing,
   getAllCategoryFinancing,
+  getPaymentMethod,
 } from 'service/Finance/config';
 import { useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
@@ -35,4 +36,18 @@ export function UseCategoryListService(setParams?: ListParams) {
     queryFn: () => getAllCategoryFinancing(params.params),
   });
   return { ...areaInvoice, ...params, listData: areaInvoice?.data?.data || [] };
+}
+
+export function UsePaymentMethodListService(setParams?: ListParams) {
+  const params = UseParams(setParams);
+
+  const paymenyMethods = useQuery({
+    queryKey: ['payment-method', params.params],
+    queryFn: () => getPaymentMethod(params.params),
+  });
+  return {
+    ...paymenyMethods,
+    ...params,
+    listData: paymenyMethods?.data?.data || [],
+  };
 }

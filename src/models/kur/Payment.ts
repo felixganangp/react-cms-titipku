@@ -18,6 +18,11 @@ export interface PaymentKURDisplayFilter {
   types?: Type | null;
 }
 
+export interface PaymentMethod {
+  id: number;
+  name?: string;
+}
+
 export interface PaymentKUR {
   id: number;
   created_at: number;
@@ -40,6 +45,7 @@ export interface PaymentKUR {
   decision_by_admin_id: null;
   decision_by_admin: null;
   remarks: string;
+  payment_method: PaymentMethod;
 }
 
 export interface ModifierUser {
@@ -73,6 +79,7 @@ export interface KURPaymentDetail {
   decision_by_admin_id: number;
   decision_by_admin: null | ModifierUser;
   remarks: string;
+  payment_method: PaymentMethod;
 }
 
 export interface ActionParams {
