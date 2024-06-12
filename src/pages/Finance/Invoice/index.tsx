@@ -575,18 +575,20 @@ export default function InvoicePage() {
                         value?.id,
                       );
                     }}
-                    value={Object.keys(Type)
-                      .map((val) => ({
-                        id: val,
-                        // @ts-ignore
-                        name: Type[val],
-                      }))
-                      .find(
-                        (val) =>
-                          val.id ===
-                          (queryInnvoice.formikParams.values.user_type_id ||
-                            null),
-                      )}
+                    value={
+                      Object.keys(Type)
+                        .map((val) => ({
+                          id: val,
+                          // @ts-ignore
+                          name: Type[val],
+                        }))
+                        .find(
+                          (val) =>
+                            val.id ===
+                            (queryInnvoice.formikParams.values.user_type_id ||
+                              null),
+                        ) || null
+                    }
                     options={Object.keys(Type).map((val) => ({
                       id: val,
                       // @ts-ignore
