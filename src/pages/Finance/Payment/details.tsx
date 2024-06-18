@@ -82,13 +82,16 @@ export default function InvoiceDetails() {
                     </Typography>
                   </Grid>
                   <Grid item sm={4}>
-                    <Typography color="primary">Amount Payment</Typography>
+                    <Typography color="primary">Payment Amount</Typography>
                     <Typography>
                       Rp {numberSeperator(payment.details?.amount || 0)}
                     </Typography>
                   </Grid>
                   <Grid item sm={4}>
-                    <div> </div>
+                    <Typography color="primary">Payment Method</Typography>
+                    <Typography>
+                      {payment.details?.payment_method.name}
+                    </Typography>
                   </Grid>
 
                   <Grid item sm={4}>

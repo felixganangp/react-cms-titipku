@@ -83,12 +83,14 @@ export default function ModalFormMerchantDepo({
           ...values,
           jelajah_id: initCreateData?.id || id,
           limit: isUpdate || isDepo ? parseInt(values.limit, 10) : 0,
+          // depo_discount:
+          //   isUpdate || isAndalan
+          //     ? parseFloat(
+          //         values.depo_discount === '0' ? '5' : values.depo_discount,
+          //       )
+          //     : 0,
           depo_discount:
-            isUpdate || isAndalan
-              ? parseFloat(
-                  values.depo_discount === '0' ? '5' : values.depo_discount,
-                )
-              : 0,
+            isUpdate || isAndalan ? parseFloat(values.depo_discount) : 0,
           admin_fee:
             isUpdate || isDepo
               ? parseFloat(values.admin_fee === '0' ? '5' : values.admin_fee)
@@ -457,7 +459,6 @@ export default function ModalFormMerchantDepo({
                 formik.setFieldValue('depo_discount', value);
               }}
               onBlur={formik.handleBlur}
-              helperText="Base discount 5%"
             />
           </FormControl>
         )}

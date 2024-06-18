@@ -95,6 +95,13 @@ export default function InvoicePage() {
       },
     },
     {
+      id: 'user-number',
+      label: 'User Number',
+      format: ({ user }) => {
+        return <Typography variant="body1">{user?.user_number}</Typography>;
+      },
+    },
+    {
       id: 'Name',
       label: 'Name',
       format: ({ user }) => {
@@ -104,6 +111,7 @@ export default function InvoicePage() {
     {
       id: 'Merchant Name',
       label: 'Merchant Name',
+      minWidth: '200px',
       format: ({ user }) => {
         return <Typography variant="body1">{user?.merchant_name}</Typography>;
       },
@@ -140,12 +148,24 @@ export default function InvoicePage() {
     },
     {
       id: 'amount',
-      label: 'Invoice Amount',
+      label: 'Amount',
       minWidth: '150px',
-      format: ({ amount }) => {
+      format: ({ transfer_amount }) => {
         return (
           <Typography variant="body1">
-            Rp. {numberSeperator(amount || 0)}
+            Rp. {numberSeperator(transfer_amount || 0)}
+          </Typography>
+        );
+      },
+    },
+    {
+      id: 'interest_per_today',
+      label: 'Interest Daily',
+      minWidth: '150px',
+      format: ({ interest_per_today }) => {
+        return (
+          <Typography variant="body1">
+            Rp. {numberSeperator(interest_per_today || 0)}
           </Typography>
         );
       },
@@ -155,16 +175,13 @@ export default function InvoicePage() {
       label: 'Interest Rate',
       minWidth: '150px',
       format: ({ amount, admin_fee, interest_rate }) => {
-        return (
-          <Typography variant="body1">
-            {interest_rate === 0 ? 3 : interest_rate}%
-          </Typography>
-        );
+        return <Typography variant="body1">{interest_rate}%</Typography>;
       },
     },
     {
       id: 'paid_amount',
       label: 'Paid Off Amount',
+      minWidth: '150px',
       format: ({ paid_amount }) => {
         return (
           <Typography variant="body1">
@@ -257,6 +274,7 @@ export default function InvoicePage() {
               },
               {
                 label: 'Restructure',
+                disabled: false,
                 hide:
                   value.status === 'Paid Off' &&
                   value.invoice_type?.name !== 'Cash',
@@ -557,18 +575,20 @@ export default function InvoicePage() {
                         value?.id,
                       );
                     }}
-                    value={Object.keys(Type)
-                      .map((val) => ({
-                        id: val,
-                        // @ts-ignore
-                        name: Type[val],
-                      }))
-                      .find(
-                        (val) =>
-                          val.id ===
-                          (queryInnvoice.formikParams.values.user_type_id ||
-                            null),
-                      )}
+                    value={
+                      Object.keys(Type)
+                        .map((val) => ({
+                          id: val,
+                          // @ts-ignore
+                          name: Type[val],
+                        }))
+                        .find(
+                          (val) =>
+                            val.id ===
+                            (queryInnvoice.formikParams.values.user_type_id ||
+                              null),
+                        ) || null
+                    }
                     options={Object.keys(Type).map((val) => ({
                       id: val,
                       // @ts-ignore

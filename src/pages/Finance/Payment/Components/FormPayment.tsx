@@ -32,9 +32,11 @@ import {
   UseGetPeyement,
   UseGetSimulationPayment,
 } from '../../hooks/usePaymentService';
-
 import SelectCustomer from '../../Components/SelectCustomer';
-import { KurType } from '../../hooks/useConfigFinance';
+import {
+  KurType,
+  UsePaymentMethodListService,
+} from '../../hooks/useConfigFinance';
 
 const paymentMethod = [
   { name: 'Bank Transfer', value: 'transfer' },
@@ -51,6 +53,7 @@ export default function FormPayment({ onClose }: Props) {
   const useGetPaymentSimulation = UseGetSimulationPayment();
   const customerModal = useModal();
   const openDateSelect = useModal();
+  const queryPaymentMethod = UsePaymentMethodListService();
 
   const formik = useFormik({
     initialValues: {
@@ -86,7 +89,7 @@ export default function FormPayment({ onClose }: Props) {
             break;
           case 'payment_method':
             // @ts-ignore
-            await fd.append('payment_method', values.payment_method.value);
+            await fd.append('payment_method_id', values.payment_method.id);
             break;
           default:
             // @ts-ignore
@@ -143,13 +146,7 @@ export default function FormPayment({ onClose }: Props) {
       formik.values.user &&
       formik.values.payment_date
     ) {
-      if (
-        // @ts-ignore
-        (formik.values.user?.balance || 0) + parseInt(formik.values.amount) <=
-        0
-      ) {
-        setSimulationPayment(formik.values);
-      }
+      setSimulationPayment(formik.values);
     }
   }, [
     formik.values.amount,
@@ -306,87 +303,6 @@ export default function FormPayment({ onClose }: Props) {
               }}
               onBlur={formik.handleBlur}
             />
-            {simulation === null && (
-              <Stack
-                p={1}
-                mt={2}
-                bgcolor="#cecece"
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
-              >
-                <Typography>Tidak ada tagihan berjalan</Typography>
-              </Stack>
-            )}
-            <Stack
-              gap={1}
-              mt={2}
-              display={simulation?.length > 0 ? 'block' : 'none'}
-            >
-              <Typography mb={1}>Payment Simulation</Typography>
-              {simulation?.map((item, index) => (
-                <Stack key={index}>
-                  <Stack
-                    gap="10px"
-                    p={1}
-                    bgcolor="#cecece"
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Stack>
-                      <Typography fontSize={14}>Invoice number</Typography>
-                      <Typography>{item.invoice_number}</Typography>
-                    </Stack>
-                    <Stack direction="row" gap={1}>
-                      <Box>
-                        <Typography fontSize={14}>Invoice Total</Typography>
-                        <Typography>
-                          Rp {numberSeperator(item?.invoice_total || 0)}
-                        </Typography>
-                      </Box>
-                      <Box>
-                        <Typography fontSize={14}>Status</Typography>
-                        <Typography>{item.status}</Typography>
-                      </Box>
-                    </Stack>
-                  </Stack>
-                  <Box bgcolor="#dedede" p={1}>
-                    <table>
-                      <tr>
-                        <td>Bank Transfer</td>
-                        <td>:</td>
-                        <td>Rp {numberSeperator(item?.bank_transfer || 0)}</td>
-                      </tr>
-                      <tr>
-                        <td>Remain</td>
-                        <td>:</td>
-                        <td>Rp {numberSeperator(item?.detail?.remain || 0)}</td>
-                      </tr>
-                      <tr>
-                        <td>DPD</td>
-                        <td>:</td>
-                        <td>Rp {numberSeperator(item?.detail?.dpd || 0)}</td>
-                      </tr>
-                      <tr>
-                        <td>Interest</td>
-                        <td>:</td>
-                        <td>
-                          Rp {numberSeperator(item?.detail?.interest || 0)}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Principal</td>
-                        <td>:</td>
-                        <td>
-                          Rp {numberSeperator(item?.detail?.principal || 0)}
-                        </td>
-                      </tr>
-                    </table>
-                  </Box>
-                </Stack>
-              ))}
-            </Stack>
           </>
         </FormControl>
         <FormControl
@@ -404,7 +320,8 @@ export default function FormPayment({ onClose }: Props) {
           <Autocomplete
             data-testid="form-customer-list-bank"
             id="list-bank"
-            options={paymentMethod}
+            // options={paymentMethod}
+            options={queryPaymentMethod.listData}
             onChange={(e, value) => {
               formik.setFieldValue('payment_method', value);
             }}
@@ -424,6 +341,83 @@ export default function FormPayment({ onClose }: Props) {
             )}
           />
         </FormControl>
+        {simulation === null && (
+          <Stack
+            p={1}
+            mt={2}
+            bgcolor="#cecece"
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography>Tidak ada tagihan berjalan</Typography>
+          </Stack>
+        )}
+        <Stack
+          gap={1}
+          my={2}
+          display={simulation?.length > 0 ? 'block' : 'none'}
+        >
+          <Typography mb={1}>Payment Simulation</Typography>
+          {simulation?.map((item, index) => (
+            <Stack key={index}>
+              <Stack
+                gap="10px"
+                p={1}
+                bgcolor="#cecece"
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Stack>
+                  <Typography fontSize={14}>Invoice number</Typography>
+                  <Typography>{item.invoice_number}</Typography>
+                </Stack>
+                <Stack direction="row" gap={1}>
+                  <Box>
+                    <Typography fontSize={14}>Invoice Total</Typography>
+                    <Typography>
+                      Rp {numberSeperator(item?.invoice_total || 0)}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography fontSize={14}>Status</Typography>
+                    <Typography>{item.status}</Typography>
+                  </Box>
+                </Stack>
+              </Stack>
+              <Box bgcolor="#dedede" p={1}>
+                <table>
+                  <tr>
+                    <td>Bank Transfer</td>
+                    <td>:</td>
+                    <td>Rp {numberSeperator(item?.bank_transfer || 0)}</td>
+                  </tr>
+                  <tr>
+                    <td>Remain</td>
+                    <td>:</td>
+                    <td>Rp {numberSeperator(item?.detail?.remain || 0)}</td>
+                  </tr>
+                  <tr>
+                    <td>DPD</td>
+                    <td>:</td>
+                    <td>Rp {numberSeperator(item?.detail?.dpd || 0)}</td>
+                  </tr>
+                  <tr>
+                    <td>Interest</td>
+                    <td>:</td>
+                    <td>Rp {numberSeperator(item?.detail?.interest || 0)}</td>
+                  </tr>
+                  <tr>
+                    <td>Principal</td>
+                    <td>:</td>
+                    <td>Rp {numberSeperator(item?.detail?.principal || 0)}</td>
+                  </tr>
+                </table>
+              </Box>
+            </Stack>
+          ))}
+        </Stack>
         <FormControl
           text="Proof of Payment"
           required

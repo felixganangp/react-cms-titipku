@@ -71,7 +71,7 @@ export function useCreateCustomer({
   const formik = useFormik({
     initialValues,
     validateOnMount: true,
-    onSubmit: async (value) => {
+    onSubmit: async (value, { resetForm }) => {
       const formData = new FormData();
       /// user_data ====================
       let user_data = {};
@@ -152,6 +152,7 @@ export function useCreateCustomer({
                 severity: 'success',
               });
               handleClose(true);
+              resetForm();
               console.log(value);
             },
             onError: (value) => {
@@ -173,6 +174,7 @@ export function useCreateCustomer({
               severity: 'success',
             });
             handleClose(true);
+            resetForm();
             console.log(value);
           },
           onError: (value) => {
@@ -323,6 +325,7 @@ export function useCreateCustomer({
         is: 'cerai',
         then: () => yup.mixed().required('This field is required'),
       }),
+      bank_account: yup.number().typeError('Must be a number'),
       marriage_partner_name: yup.string().when('marriage_status', {
         is: 'kawin',
         then: () =>
@@ -434,6 +437,6 @@ export function useCreateCustomer({
       // @ts-ignore
       formik.setValues(editValue);
     }
-  }, [id, detailQuery.isLoading]);
+  }, [id, detailQuery.data]);
   return { ...formik, isLoading };
 }

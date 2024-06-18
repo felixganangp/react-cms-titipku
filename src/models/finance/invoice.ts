@@ -18,6 +18,7 @@ export type InvoiceListType = {
   invoice_number: string;
   invoice_type_id: number;
   amount: number;
+  transfer_amount: number;
   destination_bank: string;
   destination_bank_account: string;
   bank_transfer_fee: number;
@@ -42,6 +43,8 @@ export type InvoiceListType = {
   last_paid: number;
   status: string;
   interest_rate: number;
+  interest_per_today: number;
+  expected_interest: number;
 };
 
 export type InvoiceDetailsType = {
@@ -51,6 +54,7 @@ export type InvoiceDetailsType = {
   user_id: number;
   invoice_number: string;
   invoice_type_id: number;
+  interest_rate: number;
   amount: number;
   destination_bank: string;
   destination_bank_account: string;

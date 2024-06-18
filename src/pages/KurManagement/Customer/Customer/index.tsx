@@ -186,7 +186,6 @@ export default function KurCustomer() {
       id: 'user_number',
       label: 'User Number',
       align: 'left',
-      width: '200px',
       format: (val: Customer) => <div>{val.user_number}</div>,
       enableSort: true,
     },
@@ -202,14 +201,15 @@ export default function KurCustomer() {
       id: 'merchant',
       label: 'Merchant',
       align: 'left',
+      minWidth: '200px',
       format: (val: Customer) => <div>{val.merchant_name}</div>,
     },
-    {
-      id: 'pasar',
-      label: 'Pasar',
-      align: 'left',
-      format: (val: Customer) => <div>{val.area_name}</div>,
-    },
+    // {
+    //   id: 'pasar',
+    //   label: 'Pasar',
+    //   align: 'left',
+    //   format: (val: Customer) => <div>{val.area_name}</div>,
+    // },
     {
       id: 'kur_user_type',
       label: 'KUR Type',
@@ -220,25 +220,25 @@ export default function KurCustomer() {
     },
     {
       id: 'create_date',
-      label: 'Created Date',
+      label: 'Join Date',
       align: 'left',
       width: '100px',
       format: (val: Customer) => <div>{convertDate(val.created_at)}</div>,
     },
     {
-      id: 'status',
-      label: 'Status',
+      id: 'disburse_date',
+      label: 'Disburse Date',
       align: 'left',
       width: '100px',
       format: (val: Customer) => (
-        <Typography>{val.user_status.name}</Typography>
+        <div>{val.disburse_date ? convertDate(val.disburse_date) : '-'}</div>
       ),
     },
     {
       id: 'limit_invoice',
       label: 'Limit Invoice',
       align: 'left',
-      width: '200px',
+      minWidth: '150px',
       format: (val: Customer) => (
         <Typography>Rp {digitFormatter.format(val.limit_plafon)}</Typography>
       ),
@@ -247,9 +247,18 @@ export default function KurCustomer() {
       id: 'limit_cash',
       label: 'Limit Cash',
       align: 'left',
-      width: '100px',
+      minWidth: '150px',
       format: (val: Customer) => (
         <Typography>Rp {digitFormatter.format(val.limit_cash)}</Typography>
+      ),
+    },
+    {
+      id: 'status',
+      label: 'Status',
+      align: 'left',
+      width: '100px',
+      format: (val: Customer) => (
+        <Typography>{val.user_status.name}</Typography>
       ),
     },
     {

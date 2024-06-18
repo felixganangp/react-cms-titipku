@@ -94,7 +94,7 @@ export const sidebarDataDev: FilteredMenu[] = [
   },
   {
     id: 66,
-    title: 'Finance',
+    title: 'Financing',
     path: '',
     icon: <KurIcon />,
     child: [
@@ -106,13 +106,13 @@ export const sidebarDataDev: FilteredMenu[] = [
       },
       {
         id: 68,
-        title: 'Invoice Management',
+        title: 'Invoice',
         path: '/finance/invoice',
         child: [],
       },
       {
         id: 67,
-        title: 'Merchant Management',
+        title: 'Merchant',
         path: '',
         child: [
           {
@@ -249,7 +249,7 @@ export const sidebarDataProd: FilteredMenu[] = [
   },
   {
     id: 59,
-    title: 'Finance',
+    title: 'Financing',
     path: '',
     icon: <KurIcon />,
     child: [
@@ -261,13 +261,13 @@ export const sidebarDataProd: FilteredMenu[] = [
       },
       {
         id: 61,
-        title: 'Invoice Management',
+        title: 'Invoice',
         path: '/finance/invoice',
         child: [],
       },
       {
         id: 60,
-        title: 'Merchant Management',
+        title: 'Merchant',
         path: '',
         child: [
           {
