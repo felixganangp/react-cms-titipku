@@ -162,15 +162,7 @@ export default function KurCustomer() {
   const formModal = useModal();
 
   const convertDate = (date: number) => {
-    const d = new Date(0); // The 0 there is the key, which sets the date to the epoch
-    d.setUTCSeconds(date);
-    const day = d.getDate();
-    let month = d.getMonth().toString();
-    const year = d.getFullYear();
-    if (+month < 10) {
-      month = `${month}`;
-    }
-    const result = `${day}/${month + 1}/${year}`;
+    const result = moment(date * 1000).format('DD MMM YYYY');
     return result;
   };
 
@@ -223,7 +215,9 @@ export default function KurCustomer() {
       label: 'Join Date',
       align: 'left',
       width: '100px',
-      format: (val: Customer) => <div>{convertDate(val.created_at)}</div>,
+      format: (val: Customer) => (
+        <Box whiteSpace="nowrap">{convertDate(val.created_at)}</Box>
+      ),
     },
     {
       id: 'disburse_date',
@@ -232,6 +226,37 @@ export default function KurCustomer() {
       width: '100px',
       format: (val: Customer) => (
         <div>{val.disburse_date ? convertDate(val.disburse_date) : '-'}</div>
+      ),
+    },
+    {
+      id: 'first_transaction',
+      label: 'First Transaction',
+      align: 'left',
+      width: '100px',
+      format: (val: Customer) => (
+        <div>
+          {val.first_transaction ? convertDate(val.first_transaction) : '-'}
+        </div>
+      ),
+    },
+    {
+      id: 'nearest_due_date',
+      label: 'Nearest Due Date',
+      align: 'left',
+      width: '100px',
+      format: (val: Customer) => (
+        <div>
+          {val.nearest_due_date ? convertDate(val.nearest_due_date) : '-'}
+        </div>
+      ),
+    },
+    {
+      id: 'average_invoice',
+      label: 'Average Invoice',
+      align: 'left',
+      minWidth: '150px',
+      format: (val: Customer) => (
+        <Typography>Rp {digitFormatter.format(val.average_invoice)}</Typography>
       ),
     },
     {
