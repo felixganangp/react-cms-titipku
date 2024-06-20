@@ -133,7 +133,7 @@ export const getInstallmentSimulation = (params: {
 export const getInvoiceByUserId = (userId: string, params: any) =>
   new Promise<ListResponse<any>>(async (resolve, reject) => {
     try {
-      const respon = await http.get(`financing/user/${userId}/invoice`, {
+      const respon = await http.get(`financing/user/${userId}/invoice/`, {
         params,
       });
       if (respon.data) {
