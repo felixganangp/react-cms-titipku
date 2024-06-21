@@ -42,6 +42,10 @@ import { getDownloadPdfUser } from 'service/Kur/Customer';
 import useLoadingSpinner from 'hooks/useLoadingSpinner';
 import useToast from 'hooks/useToast';
 import { base64toOpen } from 'utils/base64toDownload';
+import {
+  useInvoiceDetails,
+  useInvoiceUserDetails,
+} from 'pages/Finance/hooks/useInvoiceService';
 import { TitlePage, BackButton, Menu } from './details.styled';
 
 function StatusColor(string: string | undefined) {
@@ -74,6 +78,7 @@ export default function CustomerDetails() {
   const generatePDF = useMutation(getDownloadPdfUser);
   const { setLoading } = useLoadingSpinner();
   const { openToast } = useToast();
+  const invoiceList = useInvoiceUserDetails(id);
 
   useEffect(() => {
     if (id) {
@@ -912,7 +917,7 @@ export default function CustomerDetails() {
           </Box>
         </SubDetailsPagesWrapper>
 
-        {/* <SubDetailsPagesWrapper title="KUR History" defaultOpen>
+        <SubDetailsPagesWrapper title="KUR History" defaultOpen>
           <Box p="20px">
             <Tabs.Container
               value={kurHistoryTab}
@@ -921,11 +926,11 @@ export default function CustomerDetails() {
               variant="fullWidth"
               sx={{ mb: 1 }}
             >
-              <Tabs.Item label="Request" />
-              <Tabs.Item label="Payment" />
+              {/* <Tabs.Item label="Request" /> */}
               <Tabs.Item label="Invoice" />
+              <Tabs.Item label="Payment" />
             </Tabs.Container>
-            {kurHistoryTab === 0 && (
+            {/* {kurHistoryTab === 0 && (
               <Table
                 data={request.data}
                 headCells={headCellRequest}
@@ -934,8 +939,8 @@ export default function CustomerDetails() {
                 totalData={request.total}
                 onChangePage={(page) => handleChangePageRequest(page)}
               />
-            )}
-            {kurHistoryTab === 1 && (
+            )} */}
+            {kurHistoryTab === 0 && (
               <Table
                 data={payment.data}
                 headCells={headCellPayment}
@@ -945,7 +950,7 @@ export default function CustomerDetails() {
                 onChangePage={(page) => handleChangePagePayment(page)}
               />
             )}
-            {kurHistoryTab === 2 && (
+            {kurHistoryTab === 1 && (
               <Table
                 data={invoice.data}
                 headCells={headCellInvoice}
@@ -956,7 +961,7 @@ export default function CustomerDetails() {
               />
             )}
           </Box>
-        </SubDetailsPagesWrapper> */}
+        </SubDetailsPagesWrapper>
         {/* <Modal
           open={modalImage.open}
           onClose={() => setModalImage({ open: false, filePath: null })}

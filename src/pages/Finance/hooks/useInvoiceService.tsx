@@ -4,6 +4,7 @@ import {
   createInvoice,
   getInstallmentSimulation,
   getInvoiceAll,
+  getInvoiceByUserId,
   getInvoiceDetails,
   getInvoicePDF,
   setManualSettled,
@@ -152,6 +153,23 @@ export function useInvoiceDetails(idInvoice?: string | number) {
     details: queryInvoice?.data?.data,
   };
 }
+
+export function useInvoiceUserDetails(idInvoice?: string | number) {
+  const params = UseParams<any>();
+
+  const queryInvoice = useQuery({
+    queryKey: [`invoice/details/${idInvoice}`, params.params],
+    // @ts-ignore
+    queryFn: () => getInvoiceByUserId(idInvoice, params.params),
+    // enabled: !!idInvoice,
+  });
+
+  return {
+    ...queryInvoice,
+    details: queryInvoice?.data?.data,
+  };
+}
+
 export function UseCreateInvoice() {
   return useMutation(createInvoice);
 }

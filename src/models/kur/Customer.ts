@@ -166,6 +166,9 @@ export interface Customer {
   deleted_at: number | null;
   user_status: CustomerStatus;
   user_type: CustomerType;
+  first_transaction: number | null;
+  nearest_due_date: number | null;
+  average_invoice: number | null;
 }
 
 export interface CustomerStatus {
