@@ -927,8 +927,8 @@ export default function CustomerDetails() {
               sx={{ mb: 1 }}
             >
               {/* <Tabs.Item label="Request" /> */}
-              <Tabs.Item label="Payment" />
               <Tabs.Item label="Invoice" />
+              <Tabs.Item label="Payment" />
             </Tabs.Container>
             {/* {kurHistoryTab === 0 && (
               <Table

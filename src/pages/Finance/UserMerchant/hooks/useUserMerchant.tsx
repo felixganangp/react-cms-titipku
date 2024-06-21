@@ -3,7 +3,8 @@ import { useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import useToast from 'hooks/useToast';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { getRemainingBillyUserId } from 'service/Finance/invoice';
 import { postCreateUser, putCreateUser } from 'service/Finance/customer';
 import { useCustomerDetails } from '../../hooks/useCustomer';
 
@@ -263,10 +264,9 @@ export default function useUserMerchant({
             },
             onError: (err) => {
               openToast({
-                severity: 'success',
-                headMsg: 'Success create merchant',
+                severity: 'error',
+                headMsg: 'Error update merchant',
               });
-              handleClose(true);
             },
           },
         );
@@ -281,10 +281,9 @@ export default function useUserMerchant({
           },
           onError: (err) => {
             openToast({
-              severity: 'success',
-              headMsg: 'Success create merchant',
+              severity: 'error',
+              headMsg: 'Failed create merchant',
             });
-            handleClose(true);
           },
         });
       }
@@ -345,5 +344,20 @@ export default function useUserMerchant({
   }, [id, detailQuery.data]);
   return {
     ...formik,
+  };
+}
+
+export function useUserRemainingBill(id?: string) {
+  const queryCostumer = useQuery({
+    queryKey: [`financing/user/${id}/remaining-bill`],
+    queryFn: () => getRemainingBillyUserId(id || ''),
+    enabled: !!id,
+  });
+
+  // @ts-ignore
+  const details = queryCostumer.data?.data?.remaining_bill || 0;
+  return {
+    ...queryCostumer,
+    details,
   };
 }

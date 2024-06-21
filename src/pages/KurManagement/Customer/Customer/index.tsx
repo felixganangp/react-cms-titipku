@@ -50,6 +50,7 @@ import { base64toOpen } from 'utils/base64toDownload';
 import useToast from 'hooks/useToast';
 import FormUserMerchant from 'pages/Finance/UserMerchant/Components/Form';
 import FormTopUpLimit from 'pages/Finance/UserMerchant/Components/FormTopUpLimit';
+import FormRestructureMerchant from 'pages/Finance/UserMerchant/Components/FormRestructure';
 
 // import FormCustomer from '../Verification/components/form';
 
@@ -68,6 +69,7 @@ export default function KurCustomer() {
   // const creditScore = useAppSelector((state) => state.creditScore);
   const createUserModal = useModal();
   const topUpModal = useModal();
+  const restructureModal = useModal();
   const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
   const generatePDF = useMutation(getDownloadPdfUser);
   const { setLoading } = useLoadingSpinner();
@@ -313,14 +315,6 @@ export default function KurCustomer() {
                 dataId: 'button-edit-customer',
               },
               {
-                label: `Top Up Limit`,
-                onClick: () => {
-                  topUpModal.openModal();
-                  setSelectedIdUser(val.id);
-                },
-                dataId: 'button-top-up-customer',
-              },
-              {
                 label: `Generate Invoice`,
                 onClick: () => {
                   setLoading(true);
@@ -347,6 +341,22 @@ export default function KurCustomer() {
                   });
                 },
                 dataId: 'button-edit-customer',
+              },
+              {
+                label: `Top Up Limit`,
+                onClick: () => {
+                  topUpModal.openModal();
+                  setSelectedIdUser(val.id);
+                },
+                dataId: 'button-top-up-customer',
+              },
+              {
+                label: `Restructure`,
+                onClick: () => {
+                  restructureModal.openModal();
+                  setSelectedIdUser(val.id);
+                },
+                dataId: 'button-restructure-customer',
               },
             ]}
           >
@@ -845,7 +855,7 @@ export default function KurCustomer() {
       <Modal
         open={topUpModal.open}
         onClose={topUpModal.closeModal}
-        title={selectedIdUser ? 'Update Merchant' : 'Create Merchant'}
+        title="Top Up Limit"
       >
         <FormTopUpLimit
           id={selectedIdUser}
@@ -861,6 +871,29 @@ export default function KurCustomer() {
             }
             topUpModal.closeModal();
           }}
+          openModal={topUpModal.open}
+        />
+      </Modal>
+      <Modal
+        open={restructureModal.open}
+        onClose={restructureModal.closeModal}
+        title="Restructure"
+      >
+        <FormRestructureMerchant
+          id={selectedIdUser}
+          handleClose={(isSubmite) => {
+            if (isSubmite) {
+              dispatch(
+                customerAction.fetchData({
+                  status: 6,
+                  page: customerKur.params.page,
+                  search: customerKur.params.search,
+                }),
+              );
+            }
+            restructureModal.closeModal();
+          }}
+          openModal={topUpModal.open}
         />
       </Modal>
     </Box>
