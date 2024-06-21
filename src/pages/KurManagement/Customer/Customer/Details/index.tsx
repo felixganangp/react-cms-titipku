@@ -1,6 +1,14 @@
 /* eslint-disable radix */
 import React, { useEffect, useState } from 'react';
-import { Box, Grid, Card, Stack, Typography, Button } from '@mui/material';
+import {
+  Box,
+  Grid,
+  Card,
+  Stack,
+  Typography,
+  Button,
+  IconButton,
+} from '@mui/material';
 import moment from 'moment';
 
 import DescDetails from 'components/DescDetails';
@@ -24,6 +32,7 @@ import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import HideImageOutlinedIcon from '@mui/icons-material/HideImageOutlined';
+import Label from 'components/Label';
 
 import { useParams, useNavigate } from 'react-router-dom';
 import { customerAction } from 'store/slice/kur/Customer';
@@ -34,8 +43,13 @@ import { useAppDispatch, useAppSelector } from 'store/hooks';
 import { RequestKUR } from 'models/kur/Request';
 import { PaymentKUR } from 'models/kur/Payment';
 import { InvoiceKur, InvoiceKurDetail } from 'models/kur/Invoice';
-
-import { CalendarMonth, KeyboardArrowDown } from '@mui/icons-material';
+import { KurType } from 'pages/Finance/hooks/useConfigFinance';
+import numberSeperator from 'utils/numberSeperator';
+import {
+  CalendarMonth,
+  KeyboardArrowDown,
+  MoreVert,
+} from '@mui/icons-material';
 import MenuList from 'components/MenuList';
 import { useMutation } from '@tanstack/react-query';
 import { getDownloadPdfUser } from 'service/Kur/Customer';
@@ -45,6 +59,7 @@ import { base64toOpen } from 'utils/base64toDownload';
 import {
   useInvoiceDetails,
   useInvoiceUserDetails,
+  usePaymentUserDetails,
 } from 'pages/Finance/hooks/useInvoiceService';
 import { TitlePage, BackButton, Menu } from './details.styled';
 
@@ -79,6 +94,7 @@ export default function CustomerDetails() {
   const { setLoading } = useLoadingSpinner();
   const { openToast } = useToast();
   const invoiceList = useInvoiceUserDetails(id);
+  const paymentList = usePaymentUserDetails(id);
 
   useEffect(() => {
     if (id) {
@@ -120,20 +136,6 @@ export default function CustomerDetails() {
     setKurHistoryTab(newValue);
   };
 
-  const handleChangePageRequest = (value: number) => {
-    dispatch(
-      requestKURAction.fetchData({
-        ...request.params,
-        page: value,
-      }),
-    );
-    dispatch(
-      requestKURAction.setParams({
-        page: value,
-      }),
-    );
-  };
-
   const handleChangePagePayment = (value: number) => {
     dispatch(
       paymentKURAction.fetchData({
@@ -161,11 +163,6 @@ export default function CustomerDetails() {
       }),
     );
   };
-
-  const handleViewDetailImage = (open: boolean, filePath: string | null) => {
-    setModalImage({ open, filePath });
-  };
-
   const countDiffDate = (start: number | undefined) => {
     const month = Math.round(
       (new Date().getTime() - (start || 0) * 1000) / 1000 / 60 / 60 / 24 / 30,
@@ -206,333 +203,6 @@ export default function CustomerDetails() {
     return stat;
   };
 
-  const headCellRequest: HeadCells<RequestKUR>[] = [
-    {
-      id: 'id',
-      label: 'Order Number',
-      align: 'left',
-      format: (val) => (
-        <Typography
-          sx={{ color: '#0774d1', cursor: 'pointer' }}
-          onClick={() => navigate(`/kur/request/${val.id}`)}
-        >
-          {val.kur_request_number}
-        </Typography>
-      ),
-    },
-    {
-      id: 'created_at',
-      label: 'Request Date',
-      align: 'left',
-      format: (val) => (
-        <Box>
-          <Typography>
-            {moment.unix(val.created_at).format('MMM DD, YYYY')}
-          </Typography>
-          <Typography fontSize="12px">
-            {moment.unix(val.created_at).format('hh:mm')}
-          </Typography>
-        </Box>
-      ),
-    },
-    {
-      id: 'decision_date',
-      label: 'Delivery Date',
-      align: 'left',
-      format: (val) => {
-        if (val.decision_date === 0) {
-          return <span>-</span>;
-        }
-        return (
-          <Box>
-            <Typography>
-              {moment.unix(val.decision_date).format('MMM DD, YYYY')}
-            </Typography>
-            <Typography fontSize="12px">
-              {moment.unix(val.decision_date).format('hh:mm')}
-            </Typography>
-          </Box>
-        );
-      },
-    },
-    {
-      id: 'amount',
-      label: 'Amount',
-      align: 'left',
-      format: (val) => (
-        <Typography>Rp {digitFormatter.format(val.amount)}</Typography>
-      ),
-    },
-    {
-      id: 'status',
-      label: 'Status',
-      align: 'center',
-      width: '150px',
-      format: (val) => {
-        const color = (status: string) => {
-          let result = '#C10000';
-          if (status === 'pending') {
-            result = '#FF8F00';
-          }
-          if (status === 'approved') {
-            result = '#008E58';
-          }
-
-          return result;
-        };
-        return <Status color={color(val.status)}>{val.status}</Status>;
-      },
-    },
-  ];
-
-  const headCellPayment: HeadCells<PaymentKUR>[] = [
-    {
-      id: 'kur_payment_number',
-      label: 'No. Payment',
-      align: 'left',
-      minWidth: '160px',
-      format: (val) => (
-        <Typography
-          sx={{ color: '#0774d1', cursor: 'pointer' }}
-          onClick={() => navigate(`/kur/payment/${val.id}`)}
-        >
-          {val.kur_payment_number}
-        </Typography>
-      ),
-    },
-    {
-      id: 'paid_to_account_number',
-      label: 'Transfer To',
-      align: 'left',
-      minWidth: '200px',
-      format: (val) => (
-        <Typography>
-          {val.paid_to_account_number} - {val.paid_to_bank}
-        </Typography>
-      ),
-    },
-    {
-      id: 'payment_amount',
-      label: 'Payment Amount',
-      align: 'left',
-      format: (val) => (
-        <Typography>Rp {digitFormatter.format(val.amount)}</Typography>
-      ),
-    },
-    {
-      id: 'created_at',
-      label: 'Submit Date',
-      align: 'left',
-      format: (val) => (
-        <Typography>
-          {moment.unix(val.created_at).format('DD/MM/YYYY')}
-        </Typography>
-      ),
-    },
-    {
-      id: 'decision_date',
-      label: 'Approve Date',
-      align: 'left',
-      format: (val) => (
-        <Typography>
-          {val.decision_date !== 0 && val.decision_date !== null
-            ? moment.unix(val.decision_date).format('DD/MM/YYYY')
-            : '-'}
-        </Typography>
-      ),
-    },
-    {
-      id: 'status',
-      label: 'Status',
-      align: 'left',
-      width: '160px',
-      format: (val) => {
-        const color = () => {
-          let result = '#cecece';
-          if (val.status === 'approved') {
-            result = '#008e58';
-          }
-          if (val.status === 'pending') {
-            result = '#FF8F00';
-          }
-          if (val.status === 'rejected') {
-            result = '#c10000';
-          }
-          return result;
-        };
-        return (
-          <Status color={color()}>{val.status.replaceAll('_', ' ')}</Status>
-        );
-      },
-    },
-  ];
-
-  const headCellInvoice: HeadCells<InvoiceKur>[] = [
-    {
-      id: 'kur_payment_number',
-      label: 'No. Invoice',
-      align: 'left',
-      minWidth: '160px',
-      format: (val) => (
-        <Typography
-          sx={{ color: '#0774d1', cursor: 'pointer' }}
-          onClick={() => navigate(`/kur/invoice/${val.id}`)}
-        >
-          {val.kur_invoice_number}
-        </Typography>
-      ),
-    },
-    {
-      id: 'condition',
-      label: 'Condition',
-      align: 'left',
-      width: '160px',
-      format: (val) => {
-        const color = () => {
-          let result = '#cecece';
-          if (val.condition === 'on_schedule') {
-            result = '#008e58';
-          }
-
-          if (val.condition === 'late') {
-            result = '#c10000';
-          }
-
-          return result;
-        };
-        return (
-          <Status color={color()}>{val.condition.replaceAll('_', ' ')}</Status>
-        );
-      },
-    },
-    {
-      id: 'status',
-      label: 'Status',
-      align: 'left',
-      width: '160px',
-      format: (val) => {
-        const color = () => {
-          let result = '#cecece';
-          if (val.paid_status === 'paid_off') {
-            result = '#008e58';
-          }
-
-          if (val.paid_status === 'debt') {
-            result = '#c10000';
-          }
-          return result;
-        };
-        return (
-          <Status color={color()}>
-            {val.paid_status.replaceAll('_', ' ')}
-          </Status>
-        );
-      },
-    },
-    {
-      id: 'kur_user_type',
-      label: 'KUR Type',
-      align: 'left',
-      format: (val) => <Typography>{val.kur_user_type.name}</Typography>,
-    },
-    {
-      id: 'request_amount',
-      label: 'Request Amount',
-      align: 'left',
-      minWidth: '160px',
-      format: (val) => (
-        <Typography>Rp {digitFormatter.format(val.request_amount)}</Typography>
-      ),
-    },
-    {
-      id: 'delivery_date',
-      label: 'Delivery Date',
-      align: 'left',
-      format: (val) => (
-        <Typography>
-          {moment.unix(val.created_at).format('DD/MM/YYYY')}
-        </Typography>
-      ),
-    },
-    {
-      id: 'invoice_date',
-      label: 'Invoice Date',
-      align: 'left',
-      format: (val) => (
-        <Typography>
-          {moment.unix(val.release_date).format('DD/MM/YYYY')}
-        </Typography>
-      ),
-    },
-    {
-      id: 'invoice_amount',
-      label: 'Invoice Amount',
-      align: 'left',
-      minWidth: '160px',
-      format: (val) => (
-        <Typography>
-          Rp{' '}
-          {digitFormatter.format(
-            val.request_amount +
-              val.total_admin_fee +
-              val.total_dpd +
-              val.total_adjustment,
-          )}
-        </Typography>
-      ),
-    },
-    {
-      id: 'due_date',
-      label: 'Due date',
-      align: 'left',
-      format: (val) => (
-        <Typography>
-          {moment.unix(val.due_date).format('DD/MM/YYYY')}
-        </Typography>
-      ),
-    },
-    {
-      id: 'last_paid',
-      label: 'Last Paid',
-      align: 'left',
-      format: (val) => {
-        if (val.kur_invoice_detail?.length > 0) {
-          const getLast: InvoiceKurDetail = val.kur_invoice_detail?.filter(
-            (e: InvoiceKurDetail) => e.is_last,
-          )[0];
-          return (
-            <Typography>
-              {moment.unix(getLast.created_at).format('DD/MM/YYYY')}
-            </Typography>
-          );
-        }
-
-        return <span>-</span>;
-      },
-    },
-    {
-      id: 'paid_amount',
-      label: 'Paid Amount',
-      align: 'left',
-      minWidth: '160px',
-      format: (val) => (
-        <Typography>Rp {digitFormatter.format(val.total_payment)}</Typography>
-      ),
-    },
-  ];
-
-  const renameDocument = (value: string) => {
-    let term = value;
-
-    if (term === 'kk') {
-      term = 'Kartu Keluarga C1';
-    } else if (term === 'sku') {
-      term = 'Surat Keterangan Usaha';
-    } else {
-      term = term.toLocaleUpperCase().replaceAll('_', ' ');
-    }
-    return term;
-  };
   return (
     <div>
       <Box p="20px" bgcolor="#F5F7FA">
@@ -942,22 +612,235 @@ export default function CustomerDetails() {
             )} */}
             {kurHistoryTab === 0 && (
               <Table
-                data={payment.data}
-                headCells={headCellPayment}
-                count={payment.params.count}
-                page={payment.params.page}
-                totalData={payment.total}
-                onChangePage={(page) => handleChangePagePayment(page)}
+                data={invoiceList.listData}
+                headCells={[
+                  {
+                    id: 'invoice_number',
+                    label: 'Invoice Number',
+                    format: ({ invoice_number, user, created_at, ...data }) => {
+                      return (
+                        <Typography
+                          variant="body1"
+                          color="info.main"
+                          sx={{ cursor: 'pointer', whiteSpace: 'nowrap' }}
+                          onClick={() => {
+                            navigate(`/finance/invoice/${data.id}`);
+                          }}
+                        >
+                          {invoice_number ||
+                            `INV/${moment(created_at * 1000).format('YYYY')}/${
+                              user?.user_number
+                            }/${id}`}
+                        </Typography>
+                      );
+                    },
+                  },
+                  {
+                    id: 'invoice_date',
+                    label: 'Transfer Date',
+                    format: ({ transfer_date }) => {
+                      return (
+                        <Typography variant="body1">
+                          {transfer_date
+                            ? moment(transfer_date * 1000).format('DD/MM/YYYY')
+                            : '-'}
+                        </Typography>
+                      );
+                    },
+                  },
+                  {
+                    id: 'due_date',
+                    label: 'Due Date',
+                    format: ({ due_date }) => {
+                      return (
+                        <Typography variant="body1">
+                          {due_date
+                            ? moment(due_date * 1000).format('DD/MM/YYYY')
+                            : '-'}
+                        </Typography>
+                      );
+                    },
+                  },
+                  {
+                    id: 'amount',
+                    label: 'Transfer Amount',
+                    minWidth: '150px',
+                    format: ({ transfer_amount }) => {
+                      return (
+                        <Typography variant="body1">
+                          Rp. {numberSeperator(transfer_amount || 0)}
+                        </Typography>
+                      );
+                    },
+                  },
+                  {
+                    id: 'interest_per_today',
+                    label: 'Interest Daily',
+                    minWidth: '150px',
+                    format: ({ interest_per_today }) => {
+                      return (
+                        <Typography variant="body1">
+                          Rp. {numberSeperator(interest_per_today || 0)}
+                        </Typography>
+                      );
+                    },
+                  },
+                  {
+                    id: 'interes_rate',
+                    label: 'Interest Rate',
+                    minWidth: '150px',
+                    format: ({ amount, admin_fee, interest_rate }) => {
+                      return (
+                        <Typography variant="body1">
+                          {interest_rate}%
+                        </Typography>
+                      );
+                    },
+                  },
+                  {
+                    id: 'paid_amount',
+                    label: 'Paid Off Amount',
+                    minWidth: '150px',
+                    format: ({ paid_amount }) => {
+                      return (
+                        <Typography variant="body1">
+                          Rp. {numberSeperator(paid_amount || 0)}
+                        </Typography>
+                      );
+                    },
+                  },
+                  {
+                    id: 'last_paid',
+                    label: 'Last Paid',
+                    format: ({ last_paid }) => {
+                      return (
+                        <Typography variant="body1">
+                          {last_paid !== 0
+                            ? moment(last_paid * 1000).format('DD/MM/YYYY')
+                            : '-'}
+                        </Typography>
+                      );
+                    },
+                  },
+                  {
+                    id: 'invoice_restructure_type',
+                    label: 'Restructure Type',
+                    align: 'center',
+                    format: ({ invoice_restructure_type }) => {
+                      return (
+                        <Typography variant="body1">
+                          {invoice_restructure_type.name || '-'}
+                        </Typography>
+                      );
+                    },
+                  },
+                  {
+                    id: 'invoice_type',
+                    label: 'Invoice Type',
+                    format: ({ invoice_type }) => {
+                      return (
+                        <Typography variant="body1">
+                          {invoice_type?.name || '-'}
+                        </Typography>
+                      );
+                    },
+                  },
+                  {
+                    id: 'status',
+                    label: 'Status',
+                    align: 'center',
+                    format: ({ status }) => {
+                      if (!status) {
+                        return (
+                          <Label variant="filled" color="default">
+                            -
+                          </Label>
+                        );
+                      }
+                      const color =
+                        // eslint-disable-next-line no-nested-ternary
+                        status === 'Late'
+                          ? 'error'
+                          : status === 'On Schedule'
+                          ? 'success'
+                          : 'info';
+                      return (
+                        <Label variant="filled" color={color}>
+                          {status}
+                        </Label>
+                      );
+                    },
+                  },
+                ]}
+                count={invoiceList.data?.count || 0}
+                page={invoiceList.params.page}
+                totalData={invoiceList.data?.total || 0}
+                onChangePage={(page) =>
+                  invoiceList.handleChangeParams({
+                    page,
+                  })
+                }
               />
             )}
             {kurHistoryTab === 1 && (
               <Table
-                data={invoice.data}
-                headCells={headCellInvoice}
-                count={invoice.params.count}
-                page={invoice.params.page}
-                totalData={invoice.total}
-                onChangePage={(page) => handleChangePageInvoice(page)}
+                data={paymentList.listData}
+                headCells={[
+                  {
+                    id: 'id',
+                    label: 'Order Number',
+                    align: 'left',
+                    format: (val) => (
+                      <Typography
+                        sx={{ color: '#0774d1', cursor: 'pointer' }}
+                        // onClick={() => navigate(`/kur/request/${val.id}`)}
+                      >
+                        {val.payment_number}
+                      </Typography>
+                    ),
+                  },
+                  {
+                    id: 'created_at',
+                    label: 'Request Date',
+                    align: 'left',
+                    format: (val) => (
+                      <Box>
+                        <Typography>
+                          {moment.unix(val.payment_date).format('MMM DD, YYYY')}
+                        </Typography>
+                        <Typography fontSize="12px">
+                          {moment.unix(val.payment_date).format('hh:mm')}
+                        </Typography>
+                      </Box>
+                    ),
+                  },
+                  {
+                    id: 'id',
+                    label: 'Amount',
+                    align: 'left',
+                    format: (val) => (
+                      <Typography>
+                        Rp {numberSeperator(val.amount || '0')}
+                      </Typography>
+                    ),
+                  },
+                  {
+                    id: 'id',
+                    label: 'Payment Method',
+                    align: 'left',
+                    format: (val) => (
+                      <Typography>{val.payment_method?.name || '-'}</Typography>
+                    ),
+                  },
+                ]}
+                count={paymentList.data?.count || 0}
+                page={paymentList.params.page}
+                totalData={paymentList.data?.total || 0}
+                onChangePage={(page) =>
+                  paymentList.handleChangeParams({
+                    page,
+                  })
+                }
               />
             )}
           </Box>

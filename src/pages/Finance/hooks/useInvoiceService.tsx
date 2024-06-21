@@ -7,6 +7,7 @@ import {
   getInvoiceByUserId,
   getInvoiceDetails,
   getInvoicePDF,
+  getPaymentByUserId,
   setManualSettled,
 } from 'service/Finance/invoice';
 import { useFormik } from 'formik';
@@ -166,7 +167,25 @@ export function useInvoiceUserDetails(idInvoice?: string | number) {
 
   return {
     ...queryInvoice,
-    details: queryInvoice?.data?.data,
+    listData: queryInvoice?.data?.data || [],
+    ...params,
+  };
+}
+
+export function usePaymentUserDetails(idInvoice?: string | number) {
+  const params = UseParams<any>();
+
+  const queryInvoice = useQuery({
+    queryKey: [`payment/details/${idInvoice}`, params.params],
+    // @ts-ignore
+    queryFn: () => getPaymentByUserId(idInvoice, params.params),
+    // enabled: !!idInvoice,
+  });
+
+  return {
+    ...queryInvoice,
+    listData: queryInvoice?.data?.data || [],
+    ...params,
   };
 }
 
