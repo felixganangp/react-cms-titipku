@@ -47,6 +47,8 @@ import { KurType } from 'pages/Finance/hooks/useConfigFinance';
 import numberSeperator from 'utils/numberSeperator';
 import {
   CalendarMonth,
+  DocumentScanner,
+  DocumentScannerSharp,
   KeyboardArrowDown,
   MoreVert,
 } from '@mui/icons-material';
@@ -62,6 +64,7 @@ import {
   usePaymentUserDetails,
 } from 'pages/Finance/hooks/useInvoiceService';
 import { TitlePage, BackButton, Menu } from './details.styled';
+import { Document } from '@/pages/Finance/hooks/constumer.config';
 
 function StatusColor(string: string | undefined) {
   let color = '#008e58';
@@ -70,8 +73,6 @@ function StatusColor(string: string | undefined) {
 
   return color;
 }
-
-const Document = ['KTP', 'NIB', 'NPWP', 'SKU', 'KTP Pasangan', 'Surat Cerai'];
 
 interface ModalImageTypes {
   open: boolean;
@@ -517,34 +518,78 @@ export default function CustomerDetails() {
 
         <SubDetailsPagesWrapper title="User Documents" defaultOpen>
           <Stack direction="row" flexWrap="wrap" gap={2} p={1}>
-            {customerKur.details?.user_documents.map((val) => (
-              <Stack key={val.id} gap={0.6}>
-                <Typography
-                  fontSize={12}
-                  fontWeight="bold"
-                  color="primary.main"
-                >
-                  {Document[val.document_type_id]}
-                </Typography>
-                <Typography fontSize={16}>
-                  {val.document_number ? val.document_number : '-'}
-                </Typography>
-                <Box
-                  component="img"
-                  // onClick={() =>
-                  //   setImagePreview(VITE_APP_IMAGE_URL + val.image_filepath)
-                  // }
-                  src={val.image_filepath}
-                  sx={{
-                    aspectRatio: '1/1',
-                    border: 'unset',
-                    objectFit: 'contain',
-                    bgcolor: '#cecece',
-                  }}
-                  width="250px"
-                />
-              </Stack>
-            ))}
+            {customerKur.details?.user_documents
+              .slice()
+              .sort((a, b) => {
+                // @ts-ignore
+                const titleDocA = Document[a.document_type_id] || '';
+                // @ts-ignore
+                const titleDocB = Document[b.document_type_id] || '';
+                const isFormA = titleDocA.includes('Form');
+                const isFormB = titleDocB.includes('Form');
+
+                if (isFormA && !isFormB) return 1; // Move A (Form) towards the end
+                if (!isFormA && isFormB) return -1; // Keep B (Form) towards the end
+                return 0; // No change in order
+              })
+              .map((val) => {
+                // @ts-ignore
+                const titleDoc = Document[val.document_type_id] || '';
+                return (
+                  <Stack key={val.id} gap={0.6}>
+                    <Typography
+                      fontSize={12}
+                      fontWeight="bold"
+                      color="primary.main"
+                    >
+                      {titleDoc}
+                    </Typography>
+                    {titleDoc.includes('Form') ? (
+                      <Stack
+                        direction="row"
+                        gap={1}
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Button
+                          startIcon={<DocumentScannerSharp />}
+                          onClick={() => {
+                            window.open(val.image_filepath, '_blank');
+                          }}
+                        >
+                          View File
+                        </Button>
+                      </Stack>
+                    ) : (
+                      <Box
+                        component="img"
+                        // onClick={() =>
+                        //   setImagePreview(VITE_APP_IMAGE_URL + val.image_filepath)
+                        // }
+                        src={val.image_filepath}
+                        sx={{
+                          aspectRatio: '1/1',
+                          border: 'unset',
+                          objectFit: 'contain',
+                          bgcolor: '#cecece',
+                        }}
+                        width="250px"
+                      />
+                    )}
+                    {val.document_number && (
+                      <Typography
+                        align="center"
+                        fontSize={11}
+                        sx={{
+                          color: '#8b95a5',
+                        }}
+                      >
+                        ({val.document_number})
+                      </Typography>
+                    )}
+                  </Stack>
+                );
+              })}
           </Stack>
         </SubDetailsPagesWrapper>
 
