@@ -7,12 +7,127 @@ import { useMutation } from '@tanstack/react-query';
 import { postCreateUser, putCreateUser } from 'service/Finance/customer';
 import { useCustomerDetails } from '../../hooks/useCustomer';
 
+const defaultValidation = yup.object().shape({
+  user_data: yup.object().shape({
+    debtor_name: yup
+      .string()
+      .max(255, 'must be at most 255 characters')
+      .required('This field is required'),
+    merchant_name: yup
+      .string()
+      .max(255, 'must be at most 255 characters')
+      .required('This field is required'),
+    phone_number: yup
+      .string()
+      .min(8, 'Phone number must be at least 8 characters')
+      .max(15, 'Phone number must be at least 15 characters')
+      // @ts-ignore
+      .test('firstChar', 'Phone number must start with 8', (value) => {
+        return value && value[0] === '8';
+      })
+      .required('This field is required'),
+    family_phone_number: yup
+      .string()
+      .min(8, 'Phone number must be at least 8 characters')
+      .max(15, 'Phone number must be at least 15 characters')
+      // @ts-ignore
+      .test('firstChar', 'Phone number must start with 8', (value) => {
+        return value && value[0] === '8';
+      })
+      .required('This field is required'),
+    area: yup.mixed().nullable().required('This field is required'),
+    category_jelajah: yup.mixed().nullable().required('This field is required'),
+    limit_request_plafon: yup
+      .number()
+      .min(1, 'Cant be less than 1')
+      .max(2147483647, 'Must be less than or equal to 2147483647')
+      .required('This field is required'),
+    limit_request_cash: yup
+      .number()
+      .min(1, 'Cant be less than 1')
+      .max(2147483647, 'Must be less than or equal to 2147483647')
+      .required('This field is required'),
+    business_lifetime: yup.string().required('This field is required'),
+    user_type_id: yup.string().nullable().required('This field is required'),
+    bank_name: yup.string().required('Nama Bank wajib diisi'),
+    bank_account: yup
+      .number()
+      .typeError('Must be a number')
+      .min(1, 'Cant be less than 1')
+      .max(2147483647, 'Must be less than or equal to 2147483647')
+      .required('This field is required'),
+    bank_branch_name: yup.string(),
+    bank_account_name: yup.string().required('Nama Rekening wajib diisi'),
+    relatives_name: yup.string().required('Nama Keluarga wajib diisi'),
+    relatives_relation: yup.string().required('Hubungan Keluarga wajib diisi'),
+    disburse_date: yup.number().required('Tanggal Pencairan wajib diisi'),
+  }),
+  idir_data: yup.object().shape({
+    gmv: yup
+      .number()
+      .min(1, 'Cant be less than 1')
+      .max(2147483647, 'Must be less than or equal to 2147483647')
+      .required('This field is required'),
+    purchase: yup
+      .number()
+      .min(1, 'Cant be less than 1')
+      .max(2147483647, 'Must be less than or equal to 2147483647')
+      .required('This field is required'),
+    operational_expense: yup
+      .number()
+      .min(1, 'Cant be less than 1')
+      .max(2147483647, 'Must be less than or equal to 2147483647')
+      .required('This field is required'),
+    household_expense: yup
+      .number()
+      .min(1, 'Cant be less than 1')
+      .max(2147483647, 'Must be less than or equal to 2147483647')
+      .required('This field is required'),
+    another_expense: yup
+      .number()
+      .min(1, 'Cant be less than 1')
+      .max(2147483647, 'Must be less than or equal to 2147483647')
+      .required('This field is required'),
+    another_loan: yup
+      .number()
+      .min(1, 'Cant be less than 1')
+      .max(2147483647, 'Must be less than or equal to 2147483647')
+      .required('This field is required'),
+    requested_limit: yup
+      .number()
+      .min(1, 'Cant be less than 1')
+      .max(2147483647, 'Must be less than or equal to 2147483647')
+      .required('This field is required'),
+    agreed_fee: yup
+      .number()
+      .min(1, 'Cant be less than 1')
+      .max(2147483647, 'Must be less than or equal to 2147483647')
+      .required('This field is required'),
+    net_income: yup
+      .number()
+      .min(1, 'Cant be less than 1')
+      .max(2147483647, 'Must be less than or equal to 2147483647')
+      .required('This field is required'),
+    idir_score: yup
+      .number()
+      .min(1, 'Cant be less than 1')
+      .max(2147483647, 'Must be less than or equal to 2147483647'),
+    // .required('This field is required'),
+    idir_notes: yup.string(),
+  }),
+});
 export default function useUserMerchant({
   id,
   handleClose,
+  costumValidation,
+  new_status,
+  sendDocument,
 }: {
   id?: string | number;
   handleClose: (isSubmited: boolean) => void;
+  costumValidation?: any;
+  new_status?: number;
+  sendDocument?: boolean;
 }) {
   const { openToast } = useToast();
   const isUpdate = Boolean(id);
@@ -41,6 +156,9 @@ export default function useUserMerchant({
         relatives_name: '',
         relatives_relation: '',
         disburse_date: null,
+        limit_plafon: '',
+        limit_cash: '',
+        interest_rate: '',
         // nik: undefined,
         // nib: undefined,
         // npwp: undefined,
@@ -63,24 +181,53 @@ export default function useUserMerchant({
         idir_score: '',
         idir_notes: '',
       },
+      document: {
+        nik_image: '',
+        npwp_image: '',
+        nib_image: '',
+        sku_image: '',
+        divorce_papers_image: '',
+        marriage_papers_image: '',
+        kk_image: '',
+        kur_form: '',
+        financing_form: '',
+      },
     },
     onSubmit: async (values) => {
-      const payload: any = {};
+      const payload: any = {
+        user_data: {},
+        idir_data: {},
+      };
       const { user_data, idir_data } = values;
       const { area, category_jelajah, ...rest_user_data } = user_data;
 
-      payload.user_data = {
-        ...rest_user_data,
+      Object.keys(user_data).forEach((key) => {
         // @ts-ignore
-        area_id: area.id,
-        // @ts-ignore
-        area_name: area.name,
-        // @ts-ignore
-        category_jelajah_id: category_jelajah.id,
-        // @ts-ignore
-        category_jelajah_name: category_jelajah.name,
-        // @ts-ignore
-      };
+        if (user_data[key]) {
+          switch (key) {
+            case area:
+              // @ts-ignore
+              payload.user_data.area_id = area.id;
+              // @ts-ignore
+              payload.user_data.area_name = area.name;
+              break;
+            case category_jelajah:
+              // @ts-ignore
+              payload.user_data.category_jelajah_id = category_jelajah.id;
+              // @ts-ignore
+              payload.user_data.category_jelajah_name = category_jelajah.name;
+              break;
+            default:
+              // @ts-ignore
+              payload.user_data[key] = user_data[key];
+              break;
+          }
+        }
+      });
+
+      if (new_status) {
+        payload.user_data.new_status = new_status;
+      }
 
       payload.idir_data = idir_data;
 
@@ -93,6 +240,15 @@ export default function useUserMerchant({
         'idir_data',
         JSON.stringify(payload.idir_data, null, 2),
       );
+      if (sendDocument) {
+        Object.keys(values.document).forEach((key) => {
+          // @ts-ignore
+          if (values.document[key]) {
+            // @ts-ignore
+            formData.append(key, values.document[key]);
+          }
+        });
+      }
 
       if (isUpdate) {
         updateUser.mutate(
@@ -133,123 +289,7 @@ export default function useUserMerchant({
         });
       }
     },
-    validationSchema: yup.object().shape({
-      user_data: yup.object().shape({
-        debtor_name: yup
-          .string()
-          .max(255, 'must be at most 255 characters')
-          .required('This field is required'),
-        merchant_name: yup
-          .string()
-          .max(255, 'must be at most 255 characters')
-          .required('This field is required'),
-        phone_number: yup
-          .string()
-          .min(8, 'Phone number must be at least 8 characters')
-          .max(15, 'Phone number must be at least 15 characters')
-          // @ts-ignore
-          .test('firstChar', 'Phone number must start with 8', (value) => {
-            return value && value[0] === '8';
-          })
-          .required('This field is required'),
-        family_phone_number: yup
-          .string()
-          .min(8, 'Phone number must be at least 8 characters')
-          .max(15, 'Phone number must be at least 15 characters')
-          // @ts-ignore
-          .test('firstChar', 'Phone number must start with 8', (value) => {
-            return value && value[0] === '8';
-          })
-          .required('This field is required'),
-        area: yup.mixed().nullable().required('This field is required'),
-        category_jelajah: yup
-          .mixed()
-          .nullable()
-          .required('This field is required'),
-        limit_request_plafon: yup
-          .number()
-          .min(1, 'Cant be less than 1')
-          .max(2147483647, 'Must be less than or equal to 2147483647')
-          .required('This field is required'),
-        limit_request_cash: yup
-          .number()
-          .min(1, 'Cant be less than 1')
-          .max(2147483647, 'Must be less than or equal to 2147483647')
-          .required('This field is required'),
-        business_lifetime: yup.string().required('This field is required'),
-        user_type_id: yup
-          .string()
-          .nullable()
-          .required('This field is required'),
-        bank_name: yup.string().required('Nama Bank wajib diisi'),
-        bank_account: yup
-          .number()
-          .typeError('Must be a number')
-          .min(1, 'Cant be less than 1')
-          .max(2147483647, 'Must be less than or equal to 2147483647')
-          .required('This field is required'),
-        bank_branch_name: yup.string(),
-        bank_account_name: yup.string().required('Nama Rekening wajib diisi'),
-        relatives_name: yup.string().required('Nama Keluarga wajib diisi'),
-        relatives_relation: yup
-          .string()
-          .required('Hubungan Keluarga wajib diisi'),
-        disburse_date: yup.number().required('Tanggal Pencairan wajib diisi'),
-      }),
-      idir_data: yup.object().shape({
-        gmv: yup
-          .number()
-          .min(1, 'Cant be less than 1')
-          .max(2147483647, 'Must be less than or equal to 2147483647')
-          .required('This field is required'),
-        purchase: yup
-          .number()
-          .min(1, 'Cant be less than 1')
-          .max(2147483647, 'Must be less than or equal to 2147483647')
-          .required('This field is required'),
-        operational_expense: yup
-          .number()
-          .min(1, 'Cant be less than 1')
-          .max(2147483647, 'Must be less than or equal to 2147483647')
-          .required('This field is required'),
-        household_expense: yup
-          .number()
-          .min(1, 'Cant be less than 1')
-          .max(2147483647, 'Must be less than or equal to 2147483647')
-          .required('This field is required'),
-        another_expense: yup
-          .number()
-          .min(1, 'Cant be less than 1')
-          .max(2147483647, 'Must be less than or equal to 2147483647')
-          .required('This field is required'),
-        another_loan: yup
-          .number()
-          .min(1, 'Cant be less than 1')
-          .max(2147483647, 'Must be less than or equal to 2147483647')
-          .required('This field is required'),
-        requested_limit: yup
-          .number()
-          .min(1, 'Cant be less than 1')
-          .max(2147483647, 'Must be less than or equal to 2147483647')
-          .required('This field is required'),
-        agreed_fee: yup
-          .number()
-          .min(1, 'Cant be less than 1')
-          .max(2147483647, 'Must be less than or equal to 2147483647')
-          .required('This field is required'),
-        net_income: yup
-          .number()
-          .min(1, 'Cant be less than 1')
-          .max(2147483647, 'Must be less than or equal to 2147483647')
-          .required('This field is required'),
-        idir_score: yup
-          .number()
-          .min(1, 'Cant be less than 1')
-          .max(2147483647, 'Must be less than or equal to 2147483647'),
-        // .required('This field is required'),
-        idir_notes: yup.string(),
-      }),
-    }),
+    validationSchema: costumValidation || defaultValidation,
   });
 
   useEffect(() => {
@@ -283,6 +323,8 @@ export default function useUserMerchant({
           relatives_name: detail.relatives_name,
           relatives_relation: detail.relatives_relation,
           disburse_date: detail.disburse_date,
+          limit_plafon: detail.limit_plafon,
+          limit_cash: detail.limit_cash,
         },
         idir_data: {
           gmv: detail.user_idir.GMV,

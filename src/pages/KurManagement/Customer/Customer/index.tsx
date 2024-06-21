@@ -48,6 +48,8 @@ import { getDownloadPdfUser } from 'service/Kur/Customer';
 import useLoadingSpinner from 'hooks/useLoadingSpinner';
 import { base64toOpen } from 'utils/base64toDownload';
 import useToast from 'hooks/useToast';
+import FormUserMerchant from 'pages/Finance/UserMerchant/Components/Form';
+import FormTopUpLimit from 'pages/Finance/UserMerchant/Components/FormTopUpLimit';
 
 // import FormCustomer from '../Verification/components/form';
 
@@ -65,6 +67,7 @@ export default function KurCustomer() {
   const areaKur = useAppSelector((state) => state.area);
   // const creditScore = useAppSelector((state) => state.creditScore);
   const createUserModal = useModal();
+  const topUpModal = useModal();
   const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
   const generatePDF = useMutation(getDownloadPdfUser);
   const { setLoading } = useLoadingSpinner();
@@ -308,6 +311,14 @@ export default function KurCustomer() {
                   setSelectedIdUser(val.id);
                 },
                 dataId: 'button-edit-customer',
+              },
+              {
+                label: `Top Up Limit`,
+                onClick: () => {
+                  topUpModal.openModal();
+                  setSelectedIdUser(val.id);
+                },
+                dataId: 'button-top-up-customer',
               },
               {
                 label: `Generate Invoice`,
@@ -815,7 +826,7 @@ export default function KurCustomer() {
         onClose={createUserModal.closeModal}
         title={selectedIdUser ? 'Update Merchant' : 'Create Merchant'}
       >
-        <FormCustomer
+        <FormUserMerchant
           id={selectedIdUser}
           handleClose={(isSubmite) => {
             if (isSubmite) {
@@ -828,6 +839,27 @@ export default function KurCustomer() {
               );
             }
             createUserModal.closeModal();
+          }}
+        />
+      </Modal>
+      <Modal
+        open={topUpModal.open}
+        onClose={topUpModal.closeModal}
+        title={selectedIdUser ? 'Update Merchant' : 'Create Merchant'}
+      >
+        <FormTopUpLimit
+          id={selectedIdUser}
+          handleClose={(isSubmite) => {
+            if (isSubmite) {
+              dispatch(
+                customerAction.fetchData({
+                  status: 6,
+                  page: customerKur.params.page,
+                  search: customerKur.params.search,
+                }),
+              );
+            }
+            topUpModal.closeModal();
           }}
         />
       </Modal>
