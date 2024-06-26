@@ -113,10 +113,9 @@ const defaultValidation = yup.object().shape({
       .min(1, 'Cant be less than 1')
       .max(2147483647, 'Must be less than or equal to 2147483647')
       .required('This field is required'),
-    idir_score: yup
-      .number()
-      .min(1, 'Cant be less than 1')
-      .max(2147483647, 'Must be less than or equal to 2147483647'),
+    idir_score: yup.number(),
+    // .min(1, 'Cant be less than 1')
+    // .max(2147483647, 'Must be less than or equal to 2147483647'),
     // .required('This field is required'),
     idir_notes: yup.string(),
   }),
@@ -178,10 +177,12 @@ export default function useUserMerchant({
       idir_data: {
         gmv: '', // Jumlah pendapatan per bulan
         purchase: '', // Jumlah pembelian atau stock lapak per bulan
+        // total: gmv - purchase
         operational_expense: '', // Biaya Operasional Tempat Usaha Per bulan
         household_expense: '', // Total Biaya Rumah Tangga per bulan
         another_expense: '', // Total Biaya di Luar Rumah Tangga
         another_loan: '', // Angsuran di Bank/ BPR/ Fintech/ Leasing, dll. Per Bulan
+        // total: operational_expense + household_expense + another_expense + another_loan
         requested_limit: '', // Limit Belanja yang diajukan
         agreed_fee: '', // Total kewajiban yang disanggupi
         net_income: '', // Total Pendapatan Bersih,

@@ -131,7 +131,7 @@ export default function FormUserMerchant({
   useEffect(() => {
     if (!openModal) {
       formik.resetForm();
-      setStep(2);
+      setStep(1);
     }
   }, [openModal]);
 
@@ -161,6 +161,29 @@ export default function FormUserMerchant({
       return 0;
     }
   }, [formik.values.idir_data]);
+
+  const totalNetIncome = useMemo(() => {
+    try {
+      const result =
+        // @ts-ignore
+        totalIncome - totalExpenses - formik.values.idir_data.agreed_fee;
+      return result;
+    } catch (error) {
+      return 0;
+    }
+  }, [totalIncome, totalExpenses, formik.values.idir_data.agreed_fee]);
+
+  const scoreIdir = useMemo(() => {
+    try {
+      const result =
+        // @ts-ignore
+        totalNetIncome / formik.values.idir_data.agreed_fee;
+      return result;
+    } catch (error) {
+      return 0;
+    }
+  }, [totalExpenses, formik.values.idir_data.agreed_fee]);
+
   return (
     <Box p="24px">
       <div id="top" />
@@ -1174,6 +1197,12 @@ export default function FormUserMerchant({
                   'idir_data.requested_limit',
                   parseInt(value || '0'),
                 );
+
+                /// agreed_fee
+                formik.setFieldValue(
+                  'idir_data.agreed_fee',
+                  parseInt(value || '0') * 0.03,
+                );
               }}
               onKeyDown={(evt) =>
                 ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
@@ -1185,37 +1214,27 @@ export default function FormUserMerchant({
               }}
             />
           </FormControl>
-          <FormControl
-            text="Agreed Fee"
-            required
-            error={
-              formik.touched.idir_data?.agreed_fee &&
-              Boolean(formik.errors.idir_data?.agreed_fee)
-            }
-            helperText={
-              formik.touched.idir_data?.agreed_fee
-                ? formik.errors.idir_data?.agreed_fee
-                : ''
-            }
-          >
+          <Box my={2}>
             <TextField
+              label="Total obligations in Titipku that have been fulfilled"
+              variant="filled"
               fullWidth
               placeholder="Input Agreed Fee"
               name="idir_data.agreed_fee"
               onBlur={formik.handleBlur}
               value={numberSeperator(formik.values.idir_data?.agreed_fee)}
-              onChange={(e) => {
-                const value = e.target.value
-                  // @ts-ignore
-                  .replaceAll('.', '')
-                  .replace(/[^0-9.]/g, '')
-                  .replace(/(\..*?)\..*/g, '$1');
+              // onChange={(e) => {
+              //   const value = e.target.value
+              //     // @ts-ignore
+              //     .replaceAll('.', '')
+              //     .replace(/[^0-9.]/g, '')
+              //     .replace(/(\..*?)\..*/g, '$1');
 
-                formik.setFieldValue(
-                  'idir_data.agreed_fee',
-                  parseInt(value || '0'),
-                );
-              }}
+              //   formik.setFieldValue(
+              //     'idir_data.agreed_fee',
+              //     parseInt(value || '0'),
+              //   );
+              // }}
               onKeyDown={(evt) =>
                 ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
               }
@@ -1223,40 +1242,33 @@ export default function FormUserMerchant({
                 startAdornment: (
                   <InputAdornment position="start">Rp</InputAdornment>
                 ),
+                endAdornment: (
+                  <InputAdornment position="start">Note: 3%</InputAdornment>
+                ),
               }}
             />
-          </FormControl>
-          <FormControl
-            text="Net Income"
-            required
-            error={
-              formik.touched.idir_data?.net_income &&
-              Boolean(formik.errors.idir_data?.net_income)
-            }
-            helperText={
-              formik.touched.idir_data?.net_income
-                ? formik.errors.idir_data?.net_income
-                : ''
-            }
-          >
+          </Box>
+          <Box my={1}>
             <TextField
+              label="Total Net Income (Assumption already burdened with Titipku admin fee)"
+              variant="filled"
               fullWidth
               placeholder="Input Net Income"
               name="idir_data.net_income"
               onBlur={formik.handleBlur}
-              value={numberSeperator(formik.values.idir_data?.net_income)}
-              onChange={(e) => {
-                const value = e.target.value
-                  // @ts-ignore
-                  .replaceAll('.', '')
-                  .replace(/[^0-9.]/g, '')
-                  .replace(/(\..*?)\..*/g, '$1');
+              value={numberSeperator(totalNetIncome)}
+              // onChange={(e) => {
+              //   const value = e.target.value
+              //     // @ts-ignore
+              //     .replaceAll('.', '')
+              //     .replace(/[^0-9.]/g, '')
+              //     .replace(/(\..*?)\..*/g, '$1');
 
-                formik.setFieldValue(
-                  'idir_data.net_income',
-                  parseInt(value || '0'),
-                );
-              }}
+              //   formik.setFieldValue(
+              //     'idir_data.net_income',
+              //     parseInt(value || '0'),
+              //   );
+              // }}
               onKeyDown={(evt) =>
                 ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
               }
@@ -1266,43 +1278,33 @@ export default function FormUserMerchant({
                 ),
               }}
             />
-          </FormControl>
-          <FormControl
-            text="IDIR Score"
-            // required
-            error={
-              formik.touched.idir_data?.idir_score &&
-              Boolean(formik.errors.idir_data?.idir_score)
-            }
-            helperText={
-              formik.touched.idir_data?.idir_score
-                ? formik.errors.idir_data?.idir_score
-                : ''
-            }
-          >
+          </Box>
+          <Box my={2}>
             <TextField
+              label="Total IDIR (harus dibawah 60%)"
               fullWidth
+              variant="filled"
               placeholder="Input IDIR Score"
               name="idir_data.idir_score"
               onBlur={formik.handleBlur}
-              value={formik.values.idir_data?.idir_score}
-              onChange={(e) => {
-                const value = e.target.value
-                  // @ts-ignore
-                  .replaceAll('.', '')
-                  .replace(/[^0-9.]/g, '')
-                  .replace(/(\..*?)\..*/g, '$1');
+              value={scoreIdir}
+              // onChange={(e) => {
+              //   const value = e.target.value
+              //     // @ts-ignore
+              //     .replaceAll('.', '')
+              //     .replace(/[^0-9.]/g, '')
+              //     .replace(/(\..*?)\..*/g, '$1');
 
-                formik.setFieldValue(
-                  'idir_data.idir_score',
-                  parseInt(value || '0'),
-                );
-              }}
+              //   formik.setFieldValue(
+              //     'idir_data.idir_score',
+              //     parseInt(value || '0'),
+              //   );
+              // }}
               onKeyDown={(evt) =>
                 ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
               }
             />
-          </FormControl>
+          </Box>
         </Box>
         <FormControl
           text="IDIR notes"
