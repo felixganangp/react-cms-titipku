@@ -8,6 +8,8 @@ import {
   Autocomplete,
   Stack,
   Button,
+  Switch,
+  styled,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import FormControl from 'components/FormLabel';
@@ -365,6 +367,35 @@ export default function FormUserMerchant({
             )}
           />
         </FormControl>
+        {/* @ts-ignore */}
+        {formik.values.user_data?.area?.id === 1 && (
+          <FormControl
+            text="Area Name"
+            required
+            error={
+              formik.touched?.user_data?.area_name &&
+              Boolean(formik.errors?.user_data?.area_name)
+            }
+            helperText={
+              formik.touched?.user_data?.area_name
+                ? formik.errors?.user_data?.area_name
+                : ''
+            }
+          >
+            <TextField
+              fullWidth
+              placeholder="Input Area Name"
+              name="user_data.area_name"
+              onBlur={formik.handleBlur}
+              value={formik.values.user_data?.area_name}
+              onChange={formik.handleChange}
+              error={
+                formik.touched?.user_data?.area_name &&
+                Boolean(formik.errors?.user_data?.area_name)
+              }
+            />
+          </FormControl>
+        )}
         <FormControl
           text="Category"
           error={
@@ -441,10 +472,14 @@ export default function FormUserMerchant({
                 value?.unix(),
               );
             }}
-            value={moment.unix(
-              // @ts-ignore
-              formik.values.user_data?.business_lifetime || moment.unix(),
-            )}
+            value={
+              formik.values.user_data?.business_lifetime
+                ? moment.unix(
+                    // @ts-ignore
+                    formik.values.user_data?.business_lifetime || moment.unix(),
+                  )
+                : null
+            }
             // slotProps={{
             //   textField: {
             //     fullWidth: true,
@@ -750,10 +785,14 @@ export default function FormUserMerchant({
             onChange={(value) => {
               formik.setFieldValue('user_data.disburse_date', value?.unix());
             }}
-            value={moment.unix(
-              // @ts-ignore
-              formik.values.user_data?.disburse_date || moment.unix(),
-            )}
+            value={
+              formik.values.user_data?.disburse_date
+                ? moment.unix(
+                    // @ts-ignore
+                    formik.values.user_data?.disburse_date || moment.unix(),
+                  )
+                : null
+            }
             // slotProps={{
             //   textField: {
             //     fullWidth: true,
@@ -776,6 +815,28 @@ export default function FormUserMerchant({
                   // onClick={openDateSelect.toggleModal}
                 />
               );
+            }}
+          />
+        </FormControl>
+        <FormControl
+          text="Is QRIS Ready?"
+          // error={
+          //   formik.touched.bank_account_number &&
+          //   Boolean(formik.errors.bank_account_number)
+          // }
+          // helperText={
+          //   formik.touched.bank_account_number &&
+          //   formik.errors.bank_account_number &&
+          //   `${formik.errors.bank_account_number}`
+          // }
+        >
+          {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
+          <SwitchCostum
+            checked={formik.values.user_data?.has_qris}
+            name="user_data.has_qris"
+            onBlur={formik.handleBlur}
+            onChange={(e) => {
+              formik.handleChange(e);
             }}
           />
         </FormControl>
@@ -1223,3 +1284,47 @@ export default function FormUserMerchant({
     </Box>
   );
 }
+
+const SwitchCostum = styled(Switch)(({ theme }) => ({
+  width: 28,
+  height: 16,
+  padding: 0,
+  display: 'flex',
+  '&:active': {
+    '& .MuiSwitch-thumb': {
+      width: 15,
+    },
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      transform: 'translateX(9px)',
+    },
+  },
+  '& .MuiSwitch-switchBase': {
+    padding: 2,
+    '&.Mui-checked': {
+      transform: 'translateX(12px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        opacity: 1,
+        backgroundColor: theme.palette.primary.main,
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    transition: theme.transitions.create(['width'], {
+      duration: 200,
+    }),
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 16 / 2,
+    opacity: 1,
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255,255,255,.35)'
+        : 'rgba(0,0,0,.25)',
+    boxSizing: 'border-box',
+  },
+}));
