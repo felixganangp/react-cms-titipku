@@ -17,6 +17,8 @@ import {
   IconButton,
   Autocomplete,
   debounce,
+  styled,
+  Switch,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { Delete } from '@mui/icons-material';
@@ -63,6 +65,8 @@ export default function FormInvoice(props: FormInvoiceProps) {
       provision_installment_period: '',
       nota_image: '',
       interest_rate: 0,
+      is_sharing_margin: false,
+      sharing_margin: 0,
     },
     validationSchema: yup.object({
       user: yup.object().nullable().required('Required'),
@@ -72,6 +76,14 @@ export default function FormInvoice(props: FormInvoiceProps) {
         .required('Required'),
       transfer_date: yup.mixed().nullable().required('Required'),
       interest_rate: yup.number().nullable().required('Required').min(0),
+      sharing_margin: yup.number().when('is_sharing_margin', {
+        is: (val: any) => val === true,
+        then: yup
+          .number()
+          .typeError('Must be a number')
+          .required('Required')
+          .min(1),
+      }),
       destination_bank: yup.mixed().when('invoice_type_id', {
         is: (val: any) => val === '1',
         then: yup.object().nullable().required('Required'),
@@ -277,6 +289,56 @@ export default function FormInvoice(props: FormInvoiceProps) {
             />
           )}
         </FormControl>
+        <FormControl text="Sharing Margin">
+          <SwitchCostum
+            checked={formik.values.is_sharing_margin}
+            name="is_sharing_margin"
+            onBlur={formik.handleBlur}
+            onChange={(e) => {
+              formik.handleChange(e);
+            }}
+          />
+        </FormControl>
+        {formik.values.is_sharing_margin && (
+          <FormControl
+            text="Sharing Margin Amount"
+            required
+            error={
+              formik.touched.sharing_margin &&
+              Boolean(formik.errors.sharing_margin)
+            }
+            helperText={
+              formik.touched.sharing_margin &&
+              formik.errors.sharing_margin &&
+              `${formik.errors.sharing_margin}`
+            }
+          >
+            <TextField
+              type="text"
+              name="sharing_margin"
+              placeholder="Insert Sharing Margin Amount"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Rp</InputAdornment>
+                ),
+              }}
+              fullWidth
+              autoComplete="off"
+              value={numberSeperator(formik.values.sharing_margin || '')}
+              onBlur={(e) => {
+                formik.handleBlur(e);
+              }}
+              onChange={(e) => {
+                const value = e.target.value
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
+
+                formik.setFieldValue('sharing_margin', value);
+              }}
+            />
+          </FormControl>
+        )}
+
         <FormControl
           text="Loan Amount"
           required
@@ -667,3 +729,47 @@ export default function FormInvoice(props: FormInvoiceProps) {
     </Box>
   );
 }
+
+const SwitchCostum = styled(Switch)(({ theme }) => ({
+  width: 28,
+  height: 16,
+  padding: 0,
+  display: 'flex',
+  '&:active': {
+    '& .MuiSwitch-thumb': {
+      width: 15,
+    },
+    '& .MuiSwitch-switchBase.Mui-checked': {
+      transform: 'translateX(9px)',
+    },
+  },
+  '& .MuiSwitch-switchBase': {
+    padding: 2,
+    '&.Mui-checked': {
+      transform: 'translateX(12px)',
+      color: '#fff',
+      '& + .MuiSwitch-track': {
+        opacity: 1,
+        backgroundColor: theme.palette.primary.main,
+      },
+    },
+  },
+  '& .MuiSwitch-thumb': {
+    boxShadow: '0 2px 4px 0 rgb(0 35 11 / 20%)',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    transition: theme.transitions.create(['width'], {
+      duration: 200,
+    }),
+  },
+  '& .MuiSwitch-track': {
+    borderRadius: 16 / 2,
+    opacity: 1,
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255,255,255,.35)'
+        : 'rgba(0,0,0,.25)',
+    boxSizing: 'border-box',
+  },
+}));
