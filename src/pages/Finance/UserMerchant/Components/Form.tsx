@@ -167,6 +167,7 @@ export default function FormUserMerchant({
       const result =
         // @ts-ignore
         totalIncome - totalExpenses - formik.values.idir_data.agreed_fee;
+      formik.setFieldValue('idir_data.net_income', result);
       return result;
     } catch (error) {
       return 0;
@@ -184,6 +185,7 @@ export default function FormUserMerchant({
     }
   }, [totalExpenses, formik.values.idir_data.agreed_fee]);
 
+  console.log('scoreIdir', formik.errors);
   return (
     <Box p="24px">
       <div id="top" />
