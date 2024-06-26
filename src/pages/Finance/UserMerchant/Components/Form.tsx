@@ -897,11 +897,12 @@ export default function FormUserMerchant({
       </Box>
       <Box display={step === 2 ? 'block' : 'none'}>
         <Typography fontWeight="500">
-          1. Purchases and Income Merchant
+          1. Pembelian dan Pendapatan Hasil Lapak
         </Typography>
         <Box pl={2} pb={2} mb={2} borderBottom="1px solid #cecece">
           <FormControl
-            text="GMV"
+            styleText={{ fontWeight: 400, color: 'rgba(0,0,0,.6)' }}
+            text="Jumlah Pendapatan Per Bulan"
             required
             error={
               formik.touched.idir_data?.gmv &&
@@ -913,7 +914,7 @@ export default function FormUserMerchant({
           >
             <TextField
               fullWidth
-              placeholder="Input GVM"
+              placeholder="Input Jumlah Pendapatan Per Bulan"
               name="idir_data.gmv"
               onBlur={formik.handleBlur}
               value={numberSeperator(formik.values.idir_data?.gmv)}
@@ -936,10 +937,13 @@ export default function FormUserMerchant({
               }}
             />
           </FormControl>
-          <FormControl text="Monthly Purchase">
+          <FormControl
+            styleText={{ fontWeight: 400, color: 'rgba(0,0,0,.6)' }}
+            text="Jumlah Pembelian atau Stock Lapak Per Bulan"
+          >
             <TextField
               fullWidth
-              placeholder="Input Purchase"
+              placeholder="Input Jumlah Pembelian atau Stock Lapak Per Bulan"
               name="idir_data.purchase"
               onBlur={formik.handleBlur}
               value={numberSeperator(formik.values.idir_data?.purchase)}
@@ -967,8 +971,8 @@ export default function FormUserMerchant({
           </FormControl>
           <TextField
             fullWidth
-            label="Total Merchant Income"
-            placeholder="Input Purchase"
+            label="Jumlah Pendapatan Lapak"
+            placeholder="Input Jumlah Pendapatan Lapak"
             name="idir_data.purchase"
             value={numberSeperator(totalIncome)}
             variant="filled"
@@ -980,11 +984,12 @@ export default function FormUserMerchant({
           />
         </Box>
         <Typography fontWeight="500">
-          2. Amount of Business and Living Support Expenses Per Month
+          2. Jumlah Pengeluaran Penunjang Usaha dan Hidup Per Bulan
         </Typography>
         <Box pl={2} pb={2} mb={2} borderBottom="1px solid #cecece">
           <FormControl
-            text="Operational Expense"
+            styleText={{ fontWeight: 400, color: 'rgba(0,0,0,.6)' }}
+            text="Biaya Operasional Tempat Usaha (Listrik Kios, Transportasi, Sewa Lapak) Per Bulan"
             required
             error={
               formik.touched.idir_data?.operational_expense &&
@@ -1027,7 +1032,8 @@ export default function FormUserMerchant({
             />
           </FormControl>
           <FormControl
-            text="Household Expense"
+            styleText={{ fontWeight: 400, color: 'rgba(0,0,0,.6)' }}
+            text="Total Biaya Rumah Tangga (Pendidikan, Konsumsi,  Listrik, Air, Pulsa / Internet) Per Bulan"
             required
             error={
               formik.touched.idir_data?.household_expense &&
@@ -1070,7 +1076,8 @@ export default function FormUserMerchant({
             />
           </FormControl>
           <FormControl
-            text="Another Expense"
+            styleText={{ fontWeight: 400, color: 'rgba(0,0,0,.6)' }}
+            text="Total Biaya di Luar Rumah Tangga (Iuran sekitar tempat tinggal, arisan) Per Bulan"
             required
             error={
               formik.touched.idir_data?.another_expense &&
@@ -1111,7 +1118,8 @@ export default function FormUserMerchant({
             />
           </FormControl>
           <FormControl
-            text="Another Loan"
+            styleText={{ fontWeight: 400, color: 'rgba(0,0,0,.6)' }}
+            text="Angsuran di Bank/ BPR/ Fintech/ Leasing, dll. Per Bulan"
             required
             error={
               formik.touched.idir_data?.another_loan &&
@@ -1153,7 +1161,7 @@ export default function FormUserMerchant({
           </FormControl>
           <TextField
             fullWidth
-            label="Total Merchant expenses"
+            label="Jumlah Biaya Pengeluaran "
             placeholder="Input Purchase"
             name="idir_data.purchase"
             value={numberSeperator(totalExpenses)}
@@ -1165,10 +1173,11 @@ export default function FormUserMerchant({
             }}
           />
         </Box>
-        <Typography fontWeight="500">3. Submission Calculation</Typography>
+        <Typography fontWeight="500">3. Perhitungan Pengajuan</Typography>
         <Box pl={2} pb={2} mb={2} borderBottom="1px solid #cecece">
           <FormControl
-            text="Requested Limit"
+            styleText={{ fontWeight: 400, color: 'rgba(0,0,0,.6)' }}
+            text="Jumlah Limit Belanja yang Diajukan"
             required
             error={
               formik.touched.idir_data?.requested_limit &&
@@ -1216,7 +1225,7 @@ export default function FormUserMerchant({
           </FormControl>
           <Box my={2}>
             <TextField
-              label="Total obligations in Titipku that have been fulfilled"
+              label="Total kewajiaban ke Titipku yang disanggupi"
               variant="filled"
               fullWidth
               placeholder="Input Agreed Fee"
@@ -1250,7 +1259,7 @@ export default function FormUserMerchant({
           </Box>
           <Box my={1}>
             <TextField
-              label="Total Net Income (Assumption already burdened with Titipku admin fee)"
+              label="Total Pendapatan Bersih (Asumsi sudah dibebani admin fee Titipku)"
               variant="filled"
               fullWidth
               placeholder="Input Net Income"
@@ -1307,6 +1316,7 @@ export default function FormUserMerchant({
           </Box>
         </Box>
         <FormControl
+          styleText={{ fontWeight: 400, color: 'rgba(0,0,0,.6)' }}
           text="IDIR notes"
           error={
             formik.touched.idir_data?.idir_notes &&
