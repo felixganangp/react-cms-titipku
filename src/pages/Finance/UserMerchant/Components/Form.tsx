@@ -1,3 +1,4 @@
+/* eslint-disable no-unsafe-optional-chaining */
 /* eslint-disable radix */
 import {
   Box,
@@ -10,8 +11,9 @@ import {
   Button,
   Switch,
   styled,
+  Typography,
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import FormControl from 'components/FormLabel';
 import numberSeperator from 'utils/numberSeperator';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
@@ -118,7 +120,6 @@ export default function FormUserMerchant({
     }
   };
 
-  console.log(formik.errors);
   useEffect(() => {
     const element = document.getElementById('to');
 
@@ -130,13 +131,43 @@ export default function FormUserMerchant({
   useEffect(() => {
     if (!openModal) {
       formik.resetForm();
-      setStep(1);
+      setStep(2);
     }
   }, [openModal]);
+
+  const totalIncome = useMemo(() => {
+    try {
+      const result =
+        // @ts-ignore
+        // eslint-disable-next-line no-unsafe-optional-chaining
+        formik.values.idir_data?.gmv - formik.values.idir_data?.purchase;
+      return result;
+    } catch (error) {
+      return 0;
+    }
+  }, [formik.values.idir_data]);
+
+  const totalExpenses = useMemo(() => {
+    try {
+      const result =
+        // @ts-ignore
+        // eslint-disable-next-line no-unsafe-optional-chaining
+        formik.values.idir_data?.operational_expense +
+        formik.values.idir_data?.household_expense +
+        formik.values.idir_data?.another_expense +
+        formik.values.idir_data?.another_loan;
+      return result;
+    } catch (error) {
+      return 0;
+    }
+  }, [formik.values.idir_data]);
   return (
     <Box p="24px">
       <div id="top" />
-      <SteperHeader currentStep={step} stepList={['Basic Info', 'IDIR']} />
+      <SteperHeader
+        currentStep={step}
+        stepList={['Basic Info', 'Calculator IDIR']}
+      />
       <Box mt={2} />
       <Box display={step === 1 ? 'block' : 'none'}>
         <FormControl
@@ -842,408 +873,437 @@ export default function FormUserMerchant({
         </FormControl>
       </Box>
       <Box display={step === 2 ? 'block' : 'none'}>
-        <FormControl
-          text="GMV"
-          required
-          error={
-            formik.touched.idir_data?.gmv &&
-            Boolean(formik.errors.idir_data?.gmv)
-          }
-          helperText={
-            formik.touched.idir_data?.gmv ? formik.errors.idir_data?.gmv : ''
-          }
-        >
-          <TextField
-            fullWidth
-            placeholder="Input GVM"
-            name="idir_data.gmv"
-            onBlur={formik.handleBlur}
-            value={numberSeperator(formik.values.idir_data?.gmv)}
-            onChange={(e) => {
-              const value = e.target.value
-                // @ts-ignore
-                .replaceAll('.', '')
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
-
-              formik.setFieldValue('idir_data.gmv', parseInt(value || '0'));
-            }}
-            onKeyDown={(evt) =>
-              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+        <Typography fontWeight="500">
+          1. Purchases and Income Merchant
+        </Typography>
+        <Box pl={2} pb={2} mb={2} borderBottom="1px solid #cecece">
+          <FormControl
+            text="GMV"
+            required
+            error={
+              formik.touched.idir_data?.gmv &&
+              Boolean(formik.errors.idir_data?.gmv)
             }
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">Rp</InputAdornment>
-              ),
-            }}
-          />
-        </FormControl>
-        <FormControl
-          text="Purchase"
-          required
-          error={
-            formik.touched.idir_data?.purchase &&
-            Boolean(formik.errors.idir_data?.purchase)
-          }
-          helperText={
-            formik.touched.idir_data?.purchase
-              ? formik.errors.idir_data?.purchase
-              : ''
-          }
-        >
+            helperText={
+              formik.touched.idir_data?.gmv ? formik.errors.idir_data?.gmv : ''
+            }
+          >
+            <TextField
+              fullWidth
+              placeholder="Input GVM"
+              name="idir_data.gmv"
+              onBlur={formik.handleBlur}
+              value={numberSeperator(formik.values.idir_data?.gmv)}
+              onChange={(e) => {
+                const value = e.target.value
+                  // @ts-ignore
+                  .replaceAll('.', '')
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
+
+                formik.setFieldValue('idir_data.gmv', parseInt(value || '0'));
+              }}
+              onKeyDown={(evt) =>
+                ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Rp</InputAdornment>
+                ),
+              }}
+            />
+          </FormControl>
+          <FormControl text="Monthly Purchase">
+            <TextField
+              fullWidth
+              placeholder="Input Purchase"
+              name="idir_data.purchase"
+              onBlur={formik.handleBlur}
+              value={numberSeperator(formik.values.idir_data?.purchase)}
+              onChange={(e) => {
+                const value = e.target.value
+                  // @ts-ignore
+                  .replaceAll('.', '')
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
+
+                formik.setFieldValue(
+                  'idir_data.purchase',
+                  parseInt(value || '0'),
+                );
+              }}
+              onKeyDown={(evt) =>
+                ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Rp</InputAdornment>
+                ),
+              }}
+            />
+          </FormControl>
           <TextField
             fullWidth
+            label="Total Merchant Income"
             placeholder="Input Purchase"
             name="idir_data.purchase"
-            onBlur={formik.handleBlur}
-            value={numberSeperator(formik.values.idir_data?.purchase)}
-            onChange={(e) => {
-              const value = e.target.value
-                // @ts-ignore
-                .replaceAll('.', '')
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
-
-              formik.setFieldValue(
-                'idir_data.purchase',
-                parseInt(value || '0'),
-              );
-            }}
-            onKeyDown={(evt) =>
-              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
-            }
+            value={numberSeperator(totalIncome)}
+            variant="filled"
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">Rp</InputAdornment>
               ),
             }}
           />
-        </FormControl>
-        <FormControl
-          text="Operational Expense"
-          required
-          error={
-            formik.touched.idir_data?.operational_expense &&
-            Boolean(formik.errors.idir_data?.operational_expense)
-          }
-          helperText={
-            formik.touched.idir_data?.operational_expense
-              ? formik.errors.idir_data?.operational_expense
-              : ''
-          }
-        >
+        </Box>
+        <Typography fontWeight="500">
+          2. Amount of Business and Living Support Expenses Per Month
+        </Typography>
+        <Box pl={2} pb={2} mb={2} borderBottom="1px solid #cecece">
+          <FormControl
+            text="Operational Expense"
+            required
+            error={
+              formik.touched.idir_data?.operational_expense &&
+              Boolean(formik.errors.idir_data?.operational_expense)
+            }
+            helperText={
+              formik.touched.idir_data?.operational_expense
+                ? formik.errors.idir_data?.operational_expense
+                : ''
+            }
+          >
+            <TextField
+              fullWidth
+              placeholder="Input operational expense"
+              name="idir_data.operational_expense"
+              onBlur={formik.handleBlur}
+              value={numberSeperator(
+                formik.values.idir_data?.operational_expense,
+              )}
+              onChange={(e) => {
+                const value = e.target.value
+                  // @ts-ignore
+                  .replaceAll('.', '')
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
+
+                formik.setFieldValue(
+                  'idir_data.operational_expense',
+                  parseInt(value || '0'),
+                );
+              }}
+              onKeyDown={(evt) =>
+                ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Rp</InputAdornment>
+                ),
+              }}
+            />
+          </FormControl>
+          <FormControl
+            text="Household Expense"
+            required
+            error={
+              formik.touched.idir_data?.household_expense &&
+              Boolean(formik.errors.idir_data?.household_expense)
+            }
+            helperText={
+              formik.touched.idir_data?.household_expense
+                ? formik.errors.idir_data?.household_expense
+                : ''
+            }
+          >
+            <TextField
+              fullWidth
+              placeholder="Input household expense"
+              name="idir_data.household_expense"
+              onBlur={formik.handleBlur}
+              value={numberSeperator(
+                formik.values.idir_data?.household_expense,
+              )}
+              onChange={(e) => {
+                const value = e.target.value
+                  // @ts-ignore
+                  .replaceAll('.', '')
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
+
+                formik.setFieldValue(
+                  'idir_data.household_expense',
+                  parseInt(value || '0'),
+                );
+              }}
+              onKeyDown={(evt) =>
+                ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Rp</InputAdornment>
+                ),
+              }}
+            />
+          </FormControl>
+          <FormControl
+            text="Another Expense"
+            required
+            error={
+              formik.touched.idir_data?.another_expense &&
+              Boolean(formik.errors.idir_data?.another_expense)
+            }
+            helperText={
+              formik.touched.idir_data?.another_expense
+                ? formik.errors.idir_data?.another_expense
+                : ''
+            }
+          >
+            <TextField
+              fullWidth
+              placeholder="Input Another expense"
+              name="idir_data.another_expense"
+              onBlur={formik.handleBlur}
+              value={numberSeperator(formik.values.idir_data?.another_expense)}
+              onChange={(e) => {
+                const value = e.target.value
+                  // @ts-ignore
+                  .replaceAll('.', '')
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
+
+                formik.setFieldValue(
+                  'idir_data.another_expense',
+                  parseInt(value || '0'),
+                );
+              }}
+              onKeyDown={(evt) =>
+                ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Rp</InputAdornment>
+                ),
+              }}
+            />
+          </FormControl>
+          <FormControl
+            text="Another Loan"
+            required
+            error={
+              formik.touched.idir_data?.another_loan &&
+              Boolean(formik.errors.idir_data?.another_loan)
+            }
+            helperText={
+              formik.touched.idir_data?.another_loan
+                ? formik.errors.idir_data?.another_loan
+                : ''
+            }
+          >
+            <TextField
+              fullWidth
+              placeholder="Input Another loan"
+              name="idir_data.another_loan"
+              onBlur={formik.handleBlur}
+              value={numberSeperator(formik.values.idir_data?.another_loan)}
+              onChange={(e) => {
+                const value = e.target.value
+                  // @ts-ignore
+                  .replaceAll('.', '')
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
+
+                formik.setFieldValue(
+                  'idir_data.another_loan',
+                  parseInt(value || '0'),
+                );
+              }}
+              onKeyDown={(evt) =>
+                ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Rp</InputAdornment>
+                ),
+              }}
+            />
+          </FormControl>
           <TextField
             fullWidth
-            placeholder="Input operational expense"
-            name="idir_data.operational_expense"
-            onBlur={formik.handleBlur}
-            value={numberSeperator(
-              formik.values.idir_data?.operational_expense,
-            )}
-            onChange={(e) => {
-              const value = e.target.value
-                // @ts-ignore
-                .replaceAll('.', '')
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
-
-              formik.setFieldValue(
-                'idir_data.operational_expense',
-                parseInt(value || '0'),
-              );
-            }}
-            onKeyDown={(evt) =>
-              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
-            }
+            label="Total Merchant expenses"
+            placeholder="Input Purchase"
+            name="idir_data.purchase"
+            value={numberSeperator(totalExpenses)}
+            variant="filled"
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">Rp</InputAdornment>
               ),
             }}
           />
-        </FormControl>
-        <FormControl
-          text="Household Expense"
-          required
-          error={
-            formik.touched.idir_data?.household_expense &&
-            Boolean(formik.errors.idir_data?.household_expense)
-          }
-          helperText={
-            formik.touched.idir_data?.household_expense
-              ? formik.errors.idir_data?.household_expense
-              : ''
-          }
-        >
-          <TextField
-            fullWidth
-            placeholder="Input household expense"
-            name="idir_data.household_expense"
-            onBlur={formik.handleBlur}
-            value={numberSeperator(formik.values.idir_data?.household_expense)}
-            onChange={(e) => {
-              const value = e.target.value
-                // @ts-ignore
-                .replaceAll('.', '')
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
-
-              formik.setFieldValue(
-                'idir_data.household_expense',
-                parseInt(value || '0'),
-              );
-            }}
-            onKeyDown={(evt) =>
-              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+        </Box>
+        <Typography fontWeight="500">3. Submission Calculation</Typography>
+        <Box pl={2} pb={2} mb={2} borderBottom="1px solid #cecece">
+          <FormControl
+            text="Requested Limit"
+            required
+            error={
+              formik.touched.idir_data?.requested_limit &&
+              Boolean(formik.errors.idir_data?.requested_limit)
             }
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">Rp</InputAdornment>
-              ),
-            }}
-          />
-        </FormControl>
-        <FormControl
-          text="Another Expense"
-          required
-          error={
-            formik.touched.idir_data?.another_expense &&
-            Boolean(formik.errors.idir_data?.another_expense)
-          }
-          helperText={
-            formik.touched.idir_data?.another_expense
-              ? formik.errors.idir_data?.another_expense
-              : ''
-          }
-        >
-          <TextField
-            fullWidth
-            placeholder="Input Another expense"
-            name="idir_data.another_expense"
-            onBlur={formik.handleBlur}
-            value={numberSeperator(formik.values.idir_data?.another_expense)}
-            onChange={(e) => {
-              const value = e.target.value
-                // @ts-ignore
-                .replaceAll('.', '')
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
-
-              formik.setFieldValue(
-                'idir_data.another_expense',
-                parseInt(value || '0'),
-              );
-            }}
-            onKeyDown={(evt) =>
-              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+            helperText={
+              formik.touched.idir_data?.requested_limit
+                ? formik.errors.idir_data?.requested_limit
+                : ''
             }
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">Rp</InputAdornment>
-              ),
-            }}
-          />
-        </FormControl>
-        <FormControl
-          text="Another Loan"
-          required
-          error={
-            formik.touched.idir_data?.another_loan &&
-            Boolean(formik.errors.idir_data?.another_loan)
-          }
-          helperText={
-            formik.touched.idir_data?.another_loan
-              ? formik.errors.idir_data?.another_loan
-              : ''
-          }
-        >
-          <TextField
-            fullWidth
-            placeholder="Input Another loan"
-            name="idir_data.another_loan"
-            onBlur={formik.handleBlur}
-            value={numberSeperator(formik.values.idir_data?.another_loan)}
-            onChange={(e) => {
-              const value = e.target.value
-                // @ts-ignore
-                .replaceAll('.', '')
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
+          >
+            <TextField
+              fullWidth
+              placeholder="Input Requested Limit"
+              name="idir_data.requested_limit"
+              onBlur={formik.handleBlur}
+              value={numberSeperator(formik.values.idir_data?.requested_limit)}
+              onChange={(e) => {
+                const value = e.target.value
+                  // @ts-ignore
+                  .replaceAll('.', '')
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
 
-              formik.setFieldValue(
-                'idir_data.another_loan',
-                parseInt(value || '0'),
-              );
-            }}
-            onKeyDown={(evt) =>
-              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+                formik.setFieldValue(
+                  'idir_data.requested_limit',
+                  parseInt(value || '0'),
+                );
+              }}
+              onKeyDown={(evt) =>
+                ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Rp</InputAdornment>
+                ),
+              }}
+            />
+          </FormControl>
+          <FormControl
+            text="Agreed Fee"
+            required
+            error={
+              formik.touched.idir_data?.agreed_fee &&
+              Boolean(formik.errors.idir_data?.agreed_fee)
             }
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">Rp</InputAdornment>
-              ),
-            }}
-          />
-        </FormControl>
-        <FormControl
-          text="Requested Limit"
-          required
-          error={
-            formik.touched.idir_data?.requested_limit &&
-            Boolean(formik.errors.idir_data?.requested_limit)
-          }
-          helperText={
-            formik.touched.idir_data?.requested_limit
-              ? formik.errors.idir_data?.requested_limit
-              : ''
-          }
-        >
-          <TextField
-            fullWidth
-            placeholder="Input Requested Limit"
-            name="idir_data.requested_limit"
-            onBlur={formik.handleBlur}
-            value={numberSeperator(formik.values.idir_data?.requested_limit)}
-            onChange={(e) => {
-              const value = e.target.value
-                // @ts-ignore
-                .replaceAll('.', '')
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
+            helperText={
+              formik.touched.idir_data?.agreed_fee
+                ? formik.errors.idir_data?.agreed_fee
+                : ''
+            }
+          >
+            <TextField
+              fullWidth
+              placeholder="Input Agreed Fee"
+              name="idir_data.agreed_fee"
+              onBlur={formik.handleBlur}
+              value={numberSeperator(formik.values.idir_data?.agreed_fee)}
+              onChange={(e) => {
+                const value = e.target.value
+                  // @ts-ignore
+                  .replaceAll('.', '')
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
 
-              formik.setFieldValue(
-                'idir_data.requested_limit',
-                parseInt(value || '0'),
-              );
-            }}
-            onKeyDown={(evt) =>
-              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+                formik.setFieldValue(
+                  'idir_data.agreed_fee',
+                  parseInt(value || '0'),
+                );
+              }}
+              onKeyDown={(evt) =>
+                ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Rp</InputAdornment>
+                ),
+              }}
+            />
+          </FormControl>
+          <FormControl
+            text="Net Income"
+            required
+            error={
+              formik.touched.idir_data?.net_income &&
+              Boolean(formik.errors.idir_data?.net_income)
             }
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">Rp</InputAdornment>
-              ),
-            }}
-          />
-        </FormControl>
-        <FormControl
-          text="Agreed Fee"
-          required
-          error={
-            formik.touched.idir_data?.agreed_fee &&
-            Boolean(formik.errors.idir_data?.agreed_fee)
-          }
-          helperText={
-            formik.touched.idir_data?.agreed_fee
-              ? formik.errors.idir_data?.agreed_fee
-              : ''
-          }
-        >
-          <TextField
-            fullWidth
-            placeholder="Input Agreed Fee"
-            name="idir_data.agreed_fee"
-            onBlur={formik.handleBlur}
-            value={numberSeperator(formik.values.idir_data?.agreed_fee)}
-            onChange={(e) => {
-              const value = e.target.value
-                // @ts-ignore
-                .replaceAll('.', '')
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
+            helperText={
+              formik.touched.idir_data?.net_income
+                ? formik.errors.idir_data?.net_income
+                : ''
+            }
+          >
+            <TextField
+              fullWidth
+              placeholder="Input Net Income"
+              name="idir_data.net_income"
+              onBlur={formik.handleBlur}
+              value={numberSeperator(formik.values.idir_data?.net_income)}
+              onChange={(e) => {
+                const value = e.target.value
+                  // @ts-ignore
+                  .replaceAll('.', '')
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
 
-              formik.setFieldValue(
-                'idir_data.agreed_fee',
-                parseInt(value || '0'),
-              );
-            }}
-            onKeyDown={(evt) =>
-              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+                formik.setFieldValue(
+                  'idir_data.net_income',
+                  parseInt(value || '0'),
+                );
+              }}
+              onKeyDown={(evt) =>
+                ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+              }
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">Rp</InputAdornment>
+                ),
+              }}
+            />
+          </FormControl>
+          <FormControl
+            text="IDIR Score"
+            // required
+            error={
+              formik.touched.idir_data?.idir_score &&
+              Boolean(formik.errors.idir_data?.idir_score)
             }
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">Rp</InputAdornment>
-              ),
-            }}
-          />
-        </FormControl>
-        <FormControl
-          text="Net Income"
-          required
-          error={
-            formik.touched.idir_data?.net_income &&
-            Boolean(formik.errors.idir_data?.net_income)
-          }
-          helperText={
-            formik.touched.idir_data?.net_income
-              ? formik.errors.idir_data?.net_income
-              : ''
-          }
-        >
-          <TextField
-            fullWidth
-            placeholder="Input Net Income"
-            name="idir_data.net_income"
-            onBlur={formik.handleBlur}
-            value={numberSeperator(formik.values.idir_data?.net_income)}
-            onChange={(e) => {
-              const value = e.target.value
-                // @ts-ignore
-                .replaceAll('.', '')
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
+            helperText={
+              formik.touched.idir_data?.idir_score
+                ? formik.errors.idir_data?.idir_score
+                : ''
+            }
+          >
+            <TextField
+              fullWidth
+              placeholder="Input IDIR Score"
+              name="idir_data.idir_score"
+              onBlur={formik.handleBlur}
+              value={formik.values.idir_data?.idir_score}
+              onChange={(e) => {
+                const value = e.target.value
+                  // @ts-ignore
+                  .replaceAll('.', '')
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
 
-              formik.setFieldValue(
-                'idir_data.net_income',
-                parseInt(value || '0'),
-              );
-            }}
-            onKeyDown={(evt) =>
-              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
-            }
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">Rp</InputAdornment>
-              ),
-            }}
-          />
-        </FormControl>
-        <FormControl
-          text="IDIR Score"
-          // required
-          error={
-            formik.touched.idir_data?.idir_score &&
-            Boolean(formik.errors.idir_data?.idir_score)
-          }
-          helperText={
-            formik.touched.idir_data?.idir_score
-              ? formik.errors.idir_data?.idir_score
-              : ''
-          }
-        >
-          <TextField
-            fullWidth
-            placeholder="Input IDIR Score"
-            name="idir_data.idir_score"
-            onBlur={formik.handleBlur}
-            value={formik.values.idir_data?.idir_score}
-            onChange={(e) => {
-              const value = e.target.value
-                // @ts-ignore
-                .replaceAll('.', '')
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
-
-              formik.setFieldValue(
-                'idir_data.idir_score',
-                parseInt(value || '0'),
-              );
-            }}
-            onKeyDown={(evt) =>
-              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
-            }
-          />
-        </FormControl>
+                formik.setFieldValue(
+                  'idir_data.idir_score',
+                  parseInt(value || '0'),
+                );
+              }}
+              onKeyDown={(evt) =>
+                ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+              }
+            />
+          </FormControl>
+        </Box>
         <FormControl
           text="IDIR notes"
           error={
