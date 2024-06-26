@@ -37,6 +37,10 @@ const defaultValidation = yup.object().shape({
       })
       .required('This field is required'),
     area: yup.mixed().nullable().required('This field is required'),
+    area_name: yup.string().when('area', {
+      is: (val: { id: string | number; name: string }) => val?.id === 1,
+      then: yup.string().required('This field is required'),
+    }),
     category_jelajah: yup.mixed().nullable().required('This field is required'),
     limit_request_plafon: yup
       .number()
@@ -61,7 +65,7 @@ const defaultValidation = yup.object().shape({
     bank_account_name: yup.string().required('Nama Rekening wajib diisi'),
     relatives_name: yup.string().required('Nama Keluarga wajib diisi'),
     relatives_relation: yup.string().required('Hubungan Keluarga wajib diisi'),
-    disburse_date: yup.number().required('Tanggal Pencairan wajib diisi'),
+    disburse_date: yup.mixed(),
   }),
   idir_data: yup.object().shape({
     gmv: yup
@@ -160,6 +164,8 @@ export default function useUserMerchant({
         limit_plafon: '',
         limit_cash: '',
         interest_rate: '',
+        has_qris: false,
+        area_name: undefined,
         // nik: undefined,
         // nib: undefined,
         // npwp: undefined,
@@ -200,19 +206,21 @@ export default function useUserMerchant({
         idir_data: {},
       };
       const { user_data, idir_data } = values;
-      const { area, category_jelajah, ...rest_user_data } = user_data;
+      const { area, category_jelajah, area_name, ...rest_user_data } =
+        user_data;
 
       Object.keys(user_data).forEach((key) => {
         // @ts-ignore
         if (user_data[key]) {
           switch (key) {
-            case area:
+            case 'area':
               // @ts-ignore
               payload.user_data.area_id = area.id;
-              // @ts-ignore
-              payload.user_data.area_name = area.name;
+              payload.user_data.area_name =
+                // @ts-ignore
+                area?.id === 1 ? area_name : area?.name;
               break;
-            case category_jelajah:
+            case 'category_jelajah':
               // @ts-ignore
               payload.user_data.category_jelajah_id = category_jelajah.id;
               // @ts-ignore
@@ -304,8 +312,9 @@ export default function useUserMerchant({
           family_phone_number: detail.family_phone_number,
           area: {
             id: detail.area_id,
-            name: detail.area_name,
+            name: detail.area_id ? 'Tidak Masuk Area' : detail.area_name,
           },
+          area_name: detail.area_id === 1 ? detail.area_name : undefined,
           category_jelajah: {
             id: detail.category_jelajah_id,
             name: detail.category_jelajah_name,

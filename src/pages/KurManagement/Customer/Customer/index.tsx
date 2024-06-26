@@ -833,7 +833,10 @@ export default function KurCustomer() {
       </Modal> */}
       <Modal
         open={createUserModal.open}
-        onClose={createUserModal.closeModal}
+        onClose={() => {
+          createUserModal.closeModal();
+          setSelectedIdUser(undefined);
+        }}
         title={selectedIdUser ? 'Update Merchant' : 'Create Merchant'}
       >
         <FormUserMerchant
@@ -848,6 +851,7 @@ export default function KurCustomer() {
                 }),
               );
             }
+            setSelectedIdUser(undefined);
             createUserModal.closeModal();
           }}
         />
