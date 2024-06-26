@@ -779,7 +779,10 @@ export default function KurCustomerVerification() {
       </Modal>
       <Modal
         open={createUserModal.open}
-        onClose={createUserModal.closeModal}
+        onClose={() => {
+          createUserModal.closeModal();
+          setSelectedIdUser(undefined);
+        }}
         title={selectedIdUser ? 'Update Merchant' : 'Create Merchant'}
       >
         <FormUserMerchant
@@ -788,6 +791,7 @@ export default function KurCustomerVerification() {
             if (isSubmite) {
               dispatch(customerAction.fetchData(customerKur.params));
             }
+            setSelectedIdUser(undefined);
             createUserModal.closeModal();
           }}
         />

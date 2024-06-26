@@ -37,6 +37,10 @@ const defaultValidation = yup.object().shape({
       })
       .required('This field is required'),
     area: yup.mixed().nullable().required('This field is required'),
+    area_name: yup.string().when('area', {
+      is: (val: { id: string | number; name: string }) => val?.id === 1,
+      then: yup.string().required('This field is required'),
+    }),
     category_jelajah: yup.mixed().nullable().required('This field is required'),
     limit_request_plafon: yup
       .number()
@@ -61,7 +65,7 @@ const defaultValidation = yup.object().shape({
     bank_account_name: yup.string().required('Nama Rekening wajib diisi'),
     relatives_name: yup.string().required('Nama Keluarga wajib diisi'),
     relatives_relation: yup.string().required('Hubungan Keluarga wajib diisi'),
-    disburse_date: yup.number().required('Tanggal Pencairan wajib diisi'),
+    disburse_date: yup.mixed(),
   }),
   idir_data: yup.object().shape({
     gmv: yup
@@ -109,10 +113,9 @@ const defaultValidation = yup.object().shape({
       .min(1, 'Cant be less than 1')
       .max(2147483647, 'Must be less than or equal to 2147483647')
       .required('This field is required'),
-    idir_score: yup
-      .number()
-      .min(1, 'Cant be less than 1')
-      .max(2147483647, 'Must be less than or equal to 2147483647'),
+    idir_score: yup.number(),
+    // .min(1, 'Cant be less than 1')
+    // .max(2147483647, 'Must be less than or equal to 2147483647'),
     // .required('This field is required'),
     idir_notes: yup.string(),
   }),
@@ -160,6 +163,8 @@ export default function useUserMerchant({
         limit_plafon: '',
         limit_cash: '',
         interest_rate: '',
+        has_qris: false,
+        area_name: undefined,
         // nik: undefined,
         // nib: undefined,
         // npwp: undefined,
@@ -172,10 +177,12 @@ export default function useUserMerchant({
       idir_data: {
         gmv: '', // Jumlah pendapatan per bulan
         purchase: '', // Jumlah pembelian atau stock lapak per bulan
+        // total: gmv - purchase
         operational_expense: '', // Biaya Operasional Tempat Usaha Per bulan
         household_expense: '', // Total Biaya Rumah Tangga per bulan
         another_expense: '', // Total Biaya di Luar Rumah Tangga
         another_loan: '', // Angsuran di Bank/ BPR/ Fintech/ Leasing, dll. Per Bulan
+        // total: operational_expense + household_expense + another_expense + another_loan
         requested_limit: '', // Limit Belanja yang diajukan
         agreed_fee: '', // Total kewajiban yang disanggupi
         net_income: '', // Total Pendapatan Bersih,
@@ -200,19 +207,21 @@ export default function useUserMerchant({
         idir_data: {},
       };
       const { user_data, idir_data } = values;
-      const { area, category_jelajah, ...rest_user_data } = user_data;
+      const { area, category_jelajah, area_name, ...rest_user_data } =
+        user_data;
 
       Object.keys(user_data).forEach((key) => {
         // @ts-ignore
         if (user_data[key]) {
           switch (key) {
-            case area:
+            case 'area':
               // @ts-ignore
               payload.user_data.area_id = area.id;
-              // @ts-ignore
-              payload.user_data.area_name = area.name;
+              payload.user_data.area_name =
+                // @ts-ignore
+                area?.id === 1 ? area_name : area?.name;
               break;
-            case category_jelajah:
+            case 'category_jelajah':
               // @ts-ignore
               payload.user_data.category_jelajah_id = category_jelajah.id;
               // @ts-ignore
@@ -304,8 +313,9 @@ export default function useUserMerchant({
           family_phone_number: detail.family_phone_number,
           area: {
             id: detail.area_id,
-            name: detail.area_name,
+            name: detail.area_id ? 'Tidak Masuk Area' : detail.area_name,
           },
+          area_name: detail.area_id === 1 ? detail.area_name : undefined,
           category_jelajah: {
             id: detail.category_jelajah_id,
             name: detail.category_jelajah_name,
