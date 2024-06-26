@@ -179,6 +179,7 @@ export default function FormUserMerchant({
       const result =
         // @ts-ignore
         totalNetIncome / formik.values.idir_data.agreed_fee;
+      formik.setFieldValue('idir_data.score_idir', result);
       return result;
     } catch (error) {
       return 0;
