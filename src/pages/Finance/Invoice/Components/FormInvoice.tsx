@@ -75,7 +75,10 @@ export default function FormInvoice(props: FormInvoiceProps) {
         .min(2, 'Please enter a minimum required amount.')
         .required('Required'),
       transfer_date: yup.mixed().nullable().required('Required'),
-      interest_rate: yup.number().nullable().required('Required').min(0),
+      interest_rate: yup.mixed().when('is_sharing_margin', {
+        is: (val: any) => val === false,
+        then: yup.number().nullable().required('Required').min(0),
+      }),
       sharing_margin: yup.number().when('is_sharing_margin', {
         is: (val: any) => val === true,
         then: yup
@@ -539,37 +542,43 @@ export default function FormInvoice(props: FormInvoiceProps) {
             </FormControl>
           </>
         )}
-        <FormControl
-          text="Admin Fee"
-          required
-          error={
-            formik.touched.interest_rate && Boolean(formik.errors.interest_rate)
-          }
-          helperText={
-            formik.touched.interest_rate &&
-            formik.errors.interest_rate &&
-            `${formik.errors.interest_rate}`
-          }
-        >
-          <TextField
-            type="text"
-            name="interest_rate"
-            placeholder="Insert Admin Fee"
-            InputProps={{
-              endAdornment: <InputAdornment position="start">%</InputAdornment>,
-            }}
-            fullWidth
-            autoComplete="off"
-            value={numberSeperator(formik.values.interest_rate || '')}
-            onChange={(e) => {
-              const value = e.target.value
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
+        {!formik.values.is_sharing_margin && (
+          <FormControl
+            text="Admin Fee"
+            required
+            error={
+              formik.touched.interest_rate &&
+              Boolean(formik.errors.interest_rate)
+            }
+            helperText={
+              formik.touched.interest_rate &&
+              formik.errors.interest_rate &&
+              `${formik.errors.interest_rate}`
+            }
+          >
+            <TextField
+              type="text"
+              name="interest_rate"
+              placeholder="Insert Admin Fee"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">%</InputAdornment>
+                ),
+              }}
+              fullWidth
+              autoComplete="off"
+              value={numberSeperator(formik.values.interest_rate || '')}
+              onChange={(e) => {
+                const value = e.target.value
+                  .replace(/[^0-9.]/g, '')
+                  .replace(/(\..*?)\..*/g, '$1');
 
-              formik.setFieldValue('interest_rate', value);
-            }}
-          />
-        </FormControl>
+                formik.setFieldValue('interest_rate', value);
+              }}
+            />
+          </FormControl>
+        )}
+
         {formik.values.invoice_type_id === '2' && (
           <>
             <FormControl
