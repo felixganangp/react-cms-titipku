@@ -56,10 +56,10 @@ const defaultValidation = yup.object().shape({
     user_type_id: yup.string().nullable().required('This field is required'),
     bank_name: yup.string().required('Nama Bank wajib diisi'),
     bank_account: yup
-      .number()
+      .string()
       .typeError('Must be a number')
-      .min(1, 'Cant be less than 1')
-      .max(2147483647, 'Must be less than or equal to 2147483647')
+      .min(5, 'Cant be less than 8')
+      .max(16, 'Must be less than or equal to 20')
       .required('This field is required'),
     bank_branch_name: yup.string(),
     bank_account_name: yup.string().required('Nama Rekening wajib diisi'),
@@ -334,6 +334,7 @@ export default function useUserMerchant({
           disburse_date: detail.disburse_date,
           limit_plafon: detail.limit_plafon,
           limit_cash: detail.limit_cash,
+          interest_rate: detail.interest_rate,
         },
         idir_data: {
           gmv: detail.user_idir.GMV,

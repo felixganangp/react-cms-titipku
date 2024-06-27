@@ -178,15 +178,17 @@ export default function FormUserMerchant({
     try {
       const result =
         // @ts-ignore
-        totalNetIncome / formik.values.idir_data.agreed_fee;
-      formik.setFieldValue('idir_data.score_idir', result);
-      return result;
+        (formik.values.idir_data.agreed_fee / totalNetIncome) * 100;
+      formik.setFieldValue(
+        'idir_data.idir_score',
+        typeof result === 'number' ? parseInt(result.toFixed(2)) : 0,
+      );
+      return result.toFixed(2);
     } catch (error) {
       return 0;
     }
   }, [totalExpenses, formik.values.idir_data.agreed_fee]);
 
-  console.log('scoreIdir', formik.errors);
   return (
     <Box p="24px">
       <div id="top" />
@@ -705,7 +707,18 @@ export default function FormUserMerchant({
             fullWidth
             placeholder="Insert destination bank"
             value={formik.values.user_data?.bank_account}
-            onChange={formik.handleChange}
+            onChange={(e) => {
+              const value = e.target.value
+                // @ts-ignore
+                .replaceAll('.', '')
+                .replace(/[^0-9.]/g, '')
+                .replace(/(\..*?)\..*/g, '$1');
+
+              formik.setFieldValue('user_data.bank_account', value);
+            }}
+            onKeyDown={(evt) =>
+              ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+            }
             onBlur={formik.handleBlur}
             name="user_data.bank_account"
           />
@@ -1213,7 +1226,7 @@ export default function FormUserMerchant({
                 /// agreed_fee
                 formik.setFieldValue(
                   'idir_data.agreed_fee',
-                  parseInt(value || '0') * 0.03,
+                  parseInt((parseInt(value || '0') * 0.03).toFixed(0)),
                 );
               }}
               onKeyDown={(evt) =>
@@ -1300,6 +1313,7 @@ export default function FormUserMerchant({
               name="idir_data.idir_score"
               onBlur={formik.handleBlur}
               value={scoreIdir}
+              type="text"
               // onChange={(e) => {
               //   const value = e.target.value
               //     // @ts-ignore
@@ -1315,6 +1329,11 @@ export default function FormUserMerchant({
               onKeyDown={(evt) =>
                 ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
               }
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="start">%</InputAdornment>
+                ),
+              }}
             />
           </Box>
         </Box>
