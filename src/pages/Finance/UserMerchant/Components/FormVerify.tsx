@@ -28,6 +28,12 @@ import { SteperHeader } from '../../Customer/Components/SteperHeader';
 import useUserMerchant from '../hooks/useUserMerchant';
 import { Type } from '../../hooks/constumer.config';
 
+const fileSize = yup.mixed().test('fileSize', 'Max size 3mb', function (value) {
+  const file = value || null; // Assuming the value is an array of files
+  if (!file) return true; // No file, so validation passes
+  return file?.size <= 1024 * 1024 * 3; // 1 MB
+});
+
 export default function FormVerifyUserMerchant({
   id,
   handleClose,
@@ -49,31 +55,46 @@ export default function FormVerifyUserMerchant({
           .number()
           .required('Limit request plafon is required')
           .max(2147483647, 'Must be less than or equal to 2147483647')
-          .min(1, 'Limit request plafon must be greater than 0'),
+          .min(0, 'Limit request plafon must be greater than 0'),
         limit_request_cash: yup
           .number()
           .required('Limit request cash is required')
           .max(2147483647, 'Must be less than or equal to 2147483647')
-          .min(1, 'Limit request cash must be greater than 0'),
+          .min(0, 'Limit request cash must be greater than 0'),
         limit_plafon: yup
           .number()
+          .nullable()
           .required('Limit plafon is required')
           .max(2147483647, 'Must be less than or equal to 2147483647')
-          .min(1, 'Limit plafon must be greater than 0'),
+          .min(0, 'Limit plafon must be greater than 0'),
         limit_cash: yup
           .number()
+          .nullable()
           .required('Limit cash is required')
           .max(2147483647, 'Must be less than or equal to 2147483647')
-          .min(1, 'Limit cash must be greater than 0'),
+          .min(9, 'Limit cash must be greater than 0'),
         interest_rate: yup
           .number()
+          .nullable()
           .required('Interest rate is required')
           .max(100, 'Must be less than or equal to 100')
-          .min(1, 'Interest rate must be greater than 0'),
+          .min(0, 'Interest rate must be greater than 0'),
+      }),
+      document: yup.object().shape({
+        nik_image: fileSize,
+        npwp_image: fileSize,
+        nib_image: fileSize,
+        sku_image: fileSize,
+        divorce_papers_image: fileSize,
+        marriage_papers_image: fileSize,
+        kk_image: fileSize,
+        kur_form: fileSize,
+        financing_form: fileSize,
       }),
     }),
     sendDocument: true,
   });
+  console.log(formik.errors);
 
   const backButton = () => {
     switch (step) {
@@ -365,14 +386,28 @@ export default function FormVerifyUserMerchant({
                   .replaceAll('_', ' ')
                   .replaceAll('image', '')
                   .toLocaleUpperCase()}
+                error={
+                  // @ts-ignore
+                  formik.touched?.document?.[key] &&
+                  // @ts-ignore
+                  Boolean(formik.errors?.document?.[key])
+                }
+                helperText={
+                  // @ts-ignore
+                  formik.touched?.document?.[key]
+                    ? // @ts-ignore
+                      formik.errors?.document?.[key]
+                    : ''
+                }
               >
                 <InputImage
                   label="an Image"
                   // @ts-ignore
-                  value={formik.values.document[key]}
-                  onChange={(e: unknown) =>
-                    formik.setFieldValue(`document.${key}`, e)
-                  }
+                  value={formik.values?.document?.[key]}
+                  onChange={(e: unknown) => {
+                    formik.setFieldValue(`document.${key}`, e);
+                    formik.setFieldTouched(`document.${key}`);
+                  }}
                   onClear={() => formik.setFieldValue(`document.${key}`, null)}
                   // width={720}
                   // height={720}
@@ -389,10 +424,24 @@ export default function FormVerifyUserMerchant({
                   .replaceAll('_', ' ')
                   .replaceAll('form', '')
                   .toLocaleUpperCase()}
+                error={
+                  // @ts-ignore
+                  formik.touched?.document?.[key] &&
+                  // @ts-ignore
+                  Boolean(formik.errors?.document?.[key])
+                }
+                helperText={
+                  // @ts-ignore
+                  formik.touched?.document?.[key]
+                    ? // @ts-ignore
+                      formik.errors?.document?.[key]
+                    : ''
+                }
               >
                 <>
                   <input
                     type="file"
+                    accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,"
                     hidden
                     name={key}
                     title=""
@@ -405,6 +454,9 @@ export default function FormVerifyUserMerchant({
                           // @ts-ignore
                           e.target.files[0] || '',
                         );
+                        formik.setFieldTouched(`document.${key}`).then(() => {
+                          formik.validateForm();
+                        });
                       }
                     }}
                   />
@@ -414,7 +466,7 @@ export default function FormVerifyUserMerchant({
                     }}
                   >
                     {/* @ts-ignore */}
-                    {formik.values.document[key]?.name || 'Choose File'}
+                    {formik.values?.document?.[key]?.name || 'Choose File'}
                   </Button>
                 </>
               </FormControl>
