@@ -56,6 +56,8 @@ import MenuList from 'components/MenuList';
 import { useMutation } from '@tanstack/react-query';
 import { getDownloadPdfUser } from 'service/Kur/Customer';
 import useLoadingSpinner from 'hooks/useLoadingSpinner';
+import Modal from 'components/Modal';
+import useModal from 'hooks/useModal';
 import useToast from 'hooks/useToast';
 import { base64toOpen } from 'utils/base64toDownload';
 import {
@@ -63,6 +65,7 @@ import {
   useInvoiceUserDetails,
   usePaymentUserDetails,
 } from 'pages/Finance/hooks/useInvoiceService';
+import FormTopUpLimit from 'pages/Finance/UserMerchant/Components/FormTopUpLimit';
 import { TitlePage, BackButton, Menu } from './details.styled';
 import { Document } from '@/pages/Finance/hooks/constumer.config';
 
@@ -96,6 +99,7 @@ export default function CustomerDetails() {
   const { openToast } = useToast();
   const invoiceList = useInvoiceUserDetails(id);
   const paymentList = usePaymentUserDetails(id);
+  const topUpModal = useModal();
 
   useEffect(() => {
     if (id) {
@@ -135,34 +139,6 @@ export default function CustomerDetails() {
     newValue: number,
   ) => {
     setKurHistoryTab(newValue);
-  };
-
-  const handleChangePagePayment = (value: number) => {
-    dispatch(
-      paymentKURAction.fetchData({
-        ...payment.params,
-        page: value,
-      }),
-    );
-    dispatch(
-      paymentKURAction.setParams({
-        page: value,
-      }),
-    );
-  };
-
-  const handleChangePageInvoice = (value: number) => {
-    dispatch(
-      invoiceKurAction.fetchData({
-        ...invoice.params,
-        page: value,
-      }),
-    );
-    dispatch(
-      invoiceKurAction.setParams({
-        page: value,
-      }),
-    );
   };
   const countDiffDate = (start: number | undefined) => {
     const month = Math.round(
@@ -259,6 +235,13 @@ export default function CustomerDetails() {
                         });
                       },
                       dataId: 'button-edit-customer',
+                    },
+                    {
+                      label: 'Top Up Limit',
+                      onClick: () => {
+                        topUpModal.openModal();
+                      },
+                      dataId: 'button-top-up-limit',
                     },
                   ]}
                 >
@@ -910,6 +893,28 @@ export default function CustomerDetails() {
           />
         </Modal> */}
       </Box>
+      <Modal
+        open={topUpModal.open}
+        onClose={topUpModal.closeModal}
+        title="Top Up Limit"
+      >
+        <FormTopUpLimit
+          id={id}
+          handleClose={(isSubmite) => {
+            if (isSubmite) {
+              dispatch(
+                customerAction.fetchData({
+                  status: 6,
+                  page: customerKur.params.page,
+                  search: customerKur.params.search,
+                }),
+              );
+            }
+            topUpModal.closeModal();
+          }}
+          openModal={topUpModal.open}
+        />
+      </Modal>
     </div>
   );
 }
