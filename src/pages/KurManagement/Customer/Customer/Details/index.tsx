@@ -63,6 +63,7 @@ import { base64toOpen } from 'utils/base64toDownload';
 import {
   useInvoiceDetails,
   useInvoiceUserDetails,
+  useLimitHistoryUserDetails,
   usePaymentUserDetails,
 } from 'pages/Finance/hooks/useInvoiceService';
 import FormTopUpLimit from 'pages/Finance/UserMerchant/Components/FormTopUpLimit';
@@ -99,6 +100,7 @@ export default function CustomerDetails() {
   const { openToast } = useToast();
   const invoiceList = useInvoiceUserDetails(id);
   const paymentList = usePaymentUserDetails(id);
+  const limitHistoryList = useLimitHistoryUserDetails(id);
   const topUpModal = useModal();
 
   useEffect(() => {
@@ -627,6 +629,7 @@ export default function CustomerDetails() {
               {/* <Tabs.Item label="Request" /> */}
               <Tabs.Item label="Invoice" />
               <Tabs.Item label="Payment" />
+              <Tabs.Item label="History Limit" />
             </Tabs.Container>
             {/* {kurHistoryTab === 0 && (
               <Table
@@ -858,6 +861,61 @@ export default function CustomerDetails() {
                     align: 'left',
                     format: (val) => (
                       <Typography>{val.payment_method?.name || '-'}</Typography>
+                    ),
+                  },
+                ]}
+                count={paymentList.data?.count || 0}
+                page={paymentList.params.page}
+                totalData={paymentList.data?.total || 0}
+                onChangePage={(page) =>
+                  paymentList.handleChangeParams({
+                    page,
+                  })
+                }
+              />
+            )}
+            {kurHistoryTab === 2 && (
+              <Table
+                data={limitHistoryList.listData}
+                headCells={[
+                  {
+                    id: 'id',
+                    label: 'Old Limit Cash',
+                    align: 'left',
+                    format: (val) => (
+                      <Typography>
+                        Rp {numberSeperator(val?.old_limit_cash || '0')}
+                      </Typography>
+                    ),
+                  },
+                  {
+                    id: 'id',
+                    label: 'New Limit plafon',
+                    align: 'left',
+                    format: (val) => (
+                      <Typography>
+                        Rp {numberSeperator(val?.new_limit_plafon || '0')}
+                      </Typography>
+                    ),
+                  },
+                  {
+                    id: 'id',
+                    label: 'Old Limit plafon',
+                    align: 'left',
+                    format: (val) => (
+                      <Typography>
+                        Rp {numberSeperator(val?.old_limit_plafon || '0')}
+                      </Typography>
+                    ),
+                  },
+                  {
+                    id: 'id',
+                    label: 'New Limit plafon',
+                    align: 'left',
+                    format: (val) => (
+                      <Typography>
+                        Rp {numberSeperator(val?.new_limit_plafon || '0')}
+                      </Typography>
                     ),
                   },
                 ]}
