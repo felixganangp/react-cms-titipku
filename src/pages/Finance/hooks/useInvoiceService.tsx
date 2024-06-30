@@ -7,6 +7,7 @@ import {
   getInvoiceByUserId,
   getInvoiceDetails,
   getInvoicePDF,
+  getLimitHistoryByUserId,
   getPaymentByUserId,
   setManualSettled,
 } from 'service/Finance/invoice';
@@ -179,6 +180,23 @@ export function usePaymentUserDetails(idInvoice?: string | number) {
     queryKey: [`payment/details/${idInvoice}`, params.params],
     // @ts-ignore
     queryFn: () => getPaymentByUserId(idInvoice, params.params),
+    // enabled: !!idInvoice,
+  });
+
+  return {
+    ...queryInvoice,
+    listData: queryInvoice?.data?.data || [],
+    ...params,
+  };
+}
+
+export function useLimitHistoryUserDetails(idInvoice?: string | number) {
+  const params = UseParams<any>();
+
+  const queryInvoice = useQuery({
+    queryKey: [`limit-history/details/${idInvoice}`, params.params],
+    // @ts-ignore
+    queryFn: () => getLimitHistoryByUserId(idInvoice, params.params),
     // enabled: !!idInvoice,
   });
 
