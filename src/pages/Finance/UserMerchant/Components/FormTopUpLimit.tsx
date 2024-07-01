@@ -45,11 +45,13 @@ export default function FormTopUpLimit({
       user_data: yup.object().shape({
         limit_plafon: yup
           .number()
+          .nullable()
           .required('Limit plafon is required')
           .max(2147483647, 'Must be less than or equal to 2147483647')
           .min(1, 'Limit plafon must be greater than 0'),
         limit_cash: yup
           .number()
+          .nullable()
           .required('Limit cash is required')
           .max(2147483647, 'Must be less than or equal to 2147483647')
           .min(1, 'Limit cash must be greater than 0'),

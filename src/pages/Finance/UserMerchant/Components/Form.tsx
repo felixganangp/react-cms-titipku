@@ -906,7 +906,7 @@ export default function FormUserMerchant({
             name="user_data.has_qris"
             onBlur={formik.handleBlur}
             onChange={(e) => {
-              formik.handleChange(e);
+              formik.setFieldValue('user_data.has_qris', e.target.checked);
             }}
           />
         </FormControl>
