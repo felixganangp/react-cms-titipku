@@ -890,17 +890,17 @@ export default function CustomerDetails() {
                   },
                   {
                     id: 'id',
-                    label: 'New Limit plafon',
+                    label: 'New Limit Cash',
                     align: 'left',
                     format: (val) => (
                       <Typography>
-                        Rp {numberSeperator(val?.new_limit_plafon || '0')}
+                        Rp {numberSeperator(val?.new_limit_cash || '0')}
                       </Typography>
                     ),
                   },
                   {
                     id: 'id',
-                    label: 'Old Limit plafon',
+                    label: 'Old Limit Plafon',
                     align: 'left',
                     format: (val) => (
                       <Typography>
@@ -910,7 +910,7 @@ export default function CustomerDetails() {
                   },
                   {
                     id: 'id',
-                    label: 'New Limit plafon',
+                    label: 'New Limit Plafon',
                     align: 'left',
                     format: (val) => (
                       <Typography>
@@ -963,10 +963,10 @@ export default function CustomerDetails() {
               dispatch(
                 customerAction.fetchData({
                   status: 6,
-                  page: customerKur.params.page,
                   search: customerKur.params.search,
                 }),
               );
+              limitHistoryList.refetch();
             }
             topUpModal.closeModal();
           }}

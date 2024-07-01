@@ -321,7 +321,7 @@ export default function useUserMerchant({
             name: detail.category_jelajah_name,
           },
           limit_request_plafon: detail.limit_request_plafon,
-          limit_request_cash: detail.limit_request_plafon,
+          limit_request_cash: detail.limit_request_cash,
           business_lifetime: detail.business_lifetime,
           user_type_id: detail.user_type_id,
           is_merchant_titipku: detail.is_merchant_titipku,
@@ -353,6 +353,7 @@ export default function useUserMerchant({
       formik.setValues(payload);
     }
   }, [id, detailQuery.data]);
+
   return {
     ...formik,
   };

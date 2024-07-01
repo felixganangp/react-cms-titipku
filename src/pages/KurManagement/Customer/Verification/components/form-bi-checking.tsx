@@ -183,6 +183,39 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
                               </Typography>
                               <Typography>{cust.merchant_name}</Typography>
                               <Box>
+                                <FormLabel text="Batch" required>
+                                  <Autocomplete
+                                    options={statusBiChecking}
+                                    onChange={(e, value) => {
+                                      setFieldValue(
+                                        `customers[${index}].bi_checking_status`,
+                                        value,
+                                      );
+                                      setFieldValue(
+                                        `customers[${index}].bi_checking_status_id`,
+                                        value?.id || 0,
+                                      );
+                                    }}
+                                    getOptionLabel={(option) => option.name}
+                                    value={cust.bi_checking_status}
+                                    renderInput={(params) => (
+                                      <TextField
+                                        {...params}
+                                        name={`customers.${index}.bi_checking_status_id`}
+                                        onBlur={handleBlur}
+                                        onChange={handleChange}
+                                        placeholder="Select Existing Bi Checking"
+                                        sx={{
+                                          '& .MuiOutlinedInput-root': {
+                                            backgroundColor: '#fff',
+                                          },
+                                        }}
+                                      />
+                                    )}
+                                  />
+                                </FormLabel>
+                              </Box>
+                              <Box>
                                 <FormLabel text="Status" required>
                                   <Autocomplete
                                     options={statusBiChecking}
@@ -214,7 +247,6 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
                                     )}
                                   />
                                 </FormLabel>
-
                                 <ErrorMessage
                                   name={`customers.${index}.bi_checking_status_id`}
                                 >
