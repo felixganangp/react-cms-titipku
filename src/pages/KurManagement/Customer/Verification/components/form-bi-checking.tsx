@@ -18,6 +18,9 @@ import FormLabel from 'components/FormLabel';
 // import SelectItem from 'components/SelectItem';
 import { customerAction } from 'store/slice/kur/Customer';
 import { BiChecking, BiCheckingCustomer, Customer } from 'models/kur/Customer';
+import UseParams from 'hooks/useParams';
+import { useQuery } from '@tanstack/react-query';
+import { getAllBatch } from 'service/Finance/config';
 import SelectCustomer from '../../../../Finance/Components/SelectCustomer';
 
 // const initalValues: BiCheckingCustomer[] = [];
@@ -43,6 +46,14 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
     (state) => state.customerKur.customerSelect,
   );
   const [initialValues, setInitialValues] = useState(initalValues);
+  const batchParams = UseParams({ count: 25 });
+  const batchQuery = useQuery({
+    queryKey: ['/financing/user/batch', batchParams.params],
+    queryFn: () => getAllBatch(batchParams.params),
+    // enabled: Boolean(areaParams.searchValue),
+    keepPreviousData: true,
+  });
+
   const [searchCustomer, setSearchCustomer] = useState('');
   const statusBiChecking = [
     {
@@ -130,6 +141,7 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
               id: val.id || 0,
               bi_checking_status_id: val.bi_checking_status_id,
               bi_checking_status_notes: val.bi_checking_status_notes,
+              batch_id: val.batch_id || 0,
             };
             payload.push(temp);
           });
@@ -156,6 +168,7 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
           values,
           handleChange,
           handleBlur,
+          setFieldTouched,
         }) => (
           <Form style={{ padding: '0px !important' }}>
             <Box sx={{ padding: '24px' }}>
@@ -183,33 +196,58 @@ export default function FormBiChecking({ biCheckingData, onClose }: FormProps) {
                               </Typography>
                               <Typography>{cust.merchant_name}</Typography>
                               <Box>
-                                <FormLabel text="Batch" required>
+                                <FormLabel text="Batch">
                                   <Autocomplete
-                                    options={statusBiChecking}
-                                    onChange={(e, value) => {
+                                    options={
+                                      batchQuery.data?.data.map(
+                                        (val) => val.id,
+                                      ) || []
+                                    }
+                                    noOptionsText={
+                                      !batchParams.searchValue
+                                        ? 'Type to search area'
+                                        : 'No option'
+                                    }
+                                    inputValue={batchParams.searchValue}
+                                    onInputChange={(_, newInputValue) => {
+                                      batchParams.handleSearch(newInputValue);
+                                    }}
+                                    loading={batchQuery.isFetching}
+                                    // @ts-ignore
+                                    getOptionLabel={(item) => item}
+                                    value={
+                                      // @ts-ignore
+                                      values.customers[index]?.batch_id || null
+                                    }
+                                    onChange={(e, value) =>
                                       setFieldValue(
-                                        `customers[${index}].bi_checking_status`,
+                                        `customers[${index}].batch_id`,
                                         value,
-                                      );
-                                      setFieldValue(
-                                        `customers[${index}].bi_checking_status_id`,
-                                        value?.id || 0,
+                                      )
+                                    }
+                                    onBlur={(e) => {
+                                      setFieldTouched(
+                                        `customers[${index}].batch_id`,
                                       );
                                     }}
-                                    getOptionLabel={(option) => option.name}
-                                    value={cust.bi_checking_status}
+                                    // onBlur={() => {
+                                    //   formik.setFieldTouched('user_data.area');
+                                    // }}
                                     renderInput={(params) => (
                                       <TextField
                                         {...params}
-                                        name={`customers.${index}.bi_checking_status_id`}
-                                        onBlur={handleBlur}
-                                        onChange={handleChange}
-                                        placeholder="Select Existing Bi Checking"
+                                        placeholder="Select Bathc number"
                                         sx={{
                                           '& .MuiOutlinedInput-root': {
                                             backgroundColor: '#fff',
                                           },
                                         }}
+                                        // error={
+                                        //   formik.touched?.user_data?.area &&
+                                        //   Boolean(
+                                        //     formik.errors?.user_data?.area,
+                                        //   )
+                                        // }
                                       />
                                     )}
                                   />

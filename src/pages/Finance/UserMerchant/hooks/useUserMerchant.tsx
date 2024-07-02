@@ -350,7 +350,11 @@ export default function useUserMerchant({
           idir_notes: detail.user_idir.IdirNotes,
         },
       };
-      formik.setValues(payload);
+      formik.setValues(payload).then(() => {
+        setTimeout(() => {
+          formik.validateForm();
+        }, 50);
+      });
     }
   }, [id, detailQuery.data]);
 
