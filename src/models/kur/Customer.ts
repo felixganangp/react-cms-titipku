@@ -185,6 +185,7 @@ export interface BiChecking {
   id: number;
   bi_checking_status_id: number;
   bi_checking_status_notes: string;
+  batch_id?: number;
 }
 
 export interface BiCheckingCustomer {
@@ -195,6 +196,7 @@ export interface BiCheckingCustomer {
   bi_checking_status_id: number;
   bi_checking_status_notes: string;
   bi_checking_status: BiCheckingStatus;
+  batch_id?: number;
 }
 
 export interface BiCheckingStatus {
