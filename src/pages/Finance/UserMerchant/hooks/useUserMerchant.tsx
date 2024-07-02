@@ -304,6 +304,7 @@ export default function useUserMerchant({
     const detail = detailQuery.data?.data;
 
     if (detail) {
+      console.log(detail);
       const payload: any = {
         ...formik.values,
         user_data: {
@@ -313,7 +314,7 @@ export default function useUserMerchant({
           family_phone_number: detail.family_phone_number,
           area: {
             id: detail.area_id,
-            name: detail.area_id ? 'Tidak Masuk Area' : detail.area_name,
+            name: detail.area_id ? detail.area_name : 'Tidak Masuk Area',
           },
           area_name: detail.area_id === 1 ? detail.area_name : undefined,
           category_jelajah: {
