@@ -335,6 +335,7 @@ export default function useUserMerchant({
           limit_plafon: detail.limit_plafon,
           limit_cash: detail.limit_cash,
           interest_rate: detail.interest_rate,
+          has_qris: detail.has_qris,
         },
         idir_data: {
           gmv: detail.user_idir.GMV,

@@ -51,6 +51,7 @@ export type CustomerDetailType = {
   need_provision_normal: boolean;
   available_limit_plafon: number;
   available_limit_cash: number;
+  has_qris: boolean;
 };
 
 export type UserIdir = {
