@@ -121,7 +121,7 @@ export default function FormUserMerchant({
   };
 
   useEffect(() => {
-    const element = document.getElementById('to');
+    const element = document.getElementById('top');
 
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -176,13 +176,14 @@ export default function FormUserMerchant({
 
   const scoreIdir = useMemo(() => {
     try {
-      const result =
+      const total =
         // @ts-ignore
         (formik.values.idir_data.agreed_fee / totalNetIncome) * 100;
-      formik.setFieldValue(
-        'idir_data.idir_score',
-        typeof result === 'number' ? parseInt(result.toFixed(2)) : 0,
-      );
+      const result =
+        typeof total === 'number' && !Number.isNaN(total)
+          ? parseInt(total.toFixed(2))
+          : 0;
+      formik.setFieldValue('idir_data.idir_score', result);
       return result.toFixed(2);
     } catch (error) {
       return 0;
