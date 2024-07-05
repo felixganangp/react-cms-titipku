@@ -154,9 +154,11 @@ export default function FormInvoice(props: FormInvoiceProps) {
             });
           },
           onError: (error) => {
+            console.log('errornya', error)
             toast.openToast({
               severity: 'error',
               headMsg: 'Failed create invoice',
+              message: error || '',
             });
           },
         });
@@ -729,6 +731,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
         setSelected={(e) => {
           formik.setFieldValue('user', e);
           formik.setFieldValue('destination_bank_account', e.bank_account);
+          formik.setFieldValue('interest_rate', e.interest_rate);
           formik.setFieldValue(
             'destination_bank',
             bankData.data.find((item) => item.code === e.bank_name),
