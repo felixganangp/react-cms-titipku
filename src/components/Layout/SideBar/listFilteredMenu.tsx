@@ -205,10 +205,6 @@ export const sidebarDataProd: FilteredMenu[] = [
       },
     ],
   },
-<<<<<<< HEAD
-
-=======
->>>>>>> 58a3c6e255d7f7ec05e8d8180e5de6aeea404d02
   {
     id: 63,
     title: 'Andalan & Depo',
