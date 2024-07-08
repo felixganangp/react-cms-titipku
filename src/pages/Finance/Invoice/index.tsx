@@ -159,6 +159,18 @@ export default function InvoicePage() {
       },
     },
     {
+      id: 'sharing_margin',
+      label: 'Sharing Margin',
+      minWidth: '150px',
+      format: ({ sharing_margin }) => {
+        return (
+          <Typography variant="body1">
+            Rp. {numberSeperator(sharing_margin || 0)}
+          </Typography>
+        );
+      },
+    },
+    {
       id: 'interest_per_today',
       label: 'Interest Daily',
       minWidth: '150px',

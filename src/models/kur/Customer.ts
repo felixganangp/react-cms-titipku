@@ -166,6 +166,9 @@ export interface Customer {
   deleted_at: number | null;
   user_status: CustomerStatus;
   user_type: CustomerType;
+  first_transaction: number | null;
+  nearest_due_date: number | null;
+  average_invoice: number | null;
 }
 
 export interface CustomerStatus {
@@ -182,6 +185,7 @@ export interface BiChecking {
   id: number;
   bi_checking_status_id: number;
   bi_checking_status_notes: string;
+  batch_id?: number;
 }
 
 export interface BiCheckingCustomer {
@@ -192,6 +196,7 @@ export interface BiCheckingCustomer {
   bi_checking_status_id: number;
   bi_checking_status_notes: string;
   bi_checking_status: BiCheckingStatus;
+  batch_id?: number;
 }
 
 export interface BiCheckingStatus {

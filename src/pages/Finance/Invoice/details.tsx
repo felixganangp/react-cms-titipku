@@ -226,6 +226,15 @@ export default function InvoiceDetails() {
                       )}
                     </Typography>
                   </Grid>
+                  <Grid item sm={4}>
+                    <Typography color="primary">Sharing Margin</Typography>
+                    <Typography>
+                      Rp{' '}
+                      {numberSeperator(
+                        invoiceDetails.details?.sharing_margin || 0,
+                      )}
+                    </Typography>
+                  </Grid>
 
                   {invoiceDetails.details?.invoice_type_id === 1 && (
                     <>

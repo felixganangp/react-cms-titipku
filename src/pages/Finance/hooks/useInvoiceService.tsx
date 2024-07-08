@@ -4,8 +4,11 @@ import {
   createInvoice,
   getInstallmentSimulation,
   getInvoiceAll,
+  getInvoiceByUserId,
   getInvoiceDetails,
   getInvoicePDF,
+  getLimitHistoryByUserId,
+  getPaymentByUserId,
   setManualSettled,
 } from 'service/Finance/invoice';
 import { useFormik } from 'formik';
@@ -152,6 +155,58 @@ export function useInvoiceDetails(idInvoice?: string | number) {
     details: queryInvoice?.data?.data,
   };
 }
+
+export function useInvoiceUserDetails(idInvoice?: string | number) {
+  const params = UseParams<any>();
+
+  const queryInvoice = useQuery({
+    queryKey: [`invoice/details/${idInvoice}`, params.params],
+    // @ts-ignore
+    queryFn: () => getInvoiceByUserId(idInvoice, params.params),
+    // enabled: !!idInvoice,
+  });
+
+  return {
+    ...queryInvoice,
+    listData: queryInvoice?.data?.data || [],
+    ...params,
+  };
+}
+
+export function usePaymentUserDetails(idInvoice?: string | number) {
+  const params = UseParams<any>();
+
+  const queryInvoice = useQuery({
+    queryKey: [`payment/details/${idInvoice}`, params.params],
+    // @ts-ignore
+    queryFn: () => getPaymentByUserId(idInvoice, params.params),
+    // enabled: !!idInvoice,
+  });
+
+  return {
+    ...queryInvoice,
+    listData: queryInvoice?.data?.data || [],
+    ...params,
+  };
+}
+
+export function useLimitHistoryUserDetails(idInvoice?: string | number) {
+  const params = UseParams<any>();
+
+  const queryInvoice = useQuery({
+    queryKey: [`limit-history/details/${idInvoice}`, params.params],
+    // @ts-ignore
+    queryFn: () => getLimitHistoryByUserId(idInvoice, params.params),
+    // enabled: !!idInvoice,
+  });
+
+  return {
+    ...queryInvoice,
+    listData: queryInvoice?.data?.data || [],
+    ...params,
+  };
+}
+
 export function UseCreateInvoice() {
   return useMutation(createInvoice);
 }

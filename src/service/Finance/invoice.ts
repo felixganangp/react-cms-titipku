@@ -129,3 +129,87 @@ export const getInstallmentSimulation = (params: {
       reject(message);
     }
   });
+
+export const getInvoiceByUserId = (userId: string, params: any) =>
+  new Promise<ListResponse<any>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`financing/user/${userId}/invoice`, {
+        params,
+      });
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const getPaymentByUserId = (userId: string, params: any) =>
+  new Promise<ListResponse<any>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`financing/user/${userId}/payment`, {
+        params,
+      });
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const getLimitHistoryByUserId = (userId: string, params: any) =>
+  new Promise<ListResponse<any>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`financing/user/${userId}/limit-history`, {
+        params,
+      });
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const getRemainingBillyUserId = (userId: string) =>
+  new Promise<ListResponse<any>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`financing/user/${userId}/remaining-bill`);
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const postRestructre = (data: { userId: string; data: any }) =>
+  new Promise<ListResponse<any>>(async (resolve, reject) => {
+    try {
+      const respon = await http.post(
+        `financing/user/${data.userId}/restructure`,
+        data.data,
+      );
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });

@@ -49,6 +49,8 @@ import { Type } from 'models/kur/Type';
 import { Area } from 'models/Area';
 import debounce from 'utils/debounce';
 import useToast from 'hooks/useToast';
+import FormUserMerchant from 'pages/Finance/UserMerchant/Components/Form';
+import FormVerifyUserMerchant from 'pages/Finance/UserMerchant/Components/FormVerify';
 import FormCustomer from 'pages/Finance/Customer/Components/Form';
 import FormBiChecking from './components/form-bi-checking';
 import FormCustomerReview from './components/form-customer-review';
@@ -777,15 +779,19 @@ export default function KurCustomerVerification() {
       </Modal>
       <Modal
         open={createUserModal.open}
-        onClose={createUserModal.closeModal}
+        onClose={() => {
+          createUserModal.closeModal();
+          setSelectedIdUser(undefined);
+        }}
         title={selectedIdUser ? 'Update Merchant' : 'Create Merchant'}
       >
-        <FormCustomer
+        <FormUserMerchant
           id={selectedIdUser}
           handleClose={(isSubmite) => {
             if (isSubmite) {
               dispatch(customerAction.fetchData(customerKur.params));
             }
+            setSelectedIdUser(undefined);
             createUserModal.closeModal();
           }}
         />
@@ -805,16 +811,16 @@ export default function KurCustomerVerification() {
         onClose={verifyModalUpdateData.closeModal}
         title="Verify Customer"
       >
-        <VerifyUpdateData
+        <FormVerifyUserMerchant
           id={selectedSingle}
-          onSubmit={(isSubmited) => {
+          handleClose={(isSubmited) => {
             if (isSubmited) {
               dispatch(customerAction.fetchData(customerKur.params));
             }
             verifyModalUpdateData.closeModal();
             setSelectedSingle(undefined);
           }}
-          onClose={verifyModalUpdateData.closeModal}
+          openModal={verifyModalUpdateData.open}
         />
       </Modal>
     </Box>

@@ -153,4 +153,8 @@ export const Document = {
   4: 'SKU',
   5: 'KTP Pasangan',
   6: 'Surat Cerai',
+  7: 'Akta Nikah',
+  8: 'Kartu Keluarga',
+  9: 'Form Pengajuan KUR',
+  10: 'Form Pengajuan Financing',
 };

@@ -10,12 +10,19 @@ interface FormControlPros {
   helperText?: string | false | undefined;
   required?: boolean | undefined | null;
   error?: boolean | undefined;
+  styleText?: any;
 }
 
 const FormControl = (props: FormControlPros) => (
   <Box width="100%" mt={0.5} mb={2}>
     <Typography
-      sx={{ mb: '5px', color: '#232933', fontSize: '14px', fontWeight: 500 }}
+      sx={{
+        mb: '5px',
+        color: '#232933',
+        fontSize: '14px',
+        fontWeight: 500,
+        ...props.styleText,
+      }}
     >
       {props.text}
       {props.required && (

@@ -45,6 +45,7 @@ export type InvoiceListType = {
   interest_rate: number;
   interest_per_today: number;
   expected_interest: number;
+  sharing_margin: number;
 };
 
 export type InvoiceDetailsType = {
@@ -80,6 +81,7 @@ export type InvoiceDetailsType = {
   status: string;
   dpd_amount: number;
   invoice_details: InvoiceDetails[];
+  sharing_margin: number;
 };
 
 export type User = {
