@@ -67,6 +67,7 @@ import {
   usePaymentUserDetails,
 } from 'pages/Finance/hooks/useInvoiceService';
 import FormTopUpLimit from 'pages/Finance/UserMerchant/Components/FormTopUpLimit';
+import PrintInvoice from 'pages/Finance/Components/PrintInvoice';
 import { TitlePage, BackButton, Menu } from './details.styled';
 import { Document } from '@/pages/Finance/hooks/constumer.config';
 
@@ -102,6 +103,7 @@ export default function CustomerDetails() {
   const paymentList = usePaymentUserDetails(id);
   const limitHistoryList = useLimitHistoryUserDetails(id);
   const topUpModal = useModal();
+  const printInvoiceModal = useModal();
 
   useEffect(() => {
     if (id) {
@@ -212,29 +214,30 @@ export default function CustomerDetails() {
                     {
                       label: `Genenerate Invoice`,
                       onClick: () => {
-                        setLoading(true);
-                        // @ts-ignore
-                        generatePDF.mutate(id.toString(), {
-                          onSuccess: (data) => {
-                            setLoading(false);
-                            openToast({
-                              headMsg: 'Success to generate PDF',
-                              severity: 'success',
-                            });
-                            base64toOpen(
-                              // @ts-ignore
-                              data.data,
-                              `${customerKur.details?.user_number} - ${customerKur.details?.debtor_name}(${customerKur.details?.merchant_name}).pdf`,
-                            );
-                          },
-                          onError: (error) => {
-                            openToast({
-                              headMsg: 'Failed to generate PDF',
-                              severity: 'error',
-                            });
-                            setLoading(false);
-                          },
-                        });
+                        printInvoiceModal.openModal();
+                        // setLoading(true);
+                        // // @ts-ignore
+                        // generatePDF.mutate(id.toString(), {
+                        //   onSuccess: (data) => {
+                        //     setLoading(false);
+                        //     openToast({
+                        //       headMsg: 'Success to generate PDF',
+                        //       severity: 'success',
+                        //     });
+                        //     base64toOpen(
+                        //       // @ts-ignore
+                        //       data.data,
+                        //       `${customerKur.details?.user_number} - ${customerKur.details?.debtor_name}(${customerKur.details?.merchant_name}).pdf`,
+                        //     );
+                        //   },
+                        //   onError: (error) => {
+                        //     openToast({
+                        //       headMsg: 'Failed to generate PDF',
+                        //       severity: 'error',
+                        //     });
+                        //     setLoading(false);
+                        //   },
+                        // });
                       },
                       dataId: 'button-edit-customer',
                     },
@@ -971,6 +974,22 @@ export default function CustomerDetails() {
             topUpModal.closeModal();
           }}
           openModal={topUpModal.open}
+        />
+      </Modal>
+      <Modal
+        open={printInvoiceModal.open}
+        title="Generate Invoice PDF"
+        onClose={() => {
+          printInvoiceModal.closeModal();
+        }}
+      >
+        <PrintInvoice
+          type="user"
+          idSelected={id}
+          name={`${customerKur.details?.user_number} - ${customerKur.details?.debtor_name}(${customerKur.details?.merchant_name}).pdf`}
+          onClose={() => {
+            printInvoiceModal.closeModal();
+          }}
         />
       </Modal>
     </div>
