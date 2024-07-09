@@ -13,6 +13,7 @@ import {
   Collapse,
   IconButton,
   Chip,
+  Stack,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -51,6 +52,7 @@ import useToast from 'hooks/useToast';
 import FormUserMerchant from 'pages/Finance/UserMerchant/Components/Form';
 import FormTopUpLimit from 'pages/Finance/UserMerchant/Components/FormTopUpLimit';
 import FormRestructureMerchant from 'pages/Finance/UserMerchant/Components/FormRestructure';
+import PrintInvoice from 'pages/Finance/Components/PrintInvoice';
 
 // import FormCustomer from '../Verification/components/form';
 
@@ -73,6 +75,9 @@ export default function KurCustomer() {
   const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
   const generatePDF = useMutation(getDownloadPdfUser);
   const { setLoading } = useLoadingSpinner();
+
+  const printInvoiceModal = useModal();
+  const [selected, setSelected] = useState<any>();
 
   // useEffect(() => {
   //   dispatch(customerAction.fetchData(customerKur.params));
@@ -292,6 +297,25 @@ export default function KurCustomer() {
       ),
     },
     {
+      id: 'have_restructure',
+      label: 'Restructure',
+      align: 'left',
+      width: '100px',
+      format: (val: Customer) => (
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Typography>{val.is_restructure ? 'Yes' : 'No'}</Typography>
+          <Typography color="green">
+            {val.is_running_restructure ? '(Ongoing)' : ''}
+          </Typography>
+        </Stack>
+      ),
+    },
+    {
       id: 'action',
       label: 'Action',
       align: 'left',
@@ -317,28 +341,33 @@ export default function KurCustomer() {
               {
                 label: `Generate Invoice`,
                 onClick: () => {
-                  setLoading(true);
-                  generatePDF.mutate(val.id.toString(), {
-                    onSuccess: (data) => {
-                      setLoading(false);
-                      openToast({
-                        headMsg: 'Success to generate PDF',
-                        severity: 'success',
-                      });
-                      base64toOpen(
-                        // @ts-ignore
-                        data.data,
-                        `${val.user_number} - ${val.debtor_name}(${val.merchant_name}).pdf`,
-                      );
-                    },
-                    onError: (error) => {
-                      openToast({
-                        headMsg: 'Failed to generate PDF',
-                        severity: 'error',
-                      });
-                      setLoading(false);
-                    },
+                  setSelected({
+                    id: val.id,
+                    name: `${val.user_number} - ${val.debtor_name}(${val.merchant_name}).pdf`,
                   });
+                  printInvoiceModal.openModal();
+                  // setLoading(true);
+                  // generatePDF.mutate(val.id.toString(), {
+                  //   onSuccess: (data) => {
+                  //     setLoading(false);
+                  //     openToast({
+                  //       headMsg: 'Success to generate PDF',
+                  //       severity: 'success',
+                  //     });
+                  //     base64toOpen(
+                  //       // @ts-ignore
+                  //       data.data,
+                  //       `${val.user_number} - ${val.debtor_name}(${val.merchant_name}).pdf`,
+                  //     );
+                  //   },
+                  //   onError: (error) => {
+                  //     openToast({
+                  //       headMsg: 'Failed to generate PDF',
+                  //       severity: 'error',
+                  //     });
+                  //     setLoading(false);
+                  //   },
+                  // });
                 },
                 dataId: 'button-edit-customer',
               },
@@ -898,6 +927,24 @@ export default function KurCustomer() {
             restructureModal.closeModal();
           }}
           openModal={topUpModal.open}
+        />
+      </Modal>
+      <Modal
+        open={printInvoiceModal.open}
+        title="Generate Invoice PDF"
+        onClose={() => {
+          printInvoiceModal.closeModal();
+          setSelected(null);
+        }}
+      >
+        <PrintInvoice
+          type="user"
+          idSelected={selected?.id}
+          name={selected?.name}
+          onClose={() => {
+            printInvoiceModal.closeModal();
+            setSelected(null);
+          }}
         />
       </Modal>
     </Box>

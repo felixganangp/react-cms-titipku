@@ -131,6 +131,8 @@ export type CustomerStatusHistory = {
 
 export interface Customer {
   id: number;
+  is_restructure: boolean;
+  is_running_restructure: boolean;
   user_number: string;
   debtor_name: string;
   merchant_name: string;

@@ -9,12 +9,14 @@ import {
   getInvoicePDF,
   getLimitHistoryByUserId,
   getPaymentByUserId,
+  getPrintInvoice,
   setManualSettled,
 } from 'service/Finance/invoice';
 import { useFormik } from 'formik';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
 import { useEffect, useMemo } from 'react';
+import { getDownloadPdfUser } from 'service/Kur/Customer';
 
 export function UseInvoiceService(setParams?: InvoiceParams) {
   const params = UseParams<InvoiceParams>(setParams);
@@ -221,4 +223,8 @@ export function UseGetInvoicePDF() {
 
 export function UseGetInstalmentSimulation() {
   return useMutation(getInstallmentSimulation);
+}
+
+export function UseGetInvoicePDFCustomeDate() {
+  return useMutation(getPrintInvoice);
 }

@@ -51,6 +51,7 @@ import {
 import FormSetManualSettled from './Components/FormSetManualSettled';
 import FormCustomer from '../Customer/Components/Form';
 import { Type } from '../hooks/constumer.config';
+import PrintInvoice from '../Components/PrintInvoice';
 
 export default function InvoicePage() {
   const navigate = useNavigate();
@@ -60,8 +61,10 @@ export default function InvoicePage() {
   const [invoiceDetail, setinvoiceDetail] = useState<InvoiceListType | null>(
     null,
   );
-  const createUserModal = useModal();
+  const [selected, setSelected] = useState<any>();
+  // const createUserModal = useModal();
   const showFilter = useModal();
+  const printInvoiceModal = useModal();
   const invoiceForm = useModal();
   const [modalTypeSetManualSettled, setModalTypeSetManualSettled] = useState<
     number | null
@@ -298,25 +301,29 @@ export default function InvoicePage() {
               {
                 label: 'Generate PDF',
                 onClick: () => {
-                  setLoading(true);
-
-                  getInoivcePDF.mutate(value.id.toString(), {
-                    onSuccess: (data) => {
-                      setLoading(false);
-                      openToast({
-                        headMsg: 'Success to generate PDF',
-                        severity: 'success',
-                      });
-                      base64toOpen(data.data, `${value.invoice_number}.pdf`);
-                    },
-                    onError: (error) => {
-                      openToast({
-                        headMsg: 'Failed to generate PDF',
-                        severity: 'error',
-                      });
-                      setLoading(false);
-                    },
+                  // setLoading(true);
+                  printInvoiceModal.openModal();
+                  setSelected({
+                    name: value.invoice_number,
+                    id: value.id,
                   });
+                  // getInoivcePDF.mutate(value.id.toString(), {
+                  //   onSuccess: (data) => {
+                  //     setLoading(false);
+                  //     openToast({
+                  //       headMsg: 'Success to generate PDF',
+                  //       severity: 'success',
+                  //     });
+                  //     base64toOpen(data.data, `${value.invoice_number}.pdf`);
+                  //   },
+                  //   onError: (error) => {
+                  //     openToast({
+                  //       headMsg: 'Failed to generate PDF',
+                  //       severity: 'error',
+                  //     });
+                  //     setLoading(false);
+                  //   },
+                  // });
                 },
               },
             ]}
@@ -810,7 +817,18 @@ export default function InvoicePage() {
         <Card>
           <Table
             headCells={headCells}
-            data={queryInnvoice.listData || []}
+            data={
+              queryInnvoice.listData?.map((data) => ({
+                ...data,
+                table_color:
+                  moment(data.due_date * 1000).isBetween(
+                    moment(),
+                    moment().add(1, 'weeks'),
+                  ) || moment(data.due_date * 1000).isBefore(moment())
+                    ? '#F9EBE7'
+                    : undefined,
+              })) || []
+            }
             loading={queryInnvoice.isLoading}
             page={queryInnvoice.data?.page || 0}
             count={queryInnvoice.data?.count || 0}
@@ -860,6 +878,24 @@ export default function InvoicePage() {
               queryInnvoice.refetch();
             }
             setModalTypeSetManualSettled(null);
+          }}
+        />
+      </Modal>
+      <Modal
+        open={printInvoiceModal.open}
+        title="Generate Invoice PDF"
+        onClose={() => {
+          printInvoiceModal.closeModal();
+          setSelected(null);
+        }}
+      >
+        <PrintInvoice
+          type="invoice"
+          idSelected={selected?.id}
+          name={selected?.name}
+          onClose={() => {
+            printInvoiceModal.closeModal();
+            setSelected(null);
           }}
         />
       </Modal>
