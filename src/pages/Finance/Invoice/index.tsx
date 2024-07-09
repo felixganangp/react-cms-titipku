@@ -810,7 +810,17 @@ export default function InvoicePage() {
         <Card>
           <Table
             headCells={headCells}
-            data={queryInnvoice.listData || []}
+            data={
+              queryInnvoice.listData?.map((data) => ({
+                ...data,
+                table_color: moment(data.due_date * 1000).isBetween(
+                  moment(),
+                  moment().add(1, 'weeks'),
+                ) || moment(data.due_date * 1000).isBefore(moment())
+                  ? '#F9EBE7'
+                  : undefined,
+              })) || []
+            }
             loading={queryInnvoice.isLoading}
             page={queryInnvoice.data?.page || 0}
             count={queryInnvoice.data?.count || 0}

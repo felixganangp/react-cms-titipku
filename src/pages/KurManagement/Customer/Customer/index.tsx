@@ -13,6 +13,7 @@ import {
   Collapse,
   IconButton,
   Chip,
+  Stack,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -289,6 +290,25 @@ export default function KurCustomer() {
       width: '100px',
       format: (val: Customer) => (
         <Typography>{val.user_status.name}</Typography>
+      ),
+    },
+    {
+      id: 'have_restructure',
+      label: 'Restructure',
+      align: 'left',
+      width: '100px',
+      format: (val: Customer) => (
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Typography>{val.is_restructure ? 'Yes' : 'No'}</Typography>
+          <Typography color="green">
+            {val.is_running_restructure ? '(Ongoing)' : ''}
+          </Typography>
+        </Stack>
       ),
     },
     {
