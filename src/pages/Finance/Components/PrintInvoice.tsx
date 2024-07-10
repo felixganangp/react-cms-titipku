@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import useToast from 'hooks/useToast';
 import { base64toOpen } from 'utils/base64toDownload';
+import useModal from 'hooks/useModal';
 import { UseGetInvoicePDFCustomeDate } from '../hooks/useInvoiceService';
 
 type PrintPros = {
@@ -16,6 +17,7 @@ type PrintPros = {
 export default function PrintInvoice(props: PrintPros) {
   const { openToast } = useToast();
   const [date, setDate] = useState(null);
+  const openDateSelect = useModal();
   const { mutate, isLoading } = UseGetInvoicePDFCustomeDate();
 
   const handlePrint = () => {
@@ -58,7 +60,11 @@ export default function PrintInvoice(props: PrintPros) {
             inputFormat="MMM DD, YYYY"
             onChange={(value) => {
               setDate(value);
+              openDateSelect.toggleModal();
             }}
+            open={openDateSelect.open}
+            onOpen={openDateSelect.toggleModal}
+            onClose={openDateSelect.toggleModal}
             disableFuture
             renderInput={(params) => {
               return (
@@ -68,6 +74,8 @@ export default function PrintInvoice(props: PrintPros) {
                   placeholder="Select Grade"
                   variant="outlined"
                   fullWidth
+                  autoComplete="off"
+                  onClick={openDateSelect.toggleModal}
                 />
               );
             }}
