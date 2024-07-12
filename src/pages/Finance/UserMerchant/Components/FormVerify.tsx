@@ -92,9 +92,11 @@ export default function FormVerifyUserMerchant({
         financing_form: fileSize,
       }),
     }),
-    sendDocument: true,
+    config: {
+      sendDocument: true,
+      removeUserTypeId: false,
+    },
   });
-  console.log(formik.errors);
 
   const backButton = () => {
     switch (step) {

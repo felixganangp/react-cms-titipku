@@ -125,13 +125,16 @@ export default function useUserMerchant({
   handleClose,
   costumValidation,
   new_status,
-  sendDocument,
+  config,
 }: {
   id?: string | number;
   handleClose: (isSubmited: boolean) => void;
   costumValidation?: any;
   new_status?: number;
-  sendDocument?: boolean;
+  config?: {
+    removeUserTypeId?: boolean;
+    sendDocument?: boolean;
+  };
 }) {
   const { openToast } = useToast();
   const isUpdate = Boolean(id);
@@ -227,6 +230,12 @@ export default function useUserMerchant({
               // @ts-ignore
               payload.user_data.category_jelajah_name = category_jelajah.name;
               break;
+            case 'user_type_id':
+              if (!config?.removeUserTypeId) {
+                // @ts-ignore
+                payload.user_data.user_type_id = user_data.user_type_id;
+              }
+              break;
             default:
               // @ts-ignore
               payload.user_data[key] = user_data[key];
@@ -250,7 +259,7 @@ export default function useUserMerchant({
         'idir_data',
         JSON.stringify(payload.idir_data, null, 2),
       );
-      if (sendDocument) {
+      if (config?.sendDocument) {
         Object.keys(values.document).forEach((key) => {
           // @ts-ignore
           if (values.document[key]) {
