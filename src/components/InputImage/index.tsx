@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import ClearIcon from '@mui/icons-material/Clear';
 import useToast from 'hooks/useToast';
+import { useDropzone } from 'react-dropzone';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import ImageCrop from '../ImageCrop';
 import { createResizedImage } from './resize';
@@ -54,6 +55,13 @@ function InputImage({
   const [imageCrop, setImageCrop] = useState<any>(false);
   const [imageFile, setImageFile] = useState<File | undefined>(undefined);
   const fileInputField = useRef<HTMLInputElement>(null);
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    isDragReject,
+    fileRejections,
+  } = useDropzone({});
 
   // const handleNewFileUpload = (e: React.ChangeEvent<HTMLElement>) => {
   //   const { files: newFiles } = e.target as HTMLInputElement;
@@ -133,9 +141,24 @@ function InputImage({
           alignItems: 'center',
           borderRadius: '5px',
           padding: '10px',
-          border: `${imageCustomer ? '' : '1px solid #c4c4c4'}`,
+          border: isDragActive
+            ? '2px solid #008e58'
+            : `${imageCustomer ? '' : '1px solid #c4c4c4'}`,
           cursor: 'pointer',
         }}
+        {...getRootProps({
+          onClick: handleUploadBtnClick,
+          onDrop: (e) => {
+            e.preventDefault();
+            // e.stopPropagation();
+            const file = {
+              target: {
+                files: e.dataTransfer.files,
+              },
+            };
+            handleNewFileUpload(file);
+          },
+        })}
       >
         <Box position="relative">
           {onClear && value ? (
@@ -159,8 +182,9 @@ function InputImage({
             false
           )}
 
-          <Box onClick={handleUploadBtnClick}>
+          <Box>
             <input
+              {...getInputProps()}
               type="file"
               ref={fileInputField}
               onChange={handleNewFileUpload}
@@ -209,7 +233,9 @@ function InputImage({
             ) : (
               <Box
                 sx={{
-                  border: '2px dashed #c4c4c4',
+                  border: isDragActive
+                    ? '2px dashed #008e58'
+                    : '2px dashed #c4c4c4',
                   bgcolor: '#FAFAFA',
                   display: 'flex',
                   alignItems: 'center',

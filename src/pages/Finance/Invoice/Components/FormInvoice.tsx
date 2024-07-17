@@ -111,7 +111,10 @@ export default function FormInvoice(props: FormInvoiceProps) {
           .max(36, 'Max 36 period')
           .required('Required'),
       }),
-      nota_image: yup.string().required('Required'),
+      nota_image: yup.string().when('invoice_type_id', {
+        is: (val: any) => val === '1',
+        then: yup.string().required('Required'),
+      }),
     }),
     onSubmit: async (values) => {
       try {
@@ -154,10 +157,10 @@ export default function FormInvoice(props: FormInvoiceProps) {
             });
           },
           onError: (error) => {
-            console.log('errornya', error)
             toast.openToast({
               severity: 'error',
               headMsg: 'Failed create invoice',
+              // @ts-ignore
               message: error || '',
             });
           },
@@ -295,6 +298,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
           )}
         </FormControl>
         <FormControl text="Sharing Margin">
+          {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
           <SwitchCostum
             checked={formik.values.is_sharing_margin}
             name="is_sharing_margin"
@@ -675,27 +679,30 @@ export default function FormInvoice(props: FormInvoiceProps) {
             />
           </FormControl>
         )}
-
-        <FormControl
-          text="Note Image"
-          required
-          error={formik.touched.nota_image && Boolean(formik.errors.nota_image)}
-          helperText={
-            formik.touched.nota_image &&
-            formik.errors.nota_image &&
-            `${formik.errors.nota_image}`
-          }
-        >
-          <InputImage
-            label="Please upload an Image  "
-            width={200}
-            height={200}
-            value={formik.values.nota_image}
-            onChange={(e) => {
-              formik.setFieldValue('nota_image', e);
-            }}
-          />
-        </FormControl>
+        {formik.values.invoice_type_id === '1' && (
+          <FormControl
+            text="Note Image"
+            required
+            error={
+              formik.touched.nota_image && Boolean(formik.errors.nota_image)
+            }
+            helperText={
+              formik.touched.nota_image &&
+              formik.errors.nota_image &&
+              `${formik.errors.nota_image}`
+            }
+          >
+            <InputImage
+              label="Please upload an Image  "
+              width={200}
+              height={200}
+              value={formik.values.nota_image}
+              onChange={(e) => {
+                formik.setFieldValue('nota_image', e);
+              }}
+            />
+          </FormControl>
+        )}
       </Box>
       <Box
         display="flex"

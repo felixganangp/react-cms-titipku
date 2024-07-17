@@ -28,6 +28,7 @@ import { Person } from '@mui/icons-material';
 import { postRestructre } from 'service/Finance/invoice';
 import * as yup from 'yup';
 import useToast from 'hooks/useToast';
+import InputFile from 'components/InputFile';
 import { SteperHeader } from '../../Customer/Components/SteperHeader';
 import useUserMerchant, {
   useUserRemainingBill,
@@ -254,32 +255,16 @@ export default function FormFormRestructure({
         }
       >
         <>
-          <input
-            type="file"
-            hidden
-            name="installments"
-            title=""
-            value=""
-            accept=".csv"
-            onChange={(e) => {
-              // @ts-ignore
-              if (e.target.files[0]) {
-                formik.setFieldValue(
-                  `installments`,
-                  // @ts-ignore
-                  e.target.files[0] || '',
-                );
-              }
+          <InputFile
+            // @ts-ignore
+            value={formik.values?.document?.[key] || null}
+            onChange={(e: File) => {
+              formik.setFieldValue(`installments`, e);
+              formik.setFieldTouched(`installments`).then(() => {
+                formik.validateForm();
+              });
             }}
           />
-          <Button
-            onClick={() => {
-              document.getElementsByName('installments')[0].click();
-            }}
-          >
-            {/* @ts-ignore */}
-            {formik.values.installments?.name || 'Choose File'}
-          </Button>
         </>
       </FormControl>
       <Stack direction="row" justifyContent="end" spacing={1}>
