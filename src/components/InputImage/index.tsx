@@ -147,7 +147,6 @@ function InputImage({
           cursor: 'pointer',
         }}
         {...getRootProps({
-          onClick: handleUploadBtnClick,
           onDrop: (e) => {
             e.preventDefault();
             // e.stopPropagation();
@@ -232,6 +231,7 @@ function InputImage({
               </>
             ) : (
               <Box
+                onClick={handleUploadBtnClick}
                 sx={{
                   border: isDragActive
                     ? '2px dashed #008e58'
