@@ -29,7 +29,7 @@ import bankData from 'data/list-bank.json';
 import { useFormik } from 'formik';
 import useModal from 'hooks/useModal';
 import moment from 'moment';
-import InputImage from 'components/InputImage';
+import InputMultiImages from 'components/InputMultiImages';
 import useToast from 'hooks/useToast';
 import * as yup from 'yup';
 
@@ -111,9 +111,9 @@ export default function FormInvoice(props: FormInvoiceProps) {
           .max(36, 'Max 36 period')
           .required('Required'),
       }),
-      nota_image: yup.string().when('invoice_type_id', {
+      nota_image: yup.mixed().when('invoice_type_id', {
         is: (val: any) => val === '1',
-        then: yup.string().required('Required'),
+        then: yup.mixed().required('Required'),
       }),
     }),
     onSubmit: async (values) => {
@@ -134,6 +134,16 @@ export default function FormInvoice(props: FormInvoiceProps) {
               if (values[key]?.code) {
                 // @ts-ignore
                 await fd.append('destination_bank', values[key].code);
+              }
+              break;
+            case 'nota_image':
+              // @ts-ignore
+              if (values[key]) {
+                // @ts-ignore
+                await values[key].forEach((item: any) => {
+                  // @ts-ignore
+                  fd.append('nota_image', item);
+                });
               }
               break;
             default:
@@ -173,6 +183,8 @@ export default function FormInvoice(props: FormInvoiceProps) {
       }
     },
   });
+
+  console.log(formik.errors);
 
   const setInstallmentSimulation = useCallback(
     debounce((value: number) => {
@@ -692,7 +704,16 @@ export default function FormInvoice(props: FormInvoiceProps) {
               `${formik.errors.nota_image}`
             }
           >
-            <InputImage
+            <InputMultiImages
+              label="Please upload an Image  "
+              // @ts-ignore
+              values={formik.values.nota_image}
+              onChange={(e: any) => {
+                console.log(e);
+                formik.setFieldValue('nota_image', e);
+              }}
+            />
+            {/* <InputImage
               label="Please upload an Image  "
               width={200}
               height={200}
@@ -700,7 +721,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
               onChange={(e) => {
                 formik.setFieldValue('nota_image', e);
               }}
-            />
+            /> */}
           </FormControl>
         )}
       </Box>
