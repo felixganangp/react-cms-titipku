@@ -245,7 +245,10 @@ export const postRestructre = (data: { userId: string; data: any }) =>
 export const revolveRestructre = (invoiceId: string) =>
   new Promise<ListResponse<any>>(async (resolve, reject) => {
     try {
-      const respon = await http.post(`/invoice/${invoiceId}/revolve`, {});
+      const respon = await http.post(
+        `financing/invoice/${invoiceId}/revolve`,
+        {},
+      );
       if (respon.data) {
         resolve(respon.data);
       }
