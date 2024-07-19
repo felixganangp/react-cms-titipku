@@ -36,6 +36,7 @@ import numberSeperator from 'utils/numberSeperator';
 import MenuList from 'components/MenuList';
 import { MoreVert } from '@mui/icons-material';
 import useToast from 'hooks/useToast';
+import PopupAction from 'components/PopupAction';
 import { base64toOpen } from 'utils/base64toDownload';
 import {
   InvoiceType,
@@ -47,6 +48,7 @@ import FormInvoice from './Components/FormInvoice';
 import {
   UseGetInvoicePDF,
   UseInvoiceService,
+  UseRevolveInvoice,
 } from '../hooks/useInvoiceService';
 import FormSetManualSettled from './Components/FormSetManualSettled';
 import FormCustomer from '../Customer/Components/Form';
@@ -65,6 +67,7 @@ export default function InvoicePage() {
   // const createUserModal = useModal();
   const showFilter = useModal();
   const printInvoiceModal = useModal();
+  const revolveInvoiceModal = useModal();
   const invoiceForm = useModal();
   const [modalTypeSetManualSettled, setModalTypeSetManualSettled] = useState<
     number | null
@@ -72,7 +75,7 @@ export default function InvoicePage() {
 
   const queryInnvoice = UseInvoiceService();
   const queryArea = UseAreaListService();
-  const getInoivcePDF = UseGetInvoicePDF();
+  const revolveInvoice = UseRevolveInvoice();
   // const queryCategory = UseCategoryListService();
 
   const headCells: HeadCells<InvoiceListType>[] = [
@@ -296,6 +299,18 @@ export default function InvoicePage() {
                 onClick: () => {
                   setModalTypeSetManualSettled(3);
                   setinvoiceDetail(value);
+                },
+              },
+              {
+                label: 'Revolve',
+                disabled: false,
+                hide: value.invoice_type?.name !== 'Normal',
+                onClick: () => {
+                  revolveInvoiceModal.openModal();
+                  setSelected({
+                    name: value.invoice_number,
+                    id: value.id,
+                  });
                 },
               },
               {
@@ -899,6 +914,36 @@ export default function InvoicePage() {
           }}
         />
       </Modal>
+      <PopupAction
+        open={revolveInvoiceModal.open}
+        onClose={() => {
+          revolveInvoiceModal.closeModal();
+          setSelected(null);
+        }}
+        onSubmit={() => {
+          revolveInvoice.mutate(selected?.id, {
+            onSuccess: () => {
+              openToast({
+                headMsg: 'Success to revolve invoice',
+                severity: 'success',
+              });
+              queryInnvoice.refetch();
+              revolveInvoiceModal.closeModal();
+              setSelected(null);
+            },
+            onError: (e) => {
+              openToast({
+                // @ts-ignore
+                headMsg: e || 'Failed to revolve invoice',
+                severity: 'error',
+              });
+            },
+          });
+        }}
+        title="Revolve Invoice"
+        content={`Are you sure to revolve this invoice ${selected?.name}?`}
+        buttonLabel="Revolve"
+      />
     </Box>
   );
 }
