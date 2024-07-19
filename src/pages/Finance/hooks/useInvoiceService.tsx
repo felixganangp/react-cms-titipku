@@ -10,6 +10,7 @@ import {
   getLimitHistoryByUserId,
   getPaymentByUserId,
   getPrintInvoice,
+  revolveRestructre,
   setManualSettled,
 } from 'service/Finance/invoice';
 import { useFormik } from 'formik';
@@ -227,4 +228,8 @@ export function UseGetInstalmentSimulation() {
 
 export function UseGetInvoicePDFCustomeDate() {
   return useMutation(getPrintInvoice);
+}
+
+export function UseRevolveInvoice() {
+  return useMutation(revolveRestructre);
 }
