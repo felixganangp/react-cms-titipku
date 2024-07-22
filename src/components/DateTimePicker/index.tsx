@@ -193,7 +193,7 @@ export default function DateTimePicker({
   }, [selectedDate]);
 
   return (
-    <Box>
+    <Box width="100%">
       {randerInput ? (
         // @ts-ignore
         <Box onClick={(e) => setAnchorEl(e.currentTarget)}>
