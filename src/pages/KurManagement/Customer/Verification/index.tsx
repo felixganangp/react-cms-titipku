@@ -52,6 +52,7 @@ import useToast from 'hooks/useToast';
 import FormUserMerchant from 'pages/Finance/UserMerchant/Components/Form';
 import FormVerifyUserMerchant from 'pages/Finance/UserMerchant/Components/FormVerify';
 import FormCustomer from 'pages/Finance/Customer/Components/Form';
+import FormAssignAo from 'pages/Finance/UserMerchant/Components/FormAssignAo';
 import FormBiChecking from './components/form-bi-checking';
 import FormCustomerReview from './components/form-customer-review';
 import Verify from './components/verify';
@@ -96,6 +97,7 @@ export default function KurCustomerVerification() {
   const formCustomerReview = useModal();
   const verifyModal = useModal();
   const verifyModalUpdateData = useModal();
+  const assignAoModal = useModal();
 
   const createUserModal = useModal();
   const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
@@ -317,6 +319,14 @@ export default function KurCustomerVerification() {
                   formCustomerReview.openModal();
                 },
                 dataId: 'button-review-customer',
+              },
+              {
+                label: `Assign AO`,
+                onClick: () => {
+                  setSelectedIdUser(val.id);
+                  assignAoModal.openModal();
+                },
+                dataId: 'button-assign-ao',
               },
             ]}
           >
@@ -821,6 +831,31 @@ export default function KurCustomerVerification() {
             setSelectedSingle(undefined);
           }}
           openModal={verifyModalUpdateData.open}
+        />
+      </Modal>
+      <Modal
+        open={assignAoModal.open}
+        onClose={() => {
+          assignAoModal.closeModal();
+          setSelectedIdUser(undefined);
+        }}
+        title="Assign AO"
+      >
+        <FormAssignAo
+          id={selectedIdUser}
+          handleClose={(isSubmite) => {
+            if (isSubmite) {
+              dispatch(
+                customerAction.fetchData({
+                  status: 6,
+                  page: customerKur.params.page,
+                  search: customerKur.params.search,
+                }),
+              );
+            }
+            setSelectedIdUser(undefined);
+            assignAoModal.closeModal();
+          }}
         />
       </Modal>
     </Box>
