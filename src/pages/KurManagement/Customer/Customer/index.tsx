@@ -53,6 +53,7 @@ import FormUserMerchant from 'pages/Finance/UserMerchant/Components/Form';
 import FormTopUpLimit from 'pages/Finance/UserMerchant/Components/FormTopUpLimit';
 import FormRestructureMerchant from 'pages/Finance/UserMerchant/Components/FormRestructure';
 import PrintInvoice from 'pages/Finance/Components/PrintInvoice';
+import FormAssignAo from 'pages/Finance/UserMerchant/Components/FormAssignAo';
 
 // import FormCustomer from '../Verification/components/form';
 
@@ -75,6 +76,7 @@ export default function KurCustomer() {
   const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
   const generatePDF = useMutation(getDownloadPdfUser);
   const { setLoading } = useLoadingSpinner();
+  const assignAoModal = useModal();
 
   const printInvoiceModal = useModal();
   const [selected, setSelected] = useState<any>();
@@ -386,6 +388,14 @@ export default function KurCustomer() {
                   setSelectedIdUser(val.id);
                 },
                 dataId: 'button-restructure-customer',
+              },
+              {
+                label: `Assign AO`,
+                onClick: () => {
+                  assignAoModal.openModal();
+                  setSelectedIdUser(val.id);
+                },
+                dataId: 'button-assign-ao-customer',
               },
             ]}
           >
@@ -944,6 +954,31 @@ export default function KurCustomer() {
           onClose={() => {
             printInvoiceModal.closeModal();
             setSelected(null);
+          }}
+        />
+      </Modal>
+      <Modal
+        open={assignAoModal.open}
+        onClose={() => {
+          assignAoModal.closeModal();
+          setSelectedIdUser(undefined);
+        }}
+        title="Assign AO"
+      >
+        <FormAssignAo
+          id={selectedIdUser}
+          handleClose={(isSubmite) => {
+            if (isSubmite) {
+              dispatch(
+                customerAction.fetchData({
+                  status: 6,
+                  page: customerKur.params.page,
+                  search: customerKur.params.search,
+                }),
+              );
+            }
+            setSelectedIdUser(undefined);
+            assignAoModal.closeModal();
           }}
         />
       </Modal>
