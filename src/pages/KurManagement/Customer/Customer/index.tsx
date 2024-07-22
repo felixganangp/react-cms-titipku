@@ -54,6 +54,7 @@ import FormTopUpLimit from 'pages/Finance/UserMerchant/Components/FormTopUpLimit
 import FormRestructureMerchant from 'pages/Finance/UserMerchant/Components/FormRestructure';
 import PrintInvoice from 'pages/Finance/Components/PrintInvoice';
 import FormAssignAo from 'pages/Finance/UserMerchant/Components/FormAssignAo';
+import FilterUserMerchant from 'pages/Finance/UserMerchant/Components/FilterUserMerchant';
 
 // import FormCustomer from '../Verification/components/form';
 
@@ -677,169 +678,16 @@ export default function KurCustomer() {
             </Box>
 
             <Collapse in={openFilter} data-testid="filter-collapse-customer">
-              <Grid container spacing={2} sx={{ marginTop: '2rem' }}>
-                <Grid item xs={4}>
-                  <Typography
-                    sx={{
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      marginBottom: 1,
-                    }}
-                  >
-                    Type
-                  </Typography>
-
-                  <Autocomplete
-                    data-testid="filter-type-customer"
-                    id="type"
-                    options={customerType}
-                    onChange={(e, value) => {
-                      handleChangeType(value);
-                    }}
-                    isOptionEqualToValue={(option: Type) => {
-                      return (
-                        option.id === customerKur.stateFilter?.user_type_id?.id
-                      );
-                    }}
-                    getOptionLabel={(option) => `${option.name}`}
-                    value={customerKur?.stateFilter?.user_type_id}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="type"
-                        placeholder="Select Customer Type"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography
-                    sx={{
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      marginBottom: 1,
-                    }}
-                  >
-                    Pasar
-                  </Typography>
-                  <Autocomplete
-                    data-testid="filter-pasar-customer"
-                    multiple
-                    id="pasar-kur"
-                    options={areaKur.data}
-                    onChange={(e, value) => {
-                      handleChangeArea(value);
-                    }}
-                    // isOptionEqualToValue={(option: Area) => {
-                    //   const filtered =
-                    //     customerKur?.stateFilter?.areaKur?.filter(
-                    //       (el: Area) => el.id === option.id,
-                    //     );
-                    //   if (filtered) {
-                    //     return option.id === filtered[0]?.id;
-                    //   }
-                    //   return false;
-                    // }}
-                    getOptionLabel={(option) => {
-                      return `${option.title}`;
-                    }}
-                    inputValue={inputValueArea}
-                    onInputChange={(_, newInputValue) => {
-                      setInputValueArea(newInputValue);
-                    }}
-                    // @ts-ignore
-                    value={customerKur?.stateFilter?.areaKur}
-                    limitTags={3}
-                    renderInput={(params) => {
-                      return (
-                        <>
-                          <TextField
-                            {...params}
-                            name="type"
-                            placeholder="Select Pasar"
-                            variant="outlined"
-                            // InputProps={{
-                            //   ...params.InputProps,
-                            //   startAdornment: !areaKurFilter && (
-                            //     <InputAdornment position="start">
-                            //       <SearchIcon />
-                            //     </InputAdornment>
-                            //   ),
-                            // }}
-                          />
-                        </>
-                      );
-                    }}
-                    renderTags={(value: Area[], getTagProps) =>
-                      value.map((option: Area, index: number) => (
-                        <Chip
-                          // variant="outlined"
-                          label={option.title}
-                          {...getTagProps({ index })}
-                          key={`area_tag_${option.id}`}
-                        />
-                      ))
-                    }
-                    renderOption={(props, option) => (
-                      <Box component="li" {...props} key={`area ${option.id}`}>
-                        {option.title}
-                      </Box>
-                    )}
-                  />
-                </Grid>
-                {/* <Grid item xs={4}>
-                  <Typography
-                    sx={{
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      marginBottom: 1,
-                    }}
-                  >
-                    Credit Score
-                  </Typography>
-                  <Autocomplete
-                    data-testid="filter-credit-score-customer"
-                    id="type"
-                    options={creditScore.data}
-                    onChange={(e, value) => {
-                      handleChangeCreditScore(value);
-                    }}
-                    isOptionEqualToValue={(option: UserCreditScore) => {
-                      return (
-                        option.id === customerKur.stateFilter?.creditScore?.id
-                      );
-                    }}
-                    getOptionLabel={(option) => `${option.name}`}
-                    value={customerKur?.stateFilter?.creditScore}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="type"
-                        placeholder="Select Credit Score"
-                      />
-                    )}
-                  />
-                </Grid> */}
-                <Grid item xs={12}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'flex-end',
-                      gap: 2,
-                    }}
-                  >
-                    <Button
-                      onClick={() => {
-                        handleResetFilter();
-                      }}
-                      variant="text"
-                    >
-                      Reset
-                    </Button>
-                    <Button onClick={handleApplyFilter}>Apply</Button>
-                  </Box>
-                </Grid>
-              </Grid>
+              <FilterUserMerchant
+                onChangeValue={(value) => {
+                  dispatch(
+                    customerAction.setFilter({
+                      ...customerKur.stateFilter,
+                      ...value,
+                    }),
+                  );
+                }}
+              />
             </Collapse>
           </Card>
         </Grid>
