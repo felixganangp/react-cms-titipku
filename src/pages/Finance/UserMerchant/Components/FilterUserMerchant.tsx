@@ -94,7 +94,7 @@ export default function FilterUserMerchant({
         }
       }); // eslint-disable-line
 
-      console.log(payload);
+      onChangeValue(payload);
     },
   });
 

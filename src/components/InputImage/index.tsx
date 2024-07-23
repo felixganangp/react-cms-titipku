@@ -59,9 +59,18 @@ function InputImage({
     getRootProps,
     getInputProps,
     isDragActive,
+    open,
+    acceptedFiles,
     isDragReject,
     fileRejections,
-  } = useDropzone({});
+  } = useDropzone({
+    // Disable click and keydown behavior
+    noClick: true,
+    noKeyboard: true,
+    accept: {
+      'image/*': [],
+    },
+  });
 
   // const handleNewFileUpload = (e: React.ChangeEvent<HTMLElement>) => {
   //   const { files: newFiles } = e.target as HTMLInputElement;
@@ -72,7 +81,7 @@ function InputImage({
 
   const handleNewFileUpload = (e: any) => {
     const { files: newFiles } = e.target;
-    if (newFiles?.length) {
+    if (newFiles?.length && !isDragReject) {
       if (cropable) {
         setImageCrop(true);
         setImageFile(newFiles[0]);
@@ -118,6 +127,16 @@ function InputImage({
     }
   };
 
+  useEffect(() => {
+    if (acceptedFiles.length > 0) {
+      handleNewFileUpload({
+        target: {
+          files: acceptedFiles,
+        },
+      });
+    }
+  }, [acceptedFiles, isDragReject, fileRejections]);
+
   const handleSaveCropedImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e);
   };
@@ -141,7 +160,10 @@ function InputImage({
           alignItems: 'center',
           borderRadius: '5px',
           padding: '10px',
-          border: isDragActive
+          // eslint-disable-next-line no-nested-ternary
+          border: isDragReject
+            ? '2px solid #bf370c'
+            : isDragActive
             ? '2px solid #008e58'
             : `${imageCustomer ? '' : '1px solid #c4c4c4'}`,
           cursor: 'pointer',
@@ -156,6 +178,11 @@ function InputImage({
               },
             };
             handleNewFileUpload(file);
+          },
+          onChange: (e) => {
+            e.preventDefault();
+            // e.stopPropagation();
+            handleNewFileUpload(e);
           },
         })}
       >
@@ -233,7 +260,10 @@ function InputImage({
               <Box
                 onClick={handleUploadBtnClick}
                 sx={{
-                  border: isDragActive
+                  // eslint-disable-next-line no-nested-ternary
+                  border: isDragReject
+                    ? '2px dashed #bf370c'
+                    : isDragActive
                     ? '2px dashed #008e58'
                     : '2px dashed #c4c4c4',
                   bgcolor: '#FAFAFA',
