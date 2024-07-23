@@ -95,7 +95,7 @@ export default function FormVerifyUserMerchant({
     }),
     config: {
       sendDocument: true,
-      removeUserTypeId: false,
+      removeUserTypeId: true,
     },
   });
 

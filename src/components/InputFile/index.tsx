@@ -56,9 +56,9 @@ export default function InputFile({
         }}
       />
       <Button
-        onClick={() => {
-          handleUploadBtnClick();
-        }}
+        // onClick={() => {
+        //   handleUploadBtnClick();
+        // }}
         startIcon={<CloudUpload />}
         variant={isDragActive ? 'contained' : 'outlined'}
       >

@@ -44,13 +44,17 @@ function InputMultiImages({
     isDragActive,
     isDragReject,
     fileRejections,
-  } = useDropzone({});
+  } = useDropzone({
+    accept: {
+      'image/*': [],
+    },
+  });
   const [imageCrop, setImageCrop] = useState<any>(false);
   const fileInputField = useRef<HTMLInputElement>(null);
 
   const handleNewFileUpload = (e: any) => {
     const { files: newFiles } = e.target;
-    if (newFiles.length) {
+    if (newFiles.length && !isDragReject) {
       // props.setSelectedImg([...props.selectedImg, newFiles[0]]);
       if (cropable) {
         setImageCrop(newFiles[0]);
@@ -97,7 +101,12 @@ function InputMultiImages({
           justifyContent: 'center',
           borderRadius: '5px',
           padding: '10px',
-          border: isDragActive ? '2px solid #008e58' : '1px solid #c4c4c4',
+          // eslint-disable-next-line no-nested-ternary
+          border: isDragReject
+            ? '2px solid #bf370c'
+            : isDragActive
+            ? '2px solid #008e58'
+            : '1px solid #c4c4c4',
           // backgroundColor: 'red',
         }}
         {...getRootProps({
@@ -184,6 +193,7 @@ function InputMultiImages({
               variant={isDragActive ? 'contained' : 'outlined'}
               onClick={handleUploadBtnClick}
               size="small"
+              color={isDragReject ? 'error' : 'primary'}
               disabled={values.length === maxImage}
             >
               Add More Image
