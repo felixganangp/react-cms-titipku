@@ -79,6 +79,19 @@ export default function MerchantsPages() {
           : '-',
     },
     {
+      id: 'nearest_due_date',
+      label: 'Nearest Due Date',
+      align: 'left',
+      width: '100px',
+      format: (val) => (
+        <div>
+          {val.nearest_due_date
+            ? moment(val.join_date * 1000).format('DD MMM YYYY')
+            : '-'}
+        </div>
+      ),
+    },
+    {
       id: 'merchant_name',
       label: 'Merchant Name',
       width: 350,
@@ -443,13 +456,19 @@ export default function MerchantsPages() {
             data={merchantQuery.listData.map((item) => {
               const tenPecent = (item.limit * 10) / 100;
               const fivePecent = (item.limit * 5) / 100;
+
+              const isdueDate =
+                moment(item.nearest_due_date * 1000).isBetween(
+                  moment(),
+                  moment().add(1, 'weeks'),
+                ) || moment(item.nearest_due_date * 1000).isBefore(moment());
               return {
                 ...item,
                 table_color:
                   item.type === 'Andalan' ||
                   (item.total_gmv === 0 && item.balance === 0)
                     ? '#fff'
-                    : item.balance <= fivePecent
+                    : item.balance <= fivePecent || isdueDate
                     ? '#F9EBE7'
                     : item.balance <= tenPecent
                     ? '#FFF3CD'

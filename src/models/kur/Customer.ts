@@ -171,6 +171,15 @@ export interface Customer {
   first_transaction: number | null;
   nearest_due_date: number | null;
   average_invoice: number | null;
+  ao: {
+    id: number;
+    role_id: number;
+    name: string;
+    user_number: string;
+    email: string;
+    phone_number: string;
+    username: string;
+  };
 }
 
 export interface CustomerStatus {

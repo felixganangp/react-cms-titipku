@@ -19,7 +19,7 @@ export default function FormAssignAo({
 }) {
   const { openToast } = useToast();
   const updateUser = useMutation(putCreateUser);
-  const areaParams = UseParams({ count: 25 });
+  const areaParams = UseParams({ count: 25, role_id: 1 });
   const officeQuery = useQuery({
     queryKey: ['/user/officer/', areaParams.params],
     queryFn: () => getAllOfficer(areaParams.params),
