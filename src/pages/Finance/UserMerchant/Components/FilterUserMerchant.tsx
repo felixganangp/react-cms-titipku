@@ -18,8 +18,9 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { useFormik } from 'formik';
 import numberSeperator from 'utils/numberSeperator';
+import { useAppSelector } from 'store/hooks';
 import DateTimePicker from 'components/DateTimePicker';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Type } from '../../hooks/constumer.config';
 
 export default function FilterUserMerchant({
@@ -27,6 +28,8 @@ export default function FilterUserMerchant({
 }: {
   onChangeValue: (value: any) => void;
 }) {
+  const { params } = useAppSelector((state) => state.customerKur);
+
   const areaParams = UseParams({ count: 25 });
   const areaQuery = useQuery({
     queryKey: ['/area', areaParams.params],
@@ -65,36 +68,7 @@ export default function FilterUserMerchant({
       max_date_joined: null,
     },
     onSubmit: (values) => {
-      const payload = {
-        // @ts-ignore
-        area_id: values.area.map((val) => val.id),
-        // @ts-ignore
-        category_jelajah_id: values.category_jelajah.map((val) => val.id),
-        batch_id: values.batch,
-        user_type_id: values.user_type_id,
-        min_limit_request: values.min_limit_request,
-        max_limit_request: values.max_limit_request,
-        min_limit_cash: values.min_limit_cash,
-        max_limit_cash: values.max_limit_cash,
-        // @ts-ignore
-        min_date_created: values.min_date_created?.unix(),
-        // @ts-ignore
-        max_date_created: values.max_date_created?.unix(),
-        // @ts-ignore
-        min_date_joined: values.min_date_joined?.unix(),
-        // @ts-ignore
-        max_date_joined: values.max_date_joined?.unix(),
-      };
-
-      Object.keys(payload).forEach((key) => {
-        // @ts-ignore
-        if (!payload[key]) {
-          // @ts-ignore
-          delete payload[key];
-        }
-      }); // eslint-disable-line
-
-      onChangeValue(payload);
+      onChangeValue(values);
     },
   });
 
@@ -149,6 +123,17 @@ export default function FilterUserMerchant({
     return errors;
   }, [formik.values]);
 
+  useEffect(() => {
+    // @ts-ignore
+    if (params?.advance) {
+      formik.setValues({
+        ...formik.values,
+        // @ts-ignore
+        ...params.advance,
+      });
+    }
+  }, []);
+
   return (
     <Grid
       container
@@ -185,9 +170,10 @@ export default function FilterUserMerchant({
             onBlur={() => {
               formik.setFieldTouched('area');
             }}
-            renderInput={(params) => (
+            // @ts-ignore
+            renderInput={(props) => (
               <TextField
-                {...params}
+                {...props}
                 name="area"
                 placeholder="Example: Pasar Modern BSD"
                 error={formik.touched?.area && Boolean(formik.errors?.area)}
@@ -235,9 +221,9 @@ export default function FilterUserMerchant({
             onBlur={() => {
               formik.setFieldTouched('category_jelajah');
             }}
-            renderInput={(params) => (
+            renderInput={(props) => (
               <TextField
-                {...params}
+                {...props}
                 name="category_jelajah"
                 placeholder="Example: Pasar Modern BSD"
                 error={
@@ -275,9 +261,9 @@ export default function FilterUserMerchant({
             // onBlur={() => {
             //   formik.setFieldTouched('area');
             // }}
-            renderInput={(params) => (
+            renderInput={(props) => (
               <TextField
-                {...params}
+                {...props}
                 placeholder="Select Batch number"
                 sx={{
                   '& .MuiOutlinedInput-root': {
@@ -317,9 +303,9 @@ export default function FilterUserMerchant({
             onBlur={() => {
               formik.setFieldTouched('user_type_id');
             }}
-            renderInput={(params) => (
+            renderInput={(props) => (
               <TextField
-                {...params}
+                {...props}
                 name="user_type_id"
                 placeholder="Select user type"
                 error={
