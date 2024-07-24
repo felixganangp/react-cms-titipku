@@ -65,7 +65,6 @@ export default function PrintInvoice(props: PrintPros) {
             open={openDateSelect.open}
             onOpen={openDateSelect.toggleModal}
             onClose={openDateSelect.toggleModal}
-            disableFuture
             renderInput={(params) => {
               return (
                 <TextField

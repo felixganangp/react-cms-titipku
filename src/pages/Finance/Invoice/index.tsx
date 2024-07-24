@@ -836,10 +836,12 @@ export default function InvoicePage() {
               queryInnvoice.listData?.map((data) => ({
                 ...data,
                 table_color:
-                  moment(data.due_date * 1000).isBetween(
+                  data.status !== 'Paid Off' &&
+                  (moment(data.due_date * 1000).isBetween(
                     moment(),
                     moment().add(1, 'weeks'),
-                  ) || moment(data.due_date * 1000).isBefore(moment())
+                  ) ||
+                    moment(data.due_date * 1000).isBefore(moment()))
                     ? '#F9EBE7'
                     : undefined,
               })) || []
