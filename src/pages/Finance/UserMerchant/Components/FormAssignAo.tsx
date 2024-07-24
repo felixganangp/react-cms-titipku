@@ -70,7 +70,7 @@ export default function FormAssignAo({
     <Box p="24px">
       <Box mt={2} />
       <FormControl
-        text="Area"
+        text="AO"
         error={
           formik.touched?.ao_officer_id && Boolean(formik.errors?.ao_officer_id)
         }
@@ -86,7 +86,7 @@ export default function FormAssignAo({
             })) || []
           }
           noOptionsText={
-            !areaParams.searchValue ? 'Type to search area' : 'No option'
+            !areaParams.searchValue ? 'Type to search officer' : 'No option'
           }
           inputValue={areaParams.searchValue}
           onInputChange={(_, newInputValue) => {
@@ -103,7 +103,7 @@ export default function FormAssignAo({
             <TextField
               {...params}
               name="user_data.area"
-              placeholder="Example: Pasar Modern BSD"
+              placeholder="Select AO Officer"
               error={
                 formik.touched?.ao_officer_id &&
                 Boolean(formik.errors?.ao_officer_id)

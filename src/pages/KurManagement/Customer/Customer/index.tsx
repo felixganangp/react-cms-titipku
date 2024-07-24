@@ -700,7 +700,20 @@ export default function KurCustomer() {
             data-testid="table-customer"
           >
             <Table
-              data={customerKur.data}
+              data={
+                customerKur.data?.map((data) => ({
+                  ...data,
+                  table_color:
+                    data.nearest_due_date &&
+                    (moment(data.nearest_due_date * 1000).isBetween(
+                      moment(),
+                      moment().add(1, 'weeks'),
+                    ) ||
+                      moment(data.nearest_due_date * 1000).isBefore(moment()))
+                      ? '#F9EBE7'
+                      : undefined,
+                })) || []
+              }
               headCells={headCell}
               page={customerKur.params.page}
               totalData={customerKur.total}
