@@ -319,6 +319,13 @@ export default function KurCustomer() {
       ),
     },
     {
+      id: 'ao',
+      label: 'AO',
+      align: 'center',
+      width: '100px',
+      format: (val: Customer) => val.ao?.name || '-',
+    },
+    {
       id: 'action',
       label: 'Action',
       align: 'left',

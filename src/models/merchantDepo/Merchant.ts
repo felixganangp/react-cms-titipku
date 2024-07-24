@@ -16,6 +16,7 @@ export interface MerchantList {
   limit: number;
   balance: number;
   total_gmv: number;
+  nearest_due_date: number;
   average_daily_transaction: number;
   is_new: boolean;
 }

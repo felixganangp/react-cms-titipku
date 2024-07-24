@@ -31,6 +31,7 @@ import useModal from 'hooks/useModal';
 import moment from 'moment';
 import InputMultiImages from 'components/InputMultiImages';
 import useToast from 'hooks/useToast';
+import DateTimePicker from 'components/DateTimePicker';
 import * as yup from 'yup';
 
 import SelectCustomer from '../../Components/SelectCustomer';
@@ -439,28 +440,11 @@ export default function FormInvoice(props: FormInvoiceProps) {
             `${formik.errors.transfer_date}`
           }
         >
-          <DesktopDatePicker
-            value={formik.values.transfer_date}
-            inputFormat="MMM DD, YYYY"
+          <DateTimePicker
             onChange={(value) => {
               formik.setFieldValue('transfer_date', value);
-              openDateSelect.toggleModal();
             }}
-            open={openDateSelect.open}
-            onOpen={openDateSelect.toggleModal}
-            onClose={openDateSelect.toggleModal}
-            renderInput={(params) => {
-              return (
-                <TextField
-                  {...params}
-                  name="grade"
-                  placeholder="Select Grade"
-                  variant="outlined"
-                  fullWidth
-                  onClick={openDateSelect.toggleModal}
-                />
-              );
-            }}
+            value={formik.values.transfer_date}
           />
         </FormControl>
         {formik.values.invoice_type_id === '1' && (
