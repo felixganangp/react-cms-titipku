@@ -26,11 +26,46 @@ interface ImageUpdatePayload {
 }
 function* fetchData(params: PayloadAction<CustomerParams>) {
   try {
+    const advanceParams: any = {};
+    // @ts-ignore
+    if (params.payload?.advance) {
+      // @ts-ignore
+      const values = params.payload?.advance;
+
+      const payload = {
+        // @ts-ignore
+        area_id: values.area.map((val) => val.id),
+        // @ts-ignore
+        category_jelajah_id: values.category_jelajah.map((val) => val.id),
+        batch_id: values.batch,
+        user_type_id: values.user_type_id,
+        min_limit_request: values.min_limit_request,
+        max_limit_request: values.max_limit_request,
+        min_limit_cash: values.min_limit_cash,
+        max_limit_cash: values.max_limit_cash,
+        // @ts-ignore
+        min_date_created: values.min_date_created?.unix(),
+        // @ts-ignore
+        max_date_created: values.max_date_created?.unix(),
+        // @ts-ignore
+        min_date_joined: values.min_date_joined?.unix(),
+        // @ts-ignore
+        max_date_joined: values.max_date_joined?.unix(),
+      };
+
+      Object.keys(payload).forEach((key) => {
+        // @ts-ignore
+        if (payload[key]) {
+          // @ts-ignore
+          advanceParams[key] = payload[key];
+        }
+      }); // eslint-disable-line
+    }
+
     const response: ListResponse<Customer> = yield call(
       CustomerService.getAllCustomers,
-      params.payload,
+      { ...params.payload, ...advanceParams },
     );
-
     yield put(customerAction.fetchDataSuccess(response));
   } catch (err) {
     if (typeof err === 'string') {
@@ -538,7 +573,7 @@ function* fetchDataDetail(params: PayloadAction<{ id: string | number }>) {
       CustomerService.getCustomersDetails,
       params.payload.id,
     );
-
+    // @ts-ignore
     yield put(customerAction.fetchDataDetailSuccess(response));
   } catch (err) {
     if (typeof err === 'string') {

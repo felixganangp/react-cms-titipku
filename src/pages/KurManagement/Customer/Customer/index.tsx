@@ -109,14 +109,15 @@ export default function KurCustomer() {
         status: 6,
         page: customerKur.params.page,
         search: customerKur.params.search,
+        // @ts-ignore
+        advance: customerKur.params.advance,
       }),
     );
   }, [
     customerKur.params.search,
-    // customerKur.params.order_by,
-    // customerKur.params.order_type,
+    // @ts-ignore
+    customerKur.params.advance,
     customerKur.params.page,
-    // customerKur.params.status,
   ]);
 
   const initialData = {
@@ -185,14 +186,14 @@ export default function KurCustomer() {
       label: 'ID',
       align: 'left',
       format: (val: Customer) => <div>{val.id}</div>,
-      enableSort: true,
+      // enableSort: true,
     },
     {
       id: 'user_number',
       label: 'User Number',
       align: 'left',
       format: (val: Customer) => <div>{val.user_number}</div>,
-      enableSort: true,
+      // enableSort: true,
     },
     {
       id: 'debtor_name',
@@ -200,7 +201,7 @@ export default function KurCustomer() {
       align: 'left',
       width: '200px',
       format: (val: Customer) => <div>{val.debtor_name}</div>,
-      enableSort: true,
+      // enableSort: true,
     },
     {
       id: 'merchant',
@@ -209,19 +210,25 @@ export default function KurCustomer() {
       minWidth: '200px',
       format: (val: Customer) => <div>{val.merchant_name}</div>,
     },
-    // {
-    //   id: 'pasar',
-    //   label: 'Pasar',
-    //   align: 'left',
-    //   format: (val: Customer) => <div>{val.area_name}</div>,
-    // },
+    {
+      id: 'pasar',
+      label: 'Pasar',
+      align: 'left',
+      format: (val: Customer) => <div>{val.area_name}</div>,
+    },
+    {
+      id: 'Category',
+      label: 'Category',
+      align: 'left',
+      format: (val: Customer) => <div>{val.category_jelajah_name}</div>,
+    },
     {
       id: 'kur_user_type',
       label: 'KUR Type',
       align: 'left',
       width: '95px',
       format: (val: Customer) => <div>{val.user_type.name}</div>,
-      enableSort: true,
+      // enableSort: true,
     },
     {
       id: 'create_date',
@@ -688,9 +695,9 @@ export default function KurCustomer() {
               <FilterUserMerchant
                 onChangeValue={(value) => {
                   dispatch(
-                    customerAction.setFilter({
-                      ...customerKur.stateFilter,
-                      ...value,
+                    customerAction.setParams({
+                      // @ts-ignore
+                      advance: value,
                     }),
                   );
                 }}
