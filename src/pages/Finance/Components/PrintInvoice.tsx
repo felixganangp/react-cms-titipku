@@ -54,7 +54,7 @@ export default function PrintInvoice(props: PrintPros) {
   return (
     <Box>
       <Box p="24px">
-        <FormControl text="Loan Amount" required>
+        <FormControl text="Invoice Date" required>
           <DesktopDatePicker
             value={date}
             inputFormat="MMM DD, YYYY"
