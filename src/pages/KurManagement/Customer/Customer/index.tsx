@@ -236,7 +236,8 @@ export default function KurCustomer() {
       align: 'left',
       width: '100px',
       format: (val: Customer) => (
-        <Box whiteSpace="nowrap">{convertDate(val.created_at)}</Box>
+        // @ts-ignore
+        <Box whiteSpace="nowrap">{convertDate(val?.join_date)}</Box>
       ),
     },
     {
