@@ -27,8 +27,12 @@ interface ImageUpdatePayload {
 function* fetchData(params: PayloadAction<CustomerParams>) {
   try {
     const advanceParams: any = {};
-    // @ts-ignore
-    if (params.payload?.advance) {
+    if (
+      // @ts-ignore
+      params.payload?.advance &&
+      // @ts-ignore
+      Object.keys(params.payload?.advance || {}).length > 0
+    ) {
       // @ts-ignore
       const values = params.payload?.advance;
 

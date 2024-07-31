@@ -526,6 +526,7 @@ export default function FilterUserMerchant({
           <Button
             onClick={() => {
               formik.resetForm();
+              onChangeValue({});
             }}
             variant="text"
           >
