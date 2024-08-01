@@ -73,9 +73,9 @@ export const getAllCustomers = (params: CustomerParams) =>
           });
       }
 
-      console.log('object1', params);
-      console.log('object2', objString);
-      console.log('object3', object);
+      // console.log('object1', params);
+      // console.log('object2', objString);
+      // console.log('object3', object);
       // const respon = await http.get(`financing/user`, {
       //   params,
       // });

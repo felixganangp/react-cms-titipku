@@ -845,13 +845,7 @@ export default function KurCustomerVerification() {
           id={selectedIdUser}
           handleClose={(isSubmite) => {
             if (isSubmite) {
-              dispatch(
-                customerAction.fetchData({
-                  status: 6,
-                  page: customerKur.params.page,
-                  search: customerKur.params.search,
-                }),
-              );
+              dispatch(customerAction.fetchData(customerKur.params));
             }
             setSelectedIdUser(undefined);
             assignAoModal.closeModal();

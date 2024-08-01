@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import UseParams from 'hooks/useParams';
 import { getAllOfficer } from 'service/Finance/config';
 import { Autocomplete, Box, Button, Stack, TextField } from '@mui/material';
@@ -7,6 +8,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { putCreateUser } from 'service/Finance/customer';
 import useToast from 'hooks/useToast';
+import { useCustomerDetails } from '../../hooks/useCustomer';
 
 export default function FormAssignAo({
   id,
@@ -20,6 +22,7 @@ export default function FormAssignAo({
   const { openToast } = useToast();
   const updateUser = useMutation(putCreateUser);
   const areaParams = UseParams({ count: 25, role_id: 1 });
+  const detailQuery = useCustomerDetails(id);
   const officeQuery = useQuery({
     queryKey: ['/user/officer/', areaParams.params],
     queryFn: () => getAllOfficer(areaParams.params),
@@ -66,6 +69,24 @@ export default function FormAssignAo({
       ao_officer_id: yup.mixed().required('AO Officer is required'),
     }),
   });
+
+  useEffect(() => {
+    const detail = detailQuery.data?.data;
+
+    console.log('detail', detail);
+    // @ts-ignore
+    if (detail?.ao) {
+      formik.setFieldValue('ao_officer_id', {
+        // @ts-ignore
+        id: detail?.ao.id,
+        // @ts-ignore
+        name: `${detail?.ao.name} (${detail?.ao.username})`,
+      });
+    }
+  }, [detailQuery.data]);
+
+  useEffect(() => {}, [openModal]);
+
   return (
     <Box p="24px">
       <Box mt={2} />
