@@ -850,6 +850,8 @@ export default function KurCustomer() {
                   status: 6,
                   page: customerKur.params.page,
                   search: customerKur.params.search,
+                  // @ts-ignore
+                  advance: customerKur.params.advance,
                 }),
               );
             }

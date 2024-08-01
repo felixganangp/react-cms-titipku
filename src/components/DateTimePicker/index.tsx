@@ -155,6 +155,10 @@ export default function DateTimePicker({
       setSelectedDate(value);
       setTime([value.hour(), value.minute(), value.second()]);
     }
+    if (value === null) {
+      setSelectedDate(null);
+      setTime([0, 0, 0]);
+    }
   }, [value]);
 
   useEffect(() => {
@@ -189,8 +193,8 @@ export default function DateTimePicker({
   const valueDate = useMemo(() => {
     return selectedDate
       ? moment(selectedDate).format('YYYY-MM-DD HH:mm:ss')
-      : null;
-  }, [selectedDate]);
+      : '';
+  }, [selectedDate, currentDate]);
 
   return (
     <Box width="100%">
