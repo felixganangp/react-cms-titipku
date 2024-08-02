@@ -73,9 +73,8 @@ export default function FormAssignAo({
   useEffect(() => {
     const detail = detailQuery.data?.data;
 
-    console.log('detail', detail);
     // @ts-ignore
-    if (detail?.ao) {
+    if (detail?.ao && detail?.ao?.id !== 0) {
       formik.setFieldValue('ao_officer_id', {
         // @ts-ignore
         id: detail?.ao.id,
