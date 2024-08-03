@@ -1,6 +1,6 @@
 import { CloudUpload } from '@mui/icons-material';
 import { Button } from '@mui/material';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 export default function InputFile({
@@ -19,6 +19,7 @@ export default function InputFile({
     isDragActive,
     isDragReject,
     fileRejections,
+    acceptedFiles,
   } = useDropzone({});
 
   const handleUploadBtnClick = () => {
@@ -26,6 +27,11 @@ export default function InputFile({
       ref.current.click();
     }
   };
+  useEffect(() => {
+    if (acceptedFiles.length > 0) {
+      onChange(acceptedFiles[0]);
+    }
+  }, [acceptedFiles, isDragReject, fileRejections]);
   return (
     <div
       {...getRootProps({

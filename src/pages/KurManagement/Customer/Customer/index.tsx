@@ -277,6 +277,41 @@ export default function KurCustomer() {
       align: 'left',
       minWidth: '150px',
       format: (val: Customer) => (
+        // @ts-ignore
+        <Typography>Rp {digitFormatter.format(val.average_invoice)}</Typography>
+      ),
+    },
+    {
+      id: 'available_limit_cash',
+      label: 'Available Limit Cash',
+      align: 'left',
+      minWidth: '180px',
+      format: (val: Customer) => (
+        <Typography>
+          {/* @ts-ignore */}
+          Rp {digitFormatter.format(val.available_limit_cash)}
+        </Typography>
+      ),
+    },
+
+    {
+      id: 'available_limit_plafon',
+      label: 'Available Limit Plafon',
+      align: 'left',
+      minWidth: '150px',
+      format: (val: Customer) => (
+        <Typography>
+          {/* @ts-ignore */}
+          Rp {digitFormatter.format(val.available_limit_plafo)}
+        </Typography>
+      ),
+    },
+    {
+      id: 'average_invoice',
+      label: 'Average Invoice',
+      align: 'left',
+      minWidth: '150px',
+      format: (val: Customer) => (
         <Typography>Rp {digitFormatter.format(val.average_invoice)}</Typography>
       ),
     },
