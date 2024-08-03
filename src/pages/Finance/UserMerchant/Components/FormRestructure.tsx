@@ -116,6 +116,8 @@ export default function FormFormRestructure({
       formik.resetForm();
     }
   }, [openModal]);
+
+  // console.log(formik.values.installments)
   return (
     <Box p="24px">
       <div id="top" />
@@ -257,7 +259,7 @@ export default function FormFormRestructure({
         <>
           <InputFile
             // @ts-ignore
-            value={formik.values?.document?.[key] || null}
+            value={formik.values?.installments || null}
             onChange={(e: File) => {
               formik.setFieldValue(`installments`, e);
               formik.setFieldTouched(`installments`).then(() => {
