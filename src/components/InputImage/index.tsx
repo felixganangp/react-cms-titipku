@@ -69,6 +69,7 @@ function InputImage({
     noKeyboard: true,
     accept: {
       'image/*': [],
+      webp: [],
     },
   });
 
@@ -91,7 +92,7 @@ function InputImage({
             newFiles[0],
             1500,
             1500,
-            'JPEG',
+            'WEBP',
             90,
             0,
             (blob) => {
