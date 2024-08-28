@@ -7,6 +7,7 @@ import moment from 'moment';
 import { useEffect, useMemo } from 'react';
 import {
   createPayment,
+  deletePayment,
   getPaymentAll,
   getPaymentSimulation,
   getSettlementeAll,
@@ -142,4 +143,8 @@ export function UseCreatePayment() {
 
 export function UseGetSimulationPayment() {
   return useMutation(getPaymentSimulation);
+}
+
+export function UseDeletePayment() {
+  return useMutation(deletePayment);
 }

@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import useModal from 'hooks/useModal';
-import { Add, KeyboardArrowDown, Search } from '@mui/icons-material';
+import { Add, KeyboardArrowDown, MoreVert, Search } from '@mui/icons-material';
 import {
   Box,
   Button,
   Card,
   Collapse,
   Grid,
+  IconButton,
   InputAdornment,
   Stack,
   TextField,
@@ -18,13 +20,20 @@ import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 import numberSeperator from 'utils/numberSeperator';
 import Modal from 'components/Modal';
-import { UseGetPeyement } from '../hooks/usePaymentService';
+import PopupAction from 'components/PopupAction';
+import MenuList from 'components/MenuList';
+import useToast from 'hooks/useToast';
+import { UseDeletePayment, UseGetPeyement } from '../hooks/usePaymentService';
 import FormPayment from './Components/FormPayment';
 
 export default function PaymentPage() {
+  const { openToast } = useToast();
   const navigate = useNavigate();
   const paymentForm = useModal();
   const showFilter = useModal();
+  const deletePaymentModal = useModal();
+  const [selected, setSelected] = useState<any>();
+  const deletePayment = UseDeletePayment();
 
   const paymentQuery = UseGetPeyement();
 
@@ -85,7 +94,7 @@ export default function PaymentPage() {
               onSubmit={paymentQuery.formikParams.handleSubmit}
             >
               <Grid item xs={12} md={6}>
-                <FormLabel text="Invoice Date Range">
+                <FormLabel text="Payment Date Range">
                   <Stack direction="row" spacing={1} alignItems="start">
                     <Stack spacing={1} width="100%">
                       <DesktopDatePicker
@@ -247,6 +256,33 @@ export default function PaymentPage() {
                   </Typography>
                 ),
               },
+              {
+                id: 'action',
+                label: 'Action',
+                format: (value) => {
+                  return (
+                    <MenuList
+                      menu={[
+                        {
+                          label: 'Delete',
+                          disabled: false,
+                          onClick: () => {
+                            deletePaymentModal.openModal();
+                            setSelected({
+                              name: value.payment_number,
+                              id: value.id,
+                            });
+                          },
+                        },
+                      ]}
+                    >
+                      <IconButton>
+                        <MoreVert />
+                      </IconButton>
+                    </MenuList>
+                  );
+                },
+              },
             ]}
             data={paymentQuery.listData || []}
             loading={paymentQuery.isLoading}
@@ -277,6 +313,36 @@ export default function PaymentPage() {
           }}
         />
       </Modal>
+      <PopupAction
+        open={deletePaymentModal.open}
+        onClose={() => {
+          deletePaymentModal.closeModal();
+          setSelected(null);
+        }}
+        onSubmit={() => {
+          deletePayment.mutate(selected?.id, {
+            onSuccess: () => {
+              openToast({
+                headMsg: 'Success delete invoice',
+                severity: 'success',
+              });
+              paymentQuery.refetch();
+              deletePaymentModal.closeModal();
+              setSelected(null);
+            },
+            onError: (e) => {
+              openToast({
+                // @ts-ignore
+                headMsg: e || 'Failed delete invoice',
+                severity: 'error',
+              });
+            },
+          });
+        }}
+        title="Delete Invoice"
+        content={`Are you sure to delet this invoice ${selected?.name}?`}
+        buttonLabel="Delete"
+      />
     </Box>
   );
 }

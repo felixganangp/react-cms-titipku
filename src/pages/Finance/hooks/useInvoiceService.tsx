@@ -2,6 +2,7 @@
 import { InvoiceParams } from 'models/finance/invoice';
 import {
   createInvoice,
+  deleteInvoice,
   getInstallmentSimulation,
   getInvoiceAll,
   getInvoiceByUserId,
@@ -232,4 +233,8 @@ export function UseGetInvoicePDFCustomeDate() {
 
 export function UseRevolveInvoice() {
   return useMutation(revolveRestructre);
+}
+
+export function UseDeleteInvoice() {
+  return useMutation(deleteInvoice);
 }

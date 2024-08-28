@@ -134,6 +134,21 @@ export const getInvoicePDF = (id: string) =>
     }
   });
 
+export const deleteInvoice = (id: string) =>
+  new Promise<Response<any>>(async (resolve, reject) => {
+    try {
+      const respon = await http.delete(`financing/invoice/${id}`);
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
 export const getInstallmentSimulation = (params: {
   start_date: number;
   amount: number;

@@ -46,6 +46,7 @@ import {
 } from '../hooks/useConfigFinance';
 import FormInvoice from './Components/FormInvoice';
 import {
+  UseDeleteInvoice,
   UseGetInvoicePDF,
   UseInvoiceService,
   UseRevolveInvoice,
@@ -68,6 +69,7 @@ export default function InvoicePage() {
   const showFilter = useModal();
   const printInvoiceModal = useModal();
   const revolveInvoiceModal = useModal();
+  const deleteInvoiceModal = useModal();
   const invoiceForm = useModal();
   const [modalTypeSetManualSettled, setModalTypeSetManualSettled] = useState<
     number | null
@@ -76,6 +78,7 @@ export default function InvoicePage() {
   const queryInnvoice = UseInvoiceService();
   const queryArea = UseAreaListService();
   const revolveInvoice = UseRevolveInvoice();
+  const deleteInvoice = UseDeleteInvoice();
   // const queryCategory = UseCategoryListService();
 
   const headCells: HeadCells<InvoiceListType>[] = [
@@ -339,6 +342,17 @@ export default function InvoicePage() {
                   //     setLoading(false);
                   //   },
                   // });
+                },
+              },
+              {
+                label: 'Delete',
+                disabled: false,
+                onClick: () => {
+                  deleteInvoiceModal.openModal();
+                  setSelected({
+                    name: value.invoice_number,
+                    id: value.id,
+                  });
                 },
               },
             ]}
@@ -945,6 +959,36 @@ export default function InvoicePage() {
         title="Revolve Invoice"
         content={`Are you sure to revolve this invoice ${selected?.name}?`}
         buttonLabel="Revolve"
+      />
+      <PopupAction
+        open={deleteInvoiceModal.open}
+        onClose={() => {
+          deleteInvoiceModal.closeModal();
+          setSelected(null);
+        }}
+        onSubmit={() => {
+          deleteInvoice.mutate(selected?.id, {
+            onSuccess: () => {
+              openToast({
+                headMsg: 'Success delete invoice',
+                severity: 'success',
+              });
+              queryInnvoice.refetch();
+              deleteInvoiceModal.closeModal();
+              setSelected(null);
+            },
+            onError: (e) => {
+              openToast({
+                // @ts-ignore
+                headMsg: e || 'Failed delete invoice',
+                severity: 'error',
+              });
+            },
+          });
+        }}
+        title="Delete Invoice"
+        content={`Are you sure to delet this invoice ${selected?.name}?`}
+        buttonLabel="Delete"
       />
     </Box>
   );
