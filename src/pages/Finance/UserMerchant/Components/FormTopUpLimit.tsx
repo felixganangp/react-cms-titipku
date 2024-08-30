@@ -57,7 +57,9 @@ export default function FormTopUpLimit({
           .min(1, 'Limit cash must be greater than 0'),
       }),
     }),
-    sendDocument: true,
+    config: {
+      sendDocument: true,
+    },
   });
 
   useEffect(() => {
@@ -152,6 +154,55 @@ export default function FormTopUpLimit({
             startAdornment: (
               <InputAdornment position="start">Rp</InputAdornment>
             ),
+          }}
+        />
+      </FormControl>
+      <FormControl
+        text="Provision Installment Period"
+        required
+        error={
+          // @ts-ignore
+          formik.touched.user_data?.provision_installment_period &&
+          // @ts-ignore
+          Boolean(formik.errors.user_data?.provision_installment_period)
+        }
+        helperText={
+          // @ts-ignore
+          formik.touched.user_data?.provision_installment_period
+            ? // @ts-ignore
+              formik.errors.user_data?.provision_installment_period
+            : ''
+        }
+      >
+        <TextField
+          fullWidth
+          placeholder="Input provision installment period"
+          name="user_data.provision_installment_period"
+          onBlur={formik.handleBlur}
+          onKeyDown={(evt) =>
+            ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+          }
+          error={
+            // @ts-ignore
+            formik.touched.user_data?.provision_installment_period &&
+            // @ts-ignore
+            Boolean(formik.errors.user_data?.provision_installment_period)
+          }
+          value={numberSeperator(
+            // @ts-ignore
+            formik.values.user_data?.provision_installment_period || '',
+          )}
+          onChange={(e) => {
+            const value = e.target.value
+              // @ts-ignore
+              .replaceAll('.', '')
+              .replace(/[^0-9.]/g, '')
+              .replace(/(\..*?)\..*/g, '$1');
+
+            formik.setFieldValue(
+              'user_data.provision_installment_period',
+              parseInt(value || '0'),
+            );
           }}
         />
       </FormControl>

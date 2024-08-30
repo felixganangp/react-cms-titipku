@@ -86,7 +86,7 @@ export default function MerchantsPages() {
       format: (val) => (
         <div>
           {val.nearest_due_date
-            ? moment(val.join_date * 1000).format('DD MMM YYYY')
+            ? moment(val.nearest_due_date * 1000).format('DD MMM YYYY')
             : '-'}
         </div>
       ),

@@ -289,7 +289,7 @@ export default function KurCustomer() {
       format: (val: Customer) => (
         <Typography>
           {/* @ts-ignore */}
-          Rp {digitFormatter.format(val.available_limit_cash)}
+          Rp {digitFormatter.format(val?.available_limit_cash || '')}
         </Typography>
       ),
     },
@@ -302,7 +302,7 @@ export default function KurCustomer() {
       format: (val: Customer) => (
         <Typography>
           {/* @ts-ignore */}
-          Rp {digitFormatter.format(val.available_limit_plafo)}
+          Rp {digitFormatter.format(val?.available_limit_plafon || '')}
         </Typography>
       ),
     },
@@ -312,7 +312,9 @@ export default function KurCustomer() {
       align: 'left',
       minWidth: '150px',
       format: (val: Customer) => (
-        <Typography>Rp {digitFormatter.format(val.average_invoice)}</Typography>
+        <Typography>
+          Rp {digitFormatter.format(val?.average_invoice || '')}
+        </Typography>
       ),
     },
     {
