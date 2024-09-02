@@ -52,6 +52,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
   const openDateSelect = useModal();
   const simulationInstalment = UseGetInstalmentSimulation();
   const createInvoice = UseCreateInvoice();
+  const isProvisi = useModal();
 
   const formik = useFormik({
     initialValues: {
@@ -69,95 +70,114 @@ export default function FormInvoice(props: FormInvoiceProps) {
       is_sharing_margin: false,
       sharing_margin: 0,
     },
-    validationSchema: yup.object({
-      user: yup.object().nullable().required('Required'),
-      loan_amount: yup
-        .string()
-        .min(2, 'Please enter a minimum required amount.')
-        .required('Required'),
-      transfer_date: yup.mixed().nullable().required('Required'),
-      interest_rate: yup.mixed().when('is_sharing_margin', {
-        is: (val: any) => val === false,
-        then: yup.number().nullable().required('Required').min(0),
-      }),
-      sharing_margin: yup.number().when('is_sharing_margin', {
-        is: (val: any) => val === true,
-        then: yup
-          .number()
-          .typeError('Must be a number')
-          .required('Required')
-          .min(1),
-      }),
-      destination_bank: yup.mixed().when('invoice_type_id', {
-        is: (val: any) => val === '1',
-        then: yup.object().nullable().required('Required'),
-      }),
-      destination_bank_account: yup.number().when('invoice_type_id', {
-        is: (val: any) => val === '1',
-        then: yup.number().typeError('Must be a number').required('Required'),
-      }),
-      bank_transfer_fee: yup.string().when('invoice_type_id', {
-        is: (val: any) => val === '1',
-        then: yup.string().required('Required'),
-      }),
-      installment_period: yup.string().when('invoice_type_id', {
-        is: (val: any) => val === '2',
-        then: yup.string().required('Required'),
-      }),
-      provision_installment_period: yup.number().when('user', {
-        is: (val: any) => val?.need_provision,
-        then: yup
-          .number()
-          .min(0, 'Min 0 period')
-          .max(36, 'Max 36 period')
-          .required('Required'),
-      }),
-      nota_image: yup.mixed().when('invoice_type_id', {
-        is: (val: any) => val === '1',
-        then: yup.mixed().required('Required'),
-      }),
-    }),
+    validationSchema: isProvisi.open
+      ? yup.object({
+          user: yup.object().nullable().required('Required'),
+          provision_installment_period: yup.number().required('Required'),
+        })
+      : yup.object({
+          user: yup.object().nullable().required('Required'),
+          loan_amount: yup
+            .string()
+            .min(2, 'Please enter a minimum required amount.')
+            .required('Required'),
+          transfer_date: yup.mixed().nullable().required('Required'),
+          interest_rate: yup.mixed().when('is_sharing_margin', {
+            is: (val: any) => val === false,
+            then: yup.number().nullable().required('Required').min(0),
+          }),
+          sharing_margin: yup.number().when('is_sharing_margin', {
+            is: (val: any) => val === true,
+            then: yup
+              .number()
+              .typeError('Must be a number')
+              .required('Required')
+              .min(1),
+          }),
+          destination_bank: yup.mixed().when('invoice_type_id', {
+            is: (val: any) => val === '1',
+            then: yup.object().nullable().required('Required'),
+          }),
+          destination_bank_account: yup.number().when('invoice_type_id', {
+            is: (val: any) => val === '1',
+            then: yup
+              .number()
+              .typeError('Must be a number')
+              .required('Required'),
+          }),
+          bank_transfer_fee: yup.string().when('invoice_type_id', {
+            is: (val: any) => val === '1',
+            then: yup.string().required('Required'),
+          }),
+          installment_period: yup.string().when('invoice_type_id', {
+            is: (val: any) => val === '2',
+            then: yup.string().required('Required'),
+          }),
+          provision_installment_period: yup.number().when('user', {
+            is: (val: any) => val?.need_provision,
+            then: yup
+              .number()
+              .min(0, 'Min 0 period')
+              .max(36, 'Max 36 period')
+              .required('Required'),
+          }),
+          nota_image: yup.mixed().when('invoice_type_id', {
+            is: (val: any) => val === '1',
+            then: yup.mixed().required('Required'),
+          }),
+        }),
     onSubmit: async (values) => {
       try {
         const fd = new FormData();
-        const promises = Object.keys(values).map(async (key) => {
-          switch (key) {
-            case 'transfer_date':
-              // @ts-ignore
-              await fd.append('transfer_date', moment(values[key]).unix());
-              break;
-            case 'user':
-              // @ts-ignore
-              await fd.append('user_id', values.user.id);
-              break;
-            case 'destination_bank':
-              // @ts-ignore
-              if (values[key]?.code) {
+        if (isProvisi.open) {
+          await fd.append('invoice_type_id', values.invoice_type_id);
+          // @ts-ignore
+          await fd.append('user_id', values.user.id);
+          // @ts-ignore
+          await fd.append(
+            'provision_installment_period',
+            values.provision_installment_period,
+          );
+        } else {
+          const promises = Object.keys(values).map(async (key) => {
+            switch (key) {
+              case 'transfer_date':
                 // @ts-ignore
-                await fd.append('destination_bank', values[key].code);
-              }
-              break;
-            case 'nota_image':
-              // @ts-ignore
-              if (values[key]) {
+                await fd.append('transfer_date', moment(values[key]).unix());
+                break;
+              case 'user':
                 // @ts-ignore
-                await values[key].forEach((item: any) => {
+                await fd.append('user_id', values.user.id);
+                break;
+              case 'destination_bank':
+                // @ts-ignore
+                if (values[key]?.code) {
                   // @ts-ignore
-                  fd.append('nota_image', item);
-                });
-              }
-              break;
-            default:
-              // @ts-ignore
-              if (values[key]) {
+                  await fd.append('destination_bank', values[key].code);
+                }
+                break;
+              case 'nota_image':
                 // @ts-ignore
-                await fd.append(key, values[key]);
-              }
-              break;
-          }
-        });
+                if (values[key]) {
+                  // @ts-ignore
+                  await values[key].forEach((item: any) => {
+                    // @ts-ignore
+                    fd.append('nota_image', item);
+                  });
+                }
+                break;
+              default:
+                // @ts-ignore
+                if (values[key]) {
+                  // @ts-ignore
+                  await fd.append(key, values[key]);
+                }
+                break;
+            }
+          });
 
-        await Promise.all(promises);
+          await Promise.all(promises);
+        }
         createInvoice.mutate(fd, {
           onSuccess: (data) => {
             props.onClose(true);
@@ -238,7 +258,14 @@ export default function FormInvoice(props: FormInvoiceProps) {
             aria-labelledby="demo-row-radio-buttons-group-label"
             name="invoice_type_id"
             value={formik.values.invoice_type_id}
-            onChange={formik.handleChange}
+            onChange={(e) => {
+              formik.handleChange(e);
+              if (e.target.value === 'Normal' || e.target.value === 'Cash') {
+                isProvisi.closeModal();
+              } else {
+                isProvisi.openModal();
+              }
+            }}
           >
             <FormControlLabel value="1" control={<Radio />} label="Normal" />
             <FormControlLabel value="2" control={<Radio />} label="Cash" />
@@ -749,13 +776,13 @@ export default function FormInvoice(props: FormInvoiceProps) {
                 }
                 error={
                   // @ts-ignore
-                  formik.touched.user_data?.provision_installment_period &&
+                  formik.touched.provision_installment_period &&
                   // @ts-ignore
-                  Boolean(formik.errors.user_data?.provision_installment_period)
+                  Boolean(formik.errors.provision_installment_period)
                 }
                 value={numberSeperator(
                   // @ts-ignore
-                  formik.values.user_data?.provision_installment_period || '',
+                  formik.values.provision_installment_period || '',
                 )}
                 onChange={(e) => {
                   const value = e.target.value
@@ -765,7 +792,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
                     .replace(/(\..*?)\..*/g, '$1');
 
                   formik.setFieldValue(
-                    'user_data.provision_installment_period',
+                    'provision_installment_period',
                     parseInt(value || '0'),
                   );
                 }}
