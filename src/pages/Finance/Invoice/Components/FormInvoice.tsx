@@ -76,20 +76,11 @@ export default function FormInvoice(props: FormInvoiceProps) {
         .number()
         .when('invoice_type_id', {
           is: (val: any) => val === '3' || val === '4',
-          then: yup
-            .number()
-            .min(0, 'Min 0 period')
-            .max(36, 'Max 36 period')
-            .required('Required'),
+          then: yup.number().min(1, 'Min 1 period').required('Required'),
         })
-        .nullable()
         .when('user', {
           is: (val: any) => val?.need_provision,
-          then: yup
-            .number()
-            .min(0, 'Min 0 period')
-            .max(36, 'Max 36 period')
-            .required('Required'),
+          then: yup.number().min(1, 'Min 1 period').required('Required'),
         }),
       loan_amount: yup.string().when('invoice_type_id', {
         is: (val: any) => val === '1' || val === '2',
@@ -214,8 +205,6 @@ export default function FormInvoice(props: FormInvoiceProps) {
     },
     enableReinitialize: true,
   });
-
-  console.log(isProvisi.open, formik.errors, formik.touched);
 
   const setInstallmentSimulation = useCallback(
     debounce((value: number) => {
@@ -518,8 +507,8 @@ export default function FormInvoice(props: FormInvoiceProps) {
                       name: string;
                       code: string;
                     }) => {
-                      // @ts-ignore
                       return (
+                        // @ts-ignore
                         option.name === formik.values.destination_bank?.name
                       );
                     }}
