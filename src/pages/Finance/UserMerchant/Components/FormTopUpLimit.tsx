@@ -67,6 +67,7 @@ export default function FormTopUpLimit({
       formik.resetForm();
     }
   }, [openModal]);
+
   return (
     <Box p="24px">
       <div id="top" />
