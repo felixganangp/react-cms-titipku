@@ -262,8 +262,12 @@ export default function useUserMerchant({
       );
       if (config?.sendDocument) {
         Object.keys(values.document).forEach((key) => {
-          // @ts-ignore
-          if (values.document[key]) {
+          if (
+            // @ts-ignore
+            values.document[key] &&
+            // @ts-ignore
+            typeof values.document[key] === 'object'
+          ) {
             // @ts-ignore
             formData.append(key, values.document[key]);
           }
@@ -314,14 +318,16 @@ export default function useUserMerchant({
     const detail = detailQuery.data?.data;
 
     if (detail) {
-      const docDetailData = {};
+      const docDetailData = {
+        ...formik.values.document,
+      };
 
       detail.user_documents.forEach((doc: any) => {
         // @ts-ignore
         const { key } = DocumentObjFinace[doc.document_type_id];
+        // @ts-ignore
         docDetailData[key] = doc.image_filepath;
       });
-      console.log('docDetailData', docDetailData);
       const payload: any = {
         ...formik.values,
         user_data: {

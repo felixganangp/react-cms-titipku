@@ -64,6 +64,9 @@ export default function FormUserMerchant({
   const formik = useUserMerchant({
     id,
     handleClose,
+    config: {
+      sendDocument: true,
+    },
   });
 
   const backButton = () => {

@@ -32,7 +32,7 @@ export default function InputFile({
       onChange(acceptedFiles[0]);
     }
   }, [acceptedFiles, isDragReject, fileRejections]);
-  console.log(value);
+
   return (
     <div
       {...getRootProps({
