@@ -32,6 +32,7 @@ export default function InputFile({
       onChange(acceptedFiles[0]);
     }
   }, [acceptedFiles, isDragReject, fileRejections]);
+  console.log(value);
   return (
     <div
       {...getRootProps({
@@ -69,7 +70,10 @@ export default function InputFile({
         variant={isDragActive ? 'contained' : 'outlined'}
       >
         {/* @ts-ignore */}
-        {value?.name || 'Choose File'}
+        {typeof value === 'string'
+          ? // @ts-ignore
+            `${value.slice(0, 20)} ...`
+          : value?.name || 'Choose File'}
       </Button>
     </div>
   );
