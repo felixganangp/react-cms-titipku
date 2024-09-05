@@ -7,6 +7,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { getRemainingBillyUserId } from 'service/Finance/invoice';
 import { postCreateUser, putCreateUser } from 'service/Finance/customer';
 import { useCustomerDetails } from '../../hooks/useCustomer';
+import { DocumentObjFinace } from '../../hooks/constumer.config';
 
 const defaultValidation = yup.object().shape({
   user_data: yup.object().shape({
@@ -261,8 +262,12 @@ export default function useUserMerchant({
       );
       if (config?.sendDocument) {
         Object.keys(values.document).forEach((key) => {
-          // @ts-ignore
-          if (values.document[key]) {
+          if (
+            // @ts-ignore
+            values.document[key] &&
+            // @ts-ignore
+            typeof values.document[key] === 'object'
+          ) {
             // @ts-ignore
             formData.append(key, values.document[key]);
           }
@@ -313,7 +318,16 @@ export default function useUserMerchant({
     const detail = detailQuery.data?.data;
 
     if (detail) {
-      console.log(detail);
+      const docDetailData = {
+        ...formik.values.document,
+      };
+
+      detail.user_documents.forEach((doc: any) => {
+        // @ts-ignore
+        const { key } = DocumentObjFinace[doc.document_type_id];
+        // @ts-ignore
+        docDetailData[key] = doc.image_filepath;
+      });
       const payload: any = {
         ...formik.values,
         user_data: {
@@ -360,6 +374,7 @@ export default function useUserMerchant({
           idir_score: detail.user_idir.IdirScore,
           idir_notes: detail.user_idir.IdirNotes,
         },
+        document: docDetailData,
       };
       formik.setValues(payload).then(() => {
         setTimeout(() => {

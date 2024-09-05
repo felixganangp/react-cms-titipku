@@ -158,3 +158,46 @@ export const Document = {
   9: 'Form Pengajuan KUR',
   10: 'Form Pengajuan Financing',
 };
+
+export const DocumentObjFinace = {
+  1: {
+    name: 'KTP',
+    key: 'nik_image',
+  },
+  2: {
+    name: 'NIB',
+    key: 'nib_image',
+  },
+  3: {
+    name: 'NPWP',
+    key: 'npwp_image',
+  },
+  4: {
+    name: 'SKU',
+    key: 'sku_image',
+  },
+  5: {
+    name: 'KTP Pasangan',
+    key: 'nik_partner_image',
+  },
+  6: {
+    name: 'Surat Cerai',
+    key: 'divorce_papers_image',
+  },
+  7: {
+    name: 'Akta Nikah',
+    key: 'marriage_papers_image',
+  },
+  8: {
+    name: 'Kartu Keluarga',
+    key: 'kk_image',
+  },
+  9: {
+    name: 'Form Pengajuan KUR',
+    key: 'financing_form',
+  },
+  10: {
+    name: 'Form Pengajuan Financing',
+    key: 'financing_form_image',
+  },
+};

@@ -70,11 +70,15 @@ export default function FormInvoice(props: FormInvoiceProps) {
       is_sharing_margin: false,
       sharing_margin: 0,
     },
-    validationSchema: isProvisi.open
-      ? yup.object({
-          user: yup.object().nullable().required('Required'),
-          provision_installment_period: yup.number().required('Required'),
+    validationSchema: yup.object({
+      user: yup.object().nullable().required('Required'),
+      provision_installment_period: yup
+        .number()
+        .when('invoice_type_id', {
+          is: (val: any) => val === '3' || val === '4',
+          then: yup.number().min(1, 'Min 1 period').required('Required'),
         })
+<<<<<<< HEAD
       : yup.object({
           user: yup.object().nullable().required('Required'),
           loan_amount: yup
@@ -125,7 +129,56 @@ export default function FormInvoice(props: FormInvoiceProps) {
             is: (val: any) => val === '1',
             then: yup.mixed().required('Required'),
           }),
+=======
+        .when('user', {
+          is: (val: any) => val?.need_provision,
+          then: yup.number().min(1, 'Min 1 period').required('Required'),
+>>>>>>> 23235e92accff7afcf03153c37d30e396d2a5ca6
         }),
+      loan_amount: yup.string().when('invoice_type_id', {
+        is: (val: any) => val === '1' || val === '2',
+        then: yup
+          .string()
+          .min(2, 'Please enter a minimum required amount.')
+          .required('Required'),
+      }),
+      transfer_date: yup.mixed().when('invoice_type_id', {
+        is: (val: any) => val === '1' || val === '2',
+        then: yup.mixed().nullable().required('Required'),
+      }),
+      interest_rate: yup.mixed().when('is_sharing_margin', {
+        is: (val: any) => val === false,
+        then: yup.number().nullable().required('Required').min(0),
+      }),
+      sharing_margin: yup.number().when('is_sharing_margin', {
+        is: (val: any) => val === true,
+        then: yup
+          .number()
+          .typeError('Must be a number')
+          .required('Required')
+          .min(1),
+      }),
+      destination_bank: yup.mixed().when('invoice_type_id', {
+        is: (val: any) => val === '1',
+        then: yup.object().nullable().required('Required'),
+      }),
+      destination_bank_account: yup.number().when('invoice_type_id', {
+        is: (val: any) => val === '1',
+        then: yup.number().typeError('Must be a number').required('Required'),
+      }),
+      bank_transfer_fee: yup.string().when('invoice_type_id', {
+        is: (val: any) => val === '1',
+        then: yup.string().required('Required'),
+      }),
+      installment_period: yup.string().when('invoice_type_id', {
+        is: (val: any) => val === '2',
+        then: yup.string().required('Required'),
+      }),
+      nota_image: yup.mixed().when('invoice_type_id', {
+        is: (val: any) => val === '1',
+        then: yup.mixed().required('Required'),
+      }),
+    }),
     onSubmit: async (values) => {
       try {
         const fd = new FormData();
@@ -203,9 +256,8 @@ export default function FormInvoice(props: FormInvoiceProps) {
         });
       }
     },
+    enableReinitialize: true,
   });
-
-  console.log(formik.errors);
 
   const setInstallmentSimulation = useCallback(
     debounce((value: number) => {
@@ -513,8 +565,8 @@ export default function FormInvoice(props: FormInvoiceProps) {
                       name: string;
                       code: string;
                     }) => {
-                      // @ts-ignore
                       return (
+                        // @ts-ignore
                         option.name === formik.values.destination_bank?.name
                       );
                     }}
@@ -774,7 +826,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
               <TextField
                 fullWidth
                 placeholder="Input provision installment period"
-                name="user_data.provision_installment_period"
+                name="provision_installment_period"
                 onBlur={formik.handleBlur}
                 onKeyDown={(evt) =>
                   ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
