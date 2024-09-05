@@ -78,62 +78,9 @@ export default function FormInvoice(props: FormInvoiceProps) {
           is: (val: any) => val === '3' || val === '4',
           then: yup.number().min(1, 'Min 1 period').required('Required'),
         })
-<<<<<<< HEAD
-      : yup.object({
-          user: yup.object().nullable().required('Required'),
-          loan_amount: yup
-            .string()
-            .min(2, 'Please enter a minimum required amount.')
-            .required('Required'),
-          transfer_date: yup.mixed().nullable().required('Required'),
-          interest_rate: yup.mixed().when('is_sharing_margin', {
-            is: (val: any) => val === false,
-            then: yup.number().nullable().required('Required').min(0),
-          }),
-          sharing_margin: yup.number().when('is_sharing_margin', {
-            is: (val: any) => val === true,
-            then: yup
-              .number()
-              .typeError('Must be a number')
-              .required('Required')
-              .min(1),
-          }),
-          destination_bank: yup.mixed().when('invoice_type_id', {
-            is: (val: any) => val === '1',
-            then: yup.object().nullable().required('Required'),
-          }),
-          destination_bank_account: yup.number().when('invoice_type_id', {
-            is: (val: any) => val === '1',
-            then: yup
-              .number()
-              .typeError('Must be a number')
-              .required('Required'),
-          }),
-          bank_transfer_fee: yup.string().when('destination_bank', {
-            is: (val: any) => !val.name.toLowerCase().includes('bca'),
-            then: yup.string().required('Required'),
-          }),
-          installment_period: yup.string().when('invoice_type_id', {
-            is: (val: any) => val === '2',
-            then: yup.string().required('Required'),
-          }),
-          provision_installment_period: yup.number().when('user', {
-            is: (val: any) => val?.need_provision,
-            then: yup
-              .number()
-              .min(0, 'Min 0 period')
-              .max(36, 'Max 36 period')
-              .required('Required'),
-          }),
-          nota_image: yup.mixed().when('invoice_type_id', {
-            is: (val: any) => val === '1',
-            then: yup.mixed().required('Required'),
-          }),
-=======
         .when('user', {
           is: (val: any) => val?.need_provision,
           then: yup.number().min(1, 'Min 1 period').required('Required'),
->>>>>>> 23235e92accff7afcf03153c37d30e396d2a5ca6
         }),
       loan_amount: yup.string().when('invoice_type_id', {
         is: (val: any) => val === '1' || val === '2',
