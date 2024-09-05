@@ -215,7 +215,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
     enableReinitialize: true,
   });
 
-  console.log(isProvisi.open, formik.errors, formik.values.user);
+  console.log(isProvisi.open, formik.errors, formik.touched);
 
   const setInstallmentSimulation = useCallback(
     debounce((value: number) => {
@@ -779,7 +779,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
               <TextField
                 fullWidth
                 placeholder="Input provision installment period"
-                name="user_data.provision_installment_period"
+                name="provision_installment_period"
                 onBlur={formik.handleBlur}
                 onKeyDown={(evt) =>
                   ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
