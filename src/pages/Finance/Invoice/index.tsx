@@ -294,17 +294,6 @@ export default function InvoicePage() {
                 },
               },
               {
-                label: 'Restructure',
-                disabled: false,
-                hide:
-                  value.status === 'Paid Off' &&
-                  value.invoice_type?.name !== 'Cash',
-                onClick: () => {
-                  setModalTypeSetManualSettled(3);
-                  setinvoiceDetail(value);
-                },
-              },
-              {
                 label: 'Revolve',
                 disabled: false,
                 hide: value.invoice_type?.name !== 'Normal',

@@ -105,8 +105,8 @@ export default function FormInvoice(props: FormInvoiceProps) {
               .typeError('Must be a number')
               .required('Required'),
           }),
-          bank_transfer_fee: yup.string().when('invoice_type_id', {
-            is: (val: any) => val === '1',
+          bank_transfer_fee: yup.string().when('destination_bank', {
+            is: (val: any) => !val.name.toLowerCase().includes('bca'),
             then: yup.string().required('Required'),
           }),
           installment_period: yup.string().when('invoice_type_id', {
@@ -503,6 +503,11 @@ export default function FormInvoice(props: FormInvoiceProps) {
                     options={bankData.data}
                     onChange={(e, value) => {
                       formik.setFieldValue('destination_bank', value);
+                      if (!value?.name.toLowerCase().includes('bca')) {
+                        formik.setFieldValue('bank_transfer_fee', 2500);
+                      } else {
+                        formik.setFieldValue('bank_transfer_fee', 0);
+                      }
                     }}
                     isOptionEqualToValue={(option: {
                       name: string;
@@ -561,8 +566,8 @@ export default function FormInvoice(props: FormInvoiceProps) {
                 >
                   <TextField
                     type="text"
-                    name="selling_price"
-                    placeholder="Insert Price"
+                    name="bank_transfer_fee"
+                    placeholder="Insert Bank Transfer Fee"
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">Rp</InputAdornment>

@@ -68,6 +68,7 @@ import {
 } from 'pages/Finance/hooks/useInvoiceService';
 import FormTopUpLimit from 'pages/Finance/UserMerchant/Components/FormTopUpLimit';
 import PrintInvoice from 'pages/Finance/Components/PrintInvoice';
+import { start } from 'repl';
 import { TitlePage, BackButton, Menu } from './details.styled';
 import { Document } from '@/pages/Finance/hooks/constumer.config';
 
@@ -144,19 +145,15 @@ export default function CustomerDetails() {
   ) => {
     setKurHistoryTab(newValue);
   };
-  const countDiffDate = (start: number | undefined) => {
-    const month = Math.round(
-      (new Date().getTime() - (start || 0) * 1000) / 1000 / 60 / 60 / 24 / 30,
-    );
-    const year = Math.round(
-      (new Date().getTime() - (start || 0) * 1000) /
-        1000 /
-        60 /
-        60 /
-        24 /
-        365.25,
-    );
-    return `${month} month(s) ${year} year(s)`;
+
+  const monthDiff = (date: number | undefined) => {
+    const today = new Date();
+    const startDate = new Date(date * 1000);
+    let months = 0;
+    months = (today.getFullYear() - startDate.getFullYear()) * 12;
+    months -= startDate.getMonth() + 1;
+    months += today.getMonth();
+    return `${Math.floor(months / 12)} year(s) ${months % 12} month(s) `;
   };
 
   const getLimit = () => {
@@ -305,7 +302,7 @@ export default function CustomerDetails() {
                   content={
                     <Box>
                       <Typography>
-                        {countDiffDate(customerKur.details?.business_lifetime)}
+                        {monthDiff(customerKur.details?.business_lifetime)}
                       </Typography>
                       <Typography sx={{ fontSize: '14px', color: '#8b95a5' }}>
                         {`Since: ${
