@@ -7,6 +7,7 @@ import React, { useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import Box from '@mui/material/Box';
 // import Typography from '@mui/material/Typography';
+import { useDropzone } from 'react-dropzone';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
@@ -37,12 +38,23 @@ function InputMultiImages({
   cropable,
   label,
 }: Props) {
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    isDragReject,
+    fileRejections,
+  } = useDropzone({
+    accept: {
+      'image/*': [],
+    },
+  });
   const [imageCrop, setImageCrop] = useState<any>(false);
   const fileInputField = useRef<HTMLInputElement>(null);
 
   const handleNewFileUpload = (e: any) => {
     const { files: newFiles } = e.target;
-    if (newFiles.length) {
+    if (newFiles.length && !isDragReject) {
       // props.setSelectedImg([...props.selectedImg, newFiles[0]]);
       if (cropable) {
         setImageCrop(newFiles[0]);
@@ -89,12 +101,30 @@ function InputMultiImages({
           justifyContent: 'center',
           borderRadius: '5px',
           padding: '10px',
-          border: '1px solid #c4c4c4',
+          // eslint-disable-next-line no-nested-ternary
+          border: isDragReject
+            ? '2px solid #bf370c'
+            : isDragActive
+            ? '2px solid #008e58'
+            : '1px solid #c4c4c4',
           // backgroundColor: 'red',
         }}
+        {...getRootProps({
+          onDrop: (e) => {
+            e.preventDefault();
+            // e.stopPropagation();
+            const file = {
+              target: {
+                files: e.dataTransfer.files,
+              },
+            };
+            handleNewFileUpload(file);
+          },
+        })}
       >
         <input
           type="file"
+          {...getInputProps()}
           ref={fileInputField}
           onChange={handleNewFileUpload}
           title=""
@@ -160,9 +190,10 @@ function InputMultiImages({
             <Button
               sx={{ maxWidth: '150px' }}
               startIcon={<AddPhotoAlternateIcon />}
-              variant="outlined"
+              variant={isDragActive ? 'contained' : 'outlined'}
               onClick={handleUploadBtnClick}
               size="small"
+              color={isDragReject ? 'error' : 'primary'}
               disabled={values.length === maxImage}
             >
               Add More Image
@@ -184,23 +215,26 @@ function InputMultiImages({
           >
             <Button
               startIcon={<AddPhotoAlternateIcon />}
-              variant="contained"
               onClick={handleUploadBtnClick}
+              variant={isDragActive ? 'contained' : 'outlined'}
             >
               Add Image
             </Button>
           </Box>
         )}
       </Box>
-      <Typography
-        sx={{
-          fontSize: '12px',
-          color: '#8B95A5',
-          marginTop: 1,
-        }}
-      >
-        Maximum {label} images: {maxImage}
-      </Typography>
+      {maxImage && (
+        <Typography
+          sx={{
+            fontSize: '12px',
+            color: '#8B95A5',
+            marginTop: 1,
+          }}
+        >
+          Maximum {label} images: {maxImage}
+        </Typography>
+      )}
+
       <ImageCrop
         open={Boolean(imageCrop)}
         image={imageCrop}
@@ -212,7 +246,6 @@ function InputMultiImages({
 }
 
 InputMultiImages.defaultProps = {
-  maxImage: 5,
   cropable: false,
 };
 

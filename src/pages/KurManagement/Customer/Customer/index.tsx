@@ -13,6 +13,7 @@ import {
   Collapse,
   IconButton,
   Chip,
+  Stack,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -51,6 +52,9 @@ import useToast from 'hooks/useToast';
 import FormUserMerchant from 'pages/Finance/UserMerchant/Components/Form';
 import FormTopUpLimit from 'pages/Finance/UserMerchant/Components/FormTopUpLimit';
 import FormRestructureMerchant from 'pages/Finance/UserMerchant/Components/FormRestructure';
+import PrintInvoice from 'pages/Finance/Components/PrintInvoice';
+import FormAssignAo from 'pages/Finance/UserMerchant/Components/FormAssignAo';
+import FilterUserMerchant from 'pages/Finance/UserMerchant/Components/FilterUserMerchant';
 
 // import FormCustomer from '../Verification/components/form';
 
@@ -73,6 +77,10 @@ export default function KurCustomer() {
   const [selectedIdUser, setSelectedIdUser] = useState<number | undefined>();
   const generatePDF = useMutation(getDownloadPdfUser);
   const { setLoading } = useLoadingSpinner();
+  const assignAoModal = useModal();
+
+  const printInvoiceModal = useModal();
+  const [selected, setSelected] = useState<any>();
 
   // useEffect(() => {
   //   dispatch(customerAction.fetchData(customerKur.params));
@@ -101,14 +109,15 @@ export default function KurCustomer() {
         status: 6,
         page: customerKur.params.page,
         search: customerKur.params.search,
+        // @ts-ignore
+        advance: customerKur.params.advance,
       }),
     );
   }, [
     customerKur.params.search,
-    // customerKur.params.order_by,
-    // customerKur.params.order_type,
+    // @ts-ignore
+    customerKur.params.advance,
     customerKur.params.page,
-    // customerKur.params.status,
   ]);
 
   const initialData = {
@@ -177,14 +186,14 @@ export default function KurCustomer() {
       label: 'ID',
       align: 'left',
       format: (val: Customer) => <div>{val.id}</div>,
-      enableSort: true,
+      // enableSort: true,
     },
     {
       id: 'user_number',
       label: 'User Number',
       align: 'left',
       format: (val: Customer) => <div>{val.user_number}</div>,
-      enableSort: true,
+      // enableSort: true,
     },
     {
       id: 'debtor_name',
@@ -192,7 +201,7 @@ export default function KurCustomer() {
       align: 'left',
       width: '200px',
       format: (val: Customer) => <div>{val.debtor_name}</div>,
-      enableSort: true,
+      // enableSort: true,
     },
     {
       id: 'merchant',
@@ -201,19 +210,25 @@ export default function KurCustomer() {
       minWidth: '200px',
       format: (val: Customer) => <div>{val.merchant_name}</div>,
     },
-    // {
-    //   id: 'pasar',
-    //   label: 'Pasar',
-    //   align: 'left',
-    //   format: (val: Customer) => <div>{val.area_name}</div>,
-    // },
+    {
+      id: 'pasar',
+      label: 'Pasar',
+      align: 'left',
+      format: (val: Customer) => <div>{val.area_name}</div>,
+    },
+    {
+      id: 'Category',
+      label: 'Category',
+      align: 'left',
+      format: (val: Customer) => <div>{val.category_jelajah_name}</div>,
+    },
     {
       id: 'kur_user_type',
       label: 'KUR Type',
       align: 'left',
       width: '95px',
       format: (val: Customer) => <div>{val.user_type.name}</div>,
-      enableSort: true,
+      // enableSort: true,
     },
     {
       id: 'create_date',
@@ -221,7 +236,8 @@ export default function KurCustomer() {
       align: 'left',
       width: '100px',
       format: (val: Customer) => (
-        <Box whiteSpace="nowrap">{convertDate(val.created_at)}</Box>
+        // @ts-ignore
+        <Box whiteSpace="nowrap">{convertDate(val?.join_date)}</Box>
       ),
     },
     {
@@ -261,7 +277,44 @@ export default function KurCustomer() {
       align: 'left',
       minWidth: '150px',
       format: (val: Customer) => (
+        // @ts-ignore
         <Typography>Rp {digitFormatter.format(val.average_invoice)}</Typography>
+      ),
+    },
+    {
+      id: 'available_limit_cash',
+      label: 'Available Limit Cash',
+      align: 'left',
+      minWidth: '180px',
+      format: (val: Customer) => (
+        <Typography>
+          {/* @ts-ignore */}
+          Rp {digitFormatter.format(val?.available_limit_cash || '')}
+        </Typography>
+      ),
+    },
+
+    {
+      id: 'available_limit_plafon',
+      label: 'Available Limit Plafon',
+      align: 'left',
+      minWidth: '150px',
+      format: (val: Customer) => (
+        <Typography>
+          {/* @ts-ignore */}
+          Rp {digitFormatter.format(val?.available_limit_plafon || '')}
+        </Typography>
+      ),
+    },
+    {
+      id: 'average_invoice',
+      label: 'Average Invoice',
+      align: 'left',
+      minWidth: '150px',
+      format: (val: Customer) => (
+        <Typography>
+          Rp {digitFormatter.format(val?.average_invoice || '')}
+        </Typography>
       ),
     },
     {
@@ -292,6 +345,32 @@ export default function KurCustomer() {
       ),
     },
     {
+      id: 'have_restructure',
+      label: 'Restructure',
+      align: 'left',
+      width: '100px',
+      format: (val: Customer) => (
+        <Stack
+          direction="row"
+          spacing={1}
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Typography>{val.is_restructure ? 'Yes' : 'No'}</Typography>
+          <Typography color="green">
+            {val.is_running_restructure ? '(Ongoing)' : ''}
+          </Typography>
+        </Stack>
+      ),
+    },
+    {
+      id: 'ao',
+      label: 'AO',
+      align: 'center',
+      width: '100px',
+      format: (val: Customer) => val.ao?.name || '-',
+    },
+    {
       id: 'action',
       label: 'Action',
       align: 'left',
@@ -317,28 +396,33 @@ export default function KurCustomer() {
               {
                 label: `Generate Invoice`,
                 onClick: () => {
-                  setLoading(true);
-                  generatePDF.mutate(val.id.toString(), {
-                    onSuccess: (data) => {
-                      setLoading(false);
-                      openToast({
-                        headMsg: 'Success to generate PDF',
-                        severity: 'success',
-                      });
-                      base64toOpen(
-                        // @ts-ignore
-                        data.data,
-                        `${val.user_number} - ${val.debtor_name}(${val.merchant_name}).pdf`,
-                      );
-                    },
-                    onError: (error) => {
-                      openToast({
-                        headMsg: 'Failed to generate PDF',
-                        severity: 'error',
-                      });
-                      setLoading(false);
-                    },
+                  setSelected({
+                    id: val.id,
+                    name: `${val.user_number} - ${val.debtor_name}(${val.merchant_name}).pdf`,
                   });
+                  printInvoiceModal.openModal();
+                  // setLoading(true);
+                  // generatePDF.mutate(val.id.toString(), {
+                  //   onSuccess: (data) => {
+                  //     setLoading(false);
+                  //     openToast({
+                  //       headMsg: 'Success to generate PDF',
+                  //       severity: 'success',
+                  //     });
+                  //     base64toOpen(
+                  //       // @ts-ignore
+                  //       data.data,
+                  //       `${val.user_number} - ${val.debtor_name}(${val.merchant_name}).pdf`,
+                  //     );
+                  //   },
+                  //   onError: (error) => {
+                  //     openToast({
+                  //       headMsg: 'Failed to generate PDF',
+                  //       severity: 'error',
+                  //     });
+                  //     setLoading(false);
+                  //   },
+                  // });
                 },
                 dataId: 'button-edit-customer',
               },
@@ -357,6 +441,14 @@ export default function KurCustomer() {
                   setSelectedIdUser(val.id);
                 },
                 dataId: 'button-restructure-customer',
+              },
+              {
+                label: `Assign AO`,
+                onClick: () => {
+                  assignAoModal.openModal();
+                  setSelectedIdUser(val.id);
+                },
+                dataId: 'button-assign-ao-customer',
               },
             ]}
           >
@@ -638,169 +730,16 @@ export default function KurCustomer() {
             </Box>
 
             <Collapse in={openFilter} data-testid="filter-collapse-customer">
-              <Grid container spacing={2} sx={{ marginTop: '2rem' }}>
-                <Grid item xs={4}>
-                  <Typography
-                    sx={{
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      marginBottom: 1,
-                    }}
-                  >
-                    Type
-                  </Typography>
-
-                  <Autocomplete
-                    data-testid="filter-type-customer"
-                    id="type"
-                    options={customerType}
-                    onChange={(e, value) => {
-                      handleChangeType(value);
-                    }}
-                    isOptionEqualToValue={(option: Type) => {
-                      return (
-                        option.id === customerKur.stateFilter?.user_type_id?.id
-                      );
-                    }}
-                    getOptionLabel={(option) => `${option.name}`}
-                    value={customerKur?.stateFilter?.user_type_id}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="type"
-                        placeholder="Select Customer Type"
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={4}>
-                  <Typography
-                    sx={{
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      marginBottom: 1,
-                    }}
-                  >
-                    Pasar
-                  </Typography>
-                  <Autocomplete
-                    data-testid="filter-pasar-customer"
-                    multiple
-                    id="pasar-kur"
-                    options={areaKur.data}
-                    onChange={(e, value) => {
-                      handleChangeArea(value);
-                    }}
-                    // isOptionEqualToValue={(option: Area) => {
-                    //   const filtered =
-                    //     customerKur?.stateFilter?.areaKur?.filter(
-                    //       (el: Area) => el.id === option.id,
-                    //     );
-                    //   if (filtered) {
-                    //     return option.id === filtered[0]?.id;
-                    //   }
-                    //   return false;
-                    // }}
-                    getOptionLabel={(option) => {
-                      return `${option.title}`;
-                    }}
-                    inputValue={inputValueArea}
-                    onInputChange={(_, newInputValue) => {
-                      setInputValueArea(newInputValue);
-                    }}
-                    // @ts-ignore
-                    value={customerKur?.stateFilter?.areaKur}
-                    limitTags={3}
-                    renderInput={(params) => {
-                      return (
-                        <>
-                          <TextField
-                            {...params}
-                            name="type"
-                            placeholder="Select Pasar"
-                            variant="outlined"
-                            // InputProps={{
-                            //   ...params.InputProps,
-                            //   startAdornment: !areaKurFilter && (
-                            //     <InputAdornment position="start">
-                            //       <SearchIcon />
-                            //     </InputAdornment>
-                            //   ),
-                            // }}
-                          />
-                        </>
-                      );
-                    }}
-                    renderTags={(value: Area[], getTagProps) =>
-                      value.map((option: Area, index: number) => (
-                        <Chip
-                          // variant="outlined"
-                          label={option.title}
-                          {...getTagProps({ index })}
-                          key={`area_tag_${option.id}`}
-                        />
-                      ))
-                    }
-                    renderOption={(props, option) => (
-                      <Box component="li" {...props} key={`area ${option.id}`}>
-                        {option.title}
-                      </Box>
-                    )}
-                  />
-                </Grid>
-                {/* <Grid item xs={4}>
-                  <Typography
-                    sx={{
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      marginBottom: 1,
-                    }}
-                  >
-                    Credit Score
-                  </Typography>
-                  <Autocomplete
-                    data-testid="filter-credit-score-customer"
-                    id="type"
-                    options={creditScore.data}
-                    onChange={(e, value) => {
-                      handleChangeCreditScore(value);
-                    }}
-                    isOptionEqualToValue={(option: UserCreditScore) => {
-                      return (
-                        option.id === customerKur.stateFilter?.creditScore?.id
-                      );
-                    }}
-                    getOptionLabel={(option) => `${option.name}`}
-                    value={customerKur?.stateFilter?.creditScore}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        name="type"
-                        placeholder="Select Credit Score"
-                      />
-                    )}
-                  />
-                </Grid> */}
-                <Grid item xs={12}>
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'flex-end',
-                      gap: 2,
-                    }}
-                  >
-                    <Button
-                      onClick={() => {
-                        handleResetFilter();
-                      }}
-                      variant="text"
-                    >
-                      Reset
-                    </Button>
-                    <Button onClick={handleApplyFilter}>Apply</Button>
-                  </Box>
-                </Grid>
-              </Grid>
+              <FilterUserMerchant
+                onChangeValue={(value) => {
+                  dispatch(
+                    customerAction.setParams({
+                      // @ts-ignore
+                      advance: value,
+                    }),
+                  );
+                }}
+              />
             </Collapse>
           </Card>
         </Grid>
@@ -813,7 +752,20 @@ export default function KurCustomer() {
             data-testid="table-customer"
           >
             <Table
-              data={customerKur.data}
+              data={
+                customerKur.data?.map((data) => ({
+                  ...data,
+                  table_color:
+                    data.nearest_due_date &&
+                    (moment(data.nearest_due_date * 1000).isBetween(
+                      moment(),
+                      moment().add(1, 'weeks'),
+                    ) ||
+                      moment(data.nearest_due_date * 1000).isBefore(moment()))
+                      ? '#F9EBE7'
+                      : undefined,
+                })) || []
+              }
               headCells={headCell}
               page={customerKur.params.page}
               totalData={customerKur.total}
@@ -898,6 +850,51 @@ export default function KurCustomer() {
             restructureModal.closeModal();
           }}
           openModal={topUpModal.open}
+        />
+      </Modal>
+      <Modal
+        open={printInvoiceModal.open}
+        title="Generate Invoice PDF"
+        onClose={() => {
+          printInvoiceModal.closeModal();
+          setSelected(null);
+        }}
+      >
+        <PrintInvoice
+          type="user"
+          idSelected={selected?.id}
+          name={selected?.name}
+          onClose={() => {
+            printInvoiceModal.closeModal();
+            setSelected(null);
+          }}
+        />
+      </Modal>
+      <Modal
+        open={assignAoModal.open}
+        onClose={() => {
+          assignAoModal.closeModal();
+          setSelectedIdUser(undefined);
+        }}
+        title="Assign AO"
+      >
+        <FormAssignAo
+          id={selectedIdUser}
+          handleClose={(isSubmite) => {
+            if (isSubmite) {
+              dispatch(
+                customerAction.fetchData({
+                  status: 6,
+                  page: customerKur.params.page,
+                  search: customerKur.params.search,
+                  // @ts-ignore
+                  advance: customerKur.params.advance,
+                }),
+              );
+            }
+            setSelectedIdUser(undefined);
+            assignAoModal.closeModal();
+          }}
         />
       </Modal>
     </Box>

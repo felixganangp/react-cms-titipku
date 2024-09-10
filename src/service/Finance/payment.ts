@@ -87,3 +87,18 @@ export const getpaymentDetails = (id?: string | number) =>
       reject(message);
     }
   });
+
+export const deletePayment = (id: string) =>
+  new Promise<Response<any>>(async (resolve, reject) => {
+    try {
+      const respon = await http.delete(`financing/payment/${id}`);
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });

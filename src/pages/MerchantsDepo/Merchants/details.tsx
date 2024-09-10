@@ -229,7 +229,7 @@ export default function MercheantsDetails() {
             <Box width="full" borderBottom="1px solid #E0E0E0" my={1} />
             <Stack px={2} py={1} width={['100%', '100%', '60%']}>
               <Grid container spacing={2}>
-                <Grid item xs={6} md={2.4}>
+                <Grid item xs={6} md={3}>
                   <Box bgcolor="#F9EBE7" p={1}>
                     <Typography color="#8e8e8e" fontSize={14}>
                       Balance
@@ -249,7 +249,7 @@ export default function MercheantsDetails() {
                     </Typography>
                   </Box>
                 </Grid>
-                <Grid item xs={6} md={2.4}>
+                <Grid item xs={6} md={2}>
                   <Box p={1}>
                     <Typography color="#8e8e8e" fontSize={14}>
                       Total Disburse
@@ -259,7 +259,7 @@ export default function MercheantsDetails() {
                     </Typography>
                   </Box>
                 </Grid>
-                <Grid item xs={6} md={2.4}>
+                <Grid item xs={6} md={2}>
                   <Box p={1}>
                     <Typography color="#8e8e8e" fontSize={14}>
                       Rank
@@ -302,7 +302,6 @@ export default function MercheantsDetails() {
                 {isDepo && (
                   <DescriptionDetail
                     title="Limit"
-                    icon={<AttachMoneyIcon sx={{ color: '#008e58' }} />}
                     content={`Rp ${numberSeperator(details?.limit || 0)}`}
                   />
                 )}

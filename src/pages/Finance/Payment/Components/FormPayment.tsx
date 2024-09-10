@@ -26,6 +26,7 @@ import {
 } from '@mui/material';
 import { Add, Delete, KeyboardArrowDown } from '@mui/icons-material';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
+import DateTimePicker from 'components/DateTimePicker';
 import InputImage from 'components/InputImage';
 import {
   UseCreatePayment,
@@ -247,28 +248,11 @@ export default function FormPayment({ onClose }: Props) {
             `${formik.errors.payment_date}`
           }
         >
-          <DesktopDatePicker
-            value={formik.values.payment_date}
-            inputFormat="MMM DD, YYYY"
+          <DateTimePicker
             onChange={(value) => {
               formik.setFieldValue('payment_date', value);
-              openDateSelect.toggleModal();
             }}
-            open={openDateSelect.open}
-            onOpen={openDateSelect.toggleModal}
-            onClose={openDateSelect.toggleModal}
-            renderInput={(params) => {
-              return (
-                <TextField
-                  {...params}
-                  name="grade"
-                  placeholder="Select Payment Date"
-                  variant="outlined"
-                  fullWidth
-                  onClick={openDateSelect.toggleModal}
-                />
-              );
-            }}
+            value={formik.values.payment_date}
           />
         </FormControl>
         <FormControl

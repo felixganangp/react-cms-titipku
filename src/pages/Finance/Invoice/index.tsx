@@ -36,6 +36,7 @@ import numberSeperator from 'utils/numberSeperator';
 import MenuList from 'components/MenuList';
 import { MoreVert } from '@mui/icons-material';
 import useToast from 'hooks/useToast';
+import PopupAction from 'components/PopupAction';
 import { base64toOpen } from 'utils/base64toDownload';
 import {
   InvoiceType,
@@ -45,12 +46,15 @@ import {
 } from '../hooks/useConfigFinance';
 import FormInvoice from './Components/FormInvoice';
 import {
+  UseDeleteInvoice,
   UseGetInvoicePDF,
   UseInvoiceService,
+  UseRevolveInvoice,
 } from '../hooks/useInvoiceService';
 import FormSetManualSettled from './Components/FormSetManualSettled';
 import FormCustomer from '../Customer/Components/Form';
 import { Type } from '../hooks/constumer.config';
+import PrintInvoice from '../Components/PrintInvoice';
 
 export default function InvoicePage() {
   const navigate = useNavigate();
@@ -60,8 +64,12 @@ export default function InvoicePage() {
   const [invoiceDetail, setinvoiceDetail] = useState<InvoiceListType | null>(
     null,
   );
-  const createUserModal = useModal();
+  const [selected, setSelected] = useState<any>();
+  // const createUserModal = useModal();
   const showFilter = useModal();
+  const printInvoiceModal = useModal();
+  const revolveInvoiceModal = useModal();
+  const deleteInvoiceModal = useModal();
   const invoiceForm = useModal();
   const [modalTypeSetManualSettled, setModalTypeSetManualSettled] = useState<
     number | null
@@ -69,7 +77,8 @@ export default function InvoicePage() {
 
   const queryInnvoice = UseInvoiceService();
   const queryArea = UseAreaListService();
-  const getInoivcePDF = UseGetInvoicePDF();
+  const revolveInvoice = UseRevolveInvoice();
+  const deleteInvoice = UseDeleteInvoice();
   // const queryCategory = UseCategoryListService();
 
   const headCells: HeadCells<InvoiceListType>[] = [
@@ -285,37 +294,53 @@ export default function InvoicePage() {
                 },
               },
               {
-                label: 'Restructure',
+                label: 'Revolve',
                 disabled: false,
-                hide:
-                  value.status === 'Paid Off' &&
-                  value.invoice_type?.name !== 'Cash',
+                hide: value.invoice_type?.name !== 'Normal',
                 onClick: () => {
-                  setModalTypeSetManualSettled(3);
-                  setinvoiceDetail(value);
+                  revolveInvoiceModal.openModal();
+                  setSelected({
+                    name: value.invoice_number,
+                    id: value.id,
+                  });
                 },
               },
               {
                 label: 'Generate PDF',
                 onClick: () => {
-                  setLoading(true);
-
-                  getInoivcePDF.mutate(value.id.toString(), {
-                    onSuccess: (data) => {
-                      setLoading(false);
-                      openToast({
-                        headMsg: 'Success to generate PDF',
-                        severity: 'success',
-                      });
-                      base64toOpen(data.data, `${value.invoice_number}.pdf`);
-                    },
-                    onError: (error) => {
-                      openToast({
-                        headMsg: 'Failed to generate PDF',
-                        severity: 'error',
-                      });
-                      setLoading(false);
-                    },
+                  // setLoading(true);
+                  printInvoiceModal.openModal();
+                  setSelected({
+                    name: value.invoice_number,
+                    id: value.id,
+                  });
+                  // getInoivcePDF.mutate(value.id.toString(), {
+                  //   onSuccess: (data) => {
+                  //     setLoading(false);
+                  //     openToast({
+                  //       headMsg: 'Success to generate PDF',
+                  //       severity: 'success',
+                  //     });
+                  //     base64toOpen(data.data, `${value.invoice_number}.pdf`);
+                  //   },
+                  //   onError: (error) => {
+                  //     openToast({
+                  //       headMsg: 'Failed to generate PDF',
+                  //       severity: 'error',
+                  //     });
+                  //     setLoading(false);
+                  //   },
+                  // });
+                },
+              },
+              {
+                label: 'Delete',
+                disabled: false,
+                onClick: () => {
+                  deleteInvoiceModal.openModal();
+                  setSelected({
+                    name: value.invoice_number,
+                    id: value.id,
                   });
                 },
               },
@@ -810,7 +835,20 @@ export default function InvoicePage() {
         <Card>
           <Table
             headCells={headCells}
-            data={queryInnvoice.listData || []}
+            data={
+              queryInnvoice.listData?.map((data) => ({
+                ...data,
+                table_color:
+                  data.status !== 'Paid Off' &&
+                  (moment(data.due_date * 1000).isBetween(
+                    moment(),
+                    moment().add(1, 'weeks'),
+                  ) ||
+                    moment(data.due_date * 1000).isBefore(moment()))
+                    ? '#F9EBE7'
+                    : undefined,
+              })) || []
+            }
             loading={queryInnvoice.isLoading}
             page={queryInnvoice.data?.page || 0}
             count={queryInnvoice.data?.count || 0}
@@ -863,6 +901,84 @@ export default function InvoicePage() {
           }}
         />
       </Modal>
+      <Modal
+        open={printInvoiceModal.open}
+        title="Generate Invoice PDF"
+        onClose={() => {
+          printInvoiceModal.closeModal();
+          setSelected(null);
+        }}
+      >
+        <PrintInvoice
+          type="invoice"
+          idSelected={selected?.id}
+          name={selected?.name}
+          onClose={() => {
+            printInvoiceModal.closeModal();
+            setSelected(null);
+          }}
+        />
+      </Modal>
+      <PopupAction
+        open={revolveInvoiceModal.open}
+        onClose={() => {
+          revolveInvoiceModal.closeModal();
+          setSelected(null);
+        }}
+        onSubmit={() => {
+          revolveInvoice.mutate(selected?.id, {
+            onSuccess: () => {
+              openToast({
+                headMsg: 'Success to revolve invoice',
+                severity: 'success',
+              });
+              queryInnvoice.refetch();
+              revolveInvoiceModal.closeModal();
+              setSelected(null);
+            },
+            onError: (e) => {
+              openToast({
+                // @ts-ignore
+                headMsg: e || 'Failed to revolve invoice',
+                severity: 'error',
+              });
+            },
+          });
+        }}
+        title="Revolve Invoice"
+        content={`Are you sure to revolve this invoice ${selected?.name}?`}
+        buttonLabel="Revolve"
+      />
+      <PopupAction
+        open={deleteInvoiceModal.open}
+        onClose={() => {
+          deleteInvoiceModal.closeModal();
+          setSelected(null);
+        }}
+        onSubmit={() => {
+          deleteInvoice.mutate(selected?.id, {
+            onSuccess: () => {
+              openToast({
+                headMsg: 'Success delete invoice',
+                severity: 'success',
+              });
+              queryInnvoice.refetch();
+              deleteInvoiceModal.closeModal();
+              setSelected(null);
+            },
+            onError: (e) => {
+              openToast({
+                // @ts-ignore
+                headMsg: e || 'Failed delete invoice',
+                severity: 'error',
+              });
+            },
+          });
+        }}
+        title="Delete Invoice"
+        content={`Are you sure to delet this invoice ${selected?.name}?`}
+        buttonLabel="Delete"
+      />
     </Box>
   );
 }

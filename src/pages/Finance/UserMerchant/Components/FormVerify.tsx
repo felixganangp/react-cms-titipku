@@ -24,6 +24,7 @@ import {
   getAllCategoryFinancing,
 } from 'service/Finance/config';
 import * as yup from 'yup';
+import InputFile from 'components/InputFile';
 import { SteperHeader } from '../../Customer/Components/SteperHeader';
 import useUserMerchant from '../hooks/useUserMerchant';
 import { Type } from '../../hooks/constumer.config';
@@ -92,9 +93,11 @@ export default function FormVerifyUserMerchant({
         financing_form: fileSize,
       }),
     }),
-    sendDocument: true,
+    config: {
+      sendDocument: true,
+      removeUserTypeId: true,
+    },
   });
-  console.log(formik.errors);
 
   const backButton = () => {
     switch (step) {
@@ -439,35 +442,16 @@ export default function FormVerifyUserMerchant({
                 }
               >
                 <>
-                  <input
-                    type="file"
-                    accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,"
-                    hidden
-                    name={key}
-                    title=""
-                    value=""
-                    onChange={(e) => {
-                      // @ts-ignore
-                      if (e.target.files[0]) {
-                        formik.setFieldValue(
-                          `document.${key}`,
-                          // @ts-ignore
-                          e.target.files[0] || '',
-                        );
-                        formik.setFieldTouched(`document.${key}`).then(() => {
-                          formik.validateForm();
-                        });
-                      }
+                  <InputFile
+                    // @ts-ignore
+                    value={formik.values?.document?.[key] || null}
+                    onChange={(e: File) => {
+                      formik.setFieldValue(`document.${key}`, e);
+                      formik.setFieldTouched(`document.${key}`).then(() => {
+                        formik.validateForm();
+                      });
                     }}
                   />
-                  <Button
-                    onClick={() => {
-                      document.getElementsByName(key)[0].click();
-                    }}
-                  >
-                    {/* @ts-ignore */}
-                    {formik.values?.document?.[key]?.name || 'Choose File'}
-                  </Button>
                 </>
               </FormControl>
             );

@@ -13,38 +13,75 @@ import { CustomerDetailType } from 'models/finance/customer';
 
 export const getAllCustomers = (params: CustomerParams) =>
   new Promise<ListResponse<Customer>>(async (resolve, reject) => {
-    let objString = '';
-    if (params.area_id && params.area_id !== '') {
-      const tempArea: string[] = params.area_id.split(',');
-      const arrayArea: string[] = [];
-      tempArea.forEach((element) => {
-        arrayArea.push(`&area_id=${element}`);
-      });
-      const queryParams = new URLSearchParams(
-        Object.fromEntries(
-          Object.entries(params).filter(
-            ([key, value]) => value !== undefined && key !== 'area_id',
-          ),
-        ),
-      );
-      objString = `?${new URLSearchParams(
-        queryParams,
-      ).toString()}${arrayArea.join('')}`;
-    } else {
-      const queryParams = new URLSearchParams(
-        Object.fromEntries(
-          Object.entries(params).filter(
-            ([key, value]) => value !== undefined && key !== 'area_id',
-          ),
-        ),
-      );
-      objString = `?${new URLSearchParams(queryParams).toString()}`;
-    }
     try {
+      let objString = '';
+      const object = {};
+
+      if ((params.area_id?.length || 0) > 0) {
+        // @ts-ignore
+        params.area_id.forEach((area) => {
+          console.log('area', area);
+          if (objString[0] === '?') {
+            objString += `&area_id=${area}`;
+          } else {
+            objString += `?area_id=${area}`;
+          }
+        });
+      }
+
+      // @ts-ignore
+      if ((params.category_jelajah_id?.length || 0) > 0) {
+        // @ts-ignore
+        params.category_jelajah_id.forEach((category) => {
+          if (objString[0] === '?') {
+            objString += `&category_jelajah_id=${category}`;
+          } else {
+            objString += `?category_jelajah_id=${category}`;
+          }
+        });
+      }
+
+      // @ts-ignore
+      if ((params.batch_id?.length || 0) > 0) {
+        // @ts-ignore
+        params.batch_id.forEach((batch) => {
+          if (objString[0] === '?') {
+            objString += `&batch_id=${batch}`;
+          } else {
+            objString += `?batch_id=${batch}`;
+          }
+        });
+      }
+
+      if (Object.keys(params).length > 0) {
+        Object.keys(params)
+          .filter(
+            (val) =>
+              ![
+                'area_id',
+                'category_jelajah_id',
+                'batch_id',
+                'advance',
+              ].includes(val),
+          )
+          .forEach((key) => {
+            // @ts-ignore
+            if (params[key]) {
+              // @ts-ignore
+              object[key] = params[key];
+            }
+          });
+      }
+
+      // console.log('object1', params);
+      // console.log('object2', objString);
+      // console.log('object3', object);
       // const respon = await http.get(`financing/user`, {
       //   params,
       // });
-      const respon = await http.get(`financing/user${objString}`);
+      const respon = await http.get(`financing/user${objString}`, {
+        params: object,
+      });
       if (respon.data) {
         resolve(respon.data);
       }

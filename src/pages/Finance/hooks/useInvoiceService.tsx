@@ -2,6 +2,7 @@
 import { InvoiceParams } from 'models/finance/invoice';
 import {
   createInvoice,
+  deleteInvoice,
   getInstallmentSimulation,
   getInvoiceAll,
   getInvoiceByUserId,
@@ -9,12 +10,15 @@ import {
   getInvoicePDF,
   getLimitHistoryByUserId,
   getPaymentByUserId,
+  getPrintInvoice,
+  revolveRestructre,
   setManualSettled,
 } from 'service/Finance/invoice';
 import { useFormik } from 'formik';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
 import { useEffect, useMemo } from 'react';
+import { getDownloadPdfUser } from 'service/Kur/Customer';
 
 export function UseInvoiceService(setParams?: InvoiceParams) {
   const params = UseParams<InvoiceParams>(setParams);
@@ -221,4 +225,16 @@ export function UseGetInvoicePDF() {
 
 export function UseGetInstalmentSimulation() {
   return useMutation(getInstallmentSimulation);
+}
+
+export function UseGetInvoicePDFCustomeDate() {
+  return useMutation(getPrintInvoice);
+}
+
+export function UseRevolveInvoice() {
+  return useMutation(revolveRestructre);
+}
+
+export function UseDeleteInvoice() {
+  return useMutation(deleteInvoice);
 }

@@ -27,6 +27,7 @@ import {
   getAllAreaFinancing,
   getAllCategoryFinancing,
 } from 'service/Finance/config';
+import InputFile from 'components/InputFile';
 import { SteperHeader } from '../../Customer/Components/SteperHeader';
 import useUserMerchant from '../hooks/useUserMerchant';
 import { Type } from '../../hooks/constumer.config';
@@ -63,6 +64,9 @@ export default function FormUserMerchant({
   const formik = useUserMerchant({
     id,
     handleClose,
+    config: {
+      sendDocument: true,
+    },
   });
 
   const backButton = () => {
@@ -104,13 +108,26 @@ export default function FormUserMerchant({
         };
       case 2:
         return {
+          label: id ? 'Next' : 'Submit',
+          onClick: () => {
+            // console.log(formik.errors);
+            // onCancelRef.current = true;
+            if (id) {
+              setStep(step + 1);
+            } else {
+              formik.handleSubmit();
+            }
+          },
+          disabled: Boolean(formik.errors?.idir_data),
+        };
+      case 3:
+        return {
           label: 'Submit',
           onClick: () => {
             // console.log(formik.errors);
             // onCancelRef.current = true;
             formik.handleSubmit();
           },
-          disabled: Boolean(formik.errors?.idir_data),
         };
       default:
         return {
@@ -195,7 +212,11 @@ export default function FormUserMerchant({
       <div id="top" />
       <SteperHeader
         currentStep={step}
-        stepList={['Basic Info', 'Calculator IDIR']}
+        stepList={
+          id
+            ? ['Basic Info', 'Calculator IDIR', 'Document']
+            : ['Basic Info', 'Calculator IDIR']
+        }
       />
       <Box mt={2} />
       <Box display={step === 1 ? 'block' : 'none'}>
@@ -1362,6 +1383,86 @@ export default function FormUserMerchant({
             rows={4}
           />
         </FormControl>
+      </Box>
+      <Box display={step === 3 ? 'block' : 'none'}>
+        {Object.keys(formik.values.document).map((key) => {
+          if (key.includes('image')) {
+            return (
+              // eslint-disable-next-line react/jsx-key
+              <FormControl
+                text={key
+                  .replaceAll('_', ' ')
+                  .replaceAll('image', '')
+                  .toLocaleUpperCase()}
+                error={
+                  // @ts-ignore
+                  formik.touched?.document?.[key] &&
+                  // @ts-ignore
+                  Boolean(formik.errors?.document?.[key])
+                }
+                helperText={
+                  // @ts-ignore
+                  formik.touched?.document?.[key]
+                    ? // @ts-ignore
+                      formik.errors?.document?.[key]
+                    : ''
+                }
+              >
+                <InputImage
+                  label="an Image"
+                  // @ts-ignore
+                  value={formik.values?.document?.[key]}
+                  onChange={(e: unknown) => {
+                    formik.setFieldValue(`document.${key}`, e);
+                    formik.setFieldTouched(`document.${key}`);
+                  }}
+                  onClear={() => formik.setFieldValue(`document.${key}`, null)}
+                  // width={720}
+                  // height={720}
+                />
+              </FormControl>
+            );
+          }
+
+          if (key.includes('form')) {
+            return (
+              // eslint-disable-next-line react/jsx-key
+              <FormControl
+                text={key
+                  .replaceAll('_', ' ')
+                  .replaceAll('form', '')
+                  .toLocaleUpperCase()}
+                error={
+                  // @ts-ignore
+                  formik.touched?.document?.[key] &&
+                  // @ts-ignore
+                  Boolean(formik.errors?.document?.[key])
+                }
+                helperText={
+                  // @ts-ignore
+                  formik.touched?.document?.[key]
+                    ? // @ts-ignore
+                      formik.errors?.document?.[key]
+                    : ''
+                }
+              >
+                <>
+                  <InputFile
+                    // @ts-ignore
+                    value={formik.values?.document?.[key] || null}
+                    onChange={(e: File) => {
+                      formik.setFieldValue(`document.${key}`, e);
+                      formik.setFieldTouched(`document.${key}`).then(() => {
+                        formik.validateForm();
+                      });
+                    }}
+                  />
+                </>
+              </FormControl>
+            );
+          }
+          return <></>;
+        })}
       </Box>
       <Stack direction="row" justifyContent="end" spacing={1}>
         <Button variant="text" color="error" onClick={backButton().onClick}>

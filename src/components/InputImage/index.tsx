@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import ClearIcon from '@mui/icons-material/Clear';
 import useToast from 'hooks/useToast';
+import { useDropzone } from 'react-dropzone';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import ImageCrop from '../ImageCrop';
 import { createResizedImage } from './resize';
@@ -54,6 +55,23 @@ function InputImage({
   const [imageCrop, setImageCrop] = useState<any>(false);
   const [imageFile, setImageFile] = useState<File | undefined>(undefined);
   const fileInputField = useRef<HTMLInputElement>(null);
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    open,
+    acceptedFiles,
+    isDragReject,
+    fileRejections,
+  } = useDropzone({
+    // Disable click and keydown behavior
+    noClick: true,
+    noKeyboard: true,
+    accept: {
+      'image/*': [],
+      webp: [],
+    },
+  });
 
   // const handleNewFileUpload = (e: React.ChangeEvent<HTMLElement>) => {
   //   const { files: newFiles } = e.target as HTMLInputElement;
@@ -64,7 +82,7 @@ function InputImage({
 
   const handleNewFileUpload = (e: any) => {
     const { files: newFiles } = e.target;
-    if (newFiles?.length) {
+    if (newFiles?.length && !isDragReject) {
       if (cropable) {
         setImageCrop(true);
         setImageFile(newFiles[0]);
@@ -74,7 +92,7 @@ function InputImage({
             newFiles[0],
             1500,
             1500,
-            'JPEG',
+            'WEBP',
             90,
             0,
             (blob) => {
@@ -110,6 +128,16 @@ function InputImage({
     }
   };
 
+  useEffect(() => {
+    if (acceptedFiles.length > 0) {
+      handleNewFileUpload({
+        target: {
+          files: acceptedFiles,
+        },
+      });
+    }
+  }, [acceptedFiles, isDragReject, fileRejections]);
+
   const handleSaveCropedImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e);
   };
@@ -133,9 +161,31 @@ function InputImage({
           alignItems: 'center',
           borderRadius: '5px',
           padding: '10px',
-          border: `${imageCustomer ? '' : '1px solid #c4c4c4'}`,
+          // eslint-disable-next-line no-nested-ternary
+          border: isDragReject
+            ? '2px solid #bf370c'
+            : isDragActive
+            ? '2px solid #008e58'
+            : `${imageCustomer ? '' : '1px solid #c4c4c4'}`,
           cursor: 'pointer',
         }}
+        {...getRootProps({
+          onDrop: (e) => {
+            e.preventDefault();
+            // e.stopPropagation();
+            const file = {
+              target: {
+                files: e.dataTransfer.files,
+              },
+            };
+            handleNewFileUpload(file);
+          },
+          onChange: (e) => {
+            e.preventDefault();
+            // e.stopPropagation();
+            handleNewFileUpload(e);
+          },
+        })}
       >
         <Box position="relative">
           {onClear && value ? (
@@ -159,8 +209,9 @@ function InputImage({
             false
           )}
 
-          <Box onClick={handleUploadBtnClick}>
+          <Box>
             <input
+              {...getInputProps()}
               type="file"
               ref={fileInputField}
               onChange={handleNewFileUpload}
@@ -208,8 +259,14 @@ function InputImage({
               </>
             ) : (
               <Box
+                onClick={handleUploadBtnClick}
                 sx={{
-                  border: '2px dashed #c4c4c4',
+                  // eslint-disable-next-line no-nested-ternary
+                  border: isDragReject
+                    ? '2px dashed #bf370c'
+                    : isDragActive
+                    ? '2px dashed #008e58'
+                    : '2px dashed #c4c4c4',
                   bgcolor: '#FAFAFA',
                   display: 'flex',
                   alignItems: 'center',

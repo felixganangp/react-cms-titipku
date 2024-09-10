@@ -18,7 +18,7 @@ interface PopupActionProps {
   content: string | any;
   onSubmit(): void;
   buttonLabel: string;
-  isGreenButton: boolean;
+  isGreenButton?: boolean;
 }
 
 export default function PopupAction(props: PopupActionProps) {
@@ -47,7 +47,7 @@ export default function PopupAction(props: PopupActionProps) {
               backgroundColor: '#EBEFF3',
             },
           }}
-          isGreenFont={isGreenButton}
+          isGreenFont={Boolean(isGreenButton)}
           onClick={() => onClose()}
         >
           Cancel

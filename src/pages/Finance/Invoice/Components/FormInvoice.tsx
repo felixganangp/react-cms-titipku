@@ -29,8 +29,9 @@ import bankData from 'data/list-bank.json';
 import { useFormik } from 'formik';
 import useModal from 'hooks/useModal';
 import moment from 'moment';
-import InputImage from 'components/InputImage';
+import InputMultiImages from 'components/InputMultiImages';
 import useToast from 'hooks/useToast';
+import DateTimePicker from 'components/DateTimePicker';
 import * as yup from 'yup';
 
 import SelectCustomer from '../../Components/SelectCustomer';
@@ -51,6 +52,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
   const openDateSelect = useModal();
   const simulationInstalment = UseGetInstalmentSimulation();
   const createInvoice = UseCreateInvoice();
+  const isProvisi = useModal();
 
   const formik = useFormik({
     initialValues: {
@@ -70,11 +72,27 @@ export default function FormInvoice(props: FormInvoiceProps) {
     },
     validationSchema: yup.object({
       user: yup.object().nullable().required('Required'),
-      loan_amount: yup
-        .string()
-        .min(2, 'Please enter a minimum required amount.')
-        .required('Required'),
-      transfer_date: yup.mixed().nullable().required('Required'),
+      provision_installment_period: yup
+        .number()
+        .when('invoice_type_id', {
+          is: (val: any) => val === '3' || val === '4',
+          then: yup.number().min(1, 'Min 1 period').required('Required'),
+        })
+        .when('user', {
+          is: (val: any) => val?.need_provision,
+          then: yup.number().min(1, 'Min 1 period').required('Required'),
+        }),
+      loan_amount: yup.string().when('invoice_type_id', {
+        is: (val: any) => val === '1' || val === '2',
+        then: yup
+          .string()
+          .min(2, 'Please enter a minimum required amount.')
+          .required('Required'),
+      }),
+      transfer_date: yup.mixed().when('invoice_type_id', {
+        is: (val: any) => val === '1' || val === '2',
+        then: yup.mixed().nullable().required('Required'),
+      }),
       interest_rate: yup.mixed().when('is_sharing_margin', {
         is: (val: any) => val === false,
         then: yup.number().nullable().required('Required').min(0),
@@ -103,47 +121,63 @@ export default function FormInvoice(props: FormInvoiceProps) {
         is: (val: any) => val === '2',
         then: yup.string().required('Required'),
       }),
-      provision_installment_period: yup.number().when('user', {
-        is: (val: any) => val?.need_provision,
-        then: yup
-          .number()
-          .min(0, 'Min 0 period')
-          .max(36, 'Max 36 period')
-          .required('Required'),
+      nota_image: yup.mixed().when('invoice_type_id', {
+        is: (val: any) => val === '1',
+        then: yup.mixed().required('Required'),
       }),
-      nota_image: yup.string().required('Required'),
     }),
     onSubmit: async (values) => {
       try {
         const fd = new FormData();
-        const promises = Object.keys(values).map(async (key) => {
-          switch (key) {
-            case 'transfer_date':
-              // @ts-ignore
-              await fd.append('transfer_date', moment(values[key]).unix());
-              break;
-            case 'user':
-              // @ts-ignore
-              await fd.append('user_id', values.user.id);
-              break;
-            case 'destination_bank':
-              // @ts-ignore
-              if (values[key]?.code) {
+        if (isProvisi.open) {
+          await fd.append('invoice_type_id', values.invoice_type_id);
+          // @ts-ignore
+          await fd.append('user_id', values.user.id);
+          // @ts-ignore
+          await fd.append(
+            'provision_installment_period',
+            values.provision_installment_period,
+          );
+        } else {
+          const promises = Object.keys(values).map(async (key) => {
+            switch (key) {
+              case 'transfer_date':
                 // @ts-ignore
-                await fd.append('destination_bank', values[key].code);
-              }
-              break;
-            default:
-              // @ts-ignore
-              if (values[key]) {
+                await fd.append('transfer_date', moment(values[key]).unix());
+                break;
+              case 'user':
                 // @ts-ignore
-                await fd.append(key, values[key]);
-              }
-              break;
-          }
-        });
+                await fd.append('user_id', values.user.id);
+                break;
+              case 'destination_bank':
+                // @ts-ignore
+                if (values[key]?.code) {
+                  // @ts-ignore
+                  await fd.append('destination_bank', values[key].code);
+                }
+                break;
+              case 'nota_image':
+                // @ts-ignore
+                if (values[key]) {
+                  // @ts-ignore
+                  await values[key].forEach((item: any) => {
+                    // @ts-ignore
+                    fd.append('nota_image', item);
+                  });
+                }
+                break;
+              default:
+                // @ts-ignore
+                if (values[key]) {
+                  // @ts-ignore
+                  await fd.append(key, values[key]);
+                }
+                break;
+            }
+          });
 
-        await Promise.all(promises);
+          await Promise.all(promises);
+        }
         createInvoice.mutate(fd, {
           onSuccess: (data) => {
             props.onClose(true);
@@ -154,10 +188,10 @@ export default function FormInvoice(props: FormInvoiceProps) {
             });
           },
           onError: (error) => {
-            console.log('errornya', error)
             toast.openToast({
               severity: 'error',
               headMsg: 'Failed create invoice',
+              // @ts-ignore
               message: error || '',
             });
           },
@@ -169,6 +203,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
         });
       }
     },
+    enableReinitialize: true,
   });
 
   const setInstallmentSimulation = useCallback(
@@ -222,10 +257,23 @@ export default function FormInvoice(props: FormInvoiceProps) {
             aria-labelledby="demo-row-radio-buttons-group-label"
             name="invoice_type_id"
             value={formik.values.invoice_type_id}
-            onChange={formik.handleChange}
+            onChange={(e) => {
+              formik.handleChange(e);
+              if (e.target.value === 'Normal' || e.target.value === 'Cash') {
+                isProvisi.closeModal();
+              } else {
+                isProvisi.openModal();
+              }
+            }}
           >
             <FormControlLabel value="1" control={<Radio />} label="Normal" />
             <FormControlLabel value="2" control={<Radio />} label="Cash" />
+            <FormControlLabel value="3" control={<Radio />} label="Provisi" />
+            <FormControlLabel
+              value="4"
+              control={<Radio />}
+              label="Provisi Cash"
+            />
           </RadioGroup>
         </FormControl>
         <FormControl
@@ -294,237 +342,75 @@ export default function FormInvoice(props: FormInvoiceProps) {
             />
           )}
         </FormControl>
-        <FormControl text="Sharing Margin">
-          <SwitchCostum
-            checked={formik.values.is_sharing_margin}
-            name="is_sharing_margin"
-            onBlur={formik.handleBlur}
-            onChange={(e) => {
-              formik.handleChange(e);
-            }}
-          />
-        </FormControl>
-        {formik.values.is_sharing_margin && (
-          <FormControl
-            text="Sharing Margin Amount"
-            required
-            error={
-              formik.touched.sharing_margin &&
-              Boolean(formik.errors.sharing_margin)
-            }
-            helperText={
-              formik.touched.sharing_margin &&
-              formik.errors.sharing_margin &&
-              `${formik.errors.sharing_margin}`
-            }
-          >
-            <TextField
-              type="text"
-              name="sharing_margin"
-              placeholder="Insert Sharing Margin Amount"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">Rp</InputAdornment>
-                ),
-              }}
-              fullWidth
-              autoComplete="off"
-              value={numberSeperator(formik.values.sharing_margin || '')}
-              onBlur={(e) => {
-                formik.handleBlur(e);
-              }}
-              onChange={(e) => {
-                const value = e.target.value
-                  .replace(/[^0-9.]/g, '')
-                  .replace(/(\..*?)\..*/g, '$1');
-
-                formik.setFieldValue('sharing_margin', value);
-              }}
-            />
-          </FormControl>
-        )}
-
-        <FormControl
-          text="Loan Amount"
-          required
-          error={
-            formik.touched.loan_amount && Boolean(formik.errors.loan_amount)
-          }
-          helperText={
-            formik.touched.loan_amount &&
-            formik.errors.loan_amount &&
-            `${formik.errors.loan_amount}`
-          }
-        >
-          <TextField
-            type="text"
-            name="loan_amount"
-            placeholder="Insert Loan Amount"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">Rp</InputAdornment>
-              ),
-            }}
-            fullWidth
-            autoComplete="off"
-            value={numberSeperator(formik.values.loan_amount || '')}
-            onBlur={(e) => {
-              formik.handleBlur(e);
-              const maxValue =
-                formik.values.invoice_type_id === '1'
-                  ? // @ts-ignore
-                    formik.values.user?.limit_plafon
-                  : // @ts-ignore
-                    formik.values.user?.limit_cash || 0;
-
-              if (parseInt(formik.values.loan_amount) > maxValue) {
-                setTimeout(() => {
-                  formik.setFieldError(
-                    'loan_amount',
-                    `Maximal ${numberSeperator(maxValue)}`,
-                  );
-                }, 100);
-              }
-            }}
-            onChange={(e) => {
-              const value = e.target.value
-                .replace(/[^0-9.]/g, '')
-                .replace(/(\..*?)\..*/g, '$1');
-
-              formik.setFieldValue('loan_amount', value);
-
-              const maxValue =
-                formik.values.invoice_type_id === '1'
-                  ? // @ts-ignore
-                    formik.values.user?.limit_plafon
-                  : // @ts-ignore
-                    formik.values.user?.limit_cash || 0;
-
-              if (parseInt(value) > maxValue) {
-                setTimeout(() => {
-                  formik.setFieldError(
-                    'loan_amount',
-                    `Maximal ${numberSeperator(maxValue)}`,
-                  );
-                }, 100);
-              }
-            }}
-          />
-        </FormControl>
-        <FormControl
-          text="Date"
-          required
-          error={
-            formik.touched.transfer_date && Boolean(formik.errors.transfer_date)
-          }
-          helperText={
-            formik.touched.transfer_date &&
-            formik.errors.transfer_date &&
-            `${formik.errors.transfer_date}`
-          }
-        >
-          <DesktopDatePicker
-            value={formik.values.transfer_date}
-            inputFormat="MMM DD, YYYY"
-            onChange={(value) => {
-              formik.setFieldValue('transfer_date', value);
-              openDateSelect.toggleModal();
-            }}
-            open={openDateSelect.open}
-            onOpen={openDateSelect.toggleModal}
-            onClose={openDateSelect.toggleModal}
-            renderInput={(params) => {
-              return (
-                <TextField
-                  {...params}
-                  name="grade"
-                  placeholder="Select Grade"
-                  variant="outlined"
-                  fullWidth
-                  onClick={openDateSelect.toggleModal}
-                />
-              );
-            }}
-          />
-        </FormControl>
-        {formik.values.invoice_type_id === '1' && (
+        {formik.values.invoice_type_id === '1' ||
+        formik.values.invoice_type_id === '2' ? (
           <>
-            <FormControl
-              text="Bank Name"
-              error={
-                formik.touched.destination_bank &&
-                Boolean(formik.errors.destination_bank)
-              }
-              helperText={
-                formik.touched.destination_bank &&
-                formik.errors.destination_bank &&
-                `${formik.errors.destination_bank}`
-              }
-            >
-              <Autocomplete
-                data-testid="form-customer-list-bank"
-                id="list-bank"
-                options={bankData.data}
-                onChange={(e, value) => {
-                  formik.setFieldValue('destination_bank', value);
-                }}
-                isOptionEqualToValue={(option: {
-                  name: string;
-                  code: string;
-                }) => {
-                  // @ts-ignore
-                  return option.name === formik.values.destination_bank?.name;
-                }}
-                getOptionLabel={(option) => `${option.name}`}
-                value={formik.values.destination_bank}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    name="bankName"
-                    onBlur={formik.handleBlur}
-                    placeholder="Seleck bank"
-                  />
-                )}
-              />
-            </FormControl>
-            <FormControl
-              text="Bank Account"
-              error={
-                formik.touched.destination_bank_account &&
-                Boolean(formik.errors.destination_bank_account)
-              }
-              helperText={
-                formik.touched.destination_bank_account &&
-                formik.errors.destination_bank_account &&
-                `${formik.errors.destination_bank_account}`
-              }
-            >
-              <TextField
-                fullWidth
-                placeholder="Insert destination bank"
-                value={formik.values.destination_bank_account}
-                onChange={formik.handleChange}
+            <FormControl text="Sharing Margin">
+              {/* eslint-disable-next-line @typescript-eslint/no-use-before-define */}
+              <SwitchCostum
+                checked={formik.values.is_sharing_margin}
+                name="is_sharing_margin"
                 onBlur={formik.handleBlur}
-                name="destination_bank_account"
+                onChange={(e) => {
+                  formik.handleChange(e);
+                }}
               />
             </FormControl>
+            {formik.values.is_sharing_margin && (
+              <FormControl
+                text="Sharing Margin Amount"
+                required
+                error={
+                  formik.touched.sharing_margin &&
+                  Boolean(formik.errors.sharing_margin)
+                }
+                helperText={
+                  formik.touched.sharing_margin &&
+                  formik.errors.sharing_margin &&
+                  `${formik.errors.sharing_margin}`
+                }
+              >
+                <TextField
+                  type="text"
+                  name="sharing_margin"
+                  placeholder="Insert Sharing Margin Amount"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">Rp</InputAdornment>
+                    ),
+                  }}
+                  fullWidth
+                  autoComplete="off"
+                  value={numberSeperator(formik.values.sharing_margin || '')}
+                  onBlur={(e) => {
+                    formik.handleBlur(e);
+                  }}
+                  onChange={(e) => {
+                    const value = e.target.value
+                      .replace(/[^0-9.]/g, '')
+                      .replace(/(\..*?)\..*/g, '$1');
+
+                    formik.setFieldValue('sharing_margin', value);
+                  }}
+                />
+              </FormControl>
+            )}
             <FormControl
-              text="Bank Transfer Fee"
+              text="Loan Amount"
               required
               error={
-                formik.touched.bank_transfer_fee &&
-                Boolean(formik.errors.bank_transfer_fee)
+                formik.touched.loan_amount && Boolean(formik.errors.loan_amount)
               }
               helperText={
-                formik.touched.bank_transfer_fee &&
-                formik.errors.bank_transfer_fee &&
-                `${formik.errors.bank_transfer_fee}`
+                formik.touched.loan_amount &&
+                formik.errors.loan_amount &&
+                `${formik.errors.loan_amount}`
               }
             >
               <TextField
                 type="text"
-                name="selling_price"
-                placeholder="Insert Price"
+                name="loan_amount"
+                placeholder="Insert Loan Amount"
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">Rp</InputAdornment>
@@ -532,170 +418,392 @@ export default function FormInvoice(props: FormInvoiceProps) {
                 }}
                 fullWidth
                 autoComplete="off"
-                value={numberSeperator(formik.values.bank_transfer_fee || '')}
+                value={numberSeperator(formik.values.loan_amount || '')}
+                onBlur={(e) => {
+                  formik.handleBlur(e);
+                  const maxValue =
+                    formik.values.invoice_type_id === '1'
+                      ? // @ts-ignore
+                        formik.values.user?.limit_plafon
+                      : // @ts-ignore
+                        formik.values.user?.limit_cash || 0;
+
+                  if (parseInt(formik.values.loan_amount) > maxValue) {
+                    setTimeout(() => {
+                      formik.setFieldError(
+                        'loan_amount',
+                        `Maximal ${numberSeperator(maxValue)}`,
+                      );
+                    }, 100);
+                  }
+                }}
                 onChange={(e) => {
                   const value = e.target.value
                     .replace(/[^0-9.]/g, '')
                     .replace(/(\..*?)\..*/g, '$1');
 
-                  formik.setFieldValue('bank_transfer_fee', value);
+                  formik.setFieldValue('loan_amount', value);
+
+                  const maxValue =
+                    formik.values.invoice_type_id === '1'
+                      ? // @ts-ignore
+                        formik.values.user?.limit_plafon
+                      : // @ts-ignore
+                        formik.values.user?.limit_cash || 0;
+
+                  if (parseInt(value) > maxValue) {
+                    setTimeout(() => {
+                      formik.setFieldError(
+                        'loan_amount',
+                        `Maximal ${numberSeperator(maxValue)}`,
+                      );
+                    }, 100);
+                  }
+                }}
+              />
+            </FormControl>
+            <FormControl
+              text="Date"
+              required
+              error={
+                formik.touched.transfer_date &&
+                Boolean(formik.errors.transfer_date)
+              }
+              helperText={
+                formik.touched.transfer_date &&
+                formik.errors.transfer_date &&
+                `${formik.errors.transfer_date}`
+              }
+            >
+              <DateTimePicker
+                onChange={(value) => {
+                  formik.setFieldValue('transfer_date', value);
+                }}
+                value={formik.values.transfer_date}
+              />
+            </FormControl>
+            {formik.values.invoice_type_id === '1' && (
+              <>
+                <FormControl
+                  text="Bank Name"
+                  error={
+                    formik.touched.destination_bank &&
+                    Boolean(formik.errors.destination_bank)
+                  }
+                  helperText={
+                    formik.touched.destination_bank &&
+                    formik.errors.destination_bank &&
+                    `${formik.errors.destination_bank}`
+                  }
+                >
+                  <Autocomplete
+                    data-testid="form-customer-list-bank"
+                    id="list-bank"
+                    options={bankData.data}
+                    onChange={(e, value) => {
+                      formik.setFieldValue('destination_bank', value);
+                      if (!value?.name.toLowerCase().includes('bca')) {
+                        formik.setFieldValue('bank_transfer_fee', 2500);
+                      } else {
+                        formik.setFieldValue('bank_transfer_fee', 0);
+                      }
+                    }}
+                    isOptionEqualToValue={(option: {
+                      name: string;
+                      code: string;
+                    }) => {
+                      return (
+                        // @ts-ignore
+                        option.name === formik.values.destination_bank?.name
+                      );
+                    }}
+                    getOptionLabel={(option) => `${option.name}`}
+                    value={formik.values.destination_bank}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="bankName"
+                        onBlur={formik.handleBlur}
+                        placeholder="Seleck bank"
+                      />
+                    )}
+                  />
+                </FormControl>
+                <FormControl
+                  text="Bank Account"
+                  error={
+                    formik.touched.destination_bank_account &&
+                    Boolean(formik.errors.destination_bank_account)
+                  }
+                  helperText={
+                    formik.touched.destination_bank_account &&
+                    formik.errors.destination_bank_account &&
+                    `${formik.errors.destination_bank_account}`
+                  }
+                >
+                  <TextField
+                    fullWidth
+                    placeholder="Insert destination bank"
+                    value={formik.values.destination_bank_account}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    name="destination_bank_account"
+                  />
+                </FormControl>
+                <FormControl
+                  text="Bank Transfer Fee"
+                  required
+                  error={
+                    formik.touched.bank_transfer_fee &&
+                    Boolean(formik.errors.bank_transfer_fee)
+                  }
+                  helperText={
+                    formik.touched.bank_transfer_fee &&
+                    formik.errors.bank_transfer_fee &&
+                    `${formik.errors.bank_transfer_fee}`
+                  }
+                >
+                  <TextField
+                    type="text"
+                    name="bank_transfer_fee"
+                    placeholder="Insert Bank Transfer Fee"
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">Rp</InputAdornment>
+                      ),
+                    }}
+                    fullWidth
+                    autoComplete="off"
+                    value={numberSeperator(
+                      formik.values.bank_transfer_fee || '',
+                    )}
+                    onChange={(e) => {
+                      const value = e.target.value
+                        .replace(/[^0-9.]/g, '')
+                        .replace(/(\..*?)\..*/g, '$1');
+
+                      formik.setFieldValue('bank_transfer_fee', value);
+                    }}
+                  />
+                </FormControl>
+              </>
+            )}
+            {!formik.values.is_sharing_margin && (
+              <FormControl
+                text="Admin Fee"
+                required
+                error={
+                  formik.touched.interest_rate &&
+                  Boolean(formik.errors.interest_rate)
+                }
+                helperText={
+                  formik.touched.interest_rate &&
+                  formik.errors.interest_rate &&
+                  `${formik.errors.interest_rate}`
+                }
+              >
+                <TextField
+                  type="text"
+                  name="interest_rate"
+                  placeholder="Insert Admin Fee"
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="start">%</InputAdornment>
+                    ),
+                  }}
+                  fullWidth
+                  autoComplete="off"
+                  value={numberSeperator(formik.values.interest_rate || '')}
+                  onChange={(e) => {
+                    const value = e.target.value
+                      .replace(/[^0-9.]/g, '')
+                      .replace(/(\..*?)\..*/g, '$1');
+
+                    formik.setFieldValue('interest_rate', value);
+                  }}
+                />
+              </FormControl>
+            )}
+
+            {formik.values.invoice_type_id === '2' && (
+              <>
+                <FormControl
+                  text="Installment Period"
+                  required
+                  error={
+                    formik.touched.installment_period &&
+                    Boolean(formik.errors.installment_period)
+                  }
+                  helperText={
+                    formik.touched.installment_period &&
+                    formik.errors.installment_period &&
+                    `${formik.errors.installment_period}`
+                  }
+                >
+                  <>
+                    <TextField
+                      fullWidth
+                      placeholder="Insert Installment Period"
+                      value={formik.values.installment_period}
+                      onChange={(e) => {
+                        formik.handleChange(e);
+                      }}
+                      onBlur={formik.handleBlur}
+                      name="installment_period"
+                      type="number"
+                      // @ts-ignore
+                      onWheel={(e) => e.target?.blur()}
+                    />
+                    <Stack spacing={2} mt={2}>
+                      {simulationInstalment.isLoading && (
+                        <Typography>Loading...</Typography>
+                      )}
+                      {simulation.map((item: any, index: number) => (
+                        <Stack
+                          key={index}
+                          alignItems="center"
+                          justifyContent="space-between"
+                          direction="row"
+                          spacing={2}
+                          p={1}
+                          bgcolor="#dedede"
+                        >
+                          <Stack>
+                            <Typography>Due Date</Typography>
+                            <Typography>
+                              {moment(item.due_date * 1000).format(
+                                'DD-MM-YYYY',
+                              )}
+                            </Typography>
+                          </Stack>
+                          <Stack>
+                            <Typography>Installment per Month</Typography>
+                            <Typography>
+                              Rp. {numberSeperator(item?.amount || 0)}
+                            </Typography>
+                          </Stack>
+                        </Stack>
+                      ))}
+                    </Stack>
+                  </>
+                </FormControl>
+              </>
+            )}
+            {/* @ts-ignore */}
+            {((formik.values.user?.need_provision_cash &&
+              formik.values.invoice_type_id === '2') ||
+              // @ts-ignore
+              (formik.values.user?.need_provision_normal &&
+                formik.values.invoice_type_id === '1')) && (
+              <FormControl
+                text="Provision Installment Period"
+                required
+                error={
+                  formik.touched.provision_installment_period &&
+                  Boolean(formik.errors.provision_installment_period)
+                }
+                helperText={
+                  formik.touched.provision_installment_period &&
+                  formik.errors.provision_installment_period &&
+                  `${formik.errors.provision_installment_period}`
+                }
+              >
+                <TextField
+                  fullWidth
+                  placeholder="Insert Provision Installment Period"
+                  value={formik.values.provision_installment_period}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  name="provision_installment_period"
+                  type="number"
+                  // @ts-ignore
+                  onWheel={(e) => e.target?.blur()}
+                />
+              </FormControl>
+            )}
+            {formik.values.invoice_type_id === '1' && (
+              <FormControl
+                text="Note Image"
+                required
+                error={
+                  formik.touched.nota_image && Boolean(formik.errors.nota_image)
+                }
+                helperText={
+                  formik.touched.nota_image &&
+                  formik.errors.nota_image &&
+                  `${formik.errors.nota_image}`
+                }
+              >
+                <InputMultiImages
+                  label="Please upload an Image  "
+                  // @ts-ignore
+                  values={formik.values.nota_image}
+                  onChange={(e: any) => {
+                    console.log(e);
+                    formik.setFieldValue('nota_image', e);
+                  }}
+                />
+                {/* <InputImage
+              label="Please upload an Image  "
+              width={200}
+              height={200}
+              value={formik.values.nota_image}
+              onChange={(e) => {
+                formik.setFieldValue('nota_image', e);
+              }}
+            /> */}
+              </FormControl>
+            )}
+          </>
+        ) : (
+          <>
+            <FormControl
+              text="Provision Installment Period"
+              required
+              error={
+                formik.touched.provision_installment_period &&
+                Boolean(formik.errors.provision_installment_period)
+              }
+              helperText={
+                formik.touched.provision_installment_period
+                  ? formik.errors.provision_installment_period
+                  : ''
+              }
+            >
+              <TextField
+                fullWidth
+                placeholder="Input provision installment period"
+                name="provision_installment_period"
+                onBlur={formik.handleBlur}
+                onKeyDown={(evt) =>
+                  ['e', 'E', '+', '-'].includes(evt.key) && evt.preventDefault()
+                }
+                error={
+                  // @ts-ignore
+                  formik.touched.provision_installment_period &&
+                  // @ts-ignore
+                  Boolean(formik.errors.provision_installment_period)
+                }
+                value={numberSeperator(
+                  // @ts-ignore
+                  formik.values.provision_installment_period || '',
+                )}
+                onChange={(e) => {
+                  const value = e.target.value
+                    // @ts-ignore
+                    .replaceAll('.', '')
+                    .replace(/[^0-9.]/g, '')
+                    .replace(/(\..*?)\..*/g, '$1');
+
+                  formik.setFieldValue(
+                    'provision_installment_period',
+                    parseInt(value || '0'),
+                  );
                 }}
               />
             </FormControl>
           </>
         )}
-        {!formik.values.is_sharing_margin && (
-          <FormControl
-            text="Admin Fee"
-            required
-            error={
-              formik.touched.interest_rate &&
-              Boolean(formik.errors.interest_rate)
-            }
-            helperText={
-              formik.touched.interest_rate &&
-              formik.errors.interest_rate &&
-              `${formik.errors.interest_rate}`
-            }
-          >
-            <TextField
-              type="text"
-              name="interest_rate"
-              placeholder="Insert Admin Fee"
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="start">%</InputAdornment>
-                ),
-              }}
-              fullWidth
-              autoComplete="off"
-              value={numberSeperator(formik.values.interest_rate || '')}
-              onChange={(e) => {
-                const value = e.target.value
-                  .replace(/[^0-9.]/g, '')
-                  .replace(/(\..*?)\..*/g, '$1');
-
-                formik.setFieldValue('interest_rate', value);
-              }}
-            />
-          </FormControl>
-        )}
-
-        {formik.values.invoice_type_id === '2' && (
-          <>
-            <FormControl
-              text="Installment Period"
-              required
-              error={
-                formik.touched.installment_period &&
-                Boolean(formik.errors.installment_period)
-              }
-              helperText={
-                formik.touched.installment_period &&
-                formik.errors.installment_period &&
-                `${formik.errors.installment_period}`
-              }
-            >
-              <>
-                <TextField
-                  fullWidth
-                  placeholder="Insert Installment Period"
-                  value={formik.values.installment_period}
-                  onChange={(e) => {
-                    formik.handleChange(e);
-                  }}
-                  onBlur={formik.handleBlur}
-                  name="installment_period"
-                  type="number"
-                  // @ts-ignore
-                  onWheel={(e) => e.target?.blur()}
-                />
-                <Stack spacing={2} mt={2}>
-                  {simulationInstalment.isLoading && (
-                    <Typography>Loading...</Typography>
-                  )}
-                  {simulation.map((item: any, index: number) => (
-                    <Stack
-                      key={index}
-                      alignItems="center"
-                      justifyContent="space-between"
-                      direction="row"
-                      spacing={2}
-                      p={1}
-                      bgcolor="#dedede"
-                    >
-                      <Stack>
-                        <Typography>Due Date</Typography>
-                        <Typography>
-                          {moment(item.due_date * 1000).format('DD-MM-YYYY')}
-                        </Typography>
-                      </Stack>
-                      <Stack>
-                        <Typography>Installment per Month</Typography>
-                        <Typography>
-                          Rp. {numberSeperator(item?.amount || 0)}
-                        </Typography>
-                      </Stack>
-                    </Stack>
-                  ))}
-                </Stack>
-              </>
-            </FormControl>
-          </>
-        )}
-        {/* @ts-ignore */}
-        {((formik.values.user?.need_provision_cash &&
-          formik.values.invoice_type_id === '2') ||
-          // @ts-ignore
-          (formik.values.user?.need_provision_normal &&
-            formik.values.invoice_type_id === '1')) && (
-          <FormControl
-            text="Provision Installment Period"
-            required
-            error={
-              formik.touched.provision_installment_period &&
-              Boolean(formik.errors.provision_installment_period)
-            }
-            helperText={
-              formik.touched.provision_installment_period &&
-              formik.errors.provision_installment_period &&
-              `${formik.errors.provision_installment_period}`
-            }
-          >
-            <TextField
-              fullWidth
-              placeholder="Insert Provision Installment Period"
-              value={formik.values.provision_installment_period}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              name="provision_installment_period"
-              type="number"
-              // @ts-ignore
-              onWheel={(e) => e.target?.blur()}
-            />
-          </FormControl>
-        )}
-
-        <FormControl
-          text="Note Image"
-          required
-          error={formik.touched.nota_image && Boolean(formik.errors.nota_image)}
-          helperText={
-            formik.touched.nota_image &&
-            formik.errors.nota_image &&
-            `${formik.errors.nota_image}`
-          }
-        >
-          <InputImage
-            label="Please upload an Image  "
-            width={200}
-            height={200}
-            value={formik.values.nota_image}
-            onChange={(e) => {
-              formik.setFieldValue('nota_image', e);
-            }}
-          />
-        </FormControl>
       </Box>
       <Box
         display="flex"
