@@ -323,7 +323,7 @@ export default function PaymentPage() {
           deletePayment.mutate(selected?.id, {
             onSuccess: () => {
               openToast({
-                headMsg: 'Success delete invoice',
+                headMsg: 'Success delete payment',
                 severity: 'success',
               });
               paymentQuery.refetch();
@@ -333,14 +333,14 @@ export default function PaymentPage() {
             onError: (e) => {
               openToast({
                 // @ts-ignore
-                headMsg: e || 'Failed delete invoice',
+                headMsg: e || 'Failed delete payment',
                 severity: 'error',
               });
             },
           });
         }}
-        title="Delete Invoice"
-        content={`Are you sure to delet this invoice ${selected?.name}?`}
+        title="Delete Payment"
+        content={`Are you sure to delet this payment ${selected?.name}?`}
         buttonLabel="Delete"
       />
     </Box>
