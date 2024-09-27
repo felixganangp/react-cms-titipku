@@ -144,6 +144,7 @@ export const docDataKey = [
 export const Type = {
   1: 'KUR WC',
   2: 'WC Titipku',
+  3: 'Nano Mikro',
 };
 
 export const Document = {
