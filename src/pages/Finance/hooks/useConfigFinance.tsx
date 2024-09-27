@@ -2,6 +2,7 @@ import { ListParams } from 'models/fetch';
 import {
   getAllAreaFinancing,
   getAllCategoryFinancing,
+  getAllUserTyoeFinancing,
   getPaymentMethod,
 } from 'service/Finance/config';
 import { useQuery } from '@tanstack/react-query';
@@ -48,6 +49,20 @@ export function UsePaymentMethodListService(setParams?: ListParams) {
   return {
     ...paymenyMethods,
     ...params,
+    listData: paymenyMethods?.data?.data || [],
+  };
+}
+
+export function UseUserTypeListService(setParams?: ListParams) {
+  // const params = UseParams(setParams);
+
+  const paymenyMethods = useQuery({
+    queryKey: ['payment-method', {}],
+    queryFn: () => getAllUserTyoeFinancing({}),
+  });
+  return {
+    // ...paymenyMethods,
+    // ...params,
     listData: paymenyMethods?.data?.data || [],
   };
 }

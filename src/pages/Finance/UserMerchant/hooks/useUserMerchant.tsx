@@ -143,6 +143,8 @@ export default function useUserMerchant({
   const createUser = useMutation(postCreateUser);
   const updateUser = useMutation(putCreateUser);
 
+  const isLoading = createUser.isLoading || updateUser.isLoading;
+
   const formik = useFormik({
     initialValues: {
       user_data: {
@@ -386,6 +388,7 @@ export default function useUserMerchant({
 
   return {
     ...formik,
+    isLoading,
   };
 }
 

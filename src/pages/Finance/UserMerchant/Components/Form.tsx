@@ -31,6 +31,7 @@ import InputFile from 'components/InputFile';
 import { SteperHeader } from '../../Customer/Components/SteperHeader';
 import useUserMerchant from '../hooks/useUserMerchant';
 import { Type } from '../../hooks/constumer.config';
+import { UseUserTypeListService } from '../../hooks/useConfigFinance';
 
 export default function FormUserMerchant({
   id,
@@ -54,6 +55,8 @@ export default function FormUserMerchant({
     keepPreviousData: true,
   });
   const categoryParams = UseParams({ count: 25 });
+  const userType = UseUserTypeListService();
+
   const categoryQuery = useQuery({
     queryKey: ['/jelajah-category', categoryParams.params],
     queryFn: () => getAllCategoryFinancing(categoryParams.params),
@@ -600,14 +603,19 @@ export default function FormUserMerchant({
           }
         >
           <Autocomplete
-            options={Object.keys(Type)}
+            options={userType.listData}
             // @ts-ignore
-            getOptionLabel={(item) => Type[item]}
-            value={formik.values.user_data?.user_type_id}
+            getOptionLabel={(item) => item.name}
+            value={
+              userType.listData?.find(
+                (val) => val.id === formik.values.user_data?.user_type_id,
+              ) || null
+            }
             onChange={(e, value) => {
               formik.setFieldValue(
                 'user_data.user_type_id',
-                parseInt(value || '1'),
+                // @ts-ignore
+                parseInt(value.id || '1'),
               );
             }}
             onBlur={() => {
