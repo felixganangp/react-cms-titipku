@@ -146,6 +146,10 @@ export default function FormInvoice(props: FormInvoiceProps) {
             );
           }
           await fd.append('installment_period', values.installment_period);
+          // @ts-ignore
+          await fd.append('interest_rate', values.interest_rate);
+          // @ts-ignore
+          await fd.append('transfer_date', moment(values.transfer_date).unix());
         } else {
           const promises = Object.keys(values).map(async (key) => {
             switch (key) {
