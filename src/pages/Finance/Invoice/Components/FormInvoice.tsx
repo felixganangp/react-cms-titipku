@@ -138,6 +138,14 @@ export default function FormInvoice(props: FormInvoiceProps) {
             'provision_installment_period',
             values.provision_installment_period,
           );
+          await fd.append('loan_amount', values.loan_amount);
+          if (values.is_sharing_margin) {
+            await fd.append(
+              'sharing_margin',
+              values.sharing_margin.toLocaleString(),
+            );
+          }
+          await fd.append('installment_period', values.installment_period);
         } else {
           const promises = Object.keys(values).map(async (key) => {
             switch (key) {
