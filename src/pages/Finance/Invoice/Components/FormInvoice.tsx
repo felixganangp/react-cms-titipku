@@ -513,7 +513,6 @@ export default function FormInvoice(props: FormInvoiceProps) {
                 >
                   <Autocomplete
                     data-testid="form-customer-list-bank"
-                    id="list-bank"
                     options={bankData.data}
                     onChange={(e, value) => {
                       formik.setFieldValue('destination_bank', value);
@@ -815,6 +814,26 @@ export default function FormInvoice(props: FormInvoiceProps) {
                     parseInt(value || '0'),
                   );
                 }}
+              />
+            </FormControl>
+            <FormControl
+              text="Date"
+              required
+              error={
+                formik.touched.transfer_date &&
+                Boolean(formik.errors.transfer_date)
+              }
+              helperText={
+                formik.touched.transfer_date &&
+                formik.errors.transfer_date &&
+                `${formik.errors.transfer_date}`
+              }
+            >
+              <DateTimePicker
+                onChange={(value) => {
+                  formik.setFieldValue('transfer_date', value);
+                }}
+                value={formik.values.transfer_date}
               />
             </FormControl>
           </>
