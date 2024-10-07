@@ -138,18 +138,6 @@ export default function FormInvoice(props: FormInvoiceProps) {
             'provision_installment_period',
             values.provision_installment_period,
           );
-          await fd.append('loan_amount', values.loan_amount);
-          if (values.is_sharing_margin) {
-            await fd.append(
-              'sharing_margin',
-              values.sharing_margin.toLocaleString(),
-            );
-          }
-          await fd.append('installment_period', values.installment_period);
-          // @ts-ignore
-          await fd.append('interest_rate', values.interest_rate);
-          // @ts-ignore
-          await fd.append('transfer_date', moment(values.transfer_date).unix());
         } else {
           const promises = Object.keys(values).map(async (key) => {
             switch (key) {
@@ -702,7 +690,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
               </>
             )}
             {/* @ts-ignore */}
-            {((formik.values.user?.need_provision_cash &&
+            {/* {((formik.values.user?.need_provision_cash &&
               formik.values.invoice_type_id === '2') ||
               // @ts-ignore
               (formik.values.user?.need_provision_normal &&
@@ -732,7 +720,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
                   onWheel={(e) => e.target?.blur()}
                 />
               </FormControl>
-            )}
+            )} */}
             {formik.values.invoice_type_id === '1' && (
               <FormControl
                 text="Note Image"
