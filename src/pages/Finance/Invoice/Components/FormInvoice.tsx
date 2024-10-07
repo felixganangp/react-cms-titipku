@@ -134,10 +134,22 @@ export default function FormInvoice(props: FormInvoiceProps) {
           // @ts-ignore
           await fd.append('user_id', values.user.id);
           // @ts-ignore
-          await fd.append(
-            'provision_installment_period',
-            values.provision_installment_period,
-          );
+          await fd.append('loan_amount', values.loan_amount);
+
+          await fd.append('installment_period', values.installment_period);
+
+          if (values.is_sharing_margin) {
+            // @ts-ignore
+            await fd.append('sharing_margin', values.sharing_margin);
+          }
+
+          if (values.transfer_date) {
+            await fd.append(
+              'transfer_date',
+              // @ts-ignore
+              moment(values.transfer_date).unix(),
+            );
+          }
         } else {
           const promises = Object.keys(values).map(async (key) => {
             switch (key) {
