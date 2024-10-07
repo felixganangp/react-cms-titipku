@@ -129,29 +129,31 @@ export default function FormInvoice(props: FormInvoiceProps) {
     onSubmit: async (values) => {
       try {
         const fd = new FormData();
-        if (isProvisi.open) {
-          await fd.append('invoice_type_id', values.invoice_type_id);
+        // if (isProvisi.open) {
+        //   await fd.append('invoice_type_id', values.invoice_type_id);
+        //   // @ts-ignore
+        //   await fd.append('user_id', values.user.id);
+        //   // @ts-ignore
+        //   await fd.append('loan_amount', values.loan_amount);
+
+        //   await fd.append('installment_period', values.installment_period);
+
+        //   if (values.is_sharing_margin) {
+        //     // @ts-ignore
+        //     await fd.append('sharing_margin', values.sharing_margin);
+        //   }
+
+        //   if (values.transfer_date) {
+        //     await fd.append(
+        //       'transfer_date',
+        //       // @ts-ignore
+        //       moment(values.transfer_date).unix(),
+        //     );
+        //   }
+        // } else {
+        const promises = Object.keys(values).map(async (key) => {
           // @ts-ignore
-          await fd.append('user_id', values.user.id);
-          // @ts-ignore
-          await fd.append('loan_amount', values.loan_amount);
-
-          await fd.append('installment_period', values.installment_period);
-
-          if (values.is_sharing_margin) {
-            // @ts-ignore
-            await fd.append('sharing_margin', values.sharing_margin);
-          }
-
-          if (values.transfer_date) {
-            await fd.append(
-              'transfer_date',
-              // @ts-ignore
-              moment(values.transfer_date).unix(),
-            );
-          }
-        } else {
-          const promises = Object.keys(values).map(async (key) => {
+          if (values[key]) {
             switch (key) {
               case 'transfer_date':
                 // @ts-ignore
@@ -186,10 +188,11 @@ export default function FormInvoice(props: FormInvoiceProps) {
                 }
                 break;
             }
-          });
+          }
+        });
 
-          await Promise.all(promises);
-        }
+        await Promise.all(promises);
+        // }
         createInvoice.mutate(fd, {
           onSuccess: (data) => {
             props.onClose(true);
