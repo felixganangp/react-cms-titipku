@@ -3,6 +3,7 @@ export type CustomerDetailType = {
   user_number: string;
   debtor_name: string;
   merchant_name: string;
+  nmid: string;
   request_number: string;
   phone_number: string;
   family_phone_number: string;

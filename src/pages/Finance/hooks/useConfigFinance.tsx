@@ -2,8 +2,9 @@ import { ListParams } from 'models/fetch';
 import {
   getAllAreaFinancing,
   getAllCategoryFinancing,
-  getAllUserTyoeFinancing,
+  getAllUserTypeFinancing,
   getPaymentMethod,
+  getRestructureCategory,
 } from 'service/Finance/config';
 import { useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
@@ -57,12 +58,22 @@ export function UseUserTypeListService(setParams?: ListParams) {
   // const params = UseParams(setParams);
 
   const paymenyMethods = useQuery({
-    queryKey: ['payment-method', {}],
-    queryFn: () => getAllUserTyoeFinancing({}),
+    queryKey: ['User-Type-List', {}],
+    queryFn: () => getAllUserTypeFinancing({}),
   });
   return {
     // ...paymenyMethods,
     // ...params,
     listData: paymenyMethods?.data?.data || [],
   };
+}
+
+export function UseCategoryRestructure(setParams?: ListParams) {
+  const params = UseParams(setParams);
+
+  const category = useQuery({
+    queryKey: ['/financing/restructure-category', params.params],
+    queryFn: () => getRestructureCategory(params.params),
+  });
+  return { ...category, ...params, listData: category?.data?.data || [] };
 }

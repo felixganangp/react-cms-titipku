@@ -35,6 +35,7 @@ import useUserMerchant, {
 } from '../hooks/useUserMerchant';
 import { Type } from '../../hooks/constumer.config';
 import { useCustomerDetails } from '../../hooks/useCustomer';
+import { UseCategoryRestructure } from '../../hooks/useConfigFinance';
 
 export default function FormFormRestructure({
   id,
@@ -50,6 +51,7 @@ export default function FormFormRestructure({
   const remainingBill = useUserRemainingBill(id as string);
   const detailQuery = useCustomerDetails(id as string);
   const mutation = useMutation(postRestructre);
+  const category = UseCategoryRestructure();
 
   const formik = useFormik({
     initialValues: {
@@ -57,6 +59,7 @@ export default function FormFormRestructure({
       transfer_date: null,
       notes: '',
       installments: null,
+      invoice_restructure_category_id: null,
     },
     onSubmit: async (values) => {
       const payload = { ...values };
@@ -142,6 +145,51 @@ export default function FormFormRestructure({
               <InputAdornment position="start">Rp</InputAdornment>
             ),
           }}
+        />
+      </FormControl>
+      <FormControl
+        text="Category"
+        required
+        error={
+          formik.touched?.invoice_restructure_category_id &&
+          Boolean(formik.errors?.invoice_restructure_category_id)
+        }
+        helperText={
+          formik.touched?.invoice_restructure_category_id
+            ? formik.errors?.invoice_restructure_category_id
+            : ''
+        }
+      >
+        <Autocomplete
+          options={category.listData}
+          // @ts-ignore
+          getOptionLabel={(item) => item.name}
+          value={
+            category.listData?.find(
+              (val) => val.id === formik.values.invoice_restructure_category_id,
+            ) || null
+          }
+          onChange={(e, value) => {
+            formik.setFieldValue(
+              'user_data.user_type_id',
+              // @ts-ignore
+              parseInt(value.id || '1'),
+            );
+          }}
+          onBlur={() => {
+            formik.setFieldTouched('user_data.user_type_id');
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              name="user_data.user_type_id"
+              placeholder="Select Category"
+              error={
+                formik.touched?.invoice_restructure_category_id &&
+                Boolean(formik.errors?.invoice_restructure_category_id)
+              }
+            />
+          )}
         />
       </FormControl>
       <FormControl

@@ -88,10 +88,27 @@ export const getAllOfficer = (params?: ListParams) =>
     }
   });
 
-export const getAllUserTyoeFinancing = (params?: ListParams) =>
+export const getAllUserTypeFinancing = (params?: ListParams) =>
   new Promise<ListResponse<AreaType>>(async (resolve, reject) => {
     try {
       const respon = await http.get(`financing/user-type`, {
+        params,
+      });
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const getRestructureCategory = (params?: ListParams) =>
+  new Promise<ListResponse<any>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`financing/restructure-category`, {
         params,
       });
       if (respon.data) {

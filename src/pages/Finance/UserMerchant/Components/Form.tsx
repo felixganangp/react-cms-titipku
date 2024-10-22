@@ -276,6 +276,32 @@ export default function FormUserMerchant({
           />
         </FormControl>
         <FormControl
+          text="NMID"
+          required
+          error={
+            formik.touched?.user_data?.nmid &&
+            Boolean(formik.errors?.user_data?.nmid)
+          }
+          helperText={
+            formik.touched?.user_data?.nmid
+              ? formik.errors?.user_data?.nmid
+              : ''
+          }
+        >
+          <TextField
+            fullWidth
+            placeholder="Input NMID"
+            name="user_data.nmid"
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.user_data?.nmid}
+            error={
+              formik.touched?.user_data?.nmid &&
+              Boolean(formik.errors?.user_data?.nmid)
+            }
+          />
+        </FormControl>
+        <FormControl
           text="Phone Number"
           required
           error={

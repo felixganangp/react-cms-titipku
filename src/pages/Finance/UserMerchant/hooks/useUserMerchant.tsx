@@ -171,6 +171,7 @@ export default function useUserMerchant({
         interest_rate: '',
         has_qris: false,
         area_name: undefined,
+        nmid: '',
         // nik: undefined,
         // nib: undefined,
         // npwp: undefined,
@@ -335,6 +336,7 @@ export default function useUserMerchant({
         user_data: {
           debtor_name: detail.debtor_name,
           merchant_name: detail.merchant_name,
+          nmid: detail.nmid,
           phone_number: detail.phone_number,
           family_phone_number: detail.family_phone_number,
           area: {
