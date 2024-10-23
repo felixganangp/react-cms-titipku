@@ -171,7 +171,7 @@ export default function FormFormRestructure({
           }
           onChange={(e, value) => {
             formik.setFieldValue(
-              'user_data.user_type_id',
+              'invoice_restructure_category_id',
               // @ts-ignore
               parseInt(value.id || '1'),
             );
