@@ -93,6 +93,12 @@ export default function InvoiceDetails() {
                       {payment.details?.payment_method.name}
                     </Typography>
                   </Grid>
+                  <Grid item sm={4}>
+                    <Typography color="primary">Invoice Type</Typography>
+                    <Typography>
+                      {payment.details?.payment_invoice_type}
+                    </Typography>
+                  </Grid>
 
                   <Grid item sm={4}>
                     <Typography color="primary">Proof Image</Typography>

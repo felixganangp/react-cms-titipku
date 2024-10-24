@@ -257,6 +257,15 @@ export default function PaymentPage() {
                 ),
               },
               {
+                id: 'invoice type',
+                label: 'Invoice Type',
+                format: (value: any) => (
+                  <Typography variant="body1">
+                    {value.payment_invoice_type}
+                  </Typography>
+                ),
+              },
+              {
                 id: 'action',
                 label: 'Action',
                 format: (value) => {
