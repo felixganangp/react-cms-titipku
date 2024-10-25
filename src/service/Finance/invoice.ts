@@ -153,6 +153,7 @@ export const getInstallmentSimulation = (params: {
   start_date: number;
   amount: number;
   period: number;
+  user_type_id?: number;
 }) =>
   new Promise<ListResponse<any>>(async (resolve, reject) => {
     try {

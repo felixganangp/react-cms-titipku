@@ -19,6 +19,7 @@ import {
   debounce,
   styled,
   Switch,
+  Skeleton,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { Delete } from '@mui/icons-material';
@@ -230,6 +231,8 @@ export default function FormInvoice(props: FormInvoiceProps) {
           period: value,
           start_date: moment(formik.values.transfer_date).unix(),
           interest_rate: formik.values.interest_rate,
+          // @ts-ignore
+          user_type_id: formik.values.user?.user_type_id,
         },
         {
           onSuccess: (data) => {
@@ -670,34 +673,40 @@ export default function FormInvoice(props: FormInvoiceProps) {
                     />
                     <Stack spacing={2} mt={2}>
                       {simulationInstalment.isLoading && (
-                        <Typography>Loading...</Typography>
+                        <>
+                          <Skeleton variant="rectangular" height={70} />
+                          <Skeleton variant="rectangular" height={70} />
+                          <Skeleton variant="rectangular" height={70} />
+                          <Skeleton variant="rectangular" height={70} />
+                        </>
                       )}
-                      {simulation.map((item: any, index: number) => (
-                        <Stack
-                          key={index}
-                          alignItems="center"
-                          justifyContent="space-between"
-                          direction="row"
-                          spacing={2}
-                          p={1}
-                          bgcolor="#dedede"
-                        >
-                          <Stack>
-                            <Typography>Due Date</Typography>
-                            <Typography>
-                              {moment(item.due_date * 1000).format(
-                                'DD-MM-YYYY',
-                              )}
-                            </Typography>
+                      {!simulationInstalment.isLoading &&
+                        simulation.map((item: any, index: number) => (
+                          <Stack
+                            key={index}
+                            alignItems="center"
+                            justifyContent="space-between"
+                            direction="row"
+                            spacing={2}
+                            p={1}
+                            bgcolor="#dedede"
+                          >
+                            <Stack>
+                              <Typography>Due Date</Typography>
+                              <Typography>
+                                {moment(item.due_date * 1000).format(
+                                  'DD-MM-YYYY',
+                                )}
+                              </Typography>
+                            </Stack>
+                            <Stack>
+                              <Typography>Installment per Month</Typography>
+                              <Typography>
+                                Rp. {numberSeperator(item?.amount || 0)}
+                              </Typography>
+                            </Stack>
                           </Stack>
-                          <Stack>
-                            <Typography>Installment per Month</Typography>
-                            <Typography>
-                              Rp. {numberSeperator(item?.amount || 0)}
-                            </Typography>
-                          </Stack>
-                        </Stack>
-                      ))}
+                        ))}
                     </Stack>
                   </>
                 </FormControl>
