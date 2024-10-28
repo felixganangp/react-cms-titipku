@@ -8,6 +8,7 @@ export interface InvoiceParams extends ListParams {
   min_due_date?: string;
   max_due_date?: string;
   restructure_type_id?: number[];
+  invoice_restructure_category_id?: number[];
   status?: string;
 }
 

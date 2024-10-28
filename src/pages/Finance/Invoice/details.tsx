@@ -402,6 +402,23 @@ export default function InvoiceDetails() {
                   },
                 },
                 {
+                  id: 'invoice_number',
+                  label: 'Invoice Numbert',
+                  format: (val: any) => {
+                    return (
+                      <Typography
+                        // color="info.main"
+                        sx={{ cursor: 'pointer' }}
+                        // onClick={() =>
+                        //   navigate(`/finance/payment/${val?.invoice?.id}`)
+                        // }
+                      >
+                        {val.invoice?.invoice_number}
+                      </Typography>
+                    );
+                  },
+                },
+                {
                   id: 'paid',
                   label: 'Paid Date',
                   format: (val: any) => {

@@ -18,7 +18,7 @@ import { useFormik } from 'formik';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
 import { useEffect, useMemo } from 'react';
-import { getDownloadPdfUser } from 'service/Kur/Customer';
+// import { getDownloadPdfUser } from 'service/Kur/Customer';
 
 export function UseInvoiceService(setParams?: InvoiceParams) {
   const params = UseParams<InvoiceParams>(setParams);
@@ -38,6 +38,7 @@ export function UseInvoiceService(setParams?: InvoiceParams) {
       min_due_date: undefined,
       max_due_date: undefined,
       restructure_type_id: [],
+      invoice_restructure_category_id: [],
       user_type_id: undefined,
     },
     onSubmit: (values) => {
@@ -83,11 +84,33 @@ export function UseInvoiceService(setParams?: InvoiceParams) {
       },
       {},
     );
+
     if (Object.keys(initialFilter).length > 0) {
       const newValue = {
         ...formik.values,
         ...initialFilter,
       };
+      // @ts-ignore
+      if (initialFilter?.restructure_type_id) {
+        // @ts-ignore
+        newValue.restructure_type_id = initialFilter.restructure_type_id
+          .split(',')
+          // @ts-ignore
+          .map((item: any) => parseInt(item, 10));
+      } else {
+        newValue.restructure_type_id = [];
+      }
+      // @ts-ignore
+      if (initialFilter?.invoice_restructure_category_id) {
+        newValue.invoice_restructure_category_id =
+          // @ts-ignore
+          initialFilter.invoice_restructure_category_id
+            .split(',')
+            // @ts-ignore
+            .map((item: any) => parseInt(item, 10));
+      } else {
+        newValue.invoice_restructure_category_id = [];
+      }
       formik.setValues(newValue);
       params.handleChangeParams(newValue);
     }

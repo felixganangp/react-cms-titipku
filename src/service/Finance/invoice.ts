@@ -9,16 +9,27 @@ import { ListResponse, Response } from 'models/fetch';
 
 export const getInvoiceAll = (params?: InvoiceParams) =>
   new Promise<ListResponse<InvoiceListType>>(async (resolve, reject) => {
+    console.log('costumeParams', params);
+
     // eslint-disable-next-line @typescript-eslint/naming-convention
     // @ts-ingnore
     const paramsRest = { ...params };
-    const { restructure_type_id } = paramsRest;
+    const { restructure_type_id, invoice_restructure_category_id } = paramsRest;
     let costumeParams = '?';
-    if (restructure_type_id) {
+    if (restructure_type_id && restructure_type_id.length > 0) {
       restructure_type_id.forEach((val) => {
         costumeParams += `restructure_type_id=${val}&`;
       });
       delete paramsRest.restructure_type_id;
+    }
+    if (
+      invoice_restructure_category_id &&
+      invoice_restructure_category_id.length > 0
+    ) {
+      invoice_restructure_category_id.forEach((val) => {
+        costumeParams += `invoice_restructure_category_id=${val}&`;
+      });
+      delete paramsRest.invoice_restructure_category_id;
     }
     if (costumeParams.length <= 1) costumeParams = '';
 
