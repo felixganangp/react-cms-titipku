@@ -239,6 +239,18 @@ export default function InvoicePage() {
       },
     },
     {
+      id: 'invoice_restructure_category',
+      label: 'Restructure Category',
+      align: 'center',
+      format: ({ invoice_restructure_category }) => {
+        return (
+          <Typography variant="body1">
+            {invoice_restructure_category.name || '-'}
+          </Typography>
+        );
+      },
+    },
+    {
       id: 'invoice_type',
       label: 'Invoice Type',
       format: ({ invoice_type }) => {
@@ -629,13 +641,13 @@ export default function InvoicePage() {
                     }}
                     onBlur={() => {
                       queryInnvoice.formikParams.setFieldTouched(
-                        'user_data.user_type_id',
+                        'invoice_restructure_category_id',
                       );
                     }}
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        name="user_data.user_type_id"
+                        name="invoice_restructure_category_id"
                         placeholder="Select Category"
                         error={
                           queryInnvoice.formikParams.touched

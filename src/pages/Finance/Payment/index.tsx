@@ -2,6 +2,7 @@ import { useState } from 'react';
 import useModal from 'hooks/useModal';
 import { Add, KeyboardArrowDown, MoreVert, Search } from '@mui/icons-material';
 import {
+  Autocomplete,
   Box,
   Button,
   Card,
@@ -25,6 +26,7 @@ import MenuList from 'components/MenuList';
 import useToast from 'hooks/useToast';
 import { UseDeletePayment, UseGetPeyement } from '../hooks/usePaymentService';
 import FormPayment from './Components/FormPayment';
+import { UseInvoiceType } from '../hooks/useConfigFinance';
 
 export default function PaymentPage() {
   const { openToast } = useToast();
@@ -34,6 +36,7 @@ export default function PaymentPage() {
   const deletePaymentModal = useModal();
   const [selected, setSelected] = useState<any>();
   const deletePayment = UseDeletePayment();
+  const invoiceType = UseInvoiceType();
 
   const paymentQuery = UseGetPeyement();
 
@@ -93,6 +96,47 @@ export default function PaymentPage() {
               component="form"
               onSubmit={paymentQuery.formikParams.handleSubmit}
             >
+              <Grid item xs={12} md={4}>
+                <FormLabel text="Category Restructure Type">
+                  <Autocomplete
+                    options={invoiceType.listData}
+                    // @ts-ignore
+                    getOptionLabel={(item) => item.name}
+                    value={
+                      invoiceType.listData?.filter(
+                        (val) =>
+                          paymentQuery.formikParams.values.invoice_type ===
+                          val.name,
+                      )?.[0] || null
+                    }
+                    // multiple
+                    onChange={(e, value) => {
+                      paymentQuery.formikParams.setFieldValue(
+                        'invoice_type',
+                        // @ts-ignore
+                        // eslint-disable-next-line radix
+                        value.name,
+                      );
+                    }}
+                    onBlur={() => {
+                      paymentQuery.formikParams.setFieldTouched('invoice_type');
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="invoice_type"
+                        placeholder="Select Category"
+                        error={
+                          paymentQuery.formikParams.touched?.invoice_type &&
+                          Boolean(
+                            paymentQuery.formikParams.errors?.invoice_type,
+                          )
+                        }
+                      />
+                    )}
+                  />
+                </FormLabel>
+              </Grid>
               <Grid item xs={12} md={6}>
                 <FormLabel text="Payment Date Range">
                   <Stack direction="row" spacing={1} alignItems="start">

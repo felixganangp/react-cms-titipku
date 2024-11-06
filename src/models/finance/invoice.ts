@@ -16,6 +16,7 @@ export type InvoiceListType = {
   id: number;
   user_id: number;
   invoice_restructure_type: { id: number; name: string };
+  invoice_restructure_category: { id: number; name: string };
   invoice_number: string;
   invoice_type_id: number;
   amount: number;
@@ -53,6 +54,7 @@ export type InvoiceDetailsType = {
   id: number;
   invoice_type: { id: number; name: string };
   invoice_restructure_type: { id: number; name: string };
+  invoice_restructure_category: { id: number; name: string };
   user_id: number;
   invoice_number: string;
   invoice_type_id: number;

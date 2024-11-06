@@ -3,6 +3,7 @@ import {
   getAllAreaFinancing,
   getAllCategoryFinancing,
   getAllUserTypeFinancing,
+  getInvoiceType,
   getPaymentMethod,
   getRestructureCategory,
 } from 'service/Finance/config';
@@ -74,6 +75,16 @@ export function UseCategoryRestructure(setParams?: ListParams) {
   const category = useQuery({
     queryKey: ['/financing/restructure-category', params.params],
     queryFn: () => getRestructureCategory(params.params),
+  });
+  return { ...category, ...params, listData: category?.data?.data || [] };
+}
+
+export function UseInvoiceType(setParams?: ListParams) {
+  const params = UseParams(setParams);
+
+  const category = useQuery({
+    queryKey: ['/financing/payment-invoice-type', params.params],
+    queryFn: () => getInvoiceType(params.params),
   });
   return { ...category, ...params, listData: category?.data?.data || [] };
 }

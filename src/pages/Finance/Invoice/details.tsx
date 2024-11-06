@@ -293,6 +293,17 @@ export default function InvoiceDetails() {
                     </Typography>
                   </Stack>
                   <Stack>
+                    <Typography color="primary">
+                      Restructure Category
+                    </Typography>
+                    <Typography>
+                      {
+                        invoiceDetails.details?.invoice_restructure_category
+                          .name
+                      }
+                    </Typography>
+                  </Stack>
+                  <Stack>
                     <Typography color="primary">Status</Typography>
                     <Label
                       variant="filled"
