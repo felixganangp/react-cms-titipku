@@ -97,7 +97,7 @@ export default function PaymentPage() {
               onSubmit={paymentQuery.formikParams.handleSubmit}
             >
               <Grid item xs={12} md={4}>
-                <FormLabel text="Invoice type ">
+                <FormLabel text="Invoice Type ">
                   <Autocomplete
                     options={invoiceType.listData}
                     // @ts-ignore
@@ -125,7 +125,7 @@ export default function PaymentPage() {
                       <TextField
                         {...params}
                         name="invoice_type"
-                        placeholder="Select Category"
+                        placeholder="Select Type"
                         error={
                           paymentQuery.formikParams.touched?.invoice_type &&
                           Boolean(
