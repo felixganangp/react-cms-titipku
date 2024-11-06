@@ -97,7 +97,7 @@ export default function PaymentPage() {
               onSubmit={paymentQuery.formikParams.handleSubmit}
             >
               <Grid item xs={12} md={4}>
-                <FormLabel text="Category Restructure Type">
+                <FormLabel text="Invoice type ">
                   <Autocomplete
                     options={invoiceType.listData}
                     // @ts-ignore
