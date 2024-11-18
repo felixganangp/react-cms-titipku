@@ -19,6 +19,7 @@ export const initialValues = {
   business_lifetime: '',
   user_type_id: null,
   is_merchant_titipku: true,
+  jelajah: null,
   // IDIR
   gmv: '',
   office_rent: '',

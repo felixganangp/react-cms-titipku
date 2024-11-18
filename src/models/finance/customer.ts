@@ -29,6 +29,7 @@ export type CustomerDetailType = {
   last_admin_id: null;
   category_jelajah_id: number;
   category_jelajah_name: string;
+  jelajah_id: number;
   batch_id: null;
   balance: number;
   created_at: number;

@@ -15,10 +15,13 @@ const defaultValidation = yup.object().shape({
       .string()
       .max(255, 'must be at most 255 characters')
       .required('This field is required'),
-    merchant_name: yup
-      .string()
-      .max(255, 'must be at most 255 characters')
-      .required('This field is required'),
+    merchant_name: yup.string().when('is_merchant_titipku', {
+      is: (val: boolean) => !val,
+      then: yup
+        .string()
+        .max(255, 'must be at most 255 characters')
+        .required('This field is required'),
+    }),
     phone_number: yup
       .string()
       .min(8, 'Phone number must be at least 8 characters')
@@ -41,6 +44,10 @@ const defaultValidation = yup.object().shape({
     area_name: yup.string().when('area', {
       is: (val: { id: string | number; name: string }) => val?.id === 1,
       then: yup.string().required('This field is required'),
+    }),
+    jelajah: yup.mixed().when('is_merchant_titipku', {
+      is: (val: boolean) => val === true,
+      then: yup.mixed().required('This field is required'),
     }),
     category_jelajah: yup.mixed().nullable().required('This field is required'),
     limit_request_plafon: yup
@@ -172,6 +179,7 @@ export default function useUserMerchant({
         has_qris: false,
         area_name: undefined,
         nmid: '',
+        jelajah: null,
         // nik: undefined,
         // nib: undefined,
         // npwp: undefined,
@@ -214,7 +222,7 @@ export default function useUserMerchant({
         idir_data: {},
       };
       const { user_data, idir_data } = values;
-      const { area, category_jelajah, area_name, ...rest_user_data } =
+      const { area, category_jelajah, area_name, jelajah, ...rest_user_data } =
         user_data;
 
       Object.keys(user_data).forEach((key) => {
@@ -233,6 +241,12 @@ export default function useUserMerchant({
               payload.user_data.category_jelajah_id = category_jelajah.id;
               // @ts-ignore
               payload.user_data.category_jelajah_name = category_jelajah.name;
+              break;
+            case 'jelajah':
+              // @ts-ignore
+              payload.user_data.jelajah_id = jelajah.id;
+              // @ts-ignore
+              payload.user_data.merchant_name = jelajah.name;
               break;
             case 'user_type_id':
               if (!config?.removeUserTypeId) {
@@ -348,6 +362,10 @@ export default function useUserMerchant({
             id: detail.category_jelajah_id,
             name: detail.category_jelajah_name,
           },
+          jelajah: {
+            id: detail.jelajah_id,
+            name: detail.merchant_name,
+          },
           limit_request_plafon: detail.limit_request_plafon,
           limit_request_cash: detail.limit_request_cash,
           business_lifetime: detail.business_lifetime,
@@ -364,6 +382,7 @@ export default function useUserMerchant({
           limit_cash: detail.limit_cash,
           interest_rate: detail.interest_rate,
           has_qris: detail.has_qris,
+          // jelajah_id: detail.jelajah_id
         },
         idir_data: {
           gmv: detail.user_idir.GMV,

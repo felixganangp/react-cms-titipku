@@ -2,6 +2,7 @@ import { ListParams } from 'models/fetch';
 import {
   getAllAreaFinancing,
   getAllCategoryFinancing,
+  getAllJelajah,
   getAllUserTypeFinancing,
   getInvoiceType,
   getPaymentMethod,
@@ -39,6 +40,16 @@ export function UseCategoryListService(setParams?: ListParams) {
     queryFn: () => getAllCategoryFinancing(params.params),
   });
   return { ...areaInvoice, ...params, listData: areaInvoice?.data?.data || [] };
+}
+
+export function UseJelajahListService(setParams?: ListParams) {
+  const params = UseParams(setParams);
+
+  const jelajah = useQuery({
+    queryKey: ['jelajah', params.params],
+    queryFn: () => getAllJelajah(params.params),
+  });
+  return { ...jelajah, ...params, listData: jelajah?.data?.data || [] };
 }
 
 export function UsePaymentMethodListService(setParams?: ListParams) {

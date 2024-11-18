@@ -26,6 +26,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   getAllAreaFinancing,
   getAllCategoryFinancing,
+  getAllJelajah,
 } from 'service/Finance/config';
 import InputFile from 'components/InputFile';
 import { SteperHeader } from '../../Customer/Components/SteperHeader';
@@ -60,6 +61,13 @@ export default function FormUserMerchant({
   const categoryQuery = useQuery({
     queryKey: ['/jelajah-category', categoryParams.params],
     queryFn: () => getAllCategoryFinancing(categoryParams.params),
+    // enabled: Boolean(categoryParams.searchValue),
+    keepPreviousData: true,
+  });
+  const jelajahParams = UseParams({ count: 25 });
+  const jelajahQuery = useQuery({
+    queryKey: ['/jelajah', categoryParams.params],
+    queryFn: () => getAllJelajah(categoryParams.params),
     // enabled: Boolean(categoryParams.searchValue),
     keepPreviousData: true,
   });
@@ -249,32 +257,110 @@ export default function FormUserMerchant({
             }
           />
         </FormControl>
-        <FormControl
-          text="Merchant Name"
-          required
-          error={
-            formik.touched?.user_data?.merchant_name &&
-            Boolean(formik.errors?.user_data?.merchant_name)
-          }
-          helperText={
-            formik.touched?.user_data?.merchant_name
-              ? formik.errors?.user_data?.merchant_name
-              : ''
-          }
-        >
-          <TextField
-            fullWidth
-            placeholder="Input merchant name"
-            name="user_data.merchant_name"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.user_data?.merchant_name}
+        <FormControl text="Merchant Titipku">
+          <Autocomplete
+            options={['Yes', 'No']}
+            // @ts-ignore
+            value={formik.values.user_data?.is_merchant_titipku ? 'Yes' : 'No'}
+            onChange={(e, value) => {
+              formik.setFieldValue(
+                'user_data.is_merchant_titipku',
+                value === 'Yes',
+              );
+            }}
+            onBlur={() => {
+              formik.setFieldTouched('user_data.is_merchant_titipku');
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                name="user_data.is_merchant_titipku"
+                placeholder="Select user type"
+                error={
+                  formik.touched?.user_data?.is_merchant_titipku &&
+                  Boolean(formik.errors?.user_data?.is_merchant_titipku)
+                }
+              />
+            )}
+          />
+        </FormControl>
+        {formik.values.user_data.is_merchant_titipku && (
+          <FormControl
+            text="Merchant Name"
+            error={
+              formik.touched?.user_data?.jelajah &&
+              Boolean(formik.errors?.user_data?.jelajah)
+            }
+            helperText={
+              formik.touched?.user_data?.jelajah
+                ? formik.errors?.user_data?.jelajah
+                : ''
+            }
+          >
+            <Autocomplete
+              options={
+                jelajahQuery.data?.data.map((val) => ({
+                  id: val.id,
+                  name: decodeURIComponent(val.name),
+                })) || []
+              }
+              noOptionsText={
+                !jelajahParams.searchValue
+                  ? 'Type to search merchant'
+                  : 'No option'
+              }
+              inputValue={jelajahParams.searchValue}
+              onInputChange={(_, newInputValue) => {
+                jelajahParams.handleSearch(newInputValue);
+              }}
+              loading={jelajahQuery.isFetching}
+              getOptionLabel={(item) => item.name}
+              value={formik.values.user_data?.jelajah}
+              onChange={(e, value) =>
+                formik.setFieldValue('user_data.jelajah', value)
+              }
+              onBlur={() => {
+                formik.setFieldTouched('user_data.jelajah');
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  name="user_data.jelajah"
+                  placeholder="Search Merchant"
+                />
+              )}
+            />
+          </FormControl>
+        )}
+        {!formik.values.user_data.is_merchant_titipku && (
+          <FormControl
+            text="Merchant Name"
+            required
             error={
               formik.touched?.user_data?.merchant_name &&
               Boolean(formik.errors?.user_data?.merchant_name)
             }
-          />
-        </FormControl>
+            helperText={
+              formik.touched?.user_data?.merchant_name
+                ? formik.errors?.user_data?.merchant_name
+                : ''
+            }
+          >
+            <TextField
+              fullWidth
+              placeholder="Input merchant name"
+              name="user_data.merchant_name"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.user_data?.merchant_name}
+              error={
+                formik.touched?.user_data?.merchant_name &&
+                Boolean(formik.errors?.user_data?.merchant_name)
+              }
+            />
+          </FormControl>
+        )}
+
         <FormControl
           text="NMID"
           required
@@ -655,33 +741,6 @@ export default function FormUserMerchant({
                 error={
                   formik.touched?.user_data?.user_type_id &&
                   Boolean(formik.errors?.user_data?.user_type_id)
-                }
-              />
-            )}
-          />
-        </FormControl>
-        <FormControl text="Merchant Titipku">
-          <Autocomplete
-            options={['Yes', 'No']}
-            // @ts-ignore
-            value={formik.values.user_data?.is_merchant_titipku ? 'Yes' : 'No'}
-            onChange={(e, value) => {
-              formik.setFieldValue(
-                'user_data.is_merchant_titipku',
-                value === 'Yes',
-              );
-            }}
-            onBlur={() => {
-              formik.setFieldTouched('user_data.is_merchant_titipku');
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                name="user_data.is_merchant_titipku"
-                placeholder="Select user type"
-                error={
-                  formik.touched?.user_data?.is_merchant_titipku &&
-                  Boolean(formik.errors?.user_data?.is_merchant_titipku)
                 }
               />
             )}
