@@ -38,6 +38,7 @@ export const UseGetPeyement = (setParams?: PaymentParams) => {
     initialValues: {
       min_payment_date: undefined,
       max_payment_date: undefined,
+      invoice_type: undefined,
     },
     onSubmit: (values) => {
       const newValue = {

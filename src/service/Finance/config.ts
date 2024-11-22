@@ -1,7 +1,7 @@
 import http from 'utils/request';
 import { InvoiceListType, InvoiceParams } from 'models/finance/invoice';
 import { ListParams, ListResponse } from 'models/fetch';
-import { AreaType, CategoryType } from 'models/finance/config';
+import { AreaType, CategoryType, JelajahType } from 'models/finance/config';
 
 export const getAllAreaFinancing = (params?: ListParams) =>
   new Promise<ListResponse<AreaType>>(async (resolve, reject) => {
@@ -24,6 +24,23 @@ export const getAllCategoryFinancing = (params?: InvoiceParams) =>
   new Promise<ListResponse<CategoryType>>(async (resolve, reject) => {
     try {
       const respon = await http.get(`financing/jelajah-category`, {
+        params,
+      });
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const getAllJelajah = (params?: InvoiceParams) =>
+  new Promise<ListResponse<JelajahType>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`financing/jelajah`, {
         params,
       });
       if (respon.data) {
@@ -75,6 +92,57 @@ export const getAllOfficer = (params?: ListParams) =>
   new Promise<ListResponse<any>>(async (resolve, reject) => {
     try {
       const respon = await http.get(`financing/user/officer`, {
+        params,
+      });
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const getAllUserTypeFinancing = (params?: ListParams) =>
+  new Promise<ListResponse<AreaType>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`financing/user-type`, {
+        params,
+      });
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const getRestructureCategory = (params?: ListParams) =>
+  new Promise<ListResponse<any>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`financing/restructure-category`, {
+        params,
+      });
+      if (respon.data) {
+        resolve(respon.data);
+      }
+    } catch (err: any) {
+      const message: string = err.response
+        ? `${err.response.data.message}`
+        : 'Oops, something wrong with our server, please try again later.';
+      reject(message);
+    }
+  });
+
+export const getInvoiceType = (params?: ListParams) =>
+  new Promise<ListResponse<any>>(async (resolve, reject) => {
+    try {
+      const respon = await http.get(`financing/payment-invoice-type`, {
         params,
       });
       if (respon.data) {

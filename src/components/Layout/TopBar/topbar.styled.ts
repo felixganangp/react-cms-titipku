@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import Typography from '@mui/material/Typography';
-import MenuItemUnstyled from '@mui/base/MenuItemUnstyled';
+// import MenuItemUnstyled from '@mui/base/MenuItemUnstyled';
 import { Box, Stack } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import NotificationIcon from '@mui/icons-material/NotificationsNoneOutlined';
@@ -37,19 +37,19 @@ export const StyledListbox = styled.ul`
   border: none !important;
 `;
 
-export const StyledMenuItem = styled(MenuItemUnstyled)`
-  list-style: none;
-  border: none !important;
-  cursor: default;
-  user-select: none;
-  width: 260px;
-  height: 100px;
-  border-radius: 10px;
-  background-color: #ffff;
-  margin-right: 25px;
-  float: left;
-  box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
-`;
+// export const StyledMenuItem = styled(MenuItemUnstyled)`
+//   list-style: none;
+//   border: none !important;
+//   cursor: default;
+//   user-select: none;
+//   width: 260px;
+//   height: 100px;
+//   border-radius: 10px;
+//   background-color: #ffff;
+//   margin-right: 25px;
+//   float: left;
+//   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.1);
+// `;
 
 export const Username = styled(Typography)`
   font-size: 16px;

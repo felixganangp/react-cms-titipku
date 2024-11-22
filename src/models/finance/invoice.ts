@@ -8,6 +8,7 @@ export interface InvoiceParams extends ListParams {
   min_due_date?: string;
   max_due_date?: string;
   restructure_type_id?: number[];
+  invoice_restructure_category_id?: number[];
   status?: string;
 }
 
@@ -15,6 +16,7 @@ export type InvoiceListType = {
   id: number;
   user_id: number;
   invoice_restructure_type: { id: number; name: string };
+  invoice_restructure_category: { id: number; name: string };
   invoice_number: string;
   invoice_type_id: number;
   amount: number;
@@ -52,6 +54,7 @@ export type InvoiceDetailsType = {
   id: number;
   invoice_type: { id: number; name: string };
   invoice_restructure_type: { id: number; name: string };
+  invoice_restructure_category: { id: number; name: string };
   user_id: number;
   invoice_number: string;
   invoice_type_id: number;

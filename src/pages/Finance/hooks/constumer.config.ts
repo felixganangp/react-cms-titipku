@@ -19,6 +19,7 @@ export const initialValues = {
   business_lifetime: '',
   user_type_id: null,
   is_merchant_titipku: true,
+  jelajah: null,
   // IDIR
   gmv: '',
   office_rent: '',
@@ -144,6 +145,7 @@ export const docDataKey = [
 export const Type = {
   1: 'KUR WC',
   2: 'WC Titipku',
+  3: 'Nano Mikro',
 };
 
 export const Document = {

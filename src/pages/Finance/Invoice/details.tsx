@@ -49,6 +49,11 @@ export default function InvoiceDetails() {
     number | null
   >(null);
 
+  const getDpd = (date: number) => {
+    const todayDate = new Date().getTime();
+    return Math.floor((todayDate - date * 1000) / (1000 * 3600 * 24));
+  };
+
   return (
     <Box p="20px" bgcolor="#F5F7FA">
       <Stack spacing={2}>
@@ -217,6 +222,7 @@ export default function InvoiceDetails() {
                       )}
                     </Typography>
                   </Grid>
+
                   <Grid item sm={4}>
                     <Typography color="primary">Outstanding Amount</Typography>
                     <Typography>
@@ -224,6 +230,14 @@ export default function InvoiceDetails() {
                       {numberSeperator(
                         invoiceDetails.details?.outstanding_amount || 0,
                       )}
+                    </Typography>
+                  </Grid>
+                  <Grid item sm={4}>
+                    <Typography color="primary">DPD</Typography>
+                    <Typography>
+                      {getDpd(invoiceDetails.details?.due_date || 0) < 0
+                        ? 0
+                        : getDpd(invoiceDetails.details?.due_date || 0)}
                     </Typography>
                   </Grid>
                   <Grid item sm={4}>
@@ -276,6 +290,17 @@ export default function InvoiceDetails() {
                     <Typography color="primary">Restructure Type</Typography>
                     <Typography>
                       {invoiceDetails.details?.invoice_restructure_type.name}
+                    </Typography>
+                  </Stack>
+                  <Stack>
+                    <Typography color="primary">
+                      Restructure Category
+                    </Typography>
+                    <Typography>
+                      {
+                        invoiceDetails.details?.invoice_restructure_category
+                          .name
+                      }
                     </Typography>
                   </Stack>
                   <Stack>
@@ -383,6 +408,23 @@ export default function InvoiceDetails() {
                         }
                       >
                         {val.payment?.payment_number}
+                      </Typography>
+                    );
+                  },
+                },
+                {
+                  id: 'invoice_number',
+                  label: 'Invoice Numbert',
+                  format: (val: any) => {
+                    return (
+                      <Typography
+                        // color="info.main"
+                        sx={{ cursor: 'pointer' }}
+                        // onClick={() =>
+                        //   navigate(`/finance/payment/${val?.invoice?.id}`)
+                        // }
+                      >
+                        {val.invoice?.invoice_number}
                       </Typography>
                     );
                   },

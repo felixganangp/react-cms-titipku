@@ -43,6 +43,7 @@ import {
   KurType,
   UseAreaListService,
   UseCategoryListService,
+  UseCategoryRestructure,
 } from '../hooks/useConfigFinance';
 import FormInvoice from './Components/FormInvoice';
 import {
@@ -79,6 +80,7 @@ export default function InvoicePage() {
   const queryArea = UseAreaListService();
   const revolveInvoice = UseRevolveInvoice();
   const deleteInvoice = UseDeleteInvoice();
+  const category = UseCategoryRestructure();
   // const queryCategory = UseCategoryListService();
 
   const headCells: HeadCells<InvoiceListType>[] = [
@@ -232,6 +234,18 @@ export default function InvoicePage() {
         return (
           <Typography variant="body1">
             {invoice_restructure_type.name || '-'}
+          </Typography>
+        );
+      },
+    },
+    {
+      id: 'invoice_restructure_category',
+      label: 'Restructure Category',
+      align: 'center',
+      format: ({ invoice_restructure_category }) => {
+        return (
+          <Typography variant="body1">
+            {invoice_restructure_category.name || '-'}
           </Typography>
         );
       },
@@ -599,6 +613,52 @@ export default function InvoicePage() {
                         />
                       );
                     }}
+                  />
+                </FormLabel>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <FormLabel text="Category Restructure Type">
+                  <Autocomplete
+                    options={category.listData}
+                    // @ts-ignore
+                    getOptionLabel={(item) => item.name}
+                    value={
+                      category.listData?.filter((val) =>
+                        queryInnvoice.formikParams.values.invoice_restructure_category_id.includes(
+                          // @ts-ignore
+                          val.id,
+                        ),
+                      ) || []
+                    }
+                    multiple
+                    onChange={(e, value) => {
+                      queryInnvoice.formikParams.setFieldValue(
+                        'invoice_restructure_category_id',
+                        // @ts-ignore
+                        // eslint-disable-next-line radix
+                        value.map((val) => parseInt(val.id, 10)),
+                      );
+                    }}
+                    onBlur={() => {
+                      queryInnvoice.formikParams.setFieldTouched(
+                        'invoice_restructure_category_id',
+                      );
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        name="invoice_restructure_category_id"
+                        placeholder="Select Category"
+                        error={
+                          queryInnvoice.formikParams.touched
+                            ?.invoice_restructure_category_id &&
+                          Boolean(
+                            queryInnvoice.formikParams.errors
+                              ?.invoice_restructure_category_id,
+                          )
+                        }
+                      />
+                    )}
                   />
                 </FormLabel>
               </Grid>

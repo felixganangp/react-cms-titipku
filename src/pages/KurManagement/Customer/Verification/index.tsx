@@ -89,6 +89,10 @@ export default function KurCustomerVerification() {
       id: 2,
       name: 'WC Titipku',
     },
+    {
+      id: 3,
+      name: 'Nano Mikro',
+    },
   ];
 
   const [userTab, setUserTab] = useState(0);

@@ -3,6 +3,7 @@ export type CustomerDetailType = {
   user_number: string;
   debtor_name: string;
   merchant_name: string;
+  nmid: string;
   request_number: string;
   phone_number: string;
   family_phone_number: string;
@@ -28,6 +29,7 @@ export type CustomerDetailType = {
   last_admin_id: null;
   category_jelajah_id: number;
   category_jelajah_name: string;
+  jelajah_id: number;
   batch_id: null;
   balance: number;
   created_at: number;

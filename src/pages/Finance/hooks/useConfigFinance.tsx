@@ -2,7 +2,11 @@ import { ListParams } from 'models/fetch';
 import {
   getAllAreaFinancing,
   getAllCategoryFinancing,
+  getAllJelajah,
+  getAllUserTypeFinancing,
+  getInvoiceType,
   getPaymentMethod,
+  getRestructureCategory,
 } from 'service/Finance/config';
 import { useQuery } from '@tanstack/react-query';
 import UseParams from 'hooks/useParams';
@@ -38,6 +42,16 @@ export function UseCategoryListService(setParams?: ListParams) {
   return { ...areaInvoice, ...params, listData: areaInvoice?.data?.data || [] };
 }
 
+export function UseJelajahListService(setParams?: ListParams) {
+  const params = UseParams(setParams);
+
+  const jelajah = useQuery({
+    queryKey: ['jelajah', params.params],
+    queryFn: () => getAllJelajah(params.params),
+  });
+  return { ...jelajah, ...params, listData: jelajah?.data?.data || [] };
+}
+
 export function UsePaymentMethodListService(setParams?: ListParams) {
   const params = UseParams(setParams);
 
@@ -50,4 +64,38 @@ export function UsePaymentMethodListService(setParams?: ListParams) {
     ...params,
     listData: paymenyMethods?.data?.data || [],
   };
+}
+
+export function UseUserTypeListService(setParams?: ListParams) {
+  // const params = UseParams(setParams);
+
+  const paymenyMethods = useQuery({
+    queryKey: ['User-Type-List', {}],
+    queryFn: () => getAllUserTypeFinancing({}),
+  });
+  return {
+    // ...paymenyMethods,
+    // ...params,
+    listData: paymenyMethods?.data?.data || [],
+  };
+}
+
+export function UseCategoryRestructure(setParams?: ListParams) {
+  const params = UseParams(setParams);
+
+  const category = useQuery({
+    queryKey: ['/financing/restructure-category', params.params],
+    queryFn: () => getRestructureCategory(params.params),
+  });
+  return { ...category, ...params, listData: category?.data?.data || [] };
+}
+
+export function UseInvoiceType(setParams?: ListParams) {
+  const params = UseParams(setParams);
+
+  const category = useQuery({
+    queryKey: ['/financing/payment-invoice-type', params.params],
+    queryFn: () => getInvoiceType(params.params),
+  });
+  return { ...category, ...params, listData: category?.data?.data || [] };
 }

@@ -19,6 +19,7 @@ import {
   debounce,
   styled,
   Switch,
+  Skeleton,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { Delete } from '@mui/icons-material';
@@ -129,17 +130,31 @@ export default function FormInvoice(props: FormInvoiceProps) {
     onSubmit: async (values) => {
       try {
         const fd = new FormData();
-        if (isProvisi.open) {
-          await fd.append('invoice_type_id', values.invoice_type_id);
+        // if (isProvisi.open) {
+        //   await fd.append('invoice_type_id', values.invoice_type_id);
+        //   // @ts-ignore
+        //   await fd.append('user_id', values.user.id);
+        //   // @ts-ignore
+        //   await fd.append('loan_amount', values.loan_amount);
+
+        //   await fd.append('installment_period', values.installment_period);
+
+        //   if (values.is_sharing_margin) {
+        //     // @ts-ignore
+        //     await fd.append('sharing_margin', values.sharing_margin);
+        //   }
+
+        //   if (values.transfer_date) {
+        //     await fd.append(
+        //       'transfer_date',
+        //       // @ts-ignore
+        //       moment(values.transfer_date).unix(),
+        //     );
+        //   }
+        // } else {
+        const promises = Object.keys(values).map(async (key) => {
           // @ts-ignore
-          await fd.append('user_id', values.user.id);
-          // @ts-ignore
-          await fd.append(
-            'provision_installment_period',
-            values.provision_installment_period,
-          );
-        } else {
-          const promises = Object.keys(values).map(async (key) => {
+          if (values[key]) {
             switch (key) {
               case 'transfer_date':
                 // @ts-ignore
@@ -174,10 +189,11 @@ export default function FormInvoice(props: FormInvoiceProps) {
                 }
                 break;
             }
-          });
+          }
+        });
 
-          await Promise.all(promises);
-        }
+        await Promise.all(promises);
+        // }
         createInvoice.mutate(fd, {
           onSuccess: (data) => {
             props.onClose(true);
@@ -215,6 +231,8 @@ export default function FormInvoice(props: FormInvoiceProps) {
           period: value,
           start_date: moment(formik.values.transfer_date).unix(),
           interest_rate: formik.values.interest_rate,
+          // @ts-ignore
+          user_type_id: formik.values.user?.user_type_id,
         },
         {
           onSuccess: (data) => {
@@ -498,7 +516,6 @@ export default function FormInvoice(props: FormInvoiceProps) {
                 >
                   <Autocomplete
                     data-testid="form-customer-list-bank"
-                    id="list-bank"
                     options={bankData.data}
                     onChange={(e, value) => {
                       formik.setFieldValue('destination_bank', value);
@@ -656,41 +673,47 @@ export default function FormInvoice(props: FormInvoiceProps) {
                     />
                     <Stack spacing={2} mt={2}>
                       {simulationInstalment.isLoading && (
-                        <Typography>Loading...</Typography>
+                        <>
+                          <Skeleton variant="rectangular" height={70} />
+                          <Skeleton variant="rectangular" height={70} />
+                          <Skeleton variant="rectangular" height={70} />
+                          <Skeleton variant="rectangular" height={70} />
+                        </>
                       )}
-                      {simulation.map((item: any, index: number) => (
-                        <Stack
-                          key={index}
-                          alignItems="center"
-                          justifyContent="space-between"
-                          direction="row"
-                          spacing={2}
-                          p={1}
-                          bgcolor="#dedede"
-                        >
-                          <Stack>
-                            <Typography>Due Date</Typography>
-                            <Typography>
-                              {moment(item.due_date * 1000).format(
-                                'DD-MM-YYYY',
-                              )}
-                            </Typography>
+                      {!simulationInstalment.isLoading &&
+                        simulation.map((item: any, index: number) => (
+                          <Stack
+                            key={index}
+                            alignItems="center"
+                            justifyContent="space-between"
+                            direction="row"
+                            spacing={2}
+                            p={1}
+                            bgcolor="#dedede"
+                          >
+                            <Stack>
+                              <Typography>Due Date</Typography>
+                              <Typography>
+                                {moment(item.due_date * 1000).format(
+                                  'DD-MM-YYYY',
+                                )}
+                              </Typography>
+                            </Stack>
+                            <Stack>
+                              <Typography>Installment per Month</Typography>
+                              <Typography>
+                                Rp. {numberSeperator(item?.amount || 0)}
+                              </Typography>
+                            </Stack>
                           </Stack>
-                          <Stack>
-                            <Typography>Installment per Month</Typography>
-                            <Typography>
-                              Rp. {numberSeperator(item?.amount || 0)}
-                            </Typography>
-                          </Stack>
-                        </Stack>
-                      ))}
+                        ))}
                     </Stack>
                   </>
                 </FormControl>
               </>
             )}
             {/* @ts-ignore */}
-            {((formik.values.user?.need_provision_cash &&
+            {/* {((formik.values.user?.need_provision_cash &&
               formik.values.invoice_type_id === '2') ||
               // @ts-ignore
               (formik.values.user?.need_provision_normal &&
@@ -720,7 +743,7 @@ export default function FormInvoice(props: FormInvoiceProps) {
                   onWheel={(e) => e.target?.blur()}
                 />
               </FormControl>
-            )}
+            )} */}
             {formik.values.invoice_type_id === '1' && (
               <FormControl
                 text="Note Image"
@@ -800,6 +823,26 @@ export default function FormInvoice(props: FormInvoiceProps) {
                     parseInt(value || '0'),
                   );
                 }}
+              />
+            </FormControl>
+            <FormControl
+              text="Date"
+              required
+              error={
+                formik.touched.transfer_date &&
+                Boolean(formik.errors.transfer_date)
+              }
+              helperText={
+                formik.touched.transfer_date &&
+                formik.errors.transfer_date &&
+                `${formik.errors.transfer_date}`
+              }
+            >
+              <DateTimePicker
+                onChange={(value) => {
+                  formik.setFieldValue('transfer_date', value);
+                }}
+                value={formik.values.transfer_date}
               />
             </FormControl>
           </>
