@@ -337,6 +337,7 @@ export default function useUserMerchant({
     if (detail) {
       const docDetailData = {
         ...formik.values.document,
+        // ...formik.values.user_document,
       };
 
       detail.user_documents.forEach((doc: any) => {

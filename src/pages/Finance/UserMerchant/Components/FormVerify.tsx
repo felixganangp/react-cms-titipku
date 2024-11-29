@@ -139,7 +139,8 @@ export default function FormVerifyUserMerchant({
       case 2:
         return {
           label: formik.isLoading ? 'Loading...' : 'Submit',
-          disabled: Boolean(formik.errors?.document) || formik.isLoading,
+          // disabled: Boolean(formik.errors?.document) || formik.isLoading,
+          disabled: formik.isLoading,
           onClick: () => {
             // console.log(formik.errors);
             // onCancelRef.current = true;
