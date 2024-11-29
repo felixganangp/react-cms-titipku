@@ -159,12 +159,12 @@ export const Document = {
   8: 'Kartu Keluarga',
   9: 'Form Pengajuan KUR',
   10: 'Form Pengajuan Financing',
-  // 11: 'Foto Lapak Tampak Kiri',
-  // 12: 'Foto Lapak Tampak Tengah',
-  // 13: 'Foto Lapak Tampak Kanan',
-  // 14: 'Surat Domisili',
-  // 15: 'Kartu Keluarga',
-  // 16: 'Foto Selfie KTP',
+  11: 'Foto Lapak Tampak Kiri',
+  12: 'Foto Lapak Tampak Tengah',
+  13: 'Foto Lapak Tampak Kanan',
+  14: 'Surat Domisili',
+  15: 'Kartu Keluarga',
+  16: 'Foto Selfie KTP',
 };
 
 export const DocumentObjFinace = {
@@ -209,28 +209,28 @@ export const DocumentObjFinace = {
     key: 'financing_form_image',
   },
   // new for nano mikro
-  // 11: {
-  //   name: 'Foto Lapak Tampak Kiri',
-  //   key: 'left_side_merchant_image',
-  // },
-  // 12: {
-  //   name: 'Foto Lapak Tampak Tengah',
-  //   key: 'middle_side_merchant_image',
-  // },
-  // 13: {
-  //   name: 'Foto Lapak Tampak Kanan',
-  //   key: 'right_side_merchant_image',
-  // },
-  // 14: {
-  //   name: 'Surat Domisili',
-  //   key: 'domisili_image',
-  // },
-  // 15: {
-  //   name: 'Foto Kartu Keluarga',
-  //   key: 'kartu_keluarga_image',
-  // },
-  // 16: {
-  //   name: 'Foto Selfie KTP',
-  //   key: 'ktp_selfie_image',
-  // },
+  11: {
+    name: 'Foto Lapak Tampak Kiri',
+    key: 'left_side_merchant_image',
+  },
+  12: {
+    name: 'Foto Lapak Tampak Tengah',
+    key: 'middle_side_merchant_image',
+  },
+  13: {
+    name: 'Foto Lapak Tampak Kanan',
+    key: 'right_side_merchant_image',
+  },
+  14: {
+    name: 'Surat Domisili',
+    key: 'domisili_image',
+  },
+  15: {
+    name: 'Foto Kartu Keluarga',
+    key: 'kartu_keluarga_image',
+  },
+  16: {
+    name: 'Foto Selfie KTP',
+    key: 'ktp_selfie_image',
+  },
 };
